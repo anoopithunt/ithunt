@@ -25,7 +25,7 @@
     <header class="navbar-header">
       <div class="container navbar-container">
         <div class="brand-logo" @click="setTab('home')">
-          <img :src="content.brand.logoImage" :alt="content.brand.name + ' Logo'" class="brand-logo-img">
+          <img :src="content.brand.logoImage" :alt="content.brand.name + ' Logo'" class="brand-logo-img" @error="onImgError">
           <div>
             <div class="brand-title">IT <span class="text-gradient">{{ content.brand.nameHighlight }}</span></div>
             <div class="brand-tagline">{{ content.brand.tagline }}</div>
@@ -178,7 +178,7 @@
           <div class="courses-grid">
             <div class="course-card" v-for="course in content.coursesSection.coursesList" :key="course.id">
               <div class="course-img-wrapper">
-                <img :src="course.image" :alt="course.title" class="course-img">
+                <img :src="course.image" :alt="course.title" class="course-img" @error="onImgError">
                 <span class="course-category-badge">{{ course.categoryName }}</span>
               </div>
               <div class="course-body">
@@ -203,8 +203,8 @@
           <div class="container">
             <div class="about-grid">
               <div class="about-card-stack">
-                <img :src="content.about.mainImage" alt="IT HUNT Society" class="about-img-main">
-                <img :src="content.about.subImage" alt="Computer Lab" class="about-img-sub">
+                <img :src="content.about.mainImage" alt="IT HUNT Society" class="about-img-main" @error="onImgError">
+                <img :src="content.about.subImage" alt="Computer Lab" class="about-img-sub" @error="onImgError">
               </div>
               <div class="about-text-content">
                 <span class="section-tag">{{ content.about.tagline }}</span>
@@ -221,7 +221,7 @@
 
             <!-- Director Spotlight -->
             <div class="director-spotlight-card">
-              <img :src="content.director.image" :alt="content.director.name" class="director-img">
+              <img :src="content.director.image" :alt="content.director.name" class="director-img" @error="onImgError">
               <div>
                 <span class="section-tag">{{ content.director.tagline }}</span>
                 <h3 style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; margin-bottom: 0.4rem;">{{ content.director.name }}</h3>
@@ -249,7 +249,7 @@
             <div class="team-grid">
               <div class="team-card" v-for="member in content.teamSection.members" :key="member.id">
                 <div class="team-avatar-wrapper">
-                  <img :src="member.image" :alt="member.name" class="team-avatar">
+                  <img :src="member.image" :alt="member.name" class="team-avatar" @error="onImgError">
                 </div>
                 <h3 class="team-name">{{ member.name }}</h3>
                 <div class="team-role">{{ member.role }}</div>
@@ -345,7 +345,7 @@
         <div class="courses-grid">
           <div class="course-card" v-for="course in filteredCourses" :key="course.id">
             <div class="course-img-wrapper">
-              <img :src="course.image" :alt="course.title" class="course-img">
+              <img :src="course.image" :alt="course.title" class="course-img" @error="onImgError">
               <span class="course-category-badge">{{ course.categoryName }}</span>
             </div>
             <div class="course-body">
@@ -404,7 +404,7 @@
               "{{ review.comment }}"
             </p>
             <div class="review-author">
-              <img :src="review.avatar" :alt="review.name" class="review-avatar">
+              <img :src="review.avatar" :alt="review.name" class="review-avatar" @error="onImgError">
               <div>
                 <div style="font-weight: 700; font-size: 0.9rem;">{{ review.name }}</div>
                 <div style="font-size: 0.775rem; color: var(--color-ai-cyan); font-family: var(--font-mono);">{{ review.role }}</div>
@@ -635,7 +635,7 @@
       <div class="container footer-grid">
         <div class="footer-col">
           <div class="brand-logo" style="margin-bottom: 1rem;">
-            <img :src="content.brand.logoImage" :alt="content.brand.name + ' Logo'" class="brand-logo-img">
+            <img :src="content.brand.logoImage" :alt="content.brand.name + ' Logo'" class="brand-logo-img" @error="onImgError">
             <div>
               <div class="brand-title">IT <span class="text-gradient">{{ content.brand.nameHighlight }}</span></div>
               <div class="brand-tagline">{{ content.brand.tagline }}</div>
@@ -808,6 +808,9 @@
           this.newReview.name = '';
           this.newReview.role = '';
           this.newReview.comment = '';
+        },
+        onImgError(e) {
+          e.target.src = 'img/logo_ithunt.png';
         },
         submitAdmission() {
           this.modalTitle = "Application Submitted Successfully!";

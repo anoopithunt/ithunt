@@ -14,7 +14,7 @@ const CONTENT_DATA = {
     name: "IT HUNT",
     nameHighlight: "HUNT",
     tagline: "Software Solutions & Tech Academy",
-    logoImage: "img/logo_ithunt.png",
+    logoImage: "img/logo_ithun1.png",
     establishedYear: "2012",
     metaTitle: "IT HUNT | Software Solutions & Tech Academy",
     metaDescription: "IT HUNT - Enterprise Software Solutions & IT Training Center in Holagarh Prayagraj. 3 & 6-month production internships in MERN Stack, iOS, Android, AI, and Digital Marketing."
