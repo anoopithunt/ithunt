@@ -1,58 +1,773 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="CSS/MYSTYLE.CSS">
-    <title>IT HUNT</title>
-    <link rel="shortcut icon" type="image/jpg" href="img/ithunt.jpg"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT HUNT | The Institute of Computer Technology</title>
+  <meta name="description" content="IT HUNT - Premier Computer Education Institute in Holagarh Prayagraj & Pratapgarh providing NIELIT O Level, A Level, Subharti University Degrees, Web Development, and Cyber Security.">
+  <link rel="shortcut icon" type="image/jpg" href="img/ithunt.jpg"/>
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="CSS/styles.css">
+  
+  <!-- Vue 3 JS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
 </head>
 <body>
-    <header>
-        <div class="head">
-        <h1>IT HUNT</h1>
-        <p> The institute of computer technology</p>
-    </div>
-        <div class="navigation">
-            <a href="index.html" alt="something wrong">Home</a>
-            <a href="Home.html" alt="something wrong">Courses</a>
-            <a href="AboutUs.html" alt="something wrong">About us</a>
-            <a href="admission.html" alt="something wrong">Admission</a>
+  <div id="app">
+    <!-- Navbar -->
+    <header class="navbar-header">
+      <div class="container navbar-container">
+        <div class="brand-logo" @click="activeTab = 'home'">
+          <img src="img/ithunt.jpg" alt="IT HUNT Logo" class="brand-logo-img">
+          <div>
+            <div class="brand-title">IT <span class="text-gradient">HUNT</span></div>
+            <div class="brand-tagline">Institute of Computer Tech</div>
+          </div>
         </div>
-            </header>
-            
+
+        <nav>
+          <ul class="nav-links">
+            <li>
+              <button class="nav-item-btn" :class="{ active: activeTab === 'home' }" @click="setTab('home')">
+                <span>🏠</span> Home
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" :class="{ active: activeTab === 'courses' }" @click="setTab('courses')">
+                <span>📚</span> Courses
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" :class="{ active: activeTab === 'about' }" @click="setTab('about')">
+                <span>🏢</span> About Us
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" :class="{ active: activeTab === 'team' }" @click="setTab('team')">
+                <span>👨‍🏫</span> Faculty & Staff
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" :class="{ active: activeTab === 'admission' }" @click="setTab('admission')">
+                <span>📝</span> Admission
+              </button>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="nav-actions">
+          <button class="theme-toggle-btn" @click="toggleTheme" :title="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+            <span>{{ isDarkMode ? '☀️' : '🌙' }}</span>
+          </button>
           
-                <div class="row">
-                <div class="side"><img src="img/ithunt.jpg" class="profile-image" alt="Anup Mishra" height="122px" width="222px"></div>
-                <div class="main">It Hunt in Holagarh, Allahabad is a top player in the category Computer Networking Training Institutes in the Allahabad. This well-known establishment acts as a one-stop destination servicing customers both local and from other parts of Allahabad. Over the course of its journey, this business has established a firm foothold in it’s industry. The belief that customer satisfaction is as important as their products and services, have helped this establishment garner a vast base of customers, which continues to grow by the day. This business employs individuals that are dedicated towards their respective roles and put in a lot of effort to achieve the common vision and larger goals of the company. In the near future, this business aims to expand its line of products and services and cater to a larger client base. In Allahabad, this establishment occupies a prominent location in Holagarh. It is an effortless task in commuting to this establishment as there are various modes of transport readily available. It is known to provide top service in the following categories: Computer Networking Training Institutes.</div>
+          <button class="cta-btn-header" @click="setTab('admission')">
+            <span>Apply Now</span> ✨
+          </button>
+
+          <button class="mobile-toggle-btn" @click="isMobileNavOpen = !isMobileNavOpen">
+            <span>{{ isMobileNavOpen ? '✕' : '☰' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Navigation Drawer -->
+      <div class="mobile-nav-drawer" :class="{ open: isMobileNavOpen }">
+        <button class="nav-item-btn" :class="{ active: activeTab === 'home' }" @click="setTab('home')">🏠 Home</button>
+        <button class="nav-item-btn" :class="{ active: activeTab === 'courses' }" @click="setTab('courses')">📚 Courses</button>
+        <button class="nav-item-btn" :class="{ active: activeTab === 'about' }" @click="setTab('about')">🏢 About Us</button>
+        <button class="nav-item-btn" :class="{ active: activeTab === 'team' }" @click="setTab('team')">👨‍🏫 Faculty & Staff</button>
+        <button class="nav-item-btn" :class="{ active: activeTab === 'admission' }" @click="setTab('admission')">📝 Admission Portal</button>
+      </div>
+    </header>
+
+    <!-- Main Content Dynamic Views -->
+    <main>
+      <!-- ================= HOME TAB ================= -->
+      <section v-if="activeTab === 'home'">
+        <!-- Hero Section -->
+        <div class="hero-section">
+          <div class="container hero-grid">
+            <div class="hero-content">
+              <div class="hero-badge">
+                <span class="hero-badge-dot"></span>
+                <span>Empowering Digital Leaders Since 2012</span>
+              </div>
+              <h1 class="hero-title">
+                Master the Future of <span class="text-gradient">Computer & IT Skills</span>
+              </h1>
+              <p class="hero-subtitle">
+                IT HUNT is Prayagraj’s #1 digital economy skills institute. From <strong>NIELIT O/A Level Diplomas</strong> to <strong>Subharti University Degrees</strong>, <strong>Full-Stack Web Dev</strong>, and <strong>Ethical Hacking</strong> — we bridge the gap between education and career success.
+              </p>
+
+              <div class="hero-cta-group">
+                <button class="btn-primary" @click="setTab('admission')">
+                  <span>Start Admission 2026</span> →
+                </button>
+                <button class="btn-secondary" @click="setTab('courses')">
+                  <span>Browse Programs</span> 🔍
+                </button>
+              </div>
+
+              <!-- Quick Highlights Badges -->
+              <div style="display: flex; gap: 1.5rem; color: var(--text-muted); font-size: 0.9rem; font-weight: 600;">
+                <div>✓ NIELIT Accredited Center</div>
+                <div>✓ 100% Practical Training</div>
+                <div>✓ Job Placement Support</div>
+              </div>
             </div>
 
-            <div id="about">   &nbsp;   IT HUNT is the world's #1 online bootcamp for digital economy skills training focused on helping people acquire the skills they need to thrive in the digital economy.
+            <!-- Hero Image Visual -->
+            <div class="hero-media-wrapper">
+              <div class="hero-media-card">
+                <img src="img/ithunt.jpg" alt="IT HUNT Institute" class="hero-img-main">
+                <div class="hero-floating-badge">
+                  <div class="hero-floating-icon">🎓</div>
+                  <div>
+                    <div style="font-weight: 800; font-size: 1.1rem; color: var(--text-main);">85%+ Placement</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Career Boost & Promotions</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                We provide rigorous online training in disciplines such as Cyber Security, Cloud Computing, Project Management, Digital Marketing, and Data Science, among others. In other words, we specialize in areas where technologies and best practices are changing rapidly, and the demand for qualified candidates significantly exceeds supply.
-                
-                Based in prayagraz ,prtapgarh and Bangalore, India, we have helped many students professionals, and  people(whose background is not IT) get trained, acquire certifications, and upskill their knowledge.
-                
-                Our award-winning coursesare designed and updated by  renowned industry and academic experts. Through individual courses, comprehensive certification programs, and partnerships with world-renowned universities, we provide millions of professionals and thousands of corporate training organizations with the work-ready skills they need to excel in their careers. Our practical and applied approach has resulted in 85 percent of learners reporting career benefits including promotions and new jobs after completing the training. With over many live classes each month, real-world projects, and more, professionals learn by doing at IT HUNT.
-                
+        <!-- Stats Counter Section -->
+        <div class="container stats-section">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-number text-gradient">5,000+</div>
+              <div class="stat-label">Students Trained</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number text-gradient-secondary">98%</div>
+              <div class="stat-label">Exam Pass Rate</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number text-gradient">15+</div>
+              <div class="stat-label">Certified Programs</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number text-gradient-secondary">4+</div>
+              <div class="stat-label">Regional Campuses</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Featured Programs Preview -->
+        <div class="container" style="padding-bottom: 5rem;">
+          <div class="section-header">
+            <span class="section-tag">Featured Curriculums</span>
+            <h2 class="section-title">Industry Accredited <span class="text-gradient">Courses</span></h2>
+            <p class="section-subtitle">Specially tailored computer training designed for beginners and professionals alike.</p>
+          </div>
+
+          <div class="courses-grid">
+            <div class="course-card" v-for="course in featuredCourses" :key="course.id">
+              <div class="course-img-wrapper">
+                <img :src="course.image" :alt="course.title" class="course-img">
+                <span class="course-category-badge">{{ course.categoryName }}</span>
+              </div>
+              <div class="course-body">
+                <h3 class="course-title">{{ course.title }}</h3>
+                <p class="course-desc">{{ course.description }}</p>
+                <div class="course-meta">
+                  <div class="course-meta-item">⏱️ {{ course.duration }}</div>
+                  <div class="course-meta-item">📜 {{ course.certification }}</div>
+                </div>
+                <button class="course-action-btn" @click="applyForCourse(course.title)">
+                  <span>Enroll in Course</span> →
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div style="text-align: center;">
+            <button class="btn-secondary" @click="setTab('courses')">View All Courses & Syllabuses →</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= COURSES TAB ================= -->
+      <section v-if="activeTab === 'courses'" class="container" style="padding: 4rem 1.5rem;">
+        <div class="section-header">
+          <span class="section-tag">Comprehensive Education</span>
+          <h2 class="section-title">Explore Our <span class="text-gradient">Courses & Affiliations</span></h2>
+          <p class="section-subtitle">Government recognized certifications, university degrees, and cutting-edge software skillsets.</p>
+        </div>
+
+        <!-- Search & Filter Control -->
+        <div class="filter-bar">
+          <button class="filter-btn" :class="{ active: courseFilter === 'all' }" @click="courseFilter = 'all'">All Courses</button>
+          <button class="filter-btn" :class="{ active: courseFilter === 'nielit' }" @click="courseFilter = 'nielit'">NIELIT Diplomas</button>
+          <button class="filter-btn" :class="{ active: courseFilter === 'university' }" @click="courseFilter = 'university'">University Degrees</button>
+          <button class="filter-btn" :class="{ active: courseFilter === 'skills' }" @click="courseFilter = 'skills'">IT & Software Skills</button>
+        </div>
+
+        <div class="courses-grid">
+          <div class="course-card" v-for="course in filteredCourses" :key="course.id">
+            <div class="course-img-wrapper">
+              <img :src="course.image" :alt="course.title" class="course-img">
+              <span class="course-category-badge">{{ course.categoryName }}</span>
+            </div>
+            <div class="course-body">
+              <h3 class="course-title">{{ course.title }}</h3>
+              <p class="course-desc">{{ course.description }}</p>
+              <div style="margin-bottom: 1rem;">
+                <div style="font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-bottom: 0.4rem;">Key Topics Covered:</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
+                  <span class="skill-tag" v-for="topic in course.topics" :key="topic">{{ topic }}</span>
+                </div>
+              </div>
+              <div class="course-meta">
+                <div class="course-meta-item">⏱️ {{ course.duration }}</div>
+                <div class="course-meta-item">📜 {{ course.certification }}</div>
+              </div>
+              <button class="course-action-btn" @click="applyForCourse(course.title)">
+                <span>Apply for {{ course.code }}</span> →
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ABOUT US TAB ================= -->
+      <section v-if="activeTab === 'about'" class="container" style="padding: 4rem 1.5rem;">
+        <div class="about-grid">
+          <div class="about-card-stack">
+            <img src="img/ithunt1.jpg" alt="IT HUNT Society" class="about-img-main">
+            <img src="img/desktop.jpg" alt="Computer Lab" class="about-img-sub">
+          </div>
+          <div class="about-text-content">
+            <span class="section-tag">About Our Society</span>
+            <h2>Transforming Tech Education in <span class="text-gradient">Prayagraj & Beyond</span></h2>
+            <p>
+              <strong>IT HUNT in Holagarh, Prayagraj</strong> is a top-tier Computer Technology Training Institute servicing students locally and across Uttar Pradesh. Established with a vision to make digital literacy accessible to all, we specialize in rapidly evolving fields like Cyber Security, Cloud Computing, Web Development, and Financial Accounting.
+            </p>
+            <p>
+              Under the guidance of renowned faculty, our institute provides live project classes, practical lab environments, and official examination prep for government recognized diplomas.
+            </p>
+
+            <div class="about-features-list">
+              <div class="about-feature-item"><span class="about-check-icon">✓</span> NIELIT Accredited</div>
+              <div class="about-feature-item"><span class="about-check-icon">✓</span> Subharti Univ Partner</div>
+              <div class="about-feature-item"><span class="about-check-icon">✓</span> Hands-on Labs</div>
+              <div class="about-feature-item"><span class="about-check-icon">✓</span> Expert Faculty</div>
+              <div class="about-feature-item"><span class="about-check-icon">✓</span> Modern Workstations</div>
+              <div class="about-feature-item"><span class="about-check-icon">✓</span> Career Counseling</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Director's Spotlight -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 3rem; margin-top: 3rem;">
+          <div style="display: grid; grid-template-columns: 200px 1fr; gap: 2.5rem; align-items: center;">
+            <img src="img/ithunt.jpg" alt="Director Lakshman Singh Chauhan" style="width: 200px; height: 200px; object-fit: cover; border-radius: 50%; border: 4px solid var(--primary); box-shadow: 0 0 20px var(--primary-glow);">
+            <div>
+              <span class="section-tag">Director's Message</span>
+              <h3 style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">Mr. Lakshman Singh Chauhan</h3>
+              <div style="color: var(--secondary); font-weight: 700; margin-bottom: 1rem;">Director & Founder, IT HUNT | MCA (Computer Science)</div>
+              <p style="color: var(--text-muted); line-height: 1.7; margin-bottom: 1rem;">
+                "Our mission is to empower every candidate—regardless of their prior background—with market-ready IT skills. Technology evolves fast, and at IT HUNT, we ensure our students stay ahead through practical, project-based learning and globally recognized certifications."
+              </p>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <span class="skill-tag">Public Speaking Expert</span>
+                <span class="skill-tag">Motivational Speaker</span>
+                <span class="skill-tag">Life Coach</span>
+                <span class="skill-tag">Spoken English Mentor</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TEAM / FACULTY TAB ================= -->
+      <section v-if="activeTab === 'team'" class="container" style="padding: 4rem 1.5rem;">
+        <div class="section-header">
+          <span class="section-tag">Expert Leadership</span>
+          <h2 class="section-title">Meet Our Dedicated <span class="text-gradient">Faculty & Staff</span></h2>
+          <p class="section-subtitle">Experienced industry professionals and mentors guiding your career path.</p>
+        </div>
+
+        <div class="team-grid">
+          <div class="team-card" v-for="member in teamMembers" :key="member.id">
+            <div class="team-avatar-wrapper">
+              <img :src="member.image" :alt="member.name" class="team-avatar">
+            </div>
+            <h3 class="team-name">{{ member.name }}</h3>
+            <div class="team-role">{{ member.role }}</div>
+            <p class="team-bio">{{ member.bio }}</p>
+            <div class="team-skills">
+              <span class="skill-tag" v-for="skill in member.skills" :key="skill">{{ skill }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ADMISSION TAB ================= -->
+      <section v-if="activeTab === 'admission'" class="container" style="padding: 4rem 1.5rem;">
+        <div class="section-header">
+          <span class="section-tag">Online Registration 2026</span>
+          <h2 class="section-title">Candidate <span class="text-gradient">Admission Application</span></h2>
+          <p class="section-subtitle">Fill out the official application form below to secure your seat at IT HUNT.</p>
+        </div>
+
+        <div class="admission-container">
+          <!-- Main Interactive Form -->
+          <div class="form-card">
+            <h3 class="form-title">Student Registration Details</h3>
+            <p class="form-subtitle">Please enter accurate candidate information as per official records.</p>
+
+            <form @submit.prevent="submitAdmission">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Candidate Name <span class="req">*</span></label>
+                  <input type="text" v-model="form.candidateName" required class="form-control" placeholder="Full candidate name">
                 </div>
 
+                <div class="form-group">
+                  <label class="form-label">Father's Name <span class="req">*</span></label>
+                  <input type="text" v-model="form.fatherName" required class="form-control" placeholder="Father's full name">
+                </div>
 
+                <div class="form-group">
+                  <label class="form-label">Mother's Name <span class="req">*</span></label>
+                  <input type="text" v-model="form.motherName" required class="form-control" placeholder="Mother's full name">
+                </div>
 
+                <div class="form-group">
+                  <label class="form-label">Date of Birth <span class="req">*</span></label>
+                  <input type="date" v-model="form.dob" required class="form-control">
+                </div>
 
+                <div class="form-group">
+                  <label class="form-label">Identity Mark</label>
+                  <input type="text" v-model="form.identityMark" class="form-control" placeholder="Visible identification mark">
+                </div>
 
+                <div class="form-group">
+                  <label class="form-label">Gender <span class="req">*</span></label>
+                  <div class="radio-group">
+                    <label class="radio-option">
+                      <input type="radio" v-model="form.gender" value="Male"> Male
+                    </label>
+                    <label class="radio-option">
+                      <input type="radio" v-model="form.gender" value="Female"> Female
+                    </label>
+                    <label class="radio-option">
+                      <input type="radio" v-model="form.gender" value="Other"> Other
+                    </label>
+                  </div>
+                </div>
 
+                <div class="form-group">
+                  <label class="form-label">Target Course <span class="req">*</span></label>
+                  <select v-model="form.course" class="form-control" required>
+                    <option value="NIELIT O Level">NIELIT O Level (Foundation)</option>
+                    <option value="NIELIT A Level">NIELIT A Level (Advance)</option>
+                    <option value="BCA - Subharti University">BCA - Subharti Univ Degree</option>
+                    <option value="MCA - Subharti University">MCA - Subharti Univ Degree</option>
+                    <option value="PGDCA">PGDCA Diploma</option>
+                    <option value="Full Stack Web Development">Full Stack Web Development</option>
+                    <option value="Tally ERP 9 & GST">Tally ERP 9 & Financial Accounting</option>
+                    <option value="Cyber Security & Ethical Hacking">Cyber Security & Ethical Hacking</option>
+                  </select>
+                </div>
 
-                <hr>
-              <footer class="footer">
-                &copy;&nbsp; <a href="#">copyrights </a> &nbsp;&nbsp;&nbsp;&nbsp;&thickapprox; <a href="#"> Term & condition </a> &nbsp;&nbsp;&nbsp; <a href="#">FAQ </a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="index.html" style="text-decoration: none;">&UpArrowBar;</a>
-                
-                </footer>
+                <div class="form-group">
+                  <label class="form-label">Mobile Number <span class="req">*</span></label>
+                  <input type="tel" v-model="form.mobile" pattern="[0-9]{10}" required class="form-control" placeholder="10-digit mobile number">
+                </div>
 
+                <div class="form-group">
+                  <label class="form-label">Email Address <span class="req">*</span></label>
+                  <input type="email" v-model="form.email" required class="form-control" placeholder="name@example.com">
+                </div>
 
+                <div class="form-group">
+                  <label class="form-label">District <span class="req">*</span></label>
+                  <select v-model="form.district" class="form-control" required>
+                    <option value="PRAYAGRAJ">PRAYAGRAJ</option>
+                    <option value="PRATAPGARH">PRATAPGARH</option>
+                    <option value="KAUSHAMBI">KAUSHAMBI</option>
+                    <option value="GORAKHPUR">GORAKHPUR</option>
+                    <option value="LUCKNOW">LUCKNOW</option>
+                    <option value="RAEBARELI">RAEBARELI</option>
+                    <option value="VARANASI">VARANASI</option>
+                    <option value="AMETHI">AMETHI</option>
+                  </select>
+                </div>
 
-           
-    
+                <div class="form-group full-width">
+                  <label class="form-label">Permanent Address <span class="req">*</span></label>
+                  <textarea v-model="form.address" rows="3" required class="form-control" placeholder="Full residential street address"></textarea>
+                </div>
+
+                <div class="form-group full-width">
+                  <label class="form-label">Upload Passport Photo</label>
+                  <input type="file" @change="handleFileUpload" accept="image/*" class="form-control">
+                </div>
+              </div>
+
+              <div style="margin-top: 2rem;">
+                <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; font-size: 1.05rem;">
+                  <span>Submit Admission Application</span> 🚀
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Live Receipt Preview -->
+          <div class="receipt-preview-card">
+            <div class="receipt-header">
+              <span class="receipt-stamp">DRAFT RECEIPT PREVIEW</span>
+              <h4 style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 800; margin-top: 0.4rem;">IT HUNT ADMISSION 2026</h4>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Holagarh, Prayagraj, UP</div>
+            </div>
+
+            <div class="receipt-row">
+              <span class="receipt-label">Candidate Name:</span>
+              <span class="receipt-val">{{ form.candidateName || '—' }}</span>
+            </div>
+            <div class="receipt-row">
+              <span class="receipt-label">Father's Name:</span>
+              <span class="receipt-val">{{ form.fatherName || '—' }}</span>
+            </div>
+            <div class="receipt-row">
+              <span class="receipt-label">Course Selected:</span>
+              <span class="receipt-val" style="color: var(--primary);">{{ form.course }}</span>
+            </div>
+            <div class="receipt-row">
+              <span class="receipt-label">Gender / DOB:</span>
+              <span class="receipt-val">{{ form.gender }} | {{ form.dob || '—' }}</span>
+            </div>
+            <div class="receipt-row">
+              <span class="receipt-label">Contact Mobile:</span>
+              <span class="receipt-val">{{ form.mobile || '—' }}</span>
+            </div>
+            <div class="receipt-row">
+              <span class="receipt-label">District:</span>
+              <span class="receipt-val">{{ form.district }}</span>
+            </div>
+
+            <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed var(--border-color); font-size: 0.8rem; color: var(--text-dim); text-align: center;">
+              🔒 Application details are validated in real-time.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= FAQ SECTION ================= -->
+      <section class="container" style="padding: 2rem 1.5rem 5rem;">
+        <div class="section-header">
+          <span class="section-tag">Got Questions?</span>
+          <h2 class="section-title">Frequently Asked <span class="text-gradient">Questions</span></h2>
+        </div>
+
+        <div class="faq-container">
+          <div class="accordion-item" v-for="(faq, index) in faqs" :key="index" :class="{ active: activeFaqIndex === index }">
+            <div class="accordion-header" @click="toggleFaq(index)">
+              <span>{{ faq.question }}</span>
+              <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content" v-show="activeFaqIndex === index">
+              {{ faq.answer }}
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" v-if="showModal" @click.self="showModal = false">
+      <div class="modal-card">
+        <div class="modal-icon-success">✓</div>
+        <h3 style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">Application Submitted!</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          Thank you <strong>{{ form.candidateName }}</strong>! Your admission request for <strong>{{ form.course }}</strong> has been registered successfully.
+        </p>
+
+        <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: var(--radius-md); font-family: monospace; font-size: 1.1rem; color: #34d399; margin-bottom: 1.5rem; border: 1px solid var(--border-color);">
+          Registration ID: {{ submittedRegistrationNo }}
+        </div>
+
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+          <button class="btn-primary" @click="printReceipt">Print Receipt 🖨️</button>
+          <button class="btn-secondary" @click="showModal = false">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer-section">
+      <div class="container footer-grid">
+        <div class="footer-col">
+          <div class="brand-logo" style="margin-bottom: 1rem;">
+            <img src="img/ithunt.jpg" alt="IT HUNT Logo" class="brand-logo-img">
+            <div>
+              <div class="brand-title">IT <span class="text-gradient">HUNT</span></div>
+              <div class="brand-tagline">Institute of Computer Technology</div>
+            </div>
+          </div>
+          <p style="font-size: 0.9rem; line-height: 1.7; color: var(--text-muted);">
+            World-class digital skill training in Holagarh Prayagraj & Pratapgarh. Partnering with NIELIT and Subharti University to prepare learners for tech careers.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Quick Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="#" @click.prevent="setTab('home')">Home Overview</a></li>
+            <li><a href="#" @click.prevent="setTab('courses')">Available Courses</a></li>
+            <li><a href="#" @click.prevent="setTab('about')">About Society</a></li>
+            <li><a href="#" @click.prevent="setTab('team')">Our Faculty</a></li>
+            <li><a href="#" @click.prevent="setTab('admission')">Admission Form</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Certified Programs</h4>
+          <ul class="footer-links">
+            <li><a href="#" @click.prevent="applyForCourse('NIELIT O Level')">NIELIT O Level</a></li>
+            <li><a href="#" @click.prevent="applyForCourse('NIELIT A Level')">NIELIT A Level</a></li>
+            <li><a href="#" @click.prevent="applyForCourse('BCA - Subharti University')">Subharti University BCA/MCA</a></li>
+            <li><a href="#" @click.prevent="applyForCourse('Full Stack Web Development')">Web Development</a></li>
+            <li><a href="#" @click.prevent="applyForCourse('Tally ERP 9 & GST')">Tally ERP 9 & GST</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Contact & Location</h4>
+          <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">📍 Holagarh, Prayagraj (Allahabad), UP</p>
+          <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">📞 Mobile: +91 98765 43210</p>
+          <p style="font-size: 0.9rem; margin-bottom: 1rem;">✉️ Email: info@ithunt.edu.in</p>
+        </div>
+      </div>
+
+      <div class="container footer-bottom">
+        <div>© 2026 IT HUNT Institute of Computer Technology. All rights reserved.</div>
+        <div style="display: flex; gap: 1.5rem;">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms & Conditions</a>
+          <a href="#" @click.prevent="window.scrollTo({top: 0, behavior: 'smooth'})">⬆ Back to Top</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Vue 3 Interactive App Engine -->
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          activeTab: 'home',
+          isDarkMode: true,
+          isMobileNavOpen: false,
+          courseFilter: 'all',
+          activeFaqIndex: 0,
+          showModal: false,
+          submittedRegistrationNo: '',
+          
+          form: {
+            candidateName: '',
+            fatherName: '',
+            motherName: '',
+            dob: '',
+            identityMark: '',
+            gender: 'Male',
+            course: 'NIELIT O Level',
+            mobile: '',
+            email: '',
+            district: 'PRAYAGRAJ',
+            address: '',
+            photoName: ''
+          },
+
+          courses: [
+            {
+              id: 1,
+              code: 'O Level',
+              title: 'NIELIT "O" Level Diploma',
+              category: 'nielit',
+              categoryName: 'NIELIT Accredited',
+              duration: '1 Year (2 Semesters)',
+              certification: 'Govt. of India Recognized',
+              image: 'img/O level.png',
+              description: 'Foundation diploma equivalent to PGDCA. Covers IT Tools, Web Designing, Python Programming, and Internet of Things (IoT).',
+              topics: ['IT Fundamentals', 'HTML5 & CSS3', 'Python Scripting', 'IoT Sensors & Microcontrollers']
+            },
+            {
+              id: 2,
+              code: 'A Level',
+              title: 'NIELIT "A" Level Diploma',
+              category: 'nielit',
+              categoryName: 'NIELIT Accredited',
+              duration: '1 Year (2 Semesters)',
+              certification: 'Advance Graduate Diploma',
+              image: 'img/A level.png',
+              description: 'Advanced IT engineering diploma covering Data Structures, Computer Networks, Database Management, and Software Engineering.',
+              topics: ['Data Structures in C++', 'DBMS & SQL', 'Computer Networks', 'Web Engineering']
+            },
+            {
+              id: 3,
+              code: 'Subharti Degree',
+              title: 'Subharti University Degree Courses (BCA / MCA)',
+              category: 'university',
+              categoryName: 'UGC / AICTE Approved',
+              duration: '1 - 3 Years',
+              certification: 'Regular / Distance Degree',
+              image: 'img/shubharati.png',
+              description: 'Comprehensive degree courses in computer applications run via Distance Education approved by UGC, AICTE, and DEC joint committee.',
+              topics: ['Computer Architecture', 'Object Oriented Programming', 'Operating Systems', 'Cloud Computing']
+            },
+            {
+              id: 4,
+              code: 'Full Stack',
+              title: 'Full Stack Web Development',
+              category: 'skills',
+              categoryName: 'Industry Skill',
+              duration: '6 Months',
+              certification: 'Professional Certificate',
+              image: 'img/web-development-course.png',
+              description: 'Hands-on practical bootcamp covering modern front-end (HTML, CSS, JavaScript, Vue.js) and back-end database engineering.',
+              topics: ['Modern JavaScript (ES6+)', 'Vue 3 Framework', 'Node.js & Express', 'MongoDB & Databases']
+            },
+            {
+              id: 5,
+              code: 'Tally ERP 9',
+              title: 'Tally ERP 9 & Financial Accounting',
+              category: 'skills',
+              categoryName: 'Financial Tech',
+              duration: '3 Months',
+              certification: 'Tally Expert Certification',
+              image: 'img/courses.png',
+              description: 'Master business transactions, inventory management, payroll, cost centers, GST filing, and daily ledger accounting.',
+              topics: ['Voucher Entries', 'GST & Taxation', 'Payroll Systems', 'Balance Sheet Analysis']
+            },
+            {
+              id: 6,
+              code: 'Cyber Security',
+              title: 'Ethical Hacking & Cyber Security',
+              category: 'skills',
+              categoryName: 'Security Track',
+              duration: '6 Months',
+              certification: 'Ethical Hacker Certificate',
+              image: 'img/hacker.png',
+              description: 'Learn network security, vulnerability assessment, penetration testing, and ethical hacking protocols to defend IT infrastructure.',
+              topics: ['Network Scanning', 'Metasploit Fundamentals', 'Web Security', 'Defensive Hardening']
+            }
+          ],
+
+          teamMembers: [
+            {
+              id: 1,
+              name: 'Mr. Lakshman Singh Chauhan',
+              role: 'Director & Founder',
+              bio: 'Public speaking expert, motivational speaker, and life coach with MCA degree. Lead mentor in computer science & executive management.',
+              image: 'img/ithunt.jpg',
+              skills: ['O/A Level', 'MCA', 'Public Speaking', 'Life Coaching', 'C/C++']
+            },
+            {
+              id: 2,
+              name: 'Anoop Mishra',
+              role: 'Software Developer & Lead Instructor',
+              bio: 'Full stack developer specializing in modern Java, Python, Web Engineering, and computer science core subjects.',
+              image: 'img/anoop.png',
+              skills: ['Java', 'Python', 'C/C++', 'Vue.js', 'Web Dev']
+            },
+            {
+              id: 3,
+              name: 'Vikash Srivastav',
+              role: 'Institute Manager & Tally Expert',
+              bio: 'Accounting specialist with expertise in Tally ERP 9, financial inventory management, HTML/CSS, and campus management.',
+              image: 'img/vikash.png',
+              skills: ['Tally ERP 9', 'CA Accounting', 'HTML', 'CSS', 'JavaScript']
+            },
+            {
+              id: 4,
+              name: 'Achal Singh Chauhan',
+              role: 'Ethical Hacking & Cyber Security Mentor',
+              bio: 'Cyber security specialist, hackathon winner, and instructor for Java, C++, and penetration testing tracks.',
+              image: 'img/hacker.png',
+              skills: ['Ethical Hacking', 'Cyber Security', 'Python', 'Java', 'Hackathons']
+            }
+          ],
+
+          faqs: [
+            {
+              question: "What are the eligibility criteria for NIELIT 'O' Level diploma?",
+              answer: "For NIELIT 'O' Level, candidates should have completed 10+2 (Intermediate) or an ITI Certificate course. Non-formal candidates with 1 year of relevant experience can also register."
+            },
+            {
+              question: "Are Subharti University degrees valid for government jobs?",
+              answer: "Yes, Swami Vivekanand Subharti University is UGC and AICTE recognized under Section 2(f) of the UGC Act 1956. Degrees are valid for government job applications and higher studies."
+            },
+            {
+              question: "How do I submit my admission form online?",
+              answer: "Simply navigate to the 'Admission' tab, fill out candidate details, target course, and click 'Submit Admission Application'. You will instantly receive a printable registration receipt with a unique ID."
+            },
+            {
+              question: "Does IT HUNT provide practical lab facilities?",
+              answer: "Absolutely! We feature air-conditioned computer labs with high-speed internet, modern desktop workstations, and dedicated doubt-clearing faculty sessions."
+            }
+          ]
+        }
+      },
+
+      computed: {
+        featuredCourses() {
+          return this.courses.slice(0, 3);
+        },
+        filteredCourses() {
+          if (this.courseFilter === 'all') return this.courses;
+          return this.courses.filter(c => c.category === this.courseFilter);
+        }
+      },
+
+      mounted() {
+        // Read hash location if navigated via direct link (e.g. index.html#admission or Home.html)
+        const hash = window.location.hash.replace('#', '');
+        if (['home', 'courses', 'about', 'team', 'admission'].includes(hash)) {
+          this.activeTab = hash;
+        }
+      },
+
+      methods: {
+        setTab(tabName) {
+          this.activeTab = tabName;
+          this.isMobileNavOpen = false;
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          window.location.hash = tabName;
+        },
+        toggleTheme() {
+          this.isDarkMode = !this.isDarkMode;
+          document.body.classList.toggle('light-theme', !this.isDarkMode);
+        },
+        applyForCourse(courseTitle) {
+          this.form.course = courseTitle;
+          this.setTab('admission');
+        },
+        handleFileUpload(event) {
+          const file = event.target.files[0];
+          if (file) {
+            this.form.photoName = file.name;
+          }
+        },
+        submitAdmission() {
+          this.submittedRegistrationNo = 'ITH-' + Math.floor(100000 + Math.random() * 900000);
+          this.showModal = true;
+        },
+        printReceipt() {
+          window.print();
+        },
+        toggleFaq(index) {
+          this.activeFaqIndex = this.activeFaqIndex === index ? -1 : index;
+        }
+      }
+    }).mount('#app');
+  </script>
 </body>
 </html>
