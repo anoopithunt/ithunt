@@ -1,68 +1,81 @@
 /* ==========================================================================
-   IT HUNT - Centralized Site Content & Text Dictionary
+   IT HUNT - Centralized Site Content & Static Text Dictionary
    ==========================================================================
-   All headings, titles, descriptions, courses, internship details, team bios,
-   reviews, career job listings, and contact info are stored here.
+   All headings, titles, subheadings, hero copy, badges, course details,
+   internship tracks, team bios, student reviews, career job listings,
+   and contact info are stored here in one distinct place.
+   
    Modifying any text here automatically updates it across the entire project!
    ========================================================================== */
 
 const CONTENT_DATA = {
-  // Brand & General Metadata
+  // Brand & Company Metadata
   brand: {
     name: "IT HUNT",
     nameHighlight: "HUNT",
-    tagline: "IT Solutions & Education",
+    tagline: "Software Solutions & Tech Academy",
     logoImage: "img/ithunt.jpg",
     establishedYear: "2012",
-    metaTitle: "IT HUNT | IT Solutions Internship, Training & Tech Institute",
-    metaDescription: "IT HUNT - Premier IT Solution Internship & Training Center in Holagarh Prayagraj. 3 & 6-month internships in MERN Stack, iOS, Android, Digital Marketing, NIELIT Diplomas, and Careers."
+    metaTitle: "IT HUNT | Software Solutions & Tech Academy",
+    metaDescription: "IT HUNT - Enterprise Software Solutions & IT Training Center in Holagarh Prayagraj. 3 & 6-month production internships in MERN Stack, iOS, Android, AI, and Digital Marketing."
   },
 
-  // Navigation Items
+  // Header Navigation Items
   navigation: [
     { id: "home", label: "Home", icon: "🏠" },
-    { id: "internships", label: "Internships", icon: "🚀" },
+    { id: "internships", label: "IT Internships", icon: "🚀" },
     { id: "courses", label: "Courses", icon: "📚" },
-    { id: "reviews", label: "Reviews", icon: "⭐" },
-    { id: "admission", label: "Admission", icon: "📝" }
+    { id: "reviews", label: "Reviews & Ratings", icon: "⭐" },
+    { id: "admission", label: "Apply Portal", icon: "📝" }
   ],
 
-  // Hero Section
+  // Hero Section Copy
   hero: {
-    badgeText: "NEW: IT Solutions Internship & Training Center 2026",
-    titlePrefix: "Master Modern ",
-    titleGradient: "IT & Software Engineering",
-    subtitle: "IT HUNT presents premier 3-Month & 6-Month Industry Internships in MERN Stack, iOS, Android, and Digital Marketing alongside government accredited NIELIT O/A Level Diplomas & Subharti University Degrees.",
+    badgeText: "🚀 IT SOLUTIONS & SOFTWARE DEVELOPMENT ACADEMY 2026",
+    titlePrefix: "Architecting Next-Gen ",
+    titleGradient: "Software & AI Solutions",
+    subtitle: "IT HUNT is a premier software development studio & technology academy in Prayagraj. We build production-ready software solutions while empowering engineers with 3-Month & 6-Month hands-on internships in MERN Stack, iOS, Android, and Digital Marketing.",
     primaryCtaText: "Explore IT Internships 🚀",
-    secondaryCtaText: "Apply Online 2026 📝",
+    secondaryCtaText: "Start Application 2026 📝",
     highlights: [
-      "✓ 3 & 6 Months Internships",
-      "✓ Live Client Projects",
-      "✓ Certificate + LOR",
-      "✓ 100% Placement Help"
+      "✓ 3 & 6 Months Production Internships",
+      "✓ Live Enterprise Client Projects",
+      "✓ Verified Certificate + LOR",
+      "✓ 100% Career Placement Support"
     ],
-    floatingBadgeTitle: "Live Production Labs",
-    floatingBadgeSubtitle: "MERN, iOS & Android Center"
+    floatingBadgeTitle: "Live Software Production",
+    floatingBadgeSubtitle: "MERN • iOS • Android • AI Center",
+    codeSnippetHeader: "App.jsx — IT HUNT MERN & AI Engine",
+    codeSnippetLines: [
+      "import { useState, useEffect } from 'react';",
+      "import { ITHuntSoftwareVenture } from '@ithunt/core';",
+      "",
+      "export default function SoftwareStudio() {",
+      "  const [internshipTrack, setTrack] = useState('MERN Stack');",
+      "  const [experienceLevel, setExperience] = useState('4+ Yrs Faculty');",
+      "  return <ITHuntSoftwareVenture status='ACTIVE' mode='PRODUCTION' />;",
+      "}"
+    ]
   },
 
-  // Key Statistics Counter
+  // Key Statistics & Metrics
   stats: [
-    { number: "5,000+", label: "Students & Interns Trained", isGradientPrimary: true },
-    { number: "4.9 ★", label: "Student Facility Rating", isGradientSecondary: true },
-    { number: "100%", label: "Practical Live Projects", isGradientPrimary: true },
-    { number: "4+ Yrs", label: "Experienced Instructors", isGradientSecondary: true }
+    { number: "5,000+", label: "Engineers & Interns Trained", isGradientPrimary: true },
+    { number: "4.9 ★", label: "Facility & Quality Review", isGradientSecondary: true },
+    { number: "100%", label: "Live Client Projects", isGradientPrimary: true },
+    { number: "4+ Yrs", label: "Senior Tech Instructors", isGradientSecondary: true }
   ],
 
-  // IT Solutions Internship Venture Section
+  // Software Company Services & Internship Venture
   internshipVenture: {
-    tagline: "IT SOLUTIONS VENTURE 2026",
-    titlePrefix: "Professional ",
-    titleGradient: "IT Internship & Training",
-    description: "Bridge the gap between academics and full-time tech engineering through live client project internships.",
-    spotlightBadge: "NEW VENTURE 2026",
+    tagline: "SOFTWARE SOLUTIONS & INTERNSHIP VENTURE 2026",
+    titlePrefix: "Production-Grade ",
+    titleGradient: "IT Solutions & Training",
+    description: "Work directly on real-world client software, enterprise APIs, mobile apps, and growth campaigns alongside senior developers.",
+    spotlightBadge: "ENTERPRISE SOFTWARE VENTURE 2026",
     spotlightTitlePrefix: "IT Solutions ",
     spotlightTitleGradient: "Internship Program",
-    spotlightDesc: "Step out of theory and step into production-level development. Work on live web applications, native iOS apps, Android projects, and growth campaigns under senior tech mentors.",
+    spotlightDesc: "Step out of theory and step into production-level development. Build scalable web applications, native iOS apps, Android software, and data-driven marketing campaigns under senior tech mentors.",
     tracks: [
       {
         id: 1,
@@ -103,11 +116,11 @@ const CONTENT_DATA = {
     ]
   },
 
-  // Accredited Courses & Diplomas Section
+  // Accredited Computer Courses & Diplomas Section
   coursesSection: {
-    tagline: "COMPREHENSIVE EDUCATION",
-    titlePrefix: "Accredited ",
-    titleGradient: "Courses & Diplomas",
+    tagline: "ACCREDITED TECH CURRICULUMS",
+    titlePrefix: "Recognized ",
+    titleGradient: "Diplomas & Degree Programs",
     description: "Government recognized computer education combined with practical lab training.",
     coursesList: [
       {
@@ -149,11 +162,11 @@ const CONTENT_DATA = {
     ]
   },
 
-  // About Us & Director Section
+  // About Company Section
   about: {
-    tagline: "ABOUT OUR SOCIETY & VENTURE",
-    titlePrefix: "Transforming Tech Education in ",
-    titleGradient: "Prayagraj & Beyond",
+    tagline: "ABOUT OUR SOFTWARE STUDIO & SOCIETY",
+    titlePrefix: "Building High-Tech Solutions in ",
+    titleGradient: "Prayagraj & India",
     description: "IT HUNT in Holagarh, Prayagraj is a top-tier Computer Technology & IT Solution Training Institute. Established with a vision to make digital literacy and modern software skills accessible to all, we specialize in rapidly evolving fields like MERN Stack, iOS/Android Development, Cyber Security, and Financial Accounting.",
     mainImage: "img/ithunt1.jpg",
     subImage: "img/desktop.jpg",
@@ -167,8 +180,9 @@ const CONTENT_DATA = {
     ]
   },
 
-  // Director Spotlight
+  // Director Spotlight Section
   director: {
+    tagline: "DIRECTOR'S SPOTLIGHT",
     name: "Mr. Lakshman Singh Chauhan",
     title: "Director & Founder, IT HUNT | MCA (Computer Science)",
     image: "img/ithunt.jpg",
@@ -176,11 +190,11 @@ const CONTENT_DATA = {
     skills: ["Public Speaking Expert", "Motivational Speaker", "Life Coach", "Spoken English Mentor"]
   },
 
-  // Faculty & Team Showcase
+  // Team & Faculty Section
   teamSection: {
-    tagline: "EXPERT MENTORSHIP",
-    titlePrefix: "Meet Our Experienced ",
-    titleGradient: "Faculty & Instructors",
+    tagline: "EXPERT TECH LEADERSHIP",
+    titlePrefix: "Meet Our Senior ",
+    titleGradient: "Instructors & Tech Mentors",
     description: "Dedicated tech leaders with minimum 4+ years industry and teaching experience.",
     members: [
       {
@@ -218,12 +232,12 @@ const CONTENT_DATA = {
     ]
   },
 
-  // Reviews & Evaluation Portal
+  // Student & Client Reviews Section
   reviewsSection: {
     tagline: "QUALITY & FACILITY EVALUATION",
-    titlePrefix: "Student & Alumni ",
+    titlePrefix: "Student & Client ",
     titleGradient: "Reviews & Feedback",
-    description: "We continuously evaluate our institute facilities and curriculum to drive excellence.",
+    description: "We continuously evaluate our institute facilities and curriculum to drive software development quality.",
     overallScore: "4.9",
     overallStars: "★★★★★",
     totalCountLabel: "Based on 250+ Verified Reviews",
@@ -264,10 +278,10 @@ const CONTENT_DATA = {
     ]
   },
 
-  // Careers & Hiring Portal
+  // Careers & Hiring Section
   careersSection: {
     tagline: "HIRING PORTAL",
-    titlePrefix: "Join Our Team: ",
+    titlePrefix: "Careers: ",
     titleGradient: "Teachers & Developers",
     description: "Looking for senior educators and technical mentors to lead our IT solutions venture.",
     mandatoryPolicyNotice: "⚠️ MANDATORY REQUIREMENT: Minimum 4+ Years Experience Required",
@@ -321,7 +335,7 @@ const CONTENT_DATA = {
     districts: ["PRAYAGRAJ", "PRATAPGARH", "KAUSHAMBI", "GORAKHPUR", "LUCKNOW", "RAEBARELI", "VARANASI", "AMETHI"]
   },
 
-  // Footer Metadata
+  // Footer Text
   footer: {
     aboutText: "World-class IT Solutions Internship Center & accredited computer education institute. Training students in MERN Stack, iOS, Android, and Digital Marketing.",
     copyrightText: "© 2026 IT HUNT Institute of Computer Technology & IT Solutions. All rights reserved."
