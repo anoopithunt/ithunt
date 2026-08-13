@@ -44,6 +44,16 @@
               </button>
             </li>
             <li>
+              <button class="nav-item-btn" :class="{ active: activeTab === 'reviews' }" @click="setTab('reviews')">
+                <span>⭐</span> Reviews
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" :class="{ active: activeTab === 'admission' }" @click="setTab('admission')">
+                <span>📝</span> Admission
+              </button>
+            </li>
+            <li>
               <button class="nav-item-btn" :class="{ active: activeTab === 'about' }" @click="setTab('about')">
                 <span>🏢</span> About Us
               </button>
@@ -54,18 +64,8 @@
               </button>
             </li>
             <li>
-              <button class="nav-item-btn" :class="{ active: activeTab === 'reviews' }" @click="setTab('reviews')">
-                <span>⭐</span> Reviews
-              </button>
-            </li>
-            <li>
               <button class="nav-item-btn" :class="{ active: activeTab === 'careers' }" @click="setTab('careers')">
                 <span>💼</span> Careers
-              </button>
-            </li>
-            <li>
-              <button class="nav-item-btn" :class="{ active: activeTab === 'admission' }" @click="setTab('admission')">
-                <span>📝</span> Admission
               </button>
             </li>
           </ul>
@@ -80,7 +80,7 @@
             <span>Apply Internship</span> ✨
           </button>
 
-          <button class="mobile-toggle-btn" @click="isMobileNavOpen = !isMobileNavOpen">
+          <button class="mobile-toggle-btn" @click="isMobileNavOpen = !isMobileNavOpen" aria-label="Toggle Navigation">
             <span>{{ isMobileNavOpen ? '✕' : '☰' }}</span>
           </button>
         </div>
@@ -89,19 +89,19 @@
       <!-- Mobile Navigation Drawer -->
       <div class="mobile-nav-drawer" :class="{ open: isMobileNavOpen }">
         <button class="nav-item-btn" :class="{ active: activeTab === 'home' }" @click="setTab('home')">🏠 Home</button>
-        <button class="nav-item-btn" :class="{ active: activeTab === 'internships' }" @click="setTab('internships')">🚀 IT Internships</button>
-        <button class="nav-item-btn" :class="{ active: activeTab === 'courses' }" @click="setTab('courses')">📚 Courses</button>
-        <button class="nav-item-btn" :class="{ active: activeTab === 'about' }" @click="setTab('about')">🏢 About Us</button>
-        <button class="nav-item-btn" :class="{ active: activeTab === 'team' }" @click="setTab('team')">👨‍🏫 Faculty & Staff</button>
-        <button class="nav-item-btn" :class="{ active: activeTab === 'reviews' }" @click="setTab('reviews')">⭐ Student Reviews & Feedback</button>
-        <button class="nav-item-btn" :class="{ active: activeTab === 'careers' }" @click="setTab('careers')">💼 Careers & Hiring (4+ Yrs Exp)</button>
+        <button class="nav-item-btn" :class="{ active: activeTab === 'internships' }" @click="setTab('internships')">🚀 IT Internships (MERN, iOS, Android)</button>
+        <button class="nav-item-btn" :class="{ active: activeTab === 'courses' }" @click="setTab('courses')">📚 Accredited Courses</button>
+        <button class="nav-item-btn" :class="{ active: activeTab === 'reviews' }" @click="setTab('reviews')">⭐ Reviews & Feedback</button>
         <button class="nav-item-btn" :class="{ active: activeTab === 'admission' }" @click="setTab('admission')">📝 Admission Portal</button>
+        <button class="nav-item-btn" :class="{ active: activeTab === 'about' }" @click="setTab('about')">🏢 About Us & Director Message</button>
+        <button class="nav-item-btn" :class="{ active: activeTab === 'team' }" @click="setTab('team')">👨‍🏫 Faculty & Mentors</button>
+        <button class="nav-item-btn" :class="{ active: activeTab === 'careers' }" @click="setTab('careers')">💼 Careers (Min 4+ Yrs Exp)</button>
       </div>
     </header>
 
     <!-- Main Content Dynamic Views -->
     <main>
-      <!-- ================= HOME TAB ================= -->
+      <!-- ================= HOME TAB (FULL FLOW VIEW) ================= -->
       <section v-if="activeTab === 'home'">
         <!-- Hero Section -->
         <div class="hero-section">
@@ -112,7 +112,7 @@
                 <span>NEW: IT Solutions Internship & Training Center 2026</span>
               </div>
               <h1 class="hero-title">
-                Gain Real-World <span class="text-gradient">IT & Software Experience</span>
+                Master Modern <span class="text-gradient">IT & Software Engineering</span>
               </h1>
               <p class="hero-subtitle">
                 IT HUNT presents premier <strong>3-Month & 6-Month Industry Internships</strong> in MERN Stack, iOS, Android, and Digital Marketing alongside government accredited <strong>NIELIT O/A Level Diplomas</strong> & <strong>Subharti University Degrees</strong>.
@@ -122,13 +122,13 @@
                 <button class="btn-primary" @click="setTab('internships')">
                   <span>Explore IT Internships</span> 🚀
                 </button>
-                <button class="btn-secondary" @click="setTab('careers')">
-                  <span>We are Hiring (4+ Yrs Exp)</span> 💼
+                <button class="btn-secondary" @click="setTab('admission')">
+                  <span>Apply Online 2026</span> 📝
                 </button>
               </div>
 
               <!-- Quick Highlights Badges -->
-              <div style="display: flex; gap: 1.5rem; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; flex-wrap: wrap;">
+              <div style="display: flex; gap: 1rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; flex-wrap: wrap;">
                 <div>✓ 3 & 6 Months Internships</div>
                 <div>✓ Live Client Projects</div>
                 <div>✓ Certificate + LOR</div>
@@ -143,8 +143,8 @@
                 <div class="hero-floating-badge">
                   <div class="hero-floating-icon">💼</div>
                   <div>
-                    <div style="font-weight: 800; font-size: 1.1rem; color: var(--text-main);">Live IT Projects</div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted);">MERN, iOS & Android Center</div>
+                    <div style="font-weight: 800; font-size: 1rem; color: var(--text-main);">Live Production Labs</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">MERN, iOS & Android Center</div>
                   </div>
                 </div>
               </div>
@@ -161,7 +161,7 @@
             </div>
             <div class="stat-card">
               <div class="stat-number text-gradient-secondary">4.9 ★</div>
-              <div class="stat-label">Student Facility Review</div>
+              <div class="stat-label">Student Facility Rating</div>
             </div>
             <div class="stat-card">
               <div class="stat-number text-gradient">100%</div>
@@ -179,31 +179,31 @@
           <div class="internship-banner">
             <div>
               <span class="duration-pill">NEW VENTURE 2026</span>
-              <h2 style="font-family: var(--font-heading); font-size: 2.25rem; font-weight: 800; margin-bottom: 1rem;">
+              <h2 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; margin-bottom: 0.85rem;">
                 IT Solutions <span class="text-gradient">Internship Program</span>
               </h2>
-              <p style="color: var(--text-muted); line-height: 1.7; margin-bottom: 1.5rem;">
+              <p style="color: var(--text-muted); line-height: 1.7; margin-bottom: 1.25rem; font-size: 0.95rem;">
                 Step out of theory and step into production-level development. Work on live web applications, native iOS apps, Android projects, and growth campaigns under senior tech mentors.
               </p>
               <button class="btn-primary" @click="setTab('internships')">Apply for Internship Track →</button>
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
               <div style="background: var(--bg-card); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); text-align: center;">
-                <div style="font-size: 1.75rem; margin-bottom: 0.3rem;">⚡</div>
-                <div style="font-weight: 800; font-size: 1rem;">3-Month Track</div>
-                <div style="font-size: 0.8rem; color: var(--text-muted);">Fast-track Skill Acceleration</div>
+                <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">⚡</div>
+                <div style="font-weight: 800; font-size: 0.95rem;">3-Month Track</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Fast-track Skill Acceleration</div>
               </div>
               <div style="background: var(--bg-card); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); text-align: center;">
-                <div style="font-size: 1.75rem; margin-bottom: 0.3rem;">🚀</div>
-                <div style="font-weight: 800; font-size: 1rem;">6-Month Track</div>
-                <div style="font-size: 0.8rem; color: var(--text-muted);">Complete Industry Masterclass</div>
+                <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">🚀</div>
+                <div style="font-weight: 800; font-size: 0.95rem;">6-Month Track</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Complete Industry Masterclass</div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Featured Programs Preview -->
-        <div class="container" style="padding-bottom: 5rem;">
+        <div class="container" style="padding-bottom: 4rem;">
           <div class="section-header">
             <span class="section-tag">Featured Curriculums</span>
             <h2 class="section-title">Accredited <span class="text-gradient">Courses & Diplomas</span></h2>
@@ -230,9 +230,118 @@
             </div>
           </div>
         </div>
+
+        <!-- ================= BOTTOM SECTIONS ON HOME PAGE FLOW ================= -->
+
+        <!-- 1. ABOUT US BOTTOM SECTION -->
+        <div style="background: rgba(15, 23, 42, 0.4); border-top: 1px solid var(--border-color); padding: 4rem 0;">
+          <div class="container">
+            <div class="about-grid">
+              <div class="about-card-stack">
+                <img src="img/ithunt1.jpg" alt="IT HUNT Society" class="about-img-main">
+                <img src="img/desktop.jpg" alt="Computer Lab" class="about-img-sub">
+              </div>
+              <div class="about-text-content">
+                <span class="section-tag">About Our Society & Venture</span>
+                <h2>Transforming Tech Education in <span class="text-gradient">Prayagraj & Beyond</span></h2>
+                <p>
+                  <strong>IT HUNT in Holagarh, Prayagraj</strong> is a top-tier Computer Technology & IT Solution Training Institute. Established with a vision to make digital literacy and modern software skills accessible to all, we specialize in rapidly evolving fields like MERN Stack, iOS/Android Development, Cyber Security, and Financial Accounting.
+                </p>
+
+                <div class="about-features-list">
+                  <div class="about-feature-item"><span class="about-check-icon">✓</span> NIELIT Accredited Center</div>
+                  <div class="about-feature-item"><span class="about-check-icon">✓</span> Subharti Univ Partner</div>
+                  <div class="about-feature-item"><span class="about-check-icon">✓</span> IT Solution Center</div>
+                  <div class="about-feature-item"><span class="about-check-icon">✓</span> 4+ Yrs Exp Faculty</div>
+                  <div class="about-feature-item"><span class="about-check-icon">✓</span> Modern Workstations</div>
+                  <div class="about-feature-item"><span class="about-check-icon">✓</span> Career Counseling</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Director Spotlight -->
+            <div class="director-spotlight-card">
+              <img src="img/ithunt.jpg" alt="Director Lakshman Singh Chauhan" class="director-img">
+              <div>
+                <span class="section-tag">Director's Message</span>
+                <h3 style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; margin-bottom: 0.4rem;">Mr. Lakshman Singh Chauhan</h3>
+                <div style="color: var(--secondary); font-weight: 700; margin-bottom: 0.85rem; font-size: 0.9rem;">Director & Founder, IT HUNT | MCA (Computer Science)</div>
+                <p style="color: var(--text-muted); line-height: 1.7; margin-bottom: 1rem; font-size: 0.925rem;">
+                  "Our mission is to empower every candidate with market-ready IT skills. With our new IT Solutions Internship Center and experienced senior faculty (min 4+ years experience), we deliver unparalleled quality and hands-on production experience."
+                </p>
+                <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                  <span class="skill-tag">Public Speaking Expert</span>
+                  <span class="skill-tag">Motivational Speaker</span>
+                  <span class="skill-tag">Life Coach</span>
+                  <span class="skill-tag">Spoken English Mentor</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. FACULTY BOTTOM SECTION -->
+        <div style="padding: 4rem 0; border-top: 1px solid var(--border-color);">
+          <div class="container">
+            <div class="section-header">
+              <span class="section-tag">Expert Mentorship</span>
+              <h2 class="section-title">Meet Our Experienced <span class="text-gradient">Faculty & Instructors</span></h2>
+              <p class="section-subtitle">Dedicated tech leaders with minimum 4+ years industry and teaching experience.</p>
+            </div>
+
+            <div class="team-grid">
+              <div class="team-card" v-for="member in teamMembers" :key="member.id">
+                <div class="team-avatar-wrapper">
+                  <img :src="member.image" :alt="member.name" class="team-avatar">
+                </div>
+                <h3 class="team-name">{{ member.name }}</h3>
+                <div class="team-role">{{ member.role }}</div>
+                <p class="team-bio">{{ member.bio }}</p>
+                <div class="team-skills">
+                  <span class="skill-tag" v-for="skill in member.skills" :key="skill">{{ skill }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. CAREERS BOTTOM SECTION -->
+        <div style="background: rgba(15, 23, 42, 0.6); padding: 4rem 0; border-top: 1px solid var(--border-color);">
+          <div class="container">
+            <div class="section-header">
+              <span class="section-tag">Hiring Portal</span>
+              <h2 class="section-title">Join Our Team: <span class="text-gradient">Teachers & Developers</span></h2>
+              <p class="section-subtitle">Looking for senior educators and technical mentors to lead our IT solutions venture.</p>
+
+              <div style="margin-top: 1.25rem;">
+                <span class="exp-badge-required">
+                  <span>⚠️ MANDATORY REQUIREMENT:</span> Minimum 4+ Years Experience Required
+                </span>
+              </div>
+            </div>
+
+            <div class="careers-grid">
+              <div class="career-card" v-for="job in jobOpenings" :key="job.id">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.85rem;">
+                  <span class="skill-tag" style="background: rgba(99, 102, 241, 0.15); color: #818cf8;">{{ job.type }}</span>
+                  <span class="exp-badge-required" style="font-size: 0.725rem; padding: 0.2rem 0.5rem;">Min 4+ Yrs Exp</span>
+                </div>
+
+                <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; margin-bottom: 0.4rem;">{{ job.title }}</h3>
+                <div style="color: var(--secondary); font-size: 0.825rem; font-weight: 700; margin-bottom: 0.85rem;">📍 {{ job.location }} | Salary: {{ job.salary }}</div>
+
+                <p style="color: var(--text-muted); font-size: 0.875rem; line-height: 1.6; margin-bottom: 1.15rem;">{{ job.description }}</p>
+
+                <button class="btn-primary" style="width: 100%; justify-content: center; margin-top: auto;" @click="openJobModal(job)">
+                  <span>Apply for {{ job.shortTitle }}</span> 💼
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <!-- ================= INTERNSHIP CENTER TAB ================= -->
+      <!-- ================= DEDICATED INTERNSHIP TAB ================= -->
       <section v-if="activeTab === 'internships'" class="container" style="padding: 4rem 1.5rem;">
         <div class="section-header">
           <span class="section-tag">IT Solutions Venture</span>
@@ -242,52 +351,38 @@
 
         <!-- Program Duration Selector -->
         <div class="filter-bar">
-          <button class="filter-btn" :class="{ active: selectedInternshipDuration === 'all' }" @click="selectedInternshipDuration = 'all'">All Internship Durations</button>
-          <button class="filter-btn" :class="{ active: selectedInternshipDuration === '3 Months' }" @click="selectedInternshipDuration = '3 Months'">3-Month Fast Track</button>
-          <button class="filter-btn" :class="{ active: selectedInternshipDuration === '6 Months' }" @click="selectedInternshipDuration = '6 Months'">6-Month Mastery Track</button>
+          <button class="filter-btn" :class="{ active: selectedInternshipDuration === 'all' }" @click="selectedInternshipDuration = 'all'">All Durations</button>
+          <button class="filter-btn" :class="{ active: selectedInternshipDuration === '3 Months' }" @click="selectedInternshipDuration = '3 Months'">3-Month Track</button>
+          <button class="filter-btn" :class="{ active: selectedInternshipDuration === '6 Months' }" @click="selectedInternshipDuration = '6 Months'">6-Month Track</button>
         </div>
 
         <div class="internship-grid">
           <div class="internship-card" v-for="track in filteredInternships" :key="track.id">
             <div class="internship-icon">{{ track.icon }}</div>
             <span class="duration-pill">{{ track.duration }}</span>
-            <h3 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; margin-bottom: 0.75rem;">{{ track.title }}</h3>
-            <p style="color: var(--text-muted); font-size: 0.925rem; margin-bottom: 1.25rem; line-height: 1.6;">{{ track.description }}</p>
+            <h3 style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; margin-bottom: 0.75rem;">{{ track.title }}</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.15rem; line-height: 1.6;">{{ track.description }}</p>
             
-            <div style="margin-bottom: 1.25rem;">
-              <div style="font-size: 0.85rem; font-weight: 700; color: var(--secondary); margin-bottom: 0.5rem;">Key Technologies & Tools:</div>
-              <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+            <div style="margin-bottom: 1.15rem;">
+              <div style="font-size: 0.825rem; font-weight: 700; color: var(--secondary); margin-bottom: 0.4rem;">Technologies & Tools:</div>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
                 <span class="skill-tag" v-for="tech in track.stack" :key="tech">{{ tech }}</span>
               </div>
             </div>
 
-            <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; margin-bottom: 1.5rem; font-size: 0.85rem; color: var(--text-dim);">
-              <div>✓ Live Project Deliverables</div>
-              <div>✓ Verified Experience Letter + LOR</div>
-              <div>✓ Senior Developer Code Reviews</div>
-            </div>
-
-            <button class="btn-primary" style="width: 100%; justify-content: center;" @click="openInternshipModal(track)">
+            <button class="btn-primary" style="width: 100%; justify-content: center; margin-top: auto;" @click="openInternshipModal(track)">
               <span>Apply for {{ track.shortName }}</span> 🚀
             </button>
           </div>
         </div>
       </section>
 
-      <!-- ================= COURSES TAB ================= -->
+      <!-- ================= DEDICATED COURSES TAB ================= -->
       <section v-if="activeTab === 'courses'" class="container" style="padding: 4rem 1.5rem;">
         <div class="section-header">
           <span class="section-tag">Comprehensive Education</span>
           <h2 class="section-title">Explore Our <span class="text-gradient">Courses & Affiliations</span></h2>
           <p class="section-subtitle">Government recognized certifications, university degrees, and cutting-edge software skillsets.</p>
-        </div>
-
-        <!-- Search & Filter Control -->
-        <div class="filter-bar">
-          <button class="filter-btn" :class="{ active: courseFilter === 'all' }" @click="courseFilter = 'all'">All Courses</button>
-          <button class="filter-btn" :class="{ active: courseFilter === 'nielit' }" @click="courseFilter = 'nielit'">NIELIT Diplomas</button>
-          <button class="filter-btn" :class="{ active: courseFilter === 'university' }" @click="courseFilter = 'university'">University Degrees</button>
-          <button class="filter-btn" :class="{ active: courseFilter === 'skills' }" @click="courseFilter = 'skills'">IT & Software Skills</button>
         </div>
 
         <div class="courses-grid">
@@ -299,12 +394,6 @@
             <div class="course-body">
               <h3 class="course-title">{{ course.title }}</h3>
               <p class="course-desc">{{ course.description }}</p>
-              <div style="margin-bottom: 1rem;">
-                <div style="font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-bottom: 0.4rem;">Key Topics Covered:</div>
-                <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
-                  <span class="skill-tag" v-for="topic in course.topics" :key="topic">{{ topic }}</span>
-                </div>
-              </div>
               <div class="course-meta">
                 <div class="course-meta-item">⏱️ {{ course.duration }}</div>
                 <div class="course-meta-item">📜 {{ course.certification }}</div>
@@ -317,94 +406,22 @@
         </div>
       </section>
 
-      <!-- ================= ABOUT US TAB ================= -->
-      <section v-if="activeTab === 'about'" class="container" style="padding: 4rem 1.5rem;">
-        <div class="about-grid">
-          <div class="about-card-stack">
-            <img src="img/ithunt1.jpg" alt="IT HUNT Society" class="about-img-main">
-            <img src="img/desktop.jpg" alt="Computer Lab" class="about-img-sub">
-          </div>
-          <div class="about-text-content">
-            <span class="section-tag">About Our Society</span>
-            <h2>Transforming Tech Education in <span class="text-gradient">Prayagraj & Beyond</span></h2>
-            <p>
-              <strong>IT HUNT in Holagarh, Prayagraj</strong> is a top-tier Computer Technology & IT Solution Training Institute servicing students locally and across Uttar Pradesh. Established with a vision to make digital literacy accessible to all, we specialize in rapidly evolving fields like MERN Stack, iOS/Android Development, Cyber Security, and Financial Accounting.
-            </p>
-
-            <div class="about-features-list">
-              <div class="about-feature-item"><span class="about-check-icon">✓</span> NIELIT Accredited</div>
-              <div class="about-feature-item"><span class="about-check-icon">✓</span> Subharti Univ Partner</div>
-              <div class="about-feature-item"><span class="about-check-icon">✓</span> IT Solution Center</div>
-              <div class="about-feature-item"><span class="about-check-icon">✓</span> 4+ Yrs Exp Faculty</div>
-              <div class="about-feature-item"><span class="about-check-icon">✓</span> Modern Workstations</div>
-              <div class="about-feature-item"><span class="about-check-icon">✓</span> Career Counseling</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Director's Spotlight -->
-        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 3rem; margin-top: 3rem;">
-          <div style="display: grid; grid-template-columns: 200px 1fr; gap: 2.5rem; align-items: center;">
-            <img src="img/ithunt.jpg" alt="Director Lakshman Singh Chauhan" style="width: 200px; height: 200px; object-fit: cover; border-radius: 50%; border: 4px solid var(--primary); box-shadow: 0 0 20px var(--primary-glow);">
-            <div>
-              <span class="section-tag">Director's Message</span>
-              <h3 style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">Mr. Lakshman Singh Chauhan</h3>
-              <div style="color: var(--secondary); font-weight: 700; margin-bottom: 1rem;">Director & Founder, IT HUNT | MCA (Computer Science)</div>
-              <p style="color: var(--text-muted); line-height: 1.7; margin-bottom: 1rem;">
-                "Our mission is to empower every candidate with market-ready IT skills. With our new IT Solutions Internship Center and experienced senior faculty (4+ years experience), we deliver unparalleled quality and hands-on production experience."
-              </p>
-              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <span class="skill-tag">Public Speaking Expert</span>
-                <span class="skill-tag">Motivational Speaker</span>
-                <span class="skill-tag">Life Coach</span>
-                <span class="skill-tag">Spoken English Mentor</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= TEAM / FACULTY TAB ================= -->
-      <section v-if="activeTab === 'team'" class="container" style="padding: 4rem 1.5rem;">
-        <div class="section-header">
-          <span class="section-tag">Expert Leadership</span>
-          <h2 class="section-title">Meet Our Dedicated <span class="text-gradient">Faculty & Staff</span></h2>
-          <p class="section-subtitle">Experienced industry professionals (4+ years experience) guiding your technical career path.</p>
-        </div>
-
-        <div class="team-grid">
-          <div class="team-card" v-for="member in teamMembers" :key="member.id">
-            <div class="team-avatar-wrapper">
-              <img :src="member.image" :alt="member.name" class="team-avatar">
-            </div>
-            <h3 class="team-name">{{ member.name }}</h3>
-            <div class="team-role">{{ member.role }}</div>
-            <p class="team-bio">{{ member.bio }}</p>
-            <div class="team-skills">
-              <span class="skill-tag" v-for="skill in member.skills" :key="skill">{{ skill }}</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= REVIEWS & FEEDBACK PORTAL ================= -->
+      <!-- ================= DEDICATED REVIEWS TAB ================= -->
       <section v-if="activeTab === 'reviews'" class="container" style="padding: 4rem 1.5rem;">
         <div class="section-header">
-          <span class="section-tag">Quality & Ease of Learning</span>
+          <span class="section-tag">Quality & Facility Evaluation</span>
           <h2 class="section-title">Student & Alumni <span class="text-gradient">Reviews & Feedback</span></h2>
-          <p class="section-subtitle">We continuously evaluate our institute facilities and curriculum to drive excellence.</p>
         </div>
 
-        <!-- Rating Summary Card -->
         <div class="rating-summary-card">
-          <div style="text-align: center; border-right: 1px solid var(--border-color); padding-right: 1.5rem;">
+          <div style="text-align: center;">
             <div class="big-rating-score">4.9</div>
             <div class="star-rating-display">★★★★★</div>
             <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.4rem;">Based on 250+ Verified Reviews</div>
           </div>
 
           <div>
-            <h4 style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem;">Facility & Development Evaluation Metrics</h4>
+            <h4 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem;">Facility & Development Evaluation Metrics</h4>
             
             <div class="metric-bar-wrapper" v-for="metric in facilityMetrics" :key="metric.name">
               <div class="metric-bar-header">
@@ -425,21 +442,21 @@
               <span class="star-rating-display">★★★★★</span>
               <span style="font-size: 0.75rem; color: var(--text-dim);">{{ review.date }}</span>
             </div>
-            <p style="color: var(--text-muted); font-size: 0.925rem; line-height: 1.6; margin-bottom: 1.25rem; font-style: italic;">
+            <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.15rem; font-style: italic;">
               "{{ review.comment }}"
             </p>
             <div class="review-author">
               <img :src="review.avatar" :alt="review.name" class="review-avatar">
               <div>
-                <div style="font-weight: 700; font-size: 0.95rem;">{{ review.name }}</div>
-                <div style="font-size: 0.8rem; color: var(--secondary);">{{ review.role }}</div>
+                <div style="font-weight: 700; font-size: 0.9rem;">{{ review.name }}</div>
+                <div style="font-size: 0.775rem; color: var(--secondary);">{{ review.role }}</div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Submit Review & Feedback Form -->
-        <div class="form-card" style="max-width: 800px; margin: 0 auto;">
+        <!-- Review Submission Form -->
+        <div class="form-card" style="max-width: 750px; margin: 0 auto;">
           <h3 class="form-title">Submit Your Review & Feedback</h3>
           <p class="form-subtitle">Help us improve institute infrastructure, labs, and ease of technical development.</p>
 
@@ -461,12 +478,11 @@
                   <option value="5">⭐⭐⭐⭐⭐ 5 Stars (Excellent)</option>
                   <option value="4">⭐⭐⭐⭐ 4 Stars (Very Good)</option>
                   <option value="3">⭐⭐⭐ 3 Stars (Average)</option>
-                  <option value="2">⭐⭐ 2 Stars (Needs Improvement)</option>
                 </select>
               </div>
 
               <div class="form-group">
-                <label class="form-label">Facility Evaluation Area</label>
+                <label class="form-label">Evaluation Category</label>
                 <select v-model="newReview.category" class="form-control">
                   <option value="Labs & Workstations">Labs & Computer Workstations</option>
                   <option value="Teaching & Mentorship">Teaching & Faculty Mentorship</option>
@@ -476,12 +492,12 @@
               </div>
 
               <div class="form-group full-width">
-                <label class="form-label">Your Detailed Review & Suggestions <span class="req">*</span></label>
+                <label class="form-label">Your Review <span class="req">*</span></label>
                 <textarea v-model="newReview.comment" rows="4" required class="form-control" placeholder="Share your experience regarding facility quality, faculty guidance, and ease of development..."></textarea>
               </div>
             </div>
 
-            <div style="margin-top: 1.5rem;">
+            <div style="margin-top: 1.25rem;">
               <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
                 <span>Post Review & Feedback</span> ⭐
               </button>
@@ -490,57 +506,14 @@
         </div>
       </section>
 
-      <!-- ================= CAREERS / HIRING TAB ================= -->
-      <section v-if="activeTab === 'careers'" class="container" style="padding: 4rem 1.5rem;">
-        <div class="section-header">
-          <span class="section-tag">Join Our Faculty & Engineering Team</span>
-          <h2 class="section-title">We are Hiring <span class="text-gradient">Teachers & Developers</span></h2>
-          <p class="section-subtitle">Looking for passionate educators and technical leaders to drive our IT HUNT education and internship programs.</p>
-
-          <div style="margin-top: 1.5rem;">
-            <span class="exp-badge-required">
-              <span>⚠️ MANDATORY REQUIREMENT:</span> Minimum 4+ Years Relevant Industry / Teaching Experience Required
-            </span>
-          </div>
-        </div>
-
-        <!-- Careers Openings Grid -->
-        <div class="careers-grid">
-          <div class="career-card" v-for="job in jobOpenings" :key="job.id">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-              <span class="skill-tag" style="background: rgba(99, 102, 241, 0.15); color: #818cf8;">{{ job.type }}</span>
-              <span class="exp-badge-required" style="font-size: 0.75rem; padding: 0.2rem 0.6rem;">Min 4+ Yrs Exp</span>
-            </div>
-
-            <h3 style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; margin-bottom: 0.5rem;">{{ job.title }}</h3>
-            <div style="color: var(--secondary); font-size: 0.85rem; font-weight: 700; margin-bottom: 1rem;">📍 Location: {{ job.location }} | Salary: {{ job.salary }}</div>
-
-            <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.25rem;">{{ job.description }}</p>
-
-            <div style="margin-bottom: 1.5rem;">
-              <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.4rem;">Key Prerequisites:</div>
-              <ul style="color: var(--text-muted); font-size: 0.85rem; padding-left: 1.2rem; line-height: 1.6;">
-                <li v-for="req in job.requirements" :key="req">{{ req }}</li>
-              </ul>
-            </div>
-
-            <button class="btn-primary" style="width: 100%; justify-content: center; margin-top: auto;" @click="openJobModal(job)">
-              <span>Apply for {{ job.shortTitle }}</span> 💼
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= ADMISSION TAB ================= -->
+      <!-- ================= DEDICATED ADMISSION TAB ================= -->
       <section v-if="activeTab === 'admission'" class="container" style="padding: 4rem 1.5rem;">
         <div class="section-header">
           <span class="section-tag">Online Registration 2026</span>
           <h2 class="section-title">Candidate <span class="text-gradient">Admission Application</span></h2>
-          <p class="section-subtitle">Fill out the official application form below to secure your seat at IT HUNT.</p>
         </div>
 
         <div class="admission-container">
-          <!-- Main Interactive Form -->
           <div class="form-card">
             <h3 class="form-title">Student Registration Details</h3>
             <p class="form-subtitle">Please enter accurate candidate information as per official records.</p>
@@ -568,27 +541,16 @@
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label">Identity Mark</label>
-                  <input type="text" v-model="form.identityMark" class="form-control" placeholder="Visible identification mark">
-                </div>
-
-                <div class="form-group">
                   <label class="form-label">Gender <span class="req">*</span></label>
                   <div class="radio-group">
-                    <label class="radio-option">
-                      <input type="radio" v-model="form.gender" value="Male"> Male
-                    </label>
-                    <label class="radio-option">
-                      <input type="radio" v-model="form.gender" value="Female"> Female
-                    </label>
-                    <label class="radio-option">
-                      <input type="radio" v-model="form.gender" value="Other"> Other
-                    </label>
+                    <label class="radio-option"><input type="radio" v-model="form.gender" value="Male"> Male</label>
+                    <label class="radio-option"><input type="radio" v-model="form.gender" value="Female"> Female</label>
+                    <label class="radio-option"><input type="radio" v-model="form.gender" value="Other"> Other</label>
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label">Target Course / Venture <span class="req">*</span></label>
+                  <label class="form-label">Target Program <span class="req">*</span></label>
                   <select v-model="form.course" class="form-control" required>
                     <option value="MERN Stack Internship (3/6 Mo)">MERN Stack IT Solution Internship</option>
                     <option value="iOS Dev Internship (3/6 Mo)">iOS Development IT Solution Internship</option>
@@ -604,26 +566,12 @@
 
                 <div class="form-group">
                   <label class="form-label">Mobile Number <span class="req">*</span></label>
-                  <input type="tel" v-model="form.mobile" pattern="[0-9]{10}" required class="form-control" placeholder="10-digit mobile number">
+                  <input type="tel" v-model="form.mobile" pattern="[0-9]{10}" required class="form-control" placeholder="10-digit mobile">
                 </div>
 
                 <div class="form-group">
                   <label class="form-label">Email Address <span class="req">*</span></label>
                   <input type="email" v-model="form.email" required class="form-control" placeholder="name@example.com">
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">District <span class="req">*</span></label>
-                  <select v-model="form.district" class="form-control" required>
-                    <option value="PRAYAGRAJ">PRAYAGRAJ</option>
-                    <option value="PRATAPGARH">PRATAPGARH</option>
-                    <option value="KAUSHAMBI">KAUSHAMBI</option>
-                    <option value="GORAKHPUR">GORAKHPUR</option>
-                    <option value="LUCKNOW">LUCKNOW</option>
-                    <option value="RAEBARELI">RAEBARELI</option>
-                    <option value="VARANASI">VARANASI</option>
-                    <option value="AMETHI">AMETHI</option>
-                  </select>
                 </div>
 
                 <div class="form-group full-width">
@@ -632,8 +580,8 @@
                 </div>
               </div>
 
-              <div style="margin-top: 2rem;">
-                <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; font-size: 1.05rem;">
+              <div style="margin-top: 1.75rem;">
+                <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
                   <span>Submit Registration</span> 🚀
                 </button>
               </div>
@@ -644,38 +592,77 @@
           <div class="receipt-preview-card">
             <div class="receipt-header">
               <span class="receipt-stamp">DRAFT RECEIPT PREVIEW</span>
-              <h4 style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 800; margin-top: 0.4rem;">IT HUNT ADMISSION 2026</h4>
+              <h4 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 800; margin-top: 0.4rem;">IT HUNT ADMISSION 2026</h4>
               <div style="font-size: 0.75rem; color: var(--text-muted);">Holagarh, Prayagraj, UP</div>
             </div>
 
-            <div class="receipt-row">
-              <span class="receipt-label">Candidate Name:</span>
-              <span class="receipt-val">{{ form.candidateName || '—' }}</span>
-            </div>
-            <div class="receipt-row">
-              <span class="receipt-label">Father's Name:</span>
-              <span class="receipt-val">{{ form.fatherName || '—' }}</span>
-            </div>
-            <div class="receipt-row">
-              <span class="receipt-label">Program Selected:</span>
-              <span class="receipt-val" style="color: var(--primary);">{{ form.course }}</span>
-            </div>
-            <div class="receipt-row">
-              <span class="receipt-label">Gender / DOB:</span>
-              <span class="receipt-val">{{ form.gender }} | {{ form.dob || '—' }}</span>
-            </div>
-            <div class="receipt-row">
-              <span class="receipt-label">Contact Mobile:</span>
-              <span class="receipt-val">{{ form.mobile || '—' }}</span>
-            </div>
-            <div class="receipt-row">
-              <span class="receipt-label">District:</span>
-              <span class="receipt-val">{{ form.district }}</span>
-            </div>
+            <div class="receipt-row"><span class="receipt-label">Candidate Name:</span><span class="receipt-val">{{ form.candidateName || '—' }}</span></div>
+            <div class="receipt-row"><span class="receipt-label">Father's Name:</span><span class="receipt-val">{{ form.fatherName || '—' }}</span></div>
+            <div class="receipt-row"><span class="receipt-label">Program Selected:</span><span class="receipt-val" style="color: var(--primary);">{{ form.course }}</span></div>
+            <div class="receipt-row"><span class="receipt-label">Gender / DOB:</span><span class="receipt-val">{{ form.gender }} | {{ form.dob || '—' }}</span></div>
+            <div class="receipt-row"><span class="receipt-label">Contact Mobile:</span><span class="receipt-val">{{ form.mobile || '—' }}</span></div>
+            <div class="receipt-row"><span class="receipt-label">District:</span><span class="receipt-val">{{ form.district }}</span></div>
+          </div>
+        </div>
+      </section>
 
-            <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed var(--border-color); font-size: 0.8rem; color: var(--text-dim); text-align: center;">
-              🔒 Application details are validated in real-time.
+      <!-- ================= DEDICATED ABOUT TAB ================= -->
+      <section v-if="activeTab === 'about'" class="container" style="padding: 4rem 1.5rem;">
+        <div class="about-grid">
+          <div class="about-card-stack">
+            <img src="img/ithunt1.jpg" alt="IT HUNT Society" class="about-img-main">
+            <img src="img/desktop.jpg" alt="Computer Lab" class="about-img-sub">
+          </div>
+          <div class="about-text-content">
+            <span class="section-tag">About Our Society</span>
+            <h2>Transforming Tech Education in <span class="text-gradient">Prayagraj & Beyond</span></h2>
+            <p>
+              <strong>IT HUNT in Holagarh, Prayagraj</strong> is a top-tier Computer Technology & IT Solution Training Institute. Established with a vision to make digital literacy accessible to all, we specialize in rapidly evolving fields like MERN Stack, iOS/Android Development, Cyber Security, and Financial Accounting.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= DEDICATED TEAM TAB ================= -->
+      <section v-if="activeTab === 'team'" class="container" style="padding: 4rem 1.5rem;">
+        <div class="section-header">
+          <span class="section-tag">Expert Leadership</span>
+          <h2 class="section-title">Meet Our Dedicated <span class="text-gradient">Faculty & Staff</span></h2>
+        </div>
+
+        <div class="team-grid">
+          <div class="team-card" v-for="member in teamMembers" :key="member.id">
+            <div class="team-avatar-wrapper">
+              <img :src="member.image" :alt="member.name" class="team-avatar">
             </div>
+            <h3 class="team-name">{{ member.name }}</h3>
+            <div class="team-role">{{ member.role }}</div>
+            <p class="team-bio">{{ member.bio }}</p>
+            <div class="team-skills">
+              <span class="skill-tag" v-for="skill in member.skills" :key="skill">{{ skill }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= DEDICATED CAREERS TAB ================= -->
+      <section v-if="activeTab === 'careers'" class="container" style="padding: 4rem 1.5rem;">
+        <div class="section-header">
+          <span class="section-tag">Join Our Team</span>
+          <h2 class="section-title">Careers: <span class="text-gradient">Teachers & Developers</span></h2>
+          <div style="margin-top: 1rem;">
+            <span class="exp-badge-required">⚠️ Requirement: Minimum 4+ Years Experience Required</span>
+          </div>
+        </div>
+
+        <div class="careers-grid">
+          <div class="career-card" v-for="job in jobOpenings" :key="job.id">
+            <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; margin-bottom: 0.4rem;">{{ job.title }}</h3>
+            <div style="color: var(--secondary); font-size: 0.825rem; font-weight: 700; margin-bottom: 0.85rem;">📍 {{ job.location }} | Salary: {{ job.salary }}</div>
+            <p style="color: var(--text-muted); font-size: 0.875rem; line-height: 1.6; margin-bottom: 1.15rem;">{{ job.description }}</p>
+            <button class="btn-primary" style="width: 100%; justify-content: center; margin-top: auto;" @click="openJobModal(job)">
+              <span>Apply for {{ job.shortTitle }}</span> 💼
+            </button>
           </div>
         </div>
       </section>
@@ -685,12 +672,12 @@
     <div class="modal-overlay" v-if="showModal" @click.self="showModal = false">
       <div class="modal-card">
         <div class="modal-icon-success">✓</div>
-        <h3 style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">{{ modalTitle }}</h3>
-        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+        <h3 style="font-family: var(--font-heading); font-size: 1.75rem; font-weight: 800; margin-bottom: 0.4rem;">{{ modalTitle }}</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1.25rem; font-size: 0.95rem;">
           {{ modalBody }}
         </p>
 
-        <div v-if="submittedRegistrationNo" style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: var(--radius-md); font-family: monospace; font-size: 1.1rem; color: #34d399; margin-bottom: 1.5rem; border: 1px solid var(--border-color);">
+        <div v-if="submittedRegistrationNo" style="background: rgba(255, 255, 255, 0.05); padding: 0.85rem; border-radius: var(--radius-md); font-family: monospace; font-size: 1.05rem; color: #34d399; margin-bottom: 1.25rem; border: 1px solid var(--border-color);">
           Reference ID: {{ submittedRegistrationNo }}
         </div>
 
@@ -702,19 +689,19 @@
 
     <!-- Career Job Application Modal -->
     <div class="modal-overlay" v-if="showJobModal" @click.self="showJobModal = false">
-      <div class="modal-card" style="max-width: 600px; text-align: left;">
-        <h3 style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; margin-bottom: 0.3rem;">Apply for {{ selectedJob.title }}</h3>
-        <div style="color: var(--warning); font-weight: 700; font-size: 0.85rem; margin-bottom: 1.5rem;">⚠️ Requirement: Minimum 4+ Years Experience Required</div>
+      <div class="modal-card" style="max-width: 550px; text-align: left;">
+        <h3 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; margin-bottom: 0.3rem;">Apply for {{ selectedJob.title }}</h3>
+        <div style="color: var(--warning); font-weight: 700; font-size: 0.8rem; margin-bottom: 1.25rem;">⚠️ Requirement: Minimum 4+ Years Experience Required</div>
 
         <form @submit.prevent="submitJobApplication">
-          <div class="form-group" style="margin-bottom: 1rem;">
+          <div class="form-group" style="margin-bottom: 0.85rem;">
             <label class="form-label">Full Name <span class="req">*</span></label>
             <input type="text" v-model="jobForm.name" required class="form-control" placeholder="Your full legal name">
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 0.85rem;">
             <div class="form-group">
-              <label class="form-label">Total Years of Exp <span class="req">*</span></label>
+              <label class="form-label">Total Exp <span class="req">*</span></label>
               <select v-model="jobForm.experience" class="form-control" required>
                 <option value="4 Years">4 Years Experience</option>
                 <option value="5 Years">5 Years Experience</option>
@@ -723,22 +710,22 @@
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Mobile Number <span class="req">*</span></label>
+              <label class="form-label">Mobile <span class="req">*</span></label>
               <input type="tel" v-model="jobForm.phone" pattern="[0-9]{10}" required class="form-control" placeholder="10-digit mobile">
             </div>
           </div>
 
-          <div class="form-group" style="margin-bottom: 1rem;">
+          <div class="form-group" style="margin-bottom: 0.85rem;">
             <label class="form-label">Email Address <span class="req">*</span></label>
             <input type="email" v-model="jobForm.email" required class="form-control" placeholder="name@example.com">
           </div>
 
-          <div class="form-group" style="margin-bottom: 1.5rem;">
-            <label class="form-label">LinkedIn Profile / GitHub / Resume Link <span class="req">*</span></label>
-            <input type="url" v-model="jobForm.link" required class="form-control" placeholder="https://linkedin.com/in/username or resume link">
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label">Portfolio / LinkedIn Link <span class="req">*</span></label>
+            <input type="url" v-model="jobForm.link" required class="form-control" placeholder="https://linkedin.com/in/username">
           </div>
 
-          <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+          <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
             <button type="button" class="btn-secondary" @click="showJobModal = false">Cancel</button>
             <button type="submit" class="btn-primary">Submit Job Application 💼</button>
           </div>
@@ -757,37 +744,36 @@
               <div class="brand-tagline">IT Solutions & Institute of Computer Tech</div>
             </div>
           </div>
-          <p style="font-size: 0.9rem; line-height: 1.7; color: var(--text-muted);">
+          <p style="font-size: 0.875rem; line-height: 1.7; color: var(--text-muted);">
             World-class IT Solutions Internship Center & accredited computer education institute. Training students in MERN Stack, iOS, Android, and Digital Marketing.
           </p>
         </div>
 
         <div class="footer-col">
-          <h4>Quick Navigation</h4>
+          <h4>Quick Links</h4>
           <ul class="footer-links">
             <li><a href="#" @click.prevent="setTab('home')">Home Overview</a></li>
             <li><a href="#" @click.prevent="setTab('internships')">IT Internships (3/6 Mo)</a></li>
             <li><a href="#" @click.prevent="setTab('courses')">Accredited Courses</a></li>
             <li><a href="#" @click.prevent="setTab('reviews')">Reviews & Feedback</a></li>
+            <li><a href="#" @click.prevent="setTab('admission')">Admission Portal</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>About & Careers</h4>
+          <ul class="footer-links">
+            <li><a href="#" @click.prevent="setTab('about')">About Society</a></li>
+            <li><a href="#" @click.prevent="setTab('team')">Faculty Members</a></li>
             <li><a href="#" @click.prevent="setTab('careers')">Careers (4+ Yrs Exp)</a></li>
           </ul>
         </div>
 
         <div class="footer-col">
-          <h4>Internship Ventures</h4>
-          <ul class="footer-links">
-            <li><a href="#" @click.prevent="setTab('internships')">MERN Stack Developer</a></li>
-            <li><a href="#" @click.prevent="setTab('internships')">iOS App Development</a></li>
-            <li><a href="#" @click.prevent="setTab('internships')">Android App Development</a></li>
-            <li><a href="#" @click.prevent="setTab('internships')">Digital Marketing Track</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-col">
           <h4>Contact & Location</h4>
-          <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">📍 Holagarh, Prayagraj (Allahabad), UP</p>
-          <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">📞 Mobile: +91 9795771806</p>
-          <p style="font-size: 0.9rem; margin-bottom: 1rem;">✉️ Email: info@ithunt.edu.in</p>
+          <p style="font-size: 0.875rem; margin-bottom: 0.4rem;">📍 Holagarh, Prayagraj (Allahabad), UP</p>
+          <p style="font-size: 0.875rem; margin-bottom: 0.4rem;">📞 Mobile: +91 9795771806</p>
+          <p style="font-size: 0.875rem; margin-bottom: 1rem;">✉️ Email: info@ithunt.edu.in</p>
         </div>
       </div>
 
@@ -860,7 +846,7 @@
               title: 'Web Development (MERN Stack Developer)',
               duration: '3 Months / 6 Months',
               description: 'Production-ready full stack engineering with MongoDB, Express.js, React.js, and Node.js. Build scalable SaaS APIs, microservices, and reactive front-ends.',
-              stack: ['MongoDB', 'Express', 'React.js', 'Node.js', 'REST APIs', 'Redux / Zustand', 'Docker']
+              stack: ['MongoDB', 'Express', 'React.js', 'Node.js', 'REST APIs', 'Redux / Zustand']
             },
             {
               id: 2,
@@ -869,7 +855,7 @@
               title: 'iOS Native App Development',
               duration: '3 Months / 6 Months',
               description: 'Native iOS application engineering with Swift and SwiftUI. Learn Xcode, App Store guidelines, REST APIs integration, CoreData, and Apple UI design.',
-              stack: ['Swift 5', 'SwiftUI', 'Xcode', 'CoreData', 'Combine', 'App Store Publishing']
+              stack: ['Swift 5', 'SwiftUI', 'Xcode', 'CoreData', 'Combine']
             },
             {
               id: 3,
@@ -878,7 +864,7 @@
               title: 'Android Native App Development',
               duration: '3 Months / 6 Months',
               description: 'Build high-performance native Android applications using Kotlin and Jetpack Compose. Learn MVVM architecture, Room database, and Google Play deployment.',
-              stack: ['Kotlin', 'Jetpack Compose', 'Android Studio', 'Retrofit', 'MVVM', 'Play Store']
+              stack: ['Kotlin', 'Jetpack Compose', 'Android Studio', 'Retrofit', 'MVVM']
             },
             {
               id: 4,
@@ -887,7 +873,7 @@
               title: 'Digital Marketing & Growth Hacking',
               duration: '3 Months / 6 Months',
               description: 'Master data-driven marketing, Search Engine Optimization (SEO), Pay-Per-Click (PPC) campaigns, Meta Ads, social media strategy, and conversion optimization.',
-              stack: ['SEO Strategy', 'Google Ads PPC', 'Meta Ads', 'Google Analytics 4', 'Content Strategy']
+              stack: ['SEO Strategy', 'Google Ads PPC', 'Meta Ads', 'GA4 Analytics']
             }
           ],
 
@@ -936,12 +922,7 @@
               type: 'Full-Time / Part-Time',
               location: 'Prayagraj / Hybrid',
               salary: '₹6.0L - ₹9.0L P.A.',
-              description: 'Lead our MERN stack internship track, mentor students on live web applications, conduct code reviews, and drive modern React/Node architecture.',
-              requirements: [
-                'MINIMUM 4+ YEARS of experience in Node.js, Express, React, MongoDB.',
-                'Strong background in mentoring or leading engineering teams.',
-                'Solid grasp of REST APIs, Git workflows, and deployment.'
-              ]
+              description: 'Lead our MERN stack internship track, mentor students on live web applications, conduct code reviews, and drive modern React/Node architecture.'
             },
             {
               id: 2,
@@ -950,12 +931,7 @@
               type: 'Full-Time / Part-Time',
               location: 'Prayagraj / Remote',
               salary: '₹6.5L - ₹9.5L P.A.',
-              description: 'Guide interns through native iOS development, Swift, SwiftUI framework, Xcode debugging, and App Store submission processes.',
-              requirements: [
-                'MINIMUM 4+ YEARS of hands-on Swift & SwiftUI app development.',
-                'Published iOS apps on the Apple App Store.',
-                'Excellent communication skills to mentor junior developers.'
-              ]
+              description: 'Guide interns through native iOS development, Swift, SwiftUI framework, Xcode debugging, and App Store submission processes.'
             },
             {
               id: 3,
@@ -964,26 +940,16 @@
               type: 'Full-Time',
               location: 'Prayagraj / Hybrid',
               salary: '₹6.0L - ₹8.5L P.A.',
-              description: 'Instruct and mentor Android development interns on Kotlin, Jetpack Compose, clean MVVM architecture, and Play Store deployment.',
-              requirements: [
-                'MINIMUM 4+ YEARS of commercial Android Kotlin experience.',
-                'Deep knowledge of Android SDK, Room DB, and Retrofit.',
-                'Passion for teaching and technical excellence.'
-              ]
+              description: 'Instruct and mentor Android development interns on Kotlin, Jetpack Compose, clean MVVM architecture, and Play Store deployment.'
             },
             {
               id: 4,
-              shortTitle: 'Digital Marketing Strategist',
+              shortTitle: 'Digital Marketing Lead',
               title: 'Senior Digital Marketing Lead & Educator',
               type: 'Full-Time',
               location: 'Prayagraj',
               salary: '₹4.5L - ₹7.0L P.A.',
-              description: 'Lead the Digital Marketing internship track, teaching SEO, Google Ads PPC, Meta Ads Manager, and growth hacking strategies.',
-              requirements: [
-                'MINIMUM 4+ YEARS of proven experience managing digital marketing campaigns.',
-                'Expertise in GA4, Google Search Console, and ad networks.',
-                'Demonstrated track record of ROI and brand growth.'
-              ]
+              description: 'Lead the Digital Marketing internship track, teaching SEO, Google Ads PPC, Meta Ads Manager, and growth hacking strategies.'
             }
           ],
 
@@ -997,8 +963,7 @@
               duration: '1 Year (2 Semesters)',
               certification: 'Govt. of India Recognized',
               image: 'img/O level.png',
-              description: 'Foundation diploma equivalent to PGDCA. Covers IT Tools, Web Designing, Python Programming, and Internet of Things (IoT).',
-              topics: ['IT Fundamentals', 'HTML5 & CSS3', 'Python Scripting', 'IoT Sensors']
+              description: 'Foundation diploma equivalent to PGDCA. Covers IT Tools, Web Designing, Python Programming, and Internet of Things (IoT).'
             },
             {
               id: 2,
@@ -1009,8 +974,7 @@
               duration: '1 Year (2 Semesters)',
               certification: 'Advance Graduate Diploma',
               image: 'img/A level.png',
-              description: 'Advanced IT engineering diploma covering Data Structures, Computer Networks, Database Management, and Software Engineering.',
-              topics: ['Data Structures C++', 'DBMS & SQL', 'Computer Networks', 'Software Eng']
+              description: 'Advanced IT engineering diploma covering Data Structures, Computer Networks, Database Management, and Software Engineering.'
             },
             {
               id: 3,
@@ -1021,8 +985,7 @@
               duration: '1 - 3 Years',
               certification: 'Regular / Distance Degree',
               image: 'img/shubharati.png',
-              description: 'Comprehensive degree courses in computer applications run via Distance Education approved by UGC, AICTE, and DEC joint committee.',
-              topics: ['Computer Architecture', 'Object Oriented Programming', 'Operating Systems']
+              description: 'Comprehensive degree courses in computer applications run via Distance Education approved by UGC, AICTE, and DEC joint committee.'
             }
           ],
 
