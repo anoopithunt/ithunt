@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IT HUNT | IT Solutions Internship, Training & Tech Institute</title>
+  <title>IT HUNT | Software Solutions & Tech Academy</title>
   <meta name="description" content="IT HUNT - Premier IT Solution Internship & Training Center in Holagarh Prayagraj. 3 & 6-month internships in MERN Stack, iOS, Android, Digital Marketing, NIELIT Diplomas, and Careers.">
   <link rel="shortcut icon" type="image/jpg" href="img/ithunt.jpg"/>
   
@@ -99,16 +99,30 @@
               </div>
             </div>
 
-            <!-- Hero Image Visual -->
+            <!-- Software Code Terminal Visual -->
             <div class="hero-media-wrapper">
-              <div class="hero-media-card">
-                <img :src="content.brand.logoImage" :alt="content.brand.name" class="hero-img-main">
-                <div class="hero-floating-badge">
-                  <div class="hero-floating-icon">💼</div>
-                  <div>
-                    <div style="font-weight: 800; font-size: 1rem; color: var(--text-main);">{{ content.hero.floatingBadgeTitle }}</div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">{{ content.hero.floatingBadgeSubtitle }}</div>
+              <div class="code-terminal-card">
+                <div class="code-terminal-header">
+                  <div class="terminal-dots">
+                    <div class="terminal-dot" style="background: #ef4444;"></div>
+                    <div class="terminal-dot" style="background: #f59e0b;"></div>
+                    <div class="terminal-dot" style="background: #10b981;"></div>
                   </div>
+                  <div class="terminal-title">{{ content.hero.codeSnippetHeader }}</div>
+                </div>
+                <div class="code-terminal-body">
+                  <span v-for="(line, idx) in content.hero.codeSnippetLines" :key="idx" class="code-line">
+                    <span style="color: #64748b; margin-right: 12px; user-select: none;">{{ idx + 1 }}</span>
+                    <span>{{ line }}</span>
+                  </span>
+                </div>
+              </div>
+              
+              <div class="hero-floating-badge" style="bottom: -25px; right: 10px; left: auto;">
+                <div class="hero-floating-icon">💼</div>
+                <div>
+                  <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-main);">{{ content.hero.floatingBadgeTitle }}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">{{ content.hero.floatingBadgeSubtitle }}</div>
                 </div>
               </div>
             </div>
@@ -139,12 +153,12 @@
               <button class="btn-primary" @click="setTab('internships')">Apply for Internship Track →</button>
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-              <div style="background: var(--bg-card); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); text-align: center;">
+              <div style="background: var(--bg-card-glass); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-cyber); text-align: center;">
                 <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">⚡</div>
                 <div style="font-weight: 800; font-size: 0.95rem;">3-Month Track</div>
                 <div style="font-size: 0.75rem; color: var(--text-muted);">Fast-track Skill Acceleration</div>
               </div>
-              <div style="background: var(--bg-card); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); text-align: center;">
+              <div style="background: var(--bg-card-glass); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-cyber); text-align: center;">
                 <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">🚀</div>
                 <div style="font-weight: 800; font-size: 0.95rem;">6-Month Track</div>
                 <div style="font-size: 0.75rem; color: var(--text-muted);">Complete Industry Masterclass</div>
@@ -185,7 +199,7 @@
         <!-- ================= BOTTOM SECTIONS ON HOME PAGE FLOW ================= -->
 
         <!-- 1. ABOUT US BOTTOM SECTION -->
-        <div style="background: rgba(15, 23, 42, 0.4); border-top: 1px solid var(--border-color); padding: 4rem 0;">
+        <div style="background: rgba(15, 23, 42, 0.4); border-top: 1px solid var(--border-cyber); padding: 4rem 0;">
           <div class="container">
             <div class="about-grid">
               <div class="about-card-stack">
@@ -209,9 +223,9 @@
             <div class="director-spotlight-card">
               <img :src="content.director.image" :alt="content.director.name" class="director-img">
               <div>
-                <span class="section-tag">Director's Message</span>
+                <span class="section-tag">{{ content.director.tagline }}</span>
                 <h3 style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; margin-bottom: 0.4rem;">{{ content.director.name }}</h3>
-                <div style="color: var(--secondary); font-weight: 700; margin-bottom: 0.85rem; font-size: 0.9rem;">{{ content.director.title }}</div>
+                <div style="color: var(--color-ai-cyan); font-weight: 700; margin-bottom: 0.85rem; font-size: 0.9rem; font-family: var(--font-mono);">{{ content.director.title }}</div>
                 <p style="color: var(--text-muted); line-height: 1.7; margin-bottom: 1rem; font-size: 0.925rem;">
                   "{{ content.director.message }}"
                 </p>
@@ -224,7 +238,7 @@
         </div>
 
         <!-- 2. FACULTY BOTTOM SECTION -->
-        <div style="padding: 4rem 0; border-top: 1px solid var(--border-color);">
+        <div style="padding: 4rem 0; border-top: 1px solid var(--border-cyber);">
           <div class="container">
             <div class="section-header">
               <span class="section-tag">{{ content.teamSection.tagline }}</span>
@@ -249,7 +263,7 @@
         </div>
 
         <!-- 3. CAREERS BOTTOM SECTION -->
-        <div style="background: rgba(15, 23, 42, 0.6); padding: 4rem 0; border-top: 1px solid var(--border-color);">
+        <div style="background: rgba(15, 23, 42, 0.6); padding: 4rem 0; border-top: 1px solid var(--border-cyber);">
           <div class="container">
             <div class="section-header">
               <span class="section-tag">{{ content.careersSection.tagline }}</span>
@@ -266,12 +280,12 @@
             <div class="careers-grid">
               <div class="career-card" v-for="job in content.careersSection.jobOpenings" :key="job.id">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.85rem;">
-                  <span class="skill-tag" style="background: rgba(99, 102, 241, 0.15); color: #818cf8;">{{ job.type }}</span>
+                  <span class="skill-tag" style="background: rgba(139, 92, 246, 0.15); color: #a78bfa;">{{ job.type }}</span>
                   <span class="exp-badge-required" style="font-size: 0.725rem; padding: 0.2rem 0.5rem;">Min 4+ Yrs Exp</span>
                 </div>
 
                 <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; margin-bottom: 0.4rem;">{{ job.title }}</h3>
-                <div style="color: var(--secondary); font-size: 0.825rem; font-weight: 700; margin-bottom: 0.85rem;">📍 {{ job.location }} | Salary: {{ job.salary }}</div>
+                <div style="color: var(--color-ai-cyan); font-size: 0.825rem; font-weight: 700; margin-bottom: 0.85rem; font-family: var(--font-mono);">📍 {{ job.location }} | Salary: {{ job.salary }}</div>
 
                 <p style="color: var(--text-muted); font-size: 0.875rem; line-height: 1.6; margin-bottom: 1.15rem;">{{ job.description }}</p>
 
@@ -307,7 +321,7 @@
             <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.15rem; line-height: 1.6;">{{ track.description }}</p>
             
             <div style="margin-bottom: 1.15rem;">
-              <div style="font-size: 0.825rem; font-weight: 700; color: var(--secondary); margin-bottom: 0.4rem;">Technologies & Tools:</div>
+              <div style="font-size: 0.825rem; font-weight: 700; color: var(--color-ai-cyan); margin-bottom: 0.4rem; font-family: var(--font-mono);">Technologies & Tools:</div>
               <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
                 <span class="skill-tag" v-for="tech in track.stack" :key="tech">{{ tech }}</span>
               </div>
@@ -370,7 +384,7 @@
             <div class="metric-bar-wrapper" v-for="metric in content.reviewsSection.facilityMetrics" :key="metric.name">
               <div class="metric-bar-header">
                 <span>{{ metric.name }}</span>
-                <span style="font-weight: 700; color: var(--secondary);">{{ metric.score }} / 5.0</span>
+                <span style="font-weight: 700; color: var(--color-ai-cyan); font-family: var(--font-mono);">{{ metric.score }} / 5.0</span>
               </div>
               <div class="metric-bar-track">
                 <div class="metric-bar-fill" :style="{ width: (metric.score / 5 * 100) + '%' }"></div>
@@ -384,7 +398,7 @@
           <div class="review-card" v-for="review in reviewsList" :key="review.id">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
               <span class="star-rating-display">★★★★★</span>
-              <span style="font-size: 0.75rem; color: var(--text-dim);">{{ review.date }}</span>
+              <span style="font-size: 0.75rem; color: var(--text-dim); font-family: var(--font-mono);">{{ review.date }}</span>
             </div>
             <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.15rem; font-style: italic;">
               "{{ review.comment }}"
@@ -393,7 +407,7 @@
               <img :src="review.avatar" :alt="review.name" class="review-avatar">
               <div>
                 <div style="font-weight: 700; font-size: 0.9rem;">{{ review.name }}</div>
-                <div style="font-size: 0.775rem; color: var(--secondary);">{{ review.role }}</div>
+                <div style="font-size: 0.775rem; color: var(--color-ai-cyan); font-family: var(--font-mono);">{{ review.role }}</div>
               </div>
             </div>
           </div>
@@ -542,7 +556,7 @@
 
             <div class="receipt-row"><span class="receipt-label">Candidate Name:</span><span class="receipt-val">{{ form.candidateName || '—' }}</span></div>
             <div class="receipt-row"><span class="receipt-label">Father's Name:</span><span class="receipt-val">{{ form.fatherName || '—' }}</span></div>
-            <div class="receipt-row"><span class="receipt-label">Program Selected:</span><span class="receipt-val" style="color: var(--primary);">{{ form.course }}</span></div>
+            <div class="receipt-row"><span class="receipt-label">Program Selected:</span><span class="receipt-val" style="color: var(--color-ai-violet);">{{ form.course }}</span></div>
             <div class="receipt-row"><span class="receipt-label">Gender / DOB:</span><span class="receipt-val">{{ form.gender }} | {{ form.dob || '—' }}</span></div>
             <div class="receipt-row"><span class="receipt-label">Contact Mobile:</span><span class="receipt-val">{{ form.mobile || '—' }}</span></div>
             <div class="receipt-row"><span class="receipt-label">District:</span><span class="receipt-val">{{ form.district }}</span></div>
@@ -560,7 +574,7 @@
           {{ modalBody }}
         </p>
 
-        <div v-if="submittedRegistrationNo" style="background: rgba(255, 255, 255, 0.05); padding: 0.85rem; border-radius: var(--radius-md); font-family: monospace; font-size: 1.05rem; color: #34d399; margin-bottom: 1.25rem; border: 1px solid var(--border-color);">
+        <div v-if="submittedRegistrationNo" style="background: rgba(255, 255, 255, 0.05); padding: 0.85rem; border-radius: var(--radius-md); font-family: monospace; font-size: 1.05rem; color: #34d399; margin-bottom: 1.25rem; border: 1px solid var(--border-cyber);">
           Reference ID: {{ submittedRegistrationNo }}
         </div>
 
@@ -574,7 +588,7 @@
     <div class="modal-overlay" v-if="showJobModal" @click.self="showJobModal = false">
       <div class="modal-card" style="max-width: 550px; text-align: left;">
         <h3 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; margin-bottom: 0.3rem;">Apply for {{ selectedJob.title }}</h3>
-        <div style="color: var(--warning); font-weight: 700; font-size: 0.8rem; margin-bottom: 1.25rem;">⚠️ Requirement: Minimum 4+ Years Experience Required</div>
+        <div style="color: var(--color-ai-gold); font-weight: 700; font-size: 0.8rem; margin-bottom: 1.25rem; font-family: var(--font-mono);">⚠️ Requirement: Minimum 4+ Years Experience Required</div>
 
         <form @submit.prevent="submitJobApplication">
           <div class="form-group" style="margin-bottom: 0.85rem;">

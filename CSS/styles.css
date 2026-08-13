@@ -25,8 +25,8 @@ body {
   width: 100%;
   transition: background-color 0.3s ease, color 0.3s ease;
   background-image: 
-    radial-gradient(circle at 10% 15%, rgba(139, 92, 246, 0.16) 0%, transparent 45%),
-    radial-gradient(circle at 90% 85%, rgba(6, 182, 212, 0.16) 0%, transparent 45%),
+    radial-gradient(circle at 10% 15%, rgba(139, 92, 246, 0.18) 0%, transparent 45%),
+    radial-gradient(circle at 90% 85%, rgba(6, 182, 212, 0.18) 0%, transparent 45%),
     linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
   background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
@@ -392,65 +392,58 @@ button, input, select, textarea {
   box-shadow: 0 0 15px var(--glow-cyan);
 }
 
-/* Hero Media Card */
-.hero-media-wrapper {
-  position: relative;
-}
-
-.hero-media-card {
-  background: var(--bg-card-glass);
+/* Code Terminal Window Graphic (Software Studio Aesthetic) */
+.code-terminal-card {
+  background: #090d16;
   border: 1px solid var(--border-cyber-glow);
   border-radius: var(--radius-lg);
-  padding: 0.85rem;
+  overflow: hidden;
   box-shadow: var(--shadow-lg);
-  backdrop-filter: blur(16px);
-  position: relative;
-  z-index: 2;
-  transition: var(--transition);
-}
-
-.hero-media-card:hover {
-  border-color: var(--color-ai-cyan);
-  transform: translateY(-4px);
-  box-shadow: 0 15px 35px rgba(6, 182, 212, 0.25);
-}
-
-.hero-img-main {
-  width: 100%;
-  height: 360px;
-  object-fit: cover;
-  border-radius: var(--radius-md);
-}
-
-.hero-floating-badge {
-  position: absolute;
-  bottom: -20px;
-  left: -15px;
-  background: var(--bg-card-glass);
-  border: 1px solid var(--border-cyber-glow);
   backdrop-filter: blur(20px);
-  padding: 0.85rem 1.15rem;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  z-index: 3;
 }
 
-.hero-floating-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-ai-emerald), #059669);
-  color: #fff;
+.code-terminal-header {
+  background: #0d1322;
+  padding: 0.75rem 1rem;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  flex-shrink: 0;
-  box-shadow: 0 0 12px var(--glow-emerald);
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-cyber);
 }
+
+.terminal-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.terminal-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+
+.terminal-title {
+  font-family: var(--font-mono);
+  font-size: 0.775rem;
+  color: var(--text-muted);
+}
+
+.code-terminal-body {
+  padding: 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: #a78bfa;
+  overflow-x: auto;
+}
+
+.code-line {
+  display: block;
+}
+
+.code-keyword { color: #ec4899; }
+.code-function { color: #38bdf8; }
+.code-string { color: #34d399; }
 
 /* Stats Counter Grid */
 .stats-section {
