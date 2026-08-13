@@ -53,21 +53,6 @@
                 <span>📝</span> Admission
               </button>
             </li>
-            <li>
-              <button class="nav-item-btn" :class="{ active: activeTab === 'about' }" @click="setTab('about')">
-                <span>🏢</span> About Us
-              </button>
-            </li>
-            <li>
-              <button class="nav-item-btn" :class="{ active: activeTab === 'team' }" @click="setTab('team')">
-                <span>👨‍🏫</span> Faculty
-              </button>
-            </li>
-            <li>
-              <button class="nav-item-btn" :class="{ active: activeTab === 'careers' }" @click="setTab('careers')">
-                <span>💼</span> Careers
-              </button>
-            </li>
           </ul>
         </nav>
 
@@ -93,9 +78,6 @@
         <button class="nav-item-btn" :class="{ active: activeTab === 'courses' }" @click="setTab('courses')">📚 Accredited Courses</button>
         <button class="nav-item-btn" :class="{ active: activeTab === 'reviews' }" @click="setTab('reviews')">⭐ Reviews & Feedback</button>
         <button class="nav-item-btn" :class="{ active: activeTab === 'admission' }" @click="setTab('admission')">📝 Admission Portal</button>
-        <button class="nav-item-btn" :class="{ active: activeTab === 'about' }" @click="setTab('about')">🏢 About Us & Director Message</button>
-        <button class="nav-item-btn" :class="{ active: activeTab === 'team' }" @click="setTab('team')">👨‍🏫 Faculty & Mentors</button>
-        <button class="nav-item-btn" :class="{ active: activeTab === 'careers' }" @click="setTab('careers')">💼 Careers (Min 4+ Yrs Exp)</button>
       </div>
     </header>
 
