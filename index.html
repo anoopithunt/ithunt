@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IT HUNT | The Institute of Computer Technology</title>
-  <meta name="description" content="IT HUNT - Premier Computer Education Institute in Holagarh Prayagraj & Pratapgarh providing NIELIT O Level, A Level, Subharti University Degrees, Web Development, and Cyber Security.">
+  <title>IT HUNT | IT Solutions Internship, Training & Tech Institute</title>
+  <meta name="description" content="IT HUNT - Premier IT Solution Internship & Training Center in Holagarh Prayagraj. 3 & 6-month internships in MERN Stack, iOS, Android, Digital Marketing, NIELIT Diplomas, and Careers.">
   <link rel="shortcut icon" type="image/jpg" href="img/ithunt.jpg"/>
   
   <!-- CSS Stylesheet -->
@@ -18,11 +18,11 @@
     <!-- Navbar -->
     <header class="navbar-header">
       <div class="container navbar-container">
-        <div class="brand-logo" @click="activeTab = 'home'">
+        <div class="brand-logo" @click="setTab('home')">
           <img src="img/ithunt.jpg" alt="IT HUNT Logo" class="brand-logo-img">
           <div>
             <div class="brand-title">IT <span class="text-gradient">HUNT</span></div>
-            <div class="brand-tagline">Institute of Computer Tech</div>
+            <div class="brand-tagline">IT Solutions & Education</div>
           </div>
         </div>
 
@@ -31,6 +31,11 @@
             <li>
               <button class="nav-item-btn" :class="{ active: activeTab === 'home' }" @click="setTab('home')">
                 <span>🏠</span> Home
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" :class="{ active: activeTab === 'internships' }" @click="setTab('internships')">
+                <span>🚀</span> Internships
               </button>
             </li>
             <li>
@@ -45,7 +50,17 @@
             </li>
             <li>
               <button class="nav-item-btn" :class="{ active: activeTab === 'team' }" @click="setTab('team')">
-                <span>👨‍🏫</span> Faculty & Staff
+                <span>👨‍🏫</span> Faculty
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" :class="{ active: activeTab === 'reviews' }" @click="setTab('reviews')">
+                <span>⭐</span> Reviews
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" :class="{ active: activeTab === 'careers' }" @click="setTab('careers')">
+                <span>💼</span> Careers
               </button>
             </li>
             <li>
@@ -61,8 +76,8 @@
             <span>{{ isDarkMode ? '☀️' : '🌙' }}</span>
           </button>
           
-          <button class="cta-btn-header" @click="setTab('admission')">
-            <span>Apply Now</span> ✨
+          <button class="cta-btn-header" @click="setTab('internships')">
+            <span>Apply Internship</span> ✨
           </button>
 
           <button class="mobile-toggle-btn" @click="isMobileNavOpen = !isMobileNavOpen">
@@ -74,9 +89,12 @@
       <!-- Mobile Navigation Drawer -->
       <div class="mobile-nav-drawer" :class="{ open: isMobileNavOpen }">
         <button class="nav-item-btn" :class="{ active: activeTab === 'home' }" @click="setTab('home')">🏠 Home</button>
+        <button class="nav-item-btn" :class="{ active: activeTab === 'internships' }" @click="setTab('internships')">🚀 IT Internships</button>
         <button class="nav-item-btn" :class="{ active: activeTab === 'courses' }" @click="setTab('courses')">📚 Courses</button>
         <button class="nav-item-btn" :class="{ active: activeTab === 'about' }" @click="setTab('about')">🏢 About Us</button>
         <button class="nav-item-btn" :class="{ active: activeTab === 'team' }" @click="setTab('team')">👨‍🏫 Faculty & Staff</button>
+        <button class="nav-item-btn" :class="{ active: activeTab === 'reviews' }" @click="setTab('reviews')">⭐ Student Reviews & Feedback</button>
+        <button class="nav-item-btn" :class="{ active: activeTab === 'careers' }" @click="setTab('careers')">💼 Careers & Hiring (4+ Yrs Exp)</button>
         <button class="nav-item-btn" :class="{ active: activeTab === 'admission' }" @click="setTab('admission')">📝 Admission Portal</button>
       </div>
     </header>
@@ -91,29 +109,30 @@
             <div class="hero-content">
               <div class="hero-badge">
                 <span class="hero-badge-dot"></span>
-                <span>Empowering Digital Leaders Since 2012</span>
+                <span>NEW: IT Solutions Internship & Training Center 2026</span>
               </div>
               <h1 class="hero-title">
-                Master the Future of <span class="text-gradient">Computer & IT Skills</span>
+                Gain Real-World <span class="text-gradient">IT & Software Experience</span>
               </h1>
               <p class="hero-subtitle">
-                IT HUNT is Prayagraj’s #1 digital economy skills institute. From <strong>NIELIT O/A Level Diplomas</strong> to <strong>Subharti University Degrees</strong>, <strong>Full-Stack Web Dev</strong>, and <strong>Ethical Hacking</strong> — we bridge the gap between education and career success.
+                IT HUNT presents premier <strong>3-Month & 6-Month Industry Internships</strong> in MERN Stack, iOS, Android, and Digital Marketing alongside government accredited <strong>NIELIT O/A Level Diplomas</strong> & <strong>Subharti University Degrees</strong>.
               </p>
 
               <div class="hero-cta-group">
-                <button class="btn-primary" @click="setTab('admission')">
-                  <span>Start Admission 2026</span> →
+                <button class="btn-primary" @click="setTab('internships')">
+                  <span>Explore IT Internships</span> 🚀
                 </button>
-                <button class="btn-secondary" @click="setTab('courses')">
-                  <span>Browse Programs</span> 🔍
+                <button class="btn-secondary" @click="setTab('careers')">
+                  <span>We are Hiring (4+ Yrs Exp)</span> 💼
                 </button>
               </div>
 
               <!-- Quick Highlights Badges -->
-              <div style="display: flex; gap: 1.5rem; color: var(--text-muted); font-size: 0.9rem; font-weight: 600;">
-                <div>✓ NIELIT Accredited Center</div>
-                <div>✓ 100% Practical Training</div>
-                <div>✓ Job Placement Support</div>
+              <div style="display: flex; gap: 1.5rem; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; flex-wrap: wrap;">
+                <div>✓ 3 & 6 Months Internships</div>
+                <div>✓ Live Client Projects</div>
+                <div>✓ Certificate + LOR</div>
+                <div>✓ 100% Placement Help</div>
               </div>
             </div>
 
@@ -122,10 +141,10 @@
               <div class="hero-media-card">
                 <img src="img/ithunt.jpg" alt="IT HUNT Institute" class="hero-img-main">
                 <div class="hero-floating-badge">
-                  <div class="hero-floating-icon">🎓</div>
+                  <div class="hero-floating-icon">💼</div>
                   <div>
-                    <div style="font-weight: 800; font-size: 1.1rem; color: var(--text-main);">85%+ Placement</div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted);">Career Boost & Promotions</div>
+                    <div style="font-weight: 800; font-size: 1.1rem; color: var(--text-main);">Live IT Projects</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">MERN, iOS & Android Center</div>
                   </div>
                 </div>
               </div>
@@ -138,19 +157,47 @@
           <div class="stats-grid">
             <div class="stat-card">
               <div class="stat-number text-gradient">5,000+</div>
-              <div class="stat-label">Students Trained</div>
+              <div class="stat-label">Students & Interns</div>
             </div>
             <div class="stat-card">
-              <div class="stat-number text-gradient-secondary">98%</div>
-              <div class="stat-label">Exam Pass Rate</div>
+              <div class="stat-number text-gradient-secondary">4.9 ★</div>
+              <div class="stat-label">Student Facility Review</div>
             </div>
             <div class="stat-card">
-              <div class="stat-number text-gradient">15+</div>
-              <div class="stat-label">Certified Programs</div>
+              <div class="stat-number text-gradient">100%</div>
+              <div class="stat-label">Practical Live Projects</div>
             </div>
             <div class="stat-card">
-              <div class="stat-number text-gradient-secondary">4+</div>
-              <div class="stat-label">Regional Campuses</div>
+              <div class="stat-number text-gradient-secondary">4+ Yrs</div>
+              <div class="stat-label">Experienced Instructors</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Internship Spotlight Banner -->
+        <div class="container" style="margin-bottom: 4rem;">
+          <div class="internship-banner">
+            <div>
+              <span class="duration-pill">NEW VENTURE 2026</span>
+              <h2 style="font-family: var(--font-heading); font-size: 2.25rem; font-weight: 800; margin-bottom: 1rem;">
+                IT Solutions <span class="text-gradient">Internship Program</span>
+              </h2>
+              <p style="color: var(--text-muted); line-height: 1.7; margin-bottom: 1.5rem;">
+                Step out of theory and step into production-level development. Work on live web applications, native iOS apps, Android projects, and growth campaigns under senior tech mentors.
+              </p>
+              <button class="btn-primary" @click="setTab('internships')">Apply for Internship Track →</button>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div style="background: var(--bg-card); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); text-align: center;">
+                <div style="font-size: 1.75rem; margin-bottom: 0.3rem;">⚡</div>
+                <div style="font-weight: 800; font-size: 1rem;">3-Month Track</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Fast-track Skill Acceleration</div>
+              </div>
+              <div style="background: var(--bg-card); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); text-align: center;">
+                <div style="font-size: 1.75rem; margin-bottom: 0.3rem;">🚀</div>
+                <div style="font-weight: 800; font-size: 1rem;">6-Month Track</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Complete Industry Masterclass</div>
+              </div>
             </div>
           </div>
         </div>
@@ -159,8 +206,8 @@
         <div class="container" style="padding-bottom: 5rem;">
           <div class="section-header">
             <span class="section-tag">Featured Curriculums</span>
-            <h2 class="section-title">Industry Accredited <span class="text-gradient">Courses</span></h2>
-            <p class="section-subtitle">Specially tailored computer training designed for beginners and professionals alike.</p>
+            <h2 class="section-title">Accredited <span class="text-gradient">Courses & Diplomas</span></h2>
+            <p class="section-subtitle">Government recognized computer education combined with practical lab training.</p>
           </div>
 
           <div class="courses-grid">
@@ -182,9 +229,47 @@
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div style="text-align: center;">
-            <button class="btn-secondary" @click="setTab('courses')">View All Courses & Syllabuses →</button>
+      <!-- ================= INTERNSHIP CENTER TAB ================= -->
+      <section v-if="activeTab === 'internships'" class="container" style="padding: 4rem 1.5rem;">
+        <div class="section-header">
+          <span class="section-tag">IT Solutions Venture</span>
+          <h2 class="section-title">Professional <span class="text-gradient">IT Internship & Training</span></h2>
+          <p class="section-subtitle">Bridge the gap between academics and full-time tech engineering through live client project internships.</p>
+        </div>
+
+        <!-- Program Duration Selector -->
+        <div class="filter-bar">
+          <button class="filter-btn" :class="{ active: selectedInternshipDuration === 'all' }" @click="selectedInternshipDuration = 'all'">All Internship Durations</button>
+          <button class="filter-btn" :class="{ active: selectedInternshipDuration === '3 Months' }" @click="selectedInternshipDuration = '3 Months'">3-Month Fast Track</button>
+          <button class="filter-btn" :class="{ active: selectedInternshipDuration === '6 Months' }" @click="selectedInternshipDuration = '6 Months'">6-Month Mastery Track</button>
+        </div>
+
+        <div class="internship-grid">
+          <div class="internship-card" v-for="track in filteredInternships" :key="track.id">
+            <div class="internship-icon">{{ track.icon }}</div>
+            <span class="duration-pill">{{ track.duration }}</span>
+            <h3 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; margin-bottom: 0.75rem;">{{ track.title }}</h3>
+            <p style="color: var(--text-muted); font-size: 0.925rem; margin-bottom: 1.25rem; line-height: 1.6;">{{ track.description }}</p>
+            
+            <div style="margin-bottom: 1.25rem;">
+              <div style="font-size: 0.85rem; font-weight: 700; color: var(--secondary); margin-bottom: 0.5rem;">Key Technologies & Tools:</div>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+                <span class="skill-tag" v-for="tech in track.stack" :key="tech">{{ tech }}</span>
+              </div>
+            </div>
+
+            <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; margin-bottom: 1.5rem; font-size: 0.85rem; color: var(--text-dim);">
+              <div>✓ Live Project Deliverables</div>
+              <div>✓ Verified Experience Letter + LOR</div>
+              <div>✓ Senior Developer Code Reviews</div>
+            </div>
+
+            <button class="btn-primary" style="width: 100%; justify-content: center;" @click="openInternshipModal(track)">
+              <span>Apply for {{ track.shortName }}</span> 🚀
+            </button>
           </div>
         </div>
       </section>
@@ -243,17 +328,14 @@
             <span class="section-tag">About Our Society</span>
             <h2>Transforming Tech Education in <span class="text-gradient">Prayagraj & Beyond</span></h2>
             <p>
-              <strong>IT HUNT in Holagarh, Prayagraj</strong> is a top-tier Computer Technology Training Institute servicing students locally and across Uttar Pradesh. Established with a vision to make digital literacy accessible to all, we specialize in rapidly evolving fields like Cyber Security, Cloud Computing, Web Development, and Financial Accounting.
-            </p>
-            <p>
-              Under the guidance of renowned faculty, our institute provides live project classes, practical lab environments, and official examination prep for government recognized diplomas.
+              <strong>IT HUNT in Holagarh, Prayagraj</strong> is a top-tier Computer Technology & IT Solution Training Institute servicing students locally and across Uttar Pradesh. Established with a vision to make digital literacy accessible to all, we specialize in rapidly evolving fields like MERN Stack, iOS/Android Development, Cyber Security, and Financial Accounting.
             </p>
 
             <div class="about-features-list">
               <div class="about-feature-item"><span class="about-check-icon">✓</span> NIELIT Accredited</div>
               <div class="about-feature-item"><span class="about-check-icon">✓</span> Subharti Univ Partner</div>
-              <div class="about-feature-item"><span class="about-check-icon">✓</span> Hands-on Labs</div>
-              <div class="about-feature-item"><span class="about-check-icon">✓</span> Expert Faculty</div>
+              <div class="about-feature-item"><span class="about-check-icon">✓</span> IT Solution Center</div>
+              <div class="about-feature-item"><span class="about-check-icon">✓</span> 4+ Yrs Exp Faculty</div>
               <div class="about-feature-item"><span class="about-check-icon">✓</span> Modern Workstations</div>
               <div class="about-feature-item"><span class="about-check-icon">✓</span> Career Counseling</div>
             </div>
@@ -269,7 +351,7 @@
               <h3 style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">Mr. Lakshman Singh Chauhan</h3>
               <div style="color: var(--secondary); font-weight: 700; margin-bottom: 1rem;">Director & Founder, IT HUNT | MCA (Computer Science)</div>
               <p style="color: var(--text-muted); line-height: 1.7; margin-bottom: 1rem;">
-                "Our mission is to empower every candidate—regardless of their prior background—with market-ready IT skills. Technology evolves fast, and at IT HUNT, we ensure our students stay ahead through practical, project-based learning and globally recognized certifications."
+                "Our mission is to empower every candidate with market-ready IT skills. With our new IT Solutions Internship Center and experienced senior faculty (4+ years experience), we deliver unparalleled quality and hands-on production experience."
               </p>
               <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                 <span class="skill-tag">Public Speaking Expert</span>
@@ -287,7 +369,7 @@
         <div class="section-header">
           <span class="section-tag">Expert Leadership</span>
           <h2 class="section-title">Meet Our Dedicated <span class="text-gradient">Faculty & Staff</span></h2>
-          <p class="section-subtitle">Experienced industry professionals and mentors guiding your career path.</p>
+          <p class="section-subtitle">Experienced industry professionals (4+ years experience) guiding your technical career path.</p>
         </div>
 
         <div class="team-grid">
@@ -301,6 +383,150 @@
             <div class="team-skills">
               <span class="skill-tag" v-for="skill in member.skills" :key="skill">{{ skill }}</span>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= REVIEWS & FEEDBACK PORTAL ================= -->
+      <section v-if="activeTab === 'reviews'" class="container" style="padding: 4rem 1.5rem;">
+        <div class="section-header">
+          <span class="section-tag">Quality & Ease of Learning</span>
+          <h2 class="section-title">Student & Alumni <span class="text-gradient">Reviews & Feedback</span></h2>
+          <p class="section-subtitle">We continuously evaluate our institute facilities and curriculum to drive excellence.</p>
+        </div>
+
+        <!-- Rating Summary Card -->
+        <div class="rating-summary-card">
+          <div style="text-align: center; border-right: 1px solid var(--border-color); padding-right: 1.5rem;">
+            <div class="big-rating-score">4.9</div>
+            <div class="star-rating-display">★★★★★</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.4rem;">Based on 250+ Verified Reviews</div>
+          </div>
+
+          <div>
+            <h4 style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem;">Facility & Development Evaluation Metrics</h4>
+            
+            <div class="metric-bar-wrapper" v-for="metric in facilityMetrics" :key="metric.name">
+              <div class="metric-bar-header">
+                <span>{{ metric.name }}</span>
+                <span style="font-weight: 700; color: var(--secondary);">{{ metric.score }} / 5.0</span>
+              </div>
+              <div class="metric-bar-track">
+                <div class="metric-bar-fill" :style="{ width: (metric.score / 5 * 100) + '%' }"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reviews Grid -->
+        <div class="reviews-grid">
+          <div class="review-card" v-for="review in reviewsList" :key="review.id">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <span class="star-rating-display">★★★★★</span>
+              <span style="font-size: 0.75rem; color: var(--text-dim);">{{ review.date }}</span>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.925rem; line-height: 1.6; margin-bottom: 1.25rem; font-style: italic;">
+              "{{ review.comment }}"
+            </p>
+            <div class="review-author">
+              <img :src="review.avatar" :alt="review.name" class="review-avatar">
+              <div>
+                <div style="font-weight: 700; font-size: 0.95rem;">{{ review.name }}</div>
+                <div style="font-size: 0.8rem; color: var(--secondary);">{{ review.role }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Review & Feedback Form -->
+        <div class="form-card" style="max-width: 800px; margin: 0 auto;">
+          <h3 class="form-title">Submit Your Review & Feedback</h3>
+          <p class="form-subtitle">Help us improve institute infrastructure, labs, and ease of technical development.</p>
+
+          <form @submit.prevent="submitReview">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Your Name <span class="req">*</span></label>
+                <input type="text" v-model="newReview.name" required class="form-control" placeholder="Full name">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Course / Program Attended <span class="req">*</span></label>
+                <input type="text" v-model="newReview.role" required class="form-control" placeholder="e.g. MERN Stack Intern / O Level Student">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Overall Rating <span class="req">*</span></label>
+                <select v-model.number="newReview.rating" class="form-control" required>
+                  <option value="5">⭐⭐⭐⭐⭐ 5 Stars (Excellent)</option>
+                  <option value="4">⭐⭐⭐⭐ 4 Stars (Very Good)</option>
+                  <option value="3">⭐⭐⭐ 3 Stars (Average)</option>
+                  <option value="2">⭐⭐ 2 Stars (Needs Improvement)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Facility Evaluation Area</label>
+                <select v-model="newReview.category" class="form-control">
+                  <option value="Labs & Workstations">Labs & Computer Workstations</option>
+                  <option value="Teaching & Mentorship">Teaching & Faculty Mentorship</option>
+                  <option value="Placement & LOR">Placement & Internship LOR</option>
+                  <option value="Course Curriculum">Course Curriculum & Ease of Learning</option>
+                </select>
+              </div>
+
+              <div class="form-group full-width">
+                <label class="form-label">Your Detailed Review & Suggestions <span class="req">*</span></label>
+                <textarea v-model="newReview.comment" rows="4" required class="form-control" placeholder="Share your experience regarding facility quality, faculty guidance, and ease of development..."></textarea>
+              </div>
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+              <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
+                <span>Post Review & Feedback</span> ⭐
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ================= CAREERS / HIRING TAB ================= -->
+      <section v-if="activeTab === 'careers'" class="container" style="padding: 4rem 1.5rem;">
+        <div class="section-header">
+          <span class="section-tag">Join Our Faculty & Engineering Team</span>
+          <h2 class="section-title">We are Hiring <span class="text-gradient">Teachers & Developers</span></h2>
+          <p class="section-subtitle">Looking for passionate educators and technical leaders to drive our IT HUNT education and internship programs.</p>
+
+          <div style="margin-top: 1.5rem;">
+            <span class="exp-badge-required">
+              <span>⚠️ MANDATORY REQUIREMENT:</span> Minimum 4+ Years Relevant Industry / Teaching Experience Required
+            </span>
+          </div>
+        </div>
+
+        <!-- Careers Openings Grid -->
+        <div class="careers-grid">
+          <div class="career-card" v-for="job in jobOpenings" :key="job.id">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+              <span class="skill-tag" style="background: rgba(99, 102, 241, 0.15); color: #818cf8;">{{ job.type }}</span>
+              <span class="exp-badge-required" style="font-size: 0.75rem; padding: 0.2rem 0.6rem;">Min 4+ Yrs Exp</span>
+            </div>
+
+            <h3 style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; margin-bottom: 0.5rem;">{{ job.title }}</h3>
+            <div style="color: var(--secondary); font-size: 0.85rem; font-weight: 700; margin-bottom: 1rem;">📍 Location: {{ job.location }} | Salary: {{ job.salary }}</div>
+
+            <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.25rem;">{{ job.description }}</p>
+
+            <div style="margin-bottom: 1.5rem;">
+              <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.4rem;">Key Prerequisites:</div>
+              <ul style="color: var(--text-muted); font-size: 0.85rem; padding-left: 1.2rem; line-height: 1.6;">
+                <li v-for="req in job.requirements" :key="req">{{ req }}</li>
+              </ul>
+            </div>
+
+            <button class="btn-primary" style="width: 100%; justify-content: center; margin-top: auto;" @click="openJobModal(job)">
+              <span>Apply for {{ job.shortTitle }}</span> 💼
+            </button>
           </div>
         </div>
       </section>
@@ -362,16 +588,17 @@
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label">Target Course <span class="req">*</span></label>
+                  <label class="form-label">Target Course / Venture <span class="req">*</span></label>
                   <select v-model="form.course" class="form-control" required>
+                    <option value="MERN Stack Internship (3/6 Mo)">MERN Stack IT Solution Internship</option>
+                    <option value="iOS Dev Internship (3/6 Mo)">iOS Development IT Solution Internship</option>
+                    <option value="Android Dev Internship (3/6 Mo)">Android Development IT Solution Internship</option>
+                    <option value="Digital Marketing Internship">Digital Marketing IT Solution Internship</option>
                     <option value="NIELIT O Level">NIELIT O Level (Foundation)</option>
                     <option value="NIELIT A Level">NIELIT A Level (Advance)</option>
                     <option value="BCA - Subharti University">BCA - Subharti Univ Degree</option>
                     <option value="MCA - Subharti University">MCA - Subharti Univ Degree</option>
-                    <option value="PGDCA">PGDCA Diploma</option>
-                    <option value="Full Stack Web Development">Full Stack Web Development</option>
                     <option value="Tally ERP 9 & GST">Tally ERP 9 & Financial Accounting</option>
-                    <option value="Cyber Security & Ethical Hacking">Cyber Security & Ethical Hacking</option>
                   </select>
                 </div>
 
@@ -403,16 +630,11 @@
                   <label class="form-label">Permanent Address <span class="req">*</span></label>
                   <textarea v-model="form.address" rows="3" required class="form-control" placeholder="Full residential street address"></textarea>
                 </div>
-
-                <div class="form-group full-width">
-                  <label class="form-label">Upload Passport Photo</label>
-                  <input type="file" @change="handleFileUpload" accept="image/*" class="form-control">
-                </div>
               </div>
 
               <div style="margin-top: 2rem;">
                 <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; font-size: 1.05rem;">
-                  <span>Submit Admission Application</span> 🚀
+                  <span>Submit Registration</span> 🚀
                 </button>
               </div>
             </form>
@@ -435,7 +657,7 @@
               <span class="receipt-val">{{ form.fatherName || '—' }}</span>
             </div>
             <div class="receipt-row">
-              <span class="receipt-label">Course Selected:</span>
+              <span class="receipt-label">Program Selected:</span>
               <span class="receipt-val" style="color: var(--primary);">{{ form.course }}</span>
             </div>
             <div class="receipt-row">
@@ -457,45 +679,70 @@
           </div>
         </div>
       </section>
-
-      <!-- ================= FAQ SECTION ================= -->
-      <section class="container" style="padding: 2rem 1.5rem 5rem;">
-        <div class="section-header">
-          <span class="section-tag">Got Questions?</span>
-          <h2 class="section-title">Frequently Asked <span class="text-gradient">Questions</span></h2>
-        </div>
-
-        <div class="faq-container">
-          <div class="accordion-item" v-for="(faq, index) in faqs" :key="index" :class="{ active: activeFaqIndex === index }">
-            <div class="accordion-header" @click="toggleFaq(index)">
-              <span>{{ faq.question }}</span>
-              <span class="accordion-icon">▼</span>
-            </div>
-            <div class="accordion-content" v-show="activeFaqIndex === index">
-              {{ faq.answer }}
-            </div>
-          </div>
-        </div>
-      </section>
     </main>
 
     <!-- Confirmation Modal -->
     <div class="modal-overlay" v-if="showModal" @click.self="showModal = false">
       <div class="modal-card">
         <div class="modal-icon-success">✓</div>
-        <h3 style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">Application Submitted!</h3>
+        <h3 style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">{{ modalTitle }}</h3>
         <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
-          Thank you <strong>{{ form.candidateName }}</strong>! Your admission request for <strong>{{ form.course }}</strong> has been registered successfully.
+          {{ modalBody }}
         </p>
 
-        <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: var(--radius-md); font-family: monospace; font-size: 1.1rem; color: #34d399; margin-bottom: 1.5rem; border: 1px solid var(--border-color);">
-          Registration ID: {{ submittedRegistrationNo }}
+        <div v-if="submittedRegistrationNo" style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: var(--radius-md); font-family: monospace; font-size: 1.1rem; color: #34d399; margin-bottom: 1.5rem; border: 1px solid var(--border-color);">
+          Reference ID: {{ submittedRegistrationNo }}
         </div>
 
         <div style="display: flex; gap: 1rem; justify-content: center;">
-          <button class="btn-primary" @click="printReceipt">Print Receipt 🖨️</button>
-          <button class="btn-secondary" @click="showModal = false">Close</button>
+          <button class="btn-primary" @click="showModal = false">Got It 👍</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Career Job Application Modal -->
+    <div class="modal-overlay" v-if="showJobModal" @click.self="showJobModal = false">
+      <div class="modal-card" style="max-width: 600px; text-align: left;">
+        <h3 style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; margin-bottom: 0.3rem;">Apply for {{ selectedJob.title }}</h3>
+        <div style="color: var(--warning); font-weight: 700; font-size: 0.85rem; margin-bottom: 1.5rem;">⚠️ Requirement: Minimum 4+ Years Experience Required</div>
+
+        <form @submit.prevent="submitJobApplication">
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label class="form-label">Full Name <span class="req">*</span></label>
+            <input type="text" v-model="jobForm.name" required class="form-control" placeholder="Your full legal name">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+            <div class="form-group">
+              <label class="form-label">Total Years of Exp <span class="req">*</span></label>
+              <select v-model="jobForm.experience" class="form-control" required>
+                <option value="4 Years">4 Years Experience</option>
+                <option value="5 Years">5 Years Experience</option>
+                <option value="6-8 Years">6 - 8 Years Experience</option>
+                <option value="8+ Years">8+ Years Experience</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mobile Number <span class="req">*</span></label>
+              <input type="tel" v-model="jobForm.phone" pattern="[0-9]{10}" required class="form-control" placeholder="10-digit mobile">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label class="form-label">Email Address <span class="req">*</span></label>
+            <input type="email" v-model="jobForm.email" required class="form-control" placeholder="name@example.com">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label class="form-label">LinkedIn Profile / GitHub / Resume Link <span class="req">*</span></label>
+            <input type="url" v-model="jobForm.link" required class="form-control" placeholder="https://linkedin.com/in/username or resume link">
+          </div>
+
+          <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+            <button type="button" class="btn-secondary" @click="showJobModal = false">Cancel</button>
+            <button type="submit" class="btn-primary">Submit Job Application 💼</button>
+          </div>
+        </form>
       </div>
     </div>
 
@@ -507,11 +754,11 @@
             <img src="img/ithunt.jpg" alt="IT HUNT Logo" class="brand-logo-img">
             <div>
               <div class="brand-title">IT <span class="text-gradient">HUNT</span></div>
-              <div class="brand-tagline">Institute of Computer Technology</div>
+              <div class="brand-tagline">IT Solutions & Institute of Computer Tech</div>
             </div>
           </div>
           <p style="font-size: 0.9rem; line-height: 1.7; color: var(--text-muted);">
-            World-class digital skill training in Holagarh Prayagraj & Pratapgarh. Partnering with NIELIT and Subharti University to prepare learners for tech careers.
+            World-class IT Solutions Internship Center & accredited computer education institute. Training students in MERN Stack, iOS, Android, and Digital Marketing.
           </p>
         </div>
 
@@ -519,21 +766,20 @@
           <h4>Quick Navigation</h4>
           <ul class="footer-links">
             <li><a href="#" @click.prevent="setTab('home')">Home Overview</a></li>
-            <li><a href="#" @click.prevent="setTab('courses')">Available Courses</a></li>
-            <li><a href="#" @click.prevent="setTab('about')">About Society</a></li>
-            <li><a href="#" @click.prevent="setTab('team')">Our Faculty</a></li>
-            <li><a href="#" @click.prevent="setTab('admission')">Admission Form</a></li>
+            <li><a href="#" @click.prevent="setTab('internships')">IT Internships (3/6 Mo)</a></li>
+            <li><a href="#" @click.prevent="setTab('courses')">Accredited Courses</a></li>
+            <li><a href="#" @click.prevent="setTab('reviews')">Reviews & Feedback</a></li>
+            <li><a href="#" @click.prevent="setTab('careers')">Careers (4+ Yrs Exp)</a></li>
           </ul>
         </div>
 
         <div class="footer-col">
-          <h4>Certified Programs</h4>
+          <h4>Internship Ventures</h4>
           <ul class="footer-links">
-            <li><a href="#" @click.prevent="applyForCourse('NIELIT O Level')">NIELIT O Level</a></li>
-            <li><a href="#" @click.prevent="applyForCourse('NIELIT A Level')">NIELIT A Level</a></li>
-            <li><a href="#" @click.prevent="applyForCourse('BCA - Subharti University')">Subharti University BCA/MCA</a></li>
-            <li><a href="#" @click.prevent="applyForCourse('Full Stack Web Development')">Web Development</a></li>
-            <li><a href="#" @click.prevent="applyForCourse('Tally ERP 9 & GST')">Tally ERP 9 & GST</a></li>
+            <li><a href="#" @click.prevent="setTab('internships')">MERN Stack Developer</a></li>
+            <li><a href="#" @click.prevent="setTab('internships')">iOS App Development</a></li>
+            <li><a href="#" @click.prevent="setTab('internships')">Android App Development</a></li>
+            <li><a href="#" @click.prevent="setTab('internships')">Digital Marketing Track</a></li>
           </ul>
         </div>
 
@@ -541,12 +787,12 @@
           <h4>Contact & Location</h4>
           <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">📍 Holagarh, Prayagraj (Allahabad), UP</p>
           <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">📞 Mobile: +91 9795771806</p>
-          <p style="font-size: 0.9rem; margin-bottom: 1rem;">✉️ Email: softtechithunt.com</p>
+          <p style="font-size: 0.9rem; margin-bottom: 1rem;">✉️ Email: info@ithunt.edu.in</p>
         </div>
       </div>
 
       <div class="container footer-bottom">
-        <div>© 2026 IT HUNT Institute of Computer Technology. All rights reserved.</div>
+        <div>© 2026 IT HUNT Institute of Computer Technology & IT Solutions. All rights reserved.</div>
         <div style="display: flex; gap: 1.5rem;">
           <a href="#">Privacy Policy</a>
           <a href="#">Terms & Conditions</a>
@@ -567,9 +813,30 @@
           isDarkMode: true,
           isMobileNavOpen: false,
           courseFilter: 'all',
-          activeFaqIndex: 0,
+          selectedInternshipDuration: 'all',
+          
           showModal: false,
+          modalTitle: '',
+          modalBody: '',
           submittedRegistrationNo: '',
+
+          showJobModal: false,
+          selectedJob: {},
+          jobForm: {
+            name: '',
+            experience: '4 Years',
+            phone: '',
+            email: '',
+            link: ''
+          },
+
+          newReview: {
+            name: '',
+            role: '',
+            rating: 5,
+            category: 'Labs & Workstations',
+            comment: ''
+          },
           
           form: {
             candidateName: '',
@@ -578,13 +845,147 @@
             dob: '',
             identityMark: '',
             gender: 'Male',
-            course: 'NIELIT O Level',
+            course: 'MERN Stack Internship (3/6 Mo)',
             mobile: '',
             email: '',
             district: 'PRAYAGRAJ',
-            address: '',
-            photoName: ''
+            address: ''
           },
+
+          internshipTracks: [
+            {
+              id: 1,
+              icon: '⚛️',
+              shortName: 'MERN Stack',
+              title: 'Web Development (MERN Stack Developer)',
+              duration: '3 Months / 6 Months',
+              description: 'Production-ready full stack engineering with MongoDB, Express.js, React.js, and Node.js. Build scalable SaaS APIs, microservices, and reactive front-ends.',
+              stack: ['MongoDB', 'Express', 'React.js', 'Node.js', 'REST APIs', 'Redux / Zustand', 'Docker']
+            },
+            {
+              id: 2,
+              icon: '🍏',
+              shortName: 'iOS Development',
+              title: 'iOS Native App Development',
+              duration: '3 Months / 6 Months',
+              description: 'Native iOS application engineering with Swift and SwiftUI. Learn Xcode, App Store guidelines, REST APIs integration, CoreData, and Apple UI design.',
+              stack: ['Swift 5', 'SwiftUI', 'Xcode', 'CoreData', 'Combine', 'App Store Publishing']
+            },
+            {
+              id: 3,
+              icon: '🤖',
+              shortName: 'Android Development',
+              title: 'Android Native App Development',
+              duration: '3 Months / 6 Months',
+              description: 'Build high-performance native Android applications using Kotlin and Jetpack Compose. Learn MVVM architecture, Room database, and Google Play deployment.',
+              stack: ['Kotlin', 'Jetpack Compose', 'Android Studio', 'Retrofit', 'MVVM', 'Play Store']
+            },
+            {
+              id: 4,
+              icon: '📈',
+              shortName: 'Digital Marketing',
+              title: 'Digital Marketing & Growth Hacking',
+              duration: '3 Months / 6 Months',
+              description: 'Master data-driven marketing, Search Engine Optimization (SEO), Pay-Per-Click (PPC) campaigns, Meta Ads, social media strategy, and conversion optimization.',
+              stack: ['SEO Strategy', 'Google Ads PPC', 'Meta Ads', 'Google Analytics 4', 'Content Strategy']
+            }
+          ],
+
+          facilityMetrics: [
+            { name: 'Computer Labs & Workstations', score: 4.9 },
+            { name: 'Faculty Expertise & Mentorship', score: 5.0 },
+            { name: 'Internship LOR & Placement Support', score: 4.9 },
+            { name: 'Curriculum & Ease of Development', score: 4.8 }
+          ],
+
+          reviewsList: [
+            {
+              id: 1,
+              name: 'Rahul Sharma',
+              role: 'MERN Stack Intern 2026',
+              rating: 5,
+              date: 'Aug 2026',
+              avatar: 'img/anoop.png',
+              comment: 'The 6-month MERN Stack internship transformed my practical coding skills! The mentors have 4+ years of real industry experience and guided us on live client projects.'
+            },
+            {
+              id: 2,
+              name: 'Priya Mishra',
+              role: 'NIELIT O Level Student',
+              rating: 5,
+              date: 'Jul 2026',
+              avatar: 'img/ithunt.jpg',
+              comment: 'Exceptional facilities and lab infrastructure in Holagarh Prayagraj! Teachers make complex Python and Web topics very easy to learn.'
+            },
+            {
+              id: 3,
+              name: 'Amit Kumar Srivastav',
+              role: 'iOS App Development Intern',
+              rating: 5,
+              date: 'Jun 2026',
+              avatar: 'img/vikash.png',
+              comment: 'Great experience learning Swift & SwiftUI! The lab workstations and ease of development support helped me build 2 production apps on App Store.'
+            }
+          ],
+
+          jobOpenings: [
+            {
+              id: 1,
+              shortTitle: 'MERN Lead Trainer',
+              title: 'Senior MERN Stack Developer & Technical Trainer',
+              type: 'Full-Time / Part-Time',
+              location: 'Prayagraj / Hybrid',
+              salary: '₹6.0L - ₹9.0L P.A.',
+              description: 'Lead our MERN stack internship track, mentor students on live web applications, conduct code reviews, and drive modern React/Node architecture.',
+              requirements: [
+                'MINIMUM 4+ YEARS of experience in Node.js, Express, React, MongoDB.',
+                'Strong background in mentoring or leading engineering teams.',
+                'Solid grasp of REST APIs, Git workflows, and deployment.'
+              ]
+            },
+            {
+              id: 2,
+              shortTitle: 'iOS Tech Mentor',
+              title: 'Senior iOS Mobile Application Instructor',
+              type: 'Full-Time / Part-Time',
+              location: 'Prayagraj / Remote',
+              salary: '₹6.5L - ₹9.5L P.A.',
+              description: 'Guide interns through native iOS development, Swift, SwiftUI framework, Xcode debugging, and App Store submission processes.',
+              requirements: [
+                'MINIMUM 4+ YEARS of hands-on Swift & SwiftUI app development.',
+                'Published iOS apps on the Apple App Store.',
+                'Excellent communication skills to mentor junior developers.'
+              ]
+            },
+            {
+              id: 3,
+              shortTitle: 'Android Instructor',
+              title: 'Senior Android Developer & Educator',
+              type: 'Full-Time',
+              location: 'Prayagraj / Hybrid',
+              salary: '₹6.0L - ₹8.5L P.A.',
+              description: 'Instruct and mentor Android development interns on Kotlin, Jetpack Compose, clean MVVM architecture, and Play Store deployment.',
+              requirements: [
+                'MINIMUM 4+ YEARS of commercial Android Kotlin experience.',
+                'Deep knowledge of Android SDK, Room DB, and Retrofit.',
+                'Passion for teaching and technical excellence.'
+              ]
+            },
+            {
+              id: 4,
+              shortTitle: 'Digital Marketing Strategist',
+              title: 'Senior Digital Marketing Lead & Educator',
+              type: 'Full-Time',
+              location: 'Prayagraj',
+              salary: '₹4.5L - ₹7.0L P.A.',
+              description: 'Lead the Digital Marketing internship track, teaching SEO, Google Ads PPC, Meta Ads Manager, and growth hacking strategies.',
+              requirements: [
+                'MINIMUM 4+ YEARS of proven experience managing digital marketing campaigns.',
+                'Expertise in GA4, Google Search Console, and ad networks.',
+                'Demonstrated track record of ROI and brand growth.'
+              ]
+            }
+          ],
 
           courses: [
             {
@@ -597,7 +998,7 @@
               certification: 'Govt. of India Recognized',
               image: 'img/O level.png',
               description: 'Foundation diploma equivalent to PGDCA. Covers IT Tools, Web Designing, Python Programming, and Internet of Things (IoT).',
-              topics: ['IT Fundamentals', 'HTML5 & CSS3', 'Python Scripting', 'IoT Sensors & Microcontrollers']
+              topics: ['IT Fundamentals', 'HTML5 & CSS3', 'Python Scripting', 'IoT Sensors']
             },
             {
               id: 2,
@@ -609,7 +1010,7 @@
               certification: 'Advance Graduate Diploma',
               image: 'img/A level.png',
               description: 'Advanced IT engineering diploma covering Data Structures, Computer Networks, Database Management, and Software Engineering.',
-              topics: ['Data Structures in C++', 'DBMS & SQL', 'Computer Networks', 'Web Engineering']
+              topics: ['Data Structures C++', 'DBMS & SQL', 'Computer Networks', 'Software Eng']
             },
             {
               id: 3,
@@ -621,43 +1022,7 @@
               certification: 'Regular / Distance Degree',
               image: 'img/shubharati.png',
               description: 'Comprehensive degree courses in computer applications run via Distance Education approved by UGC, AICTE, and DEC joint committee.',
-              topics: ['Computer Architecture', 'Object Oriented Programming', 'Operating Systems', 'Cloud Computing']
-            },
-            {
-              id: 4,
-              code: 'Full Stack',
-              title: 'Full Stack Web Development',
-              category: 'skills',
-              categoryName: 'Industry Skill',
-              duration: '6 Months',
-              certification: 'Professional Certificate',
-              image: 'img/web-development-course.png',
-              description: 'Hands-on practical bootcamp covering modern front-end (HTML, CSS, JavaScript, Vue.js) and back-end database engineering.',
-              topics: ['Modern JavaScript (ES6+)', 'Vue 3 Framework', 'Node.js & Express', 'MongoDB & Databases']
-            },
-            {
-              id: 5,
-              code: 'Tally ERP 9',
-              title: 'Tally ERP 9 & Financial Accounting',
-              category: 'skills',
-              categoryName: 'Financial Tech',
-              duration: '3 Months',
-              certification: 'Tally Expert Certification',
-              image: 'img/courses.png',
-              description: 'Master business transactions, inventory management, payroll, cost centers, GST filing, and daily ledger accounting.',
-              topics: ['Voucher Entries', 'GST & Taxation', 'Payroll Systems', 'Balance Sheet Analysis']
-            },
-            {
-              id: 6,
-              code: 'Cyber Security',
-              title: 'Ethical Hacking & Cyber Security',
-              category: 'skills',
-              categoryName: 'Security Track',
-              duration: '6 Months',
-              certification: 'Ethical Hacker Certificate',
-              image: 'img/hacker.png',
-              description: 'Learn network security, vulnerability assessment, penetration testing, and ethical hacking protocols to defend IT infrastructure.',
-              topics: ['Network Scanning', 'Metasploit Fundamentals', 'Web Security', 'Defensive Hardening']
+              topics: ['Computer Architecture', 'Object Oriented Programming', 'Operating Systems']
             }
           ],
 
@@ -665,7 +1030,7 @@
             {
               id: 1,
               name: 'Mr. Lakshman Singh Chauhan',
-              role: 'Director & Founder',
+              role: 'Director & Founder (4+ Yrs Leader)',
               bio: 'Public speaking expert, motivational speaker, and life coach with MCA degree. Lead mentor in computer science & executive management.',
               image: 'img/ithunt.jpg',
               skills: ['O/A Level', 'MCA', 'Public Speaking', 'Life Coaching', 'C/C++']
@@ -673,15 +1038,15 @@
             {
               id: 2,
               name: 'Anoop Mishra',
-              role: 'Software Developer & Lead Instructor',
+              role: 'Software Developer & Senior Instructor (4+ Yrs Exp)',
               bio: 'Full stack developer specializing in modern Java, Python, Web Engineering, and computer science core subjects.',
               image: 'img/anoop.png',
-              skills: ['Java', 'Python', 'C/C++', 'Vue.js', 'Web Dev']
+              skills: ['Java', 'Python', 'C/C++', 'Vue.js', 'Full Stack']
             },
             {
               id: 3,
               name: 'Vikash Srivastav',
-              role: 'Institute Manager & Tally Expert',
+              role: 'Institute Manager & Tally Specialist (4+ Yrs Exp)',
               bio: 'Accounting specialist with expertise in Tally ERP 9, financial inventory management, HTML/CSS, and campus management.',
               image: 'img/vikash.png',
               skills: ['Tally ERP 9', 'CA Accounting', 'HTML', 'CSS', 'JavaScript']
@@ -689,29 +1054,10 @@
             {
               id: 4,
               name: 'Achal Singh Chauhan',
-              role: 'Ethical Hacking & Cyber Security Mentor',
+              role: 'Ethical Hacking & Cyber Security Mentor (4+ Yrs Exp)',
               bio: 'Cyber security specialist, hackathon winner, and instructor for Java, C++, and penetration testing tracks.',
               image: 'img/hacker.png',
               skills: ['Ethical Hacking', 'Cyber Security', 'Python', 'Java', 'Hackathons']
-            }
-          ],
-
-          faqs: [
-            {
-              question: "What are the eligibility criteria for NIELIT 'O' Level diploma?",
-              answer: "For NIELIT 'O' Level, candidates should have completed 10+2 (Intermediate) or an ITI Certificate course. Non-formal candidates with 1 year of relevant experience can also register."
-            },
-            {
-              question: "Are Subharti University degrees valid for government jobs?",
-              answer: "Yes, Swami Vivekanand Subharti University is UGC and AICTE recognized under Section 2(f) of the UGC Act 1956. Degrees are valid for government job applications and higher studies."
-            },
-            {
-              question: "How do I submit my admission form online?",
-              answer: "Simply navigate to the 'Admission' tab, fill out candidate details, target course, and click 'Submit Admission Application'. You will instantly receive a printable registration receipt with a unique ID."
-            },
-            {
-              question: "Does IT HUNT provide practical lab facilities?",
-              answer: "Absolutely! We feature air-conditioned computer labs with high-speed internet, modern desktop workstations, and dedicated doubt-clearing faculty sessions."
             }
           ]
         }
@@ -719,18 +1065,21 @@
 
       computed: {
         featuredCourses() {
-          return this.courses.slice(0, 3);
+          return this.courses;
         },
         filteredCourses() {
           if (this.courseFilter === 'all') return this.courses;
           return this.courses.filter(c => c.category === this.courseFilter);
+        },
+        filteredInternships() {
+          if (this.selectedInternshipDuration === 'all') return this.internshipTracks;
+          return this.internshipTracks.filter(t => t.duration.includes(this.selectedInternshipDuration));
         }
       },
 
       mounted() {
-        // Read hash location if navigated via direct link (e.g. index.html#admission or Home.html)
         const hash = window.location.hash.replace('#', '');
-        if (['home', 'courses', 'about', 'team', 'admission'].includes(hash)) {
+        if (['home', 'internships', 'courses', 'about', 'team', 'reviews', 'careers', 'admission'].includes(hash)) {
           this.activeTab = hash;
         }
       },
@@ -750,21 +1099,44 @@
           this.form.course = courseTitle;
           this.setTab('admission');
         },
-        handleFileUpload(event) {
-          const file = event.target.files[0];
-          if (file) {
-            this.form.photoName = file.name;
-          }
+        openInternshipModal(track) {
+          this.form.course = track.title + ' (3/6 Mo Internship)';
+          this.setTab('admission');
         },
-        submitAdmission() {
-          this.submittedRegistrationNo = 'ITH-' + Math.floor(100000 + Math.random() * 900000);
+        openJobModal(job) {
+          this.selectedJob = job;
+          this.showJobModal = true;
+        },
+        submitJobApplication() {
+          this.showJobModal = false;
+          this.modalTitle = "Job Application Received!";
+          this.modalBody = `Thank you ${this.jobForm.name}! Your job application for ${this.selectedJob.title} (${this.jobForm.experience} Experience) has been submitted successfully to HR.`;
+          this.submittedRegistrationNo = 'JOB-' + Math.floor(100000 + Math.random() * 900000);
           this.showModal = true;
         },
-        printReceipt() {
-          window.print();
+        submitReview() {
+          this.reviewsList.unshift({
+            id: Date.now(),
+            name: this.newReview.name,
+            role: this.newReview.role,
+            rating: this.newReview.rating,
+            date: 'Just Now',
+            avatar: 'img/ithunt.jpg',
+            comment: this.newReview.comment
+          });
+          this.modalTitle = "Review & Feedback Posted!";
+          this.modalBody = `Thank you ${this.newReview.name}! Your valuable feedback on ${this.newReview.category} has been submitted. It helps us continually improve institute quality and ease of development.`;
+          this.submittedRegistrationNo = '';
+          this.showModal = true;
+          this.newReview.name = '';
+          this.newReview.role = '';
+          this.newReview.comment = '';
         },
-        toggleFaq(index) {
-          this.activeFaqIndex = this.activeFaqIndex === index ? -1 : index;
+        submitAdmission() {
+          this.modalTitle = "Application Submitted Successfully!";
+          this.modalBody = `Thank you ${this.form.candidateName}! Your admission/internship registration for ${this.form.course} has been registered.`;
+          this.submittedRegistrationNo = 'ITH-' + Math.floor(100000 + Math.random() * 900000);
+          this.showModal = true;
         }
       }
     }).mount('#app');
