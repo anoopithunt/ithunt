@@ -1,68 +1,54 @@
-/* Style inputs, select elements and textareas */
-input[type=text],  input[type=email],input[type=date] , input[type=tel] ,select, textarea {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid rgb(235, 224, 224);
-    border-radius: 4px;
-    color: rgb(6, 16, 156);
-    font-weight: 900;
-    box-sizing: border-box;
-    resize: vertical;
-  }
-  
-  /* Style the label to display next to the inputs */
-  label {
-    padding: 12px 12px 12px 0;
-    display: inline-block;
-  }
-  
-  /* Style the submit button */
+/* ==========================================================================
+   IT HUNT - Admission Form Styles (Orange & Yellow Solar Theme)
+   ========================================================================== */
+
+input[type=text], input[type=email], input[type=date], input[type=tel], select, textarea {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-input-cyber);
+  border: 1px solid var(--border-cyber);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  resize: vertical;
+  transition: var(--transition);
+}
+
+input[type=text]:focus, input[type=email]:focus, input[type=date]:focus, input[type=tel]:focus, select:focus, textarea:focus {
+  border-color: var(--color-ai-orange);
+  box-shadow: 0 0 15px var(--glow-orange);
+}
+
+label {
+  padding: 8px 0;
+  display: inline-block;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+
+input[type=submit] {
+  background: var(--gradient-ai-btn);
+  color: #ffffff;
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 1rem;
+  box-shadow: 0 4px 15px var(--glow-orange);
+  transition: var(--transition);
+}
+
+input[type=submit]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--glow-yellow);
+}
+
+@media screen and (max-width: 600px) {
   input[type=submit] {
-    background-color: #083f74c4;
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    float: right;
+    width: 100%;
   }
-  input[type=submit]:hover{
-      background-color: rgba(252, 30, 14, 0.664);
-  }
-  
-  /* Style the container */
-  .container {
-    border-radius: 5px;
-    background-color: #c6ddda;
-    padding: 20px;
-  }
-  
-  /* Floating column for labels: 25% width */
-  .col-25 {
-    float: left;
-    width: 25%;
-    margin-top: 6px;
-  }
-  
-  /* Floating column for inputs: 75% width */
-  .col-75 {
-    float: left;
-    width: 75%;
-    margin-top: 6px;
-  }
-  
-  /* Clear floats after the columns */
-  .row:after {
-    content: "";
-    display: table;
-    clear: both;
-  }
-  
-  /* Responsive layout - when the screen is less than 600px wide, make the two columns stack on top of each other instead of next to each other */
-  @media screen and (max-width: 600px) {
-    .col-25, .col-75, input[type=submit] {
-      width: 100%;
-      margin-top: 0;
-    }
-  }
-  
+}
