@@ -14,7 +14,7 @@ const CONTENT_DATA = {
     name: "IT HUNT",
     nameHighlight: "HUNT",
     tagline: "Software Solutions & Tech Academy",
-    logoImage: "img/logo_ithun1.png",
+    logoImage: "img/logo_ithunt.png",
     establishedYear: "2012",
     metaTitle: "IT HUNT | Software Solutions & Tech Academy",
     metaDescription: "IT HUNT - Enterprise Software Solutions & IT Training Center in Holagarh Prayagraj. 3 & 6-month production internships in MERN Stack, iOS, Android, AI, and Digital Marketing."
@@ -81,37 +81,185 @@ const CONTENT_DATA = {
         id: 1,
         icon: "⚛️",
         shortName: "MERN Stack",
-        title: "Web Development (MERN Stack Developer)",
+        title: "Web Development (MERN Stack & Cloud Architecture)",
         duration: "3 Months / 6 Months",
+        badge: "🔥 Highest Industry Demand 2026",
         description: "Production-ready full stack engineering with MongoDB, Express.js, React.js, and Node.js. Build scalable SaaS APIs, microservices, and reactive front-ends.",
-        stack: ["MongoDB", "Express", "React.js", "Node.js", "REST APIs", "Redux / Zustand"]
+        techDetails: "Modern full-stack engineering is the cornerstone of enterprise software development. In this track, you transition from basic coding to architecting scalable, distributed web applications. You will master client-side SPA state management, asynchronous REST/GraphQL microservices, NoSQL database indexing, JWT security, and automated cloud deployments with Docker and CI/CD pipelines.",
+        earningPotential: {
+          fresher: "₹4.5 LPA – ₹7.5 LPA",
+          experienced: "₹8.5 LPA – ₹18.0+ LPA",
+          freelance: "₹40,000 – ₹1,20,000 / month",
+          overview: "MERN Stack developers command top packages across product startups and MNCs due to immense demand for single-language full-stack agility."
+        },
+        jobPlacementRate: {
+          percentage: 95,
+          demandLevel: "Extremely High (60,000+ Active Roles in 2026)",
+          targetRoles: ["Full Stack Developer", "Frontend React Specialist", "Node.js Backend Engineer", "MERN Solution Architect"]
+        },
+        learningHours: {
+          totalHours: "180+ Total Hours",
+          weeklyHours: "12 - 15 Hours / Week",
+          liveLabHours: "120+ Hours Production Coding",
+          schedule: "Daily 2 Hours Interactive Sessions + Guided Lab Workstations"
+        },
+        technologiesLearned: [
+          { category: "Frontend", items: ["React.js 19", "JavaScript (ES6+)", "TypeScript", "HTML5 & CSS3", "Tailwind CSS", "Redux Toolkit / Zustand"] },
+          { category: "Backend & APIs", items: ["Node.js", "Express.js", "RESTful Architecture", "GraphQL", "JWT Auth", "WebSocket / Socket.io"] },
+          { category: "Database & Cloud", items: ["MongoDB Atlas", "Mongoose ORM", "Redis Caching", "AWS S3 / Cloudinary", "Vercel / Render Deployments"] },
+          { category: "Tools & DevOps", items: ["Git & GitHub", "Postman API Suite", "Docker Fundamentals", "VS Code Pro", "CI/CD Actions"] }
+        ],
+        liveProjects: [
+          { name: "Enterprise SaaS CRM & Billing Portal", desc: "Multi-tenant authentication, automated invoicing, analytics dashboards, and Stripe/Razorpay payment integration." },
+          { name: "Real-Time Collaborative Workspace", desc: "Live chat, WebSockets document sync, role-based access control, and notification microservices." },
+          { name: "E-Commerce Marketplace with Admin Dashboard", desc: "Product catalog, cart state, inventory management, order tracking, and dynamic filtering." }
+        ],
+        curriculumHighlights: [
+          "Module 1: Advanced JavaScript Engine, Async Architecture & ESNext",
+          "Module 2: React 19 Component Architecture, Hooks, State & Routing",
+          "Module 3: Server-side Engineering with Node.js, Express & Security",
+          "Module 4: MongoDB Schema Design, Aggregation Pipelines & Indexing",
+          "Module 5: End-to-End Live Client Production Project & Cloud Deployment"
+        ],
+        stack: ["MongoDB", "Express", "React.js", "Node.js", "REST APIs", "Redux / Zustand", "TypeScript", "Docker"]
       },
       {
         id: 2,
         icon: "🍏",
         shortName: "iOS Development",
-        title: "iOS Native App Development",
+        title: "iOS Native App Development (Swift & SwiftUI)",
         duration: "3 Months / 6 Months",
+        badge: "💎 Premium Salary Track",
         description: "Native iOS application engineering with Swift and SwiftUI. Learn Xcode, App Store guidelines, REST APIs integration, CoreData, and Apple UI design.",
-        stack: ["Swift 5", "SwiftUI", "Xcode", "CoreData", "Combine"]
+        techDetails: "Apple's iOS ecosystem represents the highest paying mobile engineering market globally. You will learn modern declarative UI development with SwiftUI, state-driven architecture with Combine, local persistence using CoreData & SwiftData, push notifications, and end-to-end publishing pipelines for the Apple App Store under strict human interface guidelines.",
+        earningPotential: {
+          fresher: "₹5.0 LPA – ₹8.5 LPA",
+          experienced: "₹10.0 LPA – ₹22.0+ LPA",
+          freelance: "₹50,000 – ₹1,50,000 / month",
+          overview: "iOS developers enjoy premium compensation due to talent scarcity and enterprise focus on high-spending iOS users."
+        },
+        jobPlacementRate: {
+          percentage: 93,
+          demandLevel: "Very High (Global & Remote Opportunities)",
+          targetRoles: ["iOS Developer", "Swift / SwiftUI Engineer", "Mobile App Specialist", "iOS Product Architect"]
+        },
+        learningHours: {
+          totalHours: "160+ Total Hours",
+          weeklyHours: "12 - 14 Hours / Week",
+          liveLabHours: "110+ Hours Mac Lab Coding",
+          schedule: "Daily 2 Hours Instructor-Led Lab on High-Performance Apple Workstations"
+        },
+        technologiesLearned: [
+          { category: "Core Languages", items: ["Swift 5.10", "SwiftUI", "UIKit Interop", "Objective-C Basics"] },
+          { category: "Architecture & Frameworks", items: ["MVVM-C", "Combine Framework", "Async/Await Concurrency", "CoreData & SwiftData", "CoreAnimation"] },
+          { category: "Integrations & APIs", items: ["URLSession & REST APIs", "Apple Push Notifications (APNs)", "Apple Pay Integration", "MapKit & CoreLocation"] },
+          { category: "Tooling & Deployment", items: ["Xcode IDE & Instruments", "TestFlight Beta Testing", "App Store Connect Submission", "Git & GitHub", "CocoaPods & SPM"] }
+        ],
+        liveProjects: [
+          { name: "Live Audio/Video Streaming & Media App", desc: "Custom AVKit player, offline download caching, pip playback, and dynamic UI animations." },
+          { name: "Smart Fitness & Health Tracker", desc: "HealthKit metrics synchronization, step tracking, custom charts, and CoreData persistence." },
+          { name: "On-Demand Delivery & Geolocation App", desc: "Live GPS driver tracking, CoreLocation geofencing, real-time status updates, and Apple Pay." }
+        ],
+        curriculumHighlights: [
+          "Module 1: Swift Syntax, Generics, Protocols & Memory Management (ARC)",
+          "Module 2: SwiftUI Layouts, Modifiers, Custom Views & Animation",
+          "Module 3: Networking with Async/Await, JSON Parsing & API Layer",
+          "Module 4: CoreData / SwiftData, Offline Sync & State Management",
+          "Module 5: App Store Submission Guidelines, TestFlight & Production Release"
+        ],
+        stack: ["Swift 5", "SwiftUI", "Xcode", "CoreData", "Combine", "SwiftData", "REST APIs", "TestFlight"]
       },
       {
         id: 3,
         icon: "🤖",
         shortName: "Android Development",
-        title: "Android Native App Development",
+        title: "Android Native App Development (Kotlin & Jetpack Compose)",
         duration: "3 Months / 6 Months",
+        badge: "🌐 Largest Global Market Reach",
         description: "Build high-performance native Android applications using Kotlin and Jetpack Compose. Learn MVVM architecture, Room database, and Google Play deployment.",
-        stack: ["Kotlin", "Jetpack Compose", "Android Studio", "Retrofit", "MVVM"]
+        techDetails: "Android powers over 70% of smartphones globally. This internship trains you in Kotlin and Jetpack Compose — Google's modern declarative UI toolkit. You will implement industry-standard Clean MVVM architecture, Room SQLite persistence, dependency injection with Hilt/Dagger, WorkManager background processing, and Google Play Console release management.",
+        earningPotential: {
+          fresher: "₹4.5 LPA – ₹7.2 LPA",
+          experienced: "₹8.0 LPA – ₹17.0+ LPA",
+          freelance: "₹40,000 – ₹1,10,000 / month",
+          overview: "Massive hiring from fintech, e-commerce, and logistics enterprises seeking robust native Android engineering."
+        },
+        jobPlacementRate: {
+          percentage: 94,
+          demandLevel: "Extremely High (55,000+ Active Openings)",
+          targetRoles: ["Android Developer", "Kotlin App Engineer", "Mobile Software Engineer", "Android SDK Specialist"]
+        },
+        learningHours: {
+          totalHours: "170+ Total Hours",
+          weeklyHours: "12 - 15 Hours / Week",
+          liveLabHours: "115+ Hours Android Studio Lab",
+          schedule: "Daily 2 Hours Interactive Hands-on Labs & Simulator Testing"
+        },
+        technologiesLearned: [
+          { category: "Language & UI", items: ["Kotlin 2.0", "Jetpack Compose", "Material 3 Design", "Kotlin Coroutines & Flow"] },
+          { category: "Architecture & Storage", items: ["Clean MVVM Architecture", "Android Jetpack Components", "Room DB (SQLite)", "DataStore Preferences"] },
+          { category: "Networking & Background", items: ["Retrofit 2 & OkHttp", "REST API & JSON", "WorkManager", "Firebase Cloud Messaging (FCM)"] },
+          { category: "Tools & Testing", items: ["Android Studio", "Hilt / Koin DI", "Google Play Console", "Git / GitHub", "JUnit & Espresso"] }
+        ],
+        liveProjects: [
+          { name: "Fintech Wallet & QR Payment App", desc: "Biometric authentication, encrypted local database, instant transaction history, and QR scanning." },
+          { name: "Ride-Booking & Navigation App", desc: "Google Maps SDK integration, live vehicle location tracking, route calculation, and background push alerts." },
+          { name: "News & Audio Podcast Hub", desc: "Compose declarative UI, offline caching with Room, foreground audio service, and Material You theming." }
+        ],
+        curriculumHighlights: [
+          "Module 1: Kotlin Object-Oriented, Functional Paradigms & Coroutines",
+          "Module 2: Modern UI with Jetpack Compose, State Hoisting & Animations",
+          "Module 3: Architecture with ViewModel, LiveData/StateFlow & Repository Pattern",
+          "Module 4: REST API Integration with Retrofit & Room Offline Caching",
+          "Module 5: Google Play Store Release, App Bundles & Production Optimization"
+        ],
+        stack: ["Kotlin", "Jetpack Compose", "Android Studio", "Retrofit", "MVVM", "Room DB", "Coroutines", "Firebase"]
       },
       {
         id: 4,
         icon: "📈",
         shortName: "Digital Marketing",
-        title: "Digital Marketing & Growth Hacking",
+        title: "Digital Marketing, SEO & Growth Hacking",
         duration: "3 Months / 6 Months",
+        badge: "🚀 Rapid Career Launch",
         description: "Master data-driven marketing, Search Engine Optimization (SEO), Pay-Per-Click (PPC) campaigns, Meta Ads, social media strategy, and conversion optimization.",
-        stack: ["SEO Strategy", "Google Ads PPC", "Meta Ads", "GA4 Analytics"]
+        techDetails: "In today's digital economy, product success hinges on growth marketing and customer acquisition. This track covers Technical SEO, Google Search Console, Google Ads (Search, Display, Performance Max), Meta Ads Manager (Facebook & Instagram), programmatic email workflows, Google Analytics 4 (GA4) attribution models, and AI-powered copywriting/conversion optimization.",
+        earningPotential: {
+          fresher: "₹3.5 LPA – ₹6.0 LPA",
+          experienced: "₹7.0 LPA – ₹14.0+ LPA",
+          freelance: "₹35,000 – ₹1,00,000+ / month",
+          overview: "High demand from businesses across Prayagraj, tier-1 cities, and remote agencies looking for measurable ROI and lead generation."
+        },
+        jobPlacementRate: {
+          percentage: 92,
+          demandLevel: "Very High (Universal Need Across All Industries)",
+          targetRoles: ["Digital Marketing Executive", "SEO Specialist", "Performance Marketing Manager", "Growth Hacker"]
+        },
+        learningHours: {
+          totalHours: "140+ Total Hours",
+          weeklyHours: "10 - 12 Hours / Week",
+          liveLabHours: "90+ Hours Live Campaign Execution",
+          schedule: "Daily 1.5 - 2 Hours Strategy Labs with Real Ad Budget Experiments"
+        },
+        technologiesLearned: [
+          { category: "SEO & Search Engine", items: ["Technical SEO", "On-Page / Off-Page SEO", "Google Search Console", "Ahrefs / SEMrush", "Schema Markup"] },
+          { category: "Paid Ads & PPC", items: ["Google Ads (Search & Video)", "Meta Ads Manager", "LinkedIn Ads", "Performance Max", "Retargeting Pixels"] },
+          { category: "Analytics & Automation", items: ["Google Analytics 4 (GA4)", "Google Tag Manager (GTM)", "HubSpot CRM", "Mailchimp / Zapier", "Looker Studio"] },
+          { category: "Creative & AI Marketing", items: ["Canva Pro & Adobe PS", "AI Copywriting (ChatGPT/Claude)", "Conversion Rate Optimization (CRO)", "Copywriting Psychology"] }
+        ],
+        liveProjects: [
+          { name: "Live Client Brand Lead Generation Campaign", desc: "End-to-end Meta & Google ad campaign with real budget, custom landing page, and A/B testing." },
+          { name: "E-Commerce Technical SEO & Organic Traffic Boost", desc: "Keyword research strategy, link building outreach, technical audit, and 300%+ search ranking growth." },
+          { name: "Multi-Channel Omni-Presence Marketing Funnel", desc: "Automated email sequences, social media calendar execution, lead magnet funnels, and GA4 tracking." }
+        ],
+        curriculumHighlights: [
+          "Module 1: Search Engine Architecture, In-Depth Keyword Research & Technical SEO",
+          "Module 2: Google Search & Display Ads, Bidding Strategies & Budget Scaling",
+          "Module 3: Meta Ads Manager, Audience Targeting & High-Converting Creatives",
+          "Module 4: GA4 Analytics, Conversion Funnels, GTM & Attribution Modeling",
+          "Module 5: Live Client Portfolio, Case Studies & Freelance Client Acquisition"
+        ],
+        stack: ["SEO Strategy", "Google Ads PPC", "Meta Ads", "GA4 Analytics", "GTM", "SEMrush", "Email Marketing", "Canva Pro"]
       }
     ]
   },
@@ -327,11 +475,11 @@ const CONTENT_DATA = {
 
   // Contact Information
   contact: {
-    location: "📍 Holagarh, Prayagraj (Allahabad), UP",
+    location: "📍Dahiyawa Holagarh(Near Mela Ground in Front of Kali Maa Mandir), Prayagraj (Allahabad), UP",
     phone: "📞 Mobile: +91 9795771806",
     rawPhone: "+91 9795771806",
-    email: "✉️ Email: info@ithunt.edu.in",
-    rawEmail: "info@ithunt.edu.in",
+    email: "✉️ Email: softtechithunt@gmail.com",
+    rawEmail: "softtechithunt@gmail.com",
     districts: ["PRAYAGRAJ", "PRATAPGARH", "KAUSHAMBI", "GORAKHPUR", "LUCKNOW", "RAEBARELI", "VARANASI", "AMETHI"]
   },
 
