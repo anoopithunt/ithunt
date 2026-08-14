@@ -2679,10 +2679,10 @@ body.light-theme .internship-bottom-cta {
 
 /* Footer */
 .footer-section {
-  background: rgba(5, 8, 15, 0.98);
-  border-top: 1px solid var(--border-cyber);
-  padding: 3.5rem 0 2rem;
-  color: var(--text-muted);
+  background: #060504;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 4rem 0 2rem;
+  color: #ffffff !important;
 }
 
 .footer-grid {
@@ -2694,10 +2694,16 @@ body.light-theme .internship-bottom-cta {
 
 .footer-col h4 {
   font-family: var(--font-heading);
-  color: var(--text-main);
-  font-size: 1.1rem;
-  font-weight: 700;
+  color: #ffffff !important;
+  font-size: 1.15rem;
+  font-weight: 800;
   margin-bottom: 1.15rem;
+  letter-spacing: -0.2px;
+}
+
+.footer-col p {
+  color: #ffffff !important;
+  opacity: 0.95;
 }
 
 .footer-links {
@@ -2708,17 +2714,20 @@ body.light-theme .internship-bottom-cta {
 }
 
 .footer-links a {
+  color: #ffffff !important;
+  opacity: 0.92;
   transition: var(--transition);
   font-size: 0.875rem;
 }
 
 .footer-links a:hover {
-  color: var(--color-ai-cyan);
-  padding-left: 4px;
+  color: var(--color-ai-yellow) !important;
+  opacity: 1;
+  padding-left: 5px;
 }
 
 .footer-bottom {
-  border-top: 1px solid var(--border-cyber);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   padding-top: 1.75rem;
   display: flex;
   align-items: center;
@@ -2726,6 +2735,33 @@ body.light-theme .internship-bottom-cta {
   font-size: 0.85rem;
   flex-wrap: wrap;
   gap: 1rem;
+  color: #ffffff !important;
+}
+
+.footer-bottom a {
+  color: #ffffff !important;
+  opacity: 0.92;
+  transition: var(--transition);
+}
+
+.footer-bottom a:hover {
+  color: var(--color-ai-yellow) !important;
+  opacity: 1;
+}
+
+/* Ensure footer text stays white in Light Theme as well */
+body.light-theme .footer-section {
+  background: #140e09;
+  border-top: 1px solid rgba(249, 115, 22, 0.3);
+  color: #ffffff !important;
+}
+
+body.light-theme .footer-section p,
+body.light-theme .footer-col h4,
+body.light-theme .footer-links a,
+body.light-theme .footer-bottom,
+body.light-theme .footer-bottom a {
+  color: #ffffff !important;
 }
 
 /* Mobile Responsive Adjustments */
