@@ -364,7 +364,7 @@
             <div class="modern-track-card" v-for="track in filteredInternships" :key="track.id">
               <!-- Glow Header Banner -->
               <div class="track-card-header">
-                <div class="track-icon-bubble">{{ track.icon }}</div>
+                <div class="track-icon-bubble" v-html="track.icon"></div>
                 <div class="track-meta-pills">
                   <span class="track-duration-tag">⏱️ {{ track.duration }}</span>
                   <span class="track-badge-tag" v-if="track.badge">{{ track.badge }}</span>
@@ -765,7 +765,7 @@
 
         <!-- Header -->
         <div class="detail-popup-header">
-          <div class="detail-header-icon">{{ selectedTrack.icon }}</div>
+          <div class="detail-header-icon" v-html="selectedTrack.icon"></div>
           <div class="detail-header-content">
             <div class="detail-badge-group">
               <span class="duration-pill">⏱️ {{ selectedTrack.duration }}</span>
