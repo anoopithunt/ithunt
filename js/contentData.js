@@ -566,7 +566,7 @@ const CONTENT_DATA = {
       {
         id: 1,
         name: "Rahul Sharma",
-        avatar: "img/anoop.png",
+        avatar: "img/student-placeholder.svg",
         batch: "Batch of 2024",
         track: "MERN Stack & Cloud Architecture",
         trackCategory: "mern",
@@ -581,7 +581,7 @@ const CONTENT_DATA = {
       {
         id: 2,
         name: "Neha Upadhyay",
-        avatar: "img/vikash.png",
+        avatar: "img/student-placeholder.svg",
         batch: "Batch of 2024",
         track: "iOS Native App Development (Swift & SwiftUI)",
         trackCategory: "ios",
@@ -596,7 +596,7 @@ const CONTENT_DATA = {
       {
         id: 3,
         name: "Amit Kumar Srivastav",
-        avatar: "img/ithunt.jpg",
+        avatar: "img/student-placeholder.svg",
         batch: "Batch of 2023",
         track: "Android Native App Development (Kotlin & Compose)",
         trackCategory: "android",
@@ -611,7 +611,7 @@ const CONTENT_DATA = {
       {
         id: 4,
         name: "Saurabh Pandey",
-        avatar: "img/hacker.png",
+        avatar: "img/student-placeholder.svg",
         batch: "Batch of 2025",
         track: "Python, FastAPI & Applied Generative AI",
         trackCategory: "ai",
@@ -626,7 +626,7 @@ const CONTENT_DATA = {
       {
         id: 5,
         name: "Pooja Verma",
-        avatar: "img/desktop.jpg",
+        avatar: "img/student-placeholder.svg",
         batch: "Batch of 2023",
         track: "NIELIT 'O' Level & 'A' Level Diploma",
         trackCategory: "diploma",
@@ -641,7 +641,7 @@ const CONTENT_DATA = {
       {
         id: 6,
         name: "Vikas Singh",
-        avatar: "img/ithunt1.jpg",
+        avatar: "img/student-placeholder.svg",
         batch: "Batch of 2024",
         track: "Digital Marketing, SEO & Growth Hacking",
         trackCategory: "marketing",
