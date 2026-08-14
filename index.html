@@ -702,18 +702,56 @@
 
           <!-- Live Receipt Preview -->
           <div class="receipt-preview-card">
+            <!-- Receipt Top Ribbon -->
             <div class="receipt-header">
-              <span class="receipt-stamp">DRAFT RECEIPT PREVIEW</span>
-              <h4 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 800; margin-top: 0.4rem;">IT HUNT ADMISSION 2026</h4>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">Holagarh, Prayagraj, UP</div>
+              <div class="receipt-stamp">
+                <span class="stamp-dot"></span>
+                <span>DRAFT RECEIPT PREVIEW</span>
+              </div>
+              <h4 class="receipt-title">IT HUNT ACADEMY 2026</h4>
+              <div class="receipt-subtitle">📍 Near Bank of Baroda, Dahiyawan Road, Holagarh, Prayagraj, UP</div>
+              <div class="receipt-reg-badge">OFFICIAL CANDIDATE COPY</div>
             </div>
 
-            <div class="receipt-row"><span class="receipt-label">Candidate Name:</span><span class="receipt-val">{{ form.candidateName || '—' }}</span></div>
-            <div class="receipt-row"><span class="receipt-label">Father's Name:</span><span class="receipt-val">{{ form.fatherName || '—' }}</span></div>
-            <div class="receipt-row"><span class="receipt-label">Program Selected:</span><span class="receipt-val" style="color: var(--color-ai-violet);">{{ form.course }}</span></div>
-            <div class="receipt-row"><span class="receipt-label">Gender / DOB:</span><span class="receipt-val">{{ form.gender }} | {{ form.dob || '—' }}</span></div>
-            <div class="receipt-row"><span class="receipt-label">Contact Mobile:</span><span class="receipt-val">{{ form.mobile || '—' }}</span></div>
-            <div class="receipt-row"><span class="receipt-label">District:</span><span class="receipt-val">{{ form.district }}</span></div>
+            <!-- Receipt Content Rows -->
+            <div class="receipt-body">
+              <div class="receipt-row">
+                <span class="receipt-label">Candidate Name:</span>
+                <span class="receipt-val">{{ form.candidateName || '— (Typing...)' }}</span>
+              </div>
+              <div class="receipt-row">
+                <span class="receipt-label">Father's Name:</span>
+                <span class="receipt-val">{{ form.fatherName || '—' }}</span>
+              </div>
+              <div class="receipt-row">
+                <span class="receipt-label">Program Selected:</span>
+                <span class="receipt-val receipt-course-pill">{{ form.course }}</span>
+              </div>
+              <div class="receipt-row">
+                <span class="receipt-label">Gender / DOB:</span>
+                <span class="receipt-val">{{ form.gender }} | {{ form.dob || '—' }}</span>
+              </div>
+              <div class="receipt-row">
+                <span class="receipt-label">Contact Mobile:</span>
+                <span class="receipt-val receipt-phone-val">{{ form.mobile || '—' }}</span>
+              </div>
+              <div class="receipt-row">
+                <span class="receipt-label">District & State:</span>
+                <span class="receipt-val">{{ form.district }}, UP</span>
+              </div>
+            </div>
+
+            <!-- Receipt Footer / Security Stamp -->
+            <div class="receipt-footer">
+              <div class="receipt-security-note">
+                <span class="security-icon">🛡️</span>
+                <span>Auto-generates official verified admission registration ID upon submission</span>
+              </div>
+              <div class="receipt-signature-line">
+                <div class="sig-title">Authorized Signatory:</div>
+                <div class="sig-name">Director Mr. Lakshman Singh Chauhan</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
