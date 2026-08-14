@@ -13,12 +13,12 @@
   <!-- CSS Stylesheet -->
   <link rel="stylesheet" href="css/styles.css">
   
-  <!-- Dynamic Environment Configuration (.env) -->
-  <script src="/env.js"></script>
-  <script src="js/envConfig.js"></script>
-  
   <!-- Centralized Site Content Data Dictionary -->
   <script src="js/contentData.js"></script>
+
+  <!-- Dynamic Environment Configuration (.env) -->
+  <script src="env.js"></script>
+  <script src="js/envConfig.js"></script>
 
   <!-- Vue 3 JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
@@ -895,8 +895,10 @@
 
     createApp({
       data() {
+        const cd = (typeof window !== 'undefined' && window.CONTENT_DATA) ? window.CONTENT_DATA : {};
+        const reviews = (cd.reviewsSection && Array.isArray(cd.reviewsSection.reviewsList)) ? cd.reviewsSection.reviewsList : [];
         return {
-          content: window.CONTENT_DATA,
+          content: cd,
           activeTab: 'home',
           isDarkMode: true,
           isMobileNavOpen: false,
@@ -943,21 +945,24 @@
             address: ''
           },
 
-          reviewsList: window.CONTENT_DATA.reviewsSection.reviewsList
+          reviewsList: [...reviews]
         }
       },
 
       computed: {
         featuredCourses() {
+          if (!this.content || !this.content.coursesSection || !this.content.coursesSection.coursesList) return [];
           return this.content.coursesSection.coursesList;
         },
         filteredCourses() {
+          if (!this.content || !this.content.coursesSection || !this.content.coursesSection.coursesList) return [];
           if (this.courseFilter === 'all') return this.content.coursesSection.coursesList;
           return this.content.coursesSection.coursesList.filter(c => c.category === this.courseFilter);
         },
         filteredInternships() {
+          if (!this.content || !this.content.internshipVenture || !this.content.internshipVenture.tracks) return [];
           if (this.selectedInternshipDuration === 'all') return this.content.internshipVenture.tracks;
-          return this.content.internshipVenture.tracks.filter(t => t.duration.includes(this.selectedInternshipDuration));
+          return this.content.internshipVenture.tracks.filter(t => t.duration && t.duration.includes(this.selectedInternshipDuration));
         }
       },
 
