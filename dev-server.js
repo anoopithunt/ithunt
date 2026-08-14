@@ -202,9 +202,23 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, HOST, () => {
+let activePort = PORT;
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    activePort++;
+    console.log(`⚠️ Port ${activePort - 1} is in use. Automatically falling back to http://${HOST}:${activePort}...`);
+    setTimeout(() => {
+      server.listen(activePort, HOST);
+    }, 100);
+  } else {
+    console.error('❌ Server error:', err.message);
+  }
+});
+
+server.listen(activePort, HOST, () => {
   console.log('================================================================');
-  console.log(`🚀 IT HUNT Local Dev Server Running at: http://${HOST}:${PORT}`);
+  console.log(`🚀 IT HUNT Local Dev Server Running at: http://${HOST}:${activePort}`);
   console.log(`⚡ Loaded Environment: ${ENV_FILE}`);
   console.log(`🔄 Live Hot-Reloading: ENABLED (Any change in .env or code auto-refreshes!)`);
   console.log('================================================================');
