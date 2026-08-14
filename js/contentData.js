@@ -260,7 +260,81 @@ const CONTENT_DATA = {
           "Module 5: Live Client Portfolio, Case Studies & Freelance Client Acquisition"
         ],
         stack: ["SEO Strategy", "Google Ads PPC", "Meta Ads", "GA4 Analytics", "GTM", "SEMrush", "Email Marketing", "Canva Pro"]
+      },
+      {
+        id: 5,
+        icon: "🐍",
+        shortName: "Python & AI",
+        title: "Python, FastAPI & Applied Generative AI Engineering",
+        duration: "3 Months / 6 Months",
+        badge: "🤖 Next-Gen High Demand",
+        description: "Architect intelligent applications with Python, FastAPI, LangChain, LLM APIs, and vector databases. Master data analysis, automated pipelines, and AI agent deployment.",
+        techDetails: "Applied AI is reshaping global tech development. This track trains you in advanced Python programming, asynchronous FastAPI backends, vector search with Pinecone/ChromaDB, RAG (Retrieval-Augmented Generation) pipelines, and deploying custom AI agents and automation bots with Docker and cloud microservices.",
+        earningPotential: {
+          fresher: "₹5.0 LPA – ₹8.5 LPA",
+          experienced: "₹9.5 LPA – ₹20.0+ LPA",
+          freelance: "₹45,000 – ₹1,30,000 / month",
+          overview: "AI engineers and Python backend specialists are experiencing unprecedented demand with the highest package growth across IT sectors."
+        },
+        jobPlacementRate: {
+          percentage: 96,
+          demandLevel: "Exponential Growth (Worldwide AI Transformation)",
+          targetRoles: ["Python Developer", "AI / ML Engineer", "FastAPI Backend Developer", "Data & Automation Engineer"]
+        },
+        learningHours: {
+          totalHours: "175+ Total Hours",
+          weeklyHours: "12 - 15 Hours / Week",
+          liveLabHours: "120+ Hours Hands-On AI Coding",
+          schedule: "Daily 2 Hours Interactive Sessions with Cloud GPU Access"
+        },
+        technologiesLearned: [
+          { category: "Python & Core Backend", items: ["Python 3.12 (Advanced)", "FastAPI", "AsyncIO", "SQLAlchemy", "Pydantic"] },
+          { category: "AI & LLM Tooling", items: ["OpenAI / Claude APIs", "LangChain & LlamaIndex", "HuggingFace", "Vector DBs (Chroma/Pinecone)", "RAG Systems"] },
+          { category: "Data & Processing", items: ["Pandas & NumPy", "Matplotlib / Seaborn", "Scikit-Learn Basics", "Data Cleaning Pipelines"] },
+          { category: "Cloud & Deployment", items: ["Docker Containers", "PostgreSQL & Redis", "Git & GitHub", "Cloud Deployment (AWS/Vercel)"] }
+        ],
+        liveProjects: [
+          { name: "Enterprise RAG AI Knowledge Assistant", desc: "Multi-document PDF querying system with semantic vector search, custom chat memory, and streaming responses." },
+          { name: "Autonomous AI Agent & Lead Extractor", desc: "Multi-agent workflow automating web scraping, data enrichment, sentiment analysis, and email drafting." },
+          { name: "High-Throughput Analytics & Prediction API", desc: "FastAPI microservice handling real-time data ingestion, background tasks, and model inference." }
+        ],
+        curriculumHighlights: [
+          "Module 1: Advanced Python, OOP, Asynchronous Programming & Data Structures",
+          "Module 2: RESTful Microservices & High-Speed APIs with FastAPI & PostgreSQL",
+          "Module 3: Data Science Fundamentals, Vector Embeddings & Similarity Search",
+          "Module 4: Generative AI, Prompt Engineering, LangChain & RAG Architectures",
+          "Module 5: End-to-End AI Agent Deployment, Cloud APIs & Production Scaling"
+        ],
+        stack: ["Python", "FastAPI", "LangChain", "OpenAI APIs", "Vector DB", "PostgreSQL", "Docker", "RAG"]
       }
+    ],
+    features: [
+      {
+        icon: "🏢",
+        title: "Live Corporate Repositories",
+        desc: "Work on genuine production codebases, Git branches, and pull request reviews matching Fortune 500 standards."
+      },
+      {
+        icon: "👨‍💻",
+        title: "1-on-1 Senior Mentorship",
+        desc: "Daily personalized debugging, code reviews, and architectural guidance from experienced MCA tech leads."
+      },
+      {
+        icon: "📜",
+        title: "Corporate Certification & LOR",
+        desc: "Receive official Letter of Recommendation (LOR) and verifiable ISO-accredited completion certificate."
+      },
+      {
+        icon: "💼",
+        title: "Guaranteed Placement Support",
+        desc: "100% interview scheduling, resume masterclasses, mock HR/tech rounds, and direct hiring partner referrals."
+      }
+    ],
+    roadmap: [
+      { phase: "01", period: "Month 1", title: "Foundation & Core Architecture", desc: "Master language syntax, OOP design patterns, modern frameworks, and local development environments." },
+      { phase: "02", period: "Month 2", title: "Advanced Full-Stack / Native APIs", desc: "Integrate complex backend databases, state management, asynchronous REST/GraphQL APIs, and UI animations." },
+      { phase: "03", period: "Month 3", title: "Live Client Production Projects", desc: "Develop and deploy 3 production-grade applications with cloud database hosting and automated CI/CD pipelines." },
+      { phase: "04", period: "Month 4-6", title: "Placement Drives & Mock Interviews", desc: "Technical interview prep, algorithmic problem solving, LinkedIn portfolio optimization, and recruitment referrals." }
     ]
   },
 
