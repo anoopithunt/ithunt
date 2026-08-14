@@ -493,4 +493,7 @@ const CONTENT_DATA = {
 // Make accessible globally
 if (typeof window !== 'undefined') {
   window.CONTENT_DATA = CONTENT_DATA;
+  if (typeof window.applyEnvToContent === 'function') {
+    window.applyEnvToContent();
+  }
 }
