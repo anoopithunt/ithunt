@@ -2,11 +2,12 @@
   "name": "ithunt-portal",
   "version": "1.0.0",
   "description": "IT HUNT - Software Solutions & Tech Academy Web Portal",
+  "main": "app.js",
   "scripts": {
     "dev": "node dev-server.js",
-    "serve": "node dev-server.js",
-    "start": "node dev-server.js",
-    "build": "echo 'Static build ready for Vercel!'",
+    "serve": "node app.js",
+    "start": "node app.js",
+    "build": "echo 'Build complete!'",
     "test": "node -e 'console.log(\"✓ All tests passed!\")'"
   },
   "keywords": [

@@ -11,17 +11,6 @@
         { "key": "X-XSS-Protection", "value": "1; mode=block" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
       ]
-    },
-    {
-      "source": "/(css|js|img)/(.*)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
-      ]
     }
-  ],
-  "rewrites": [
-    { "source": "/Home", "destination": "/Home.html" },
-    { "source": "/AboutUs", "destination": "/AboutUs.html" },
-    { "source": "/admission", "destination": "/admission.html" }
   ]
 }
