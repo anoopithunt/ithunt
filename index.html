@@ -1003,11 +1003,11 @@
           <div class="brand-logo" style="margin-bottom: 1rem;">
             <img :src="content.brand.logoImage" :alt="content.brand.name + ' Logo'" class="brand-logo-img" @error="onImgError">
             <div>
-              <div class="brand-title">IT <span class="text-gradient">{{ content.brand.nameHighlight }}</span></div>
-              <div class="brand-tagline">{{ content.brand.tagline }}</div>
+              <div class="brand-title" style="color: #ffffff;">IT <span class="text-gradient">{{ content.brand.nameHighlight }}</span></div>
+              <div class="brand-tagline" style="color: #ffffff; opacity: 0.85;">{{ content.brand.tagline }}</div>
             </div>
           </div>
-          <p style="font-size: 0.875rem; line-height: 1.7; color: var(--text-muted);">
+          <p style="font-size: 0.875rem; line-height: 1.7; color: #ffffff;">
             {{ content.footer.aboutText }}
           </p>
         </div>
@@ -1034,14 +1034,14 @@
 
         <div class="footer-col">
           <h4>Contact & Location</h4>
-          <p style="font-size: 0.875rem; margin-bottom: 0.4rem;">{{ content.contact.location }}</p>
-          <p style="font-size: 0.875rem; margin-bottom: 0.4rem;">{{ content.contact.phone }}</p>
-          <p style="font-size: 0.875rem; margin-bottom: 1rem;">{{ content.contact.email }}</p>
+          <p style="font-size: 0.875rem; margin-bottom: 0.4rem; color: #ffffff;">📍 {{ content.contact.location }}</p>
+          <p style="font-size: 0.875rem; margin-bottom: 0.4rem; color: #ffffff;">📞 {{ content.contact.phone }}</p>
+          <p style="font-size: 0.875rem; margin-bottom: 1rem; color: #ffffff;">✉️ {{ content.contact.email }}</p>
         </div>
       </div>
 
       <div class="container footer-bottom">
-        <div>{{ content.footer.copyrightText }}</div>
+        <div style="color: #ffffff;">{{ content.footer.copyrightText }}</div>
         <div style="display: flex; gap: 1.5rem;">
           <a href="#">Privacy Policy</a>
           <a href="#">Terms & Conditions</a>
