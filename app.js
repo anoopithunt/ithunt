@@ -128,11 +128,13 @@ function requestHandler(req, res) {
   }
 
   // Check possible root locations
-  const searchDirs = [process.cwd(), __dirname, path.join(__dirname, '..')];
+  const relPath = pathname.startsWith('/') ? pathname.slice(1) : pathname;
+  const searchDirs = [process.cwd(), __dirname, path.join(__dirname, '..'), '/var/task', '/vercel/path0'];
   let foundFilePath = null;
 
   for (const dir of searchDirs) {
-    const candidate = path.join(dir, pathname);
+    if (!dir || !fs.existsSync(dir)) continue;
+    const candidate = path.resolve(dir, relPath);
     if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) {
       foundFilePath = candidate;
       break;
@@ -152,7 +154,8 @@ function requestHandler(req, res) {
 
   // If file not found, try fallback to index.html for SPA routing
   for (const dir of searchDirs) {
-    const indexCandidate = path.join(dir, 'index.html');
+    if (!dir || !fs.existsSync(dir)) continue;
+    const indexCandidate = path.resolve(dir, 'index.html');
     if (fs.existsSync(indexCandidate) && fs.statSync(indexCandidate).isFile()) {
       res.writeHead(200, {
         'Content-Type': 'text/html; charset=UTF-8',
