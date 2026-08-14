@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "IT HUNT - Software Solutions & Tech Academy Web Portal",
   "scripts": {
-    "dev": "node server.js",
-    "serve": "node server.js",
-    "build": "node -e 'console.log(\"Static build ready for Vercel CDN!\")'"
+    "dev": "node dev-server.js",
+    "serve": "node dev-server.js",
+    "start": "node dev-server.js",
+    "build": "echo 'Static build ready for Vercel!'"
   },
   "keywords": [
     "ithunt",
