@@ -1500,6 +1500,13 @@ body.light-theme .sig-name {
   box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
 }
 
+.detail-header-icon svg {
+  width: 38px;
+  height: 38px;
+  fill: currentColor;
+  display: block;
+}
+
 .detail-header-content {
   flex: 1;
 }
@@ -2227,6 +2234,13 @@ body.light-theme .perks-guarantee-banner {
   flex-shrink: 0;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
   transition: transform 0.3s ease;
+}
+
+.track-icon-bubble svg {
+  width: 32px;
+  height: 32px;
+  fill: currentColor;
+  display: block;
 }
 
 .modern-track-card:hover .track-icon-bubble {
