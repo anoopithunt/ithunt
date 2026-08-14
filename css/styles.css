@@ -1235,6 +1235,583 @@ button, input, select, textarea {
   box-shadow: 0 0 15px var(--glow-emerald);
 }
 
+/* ==========================================================================
+   Course Detail Popup Modal & Enhanced Internship Cards
+   ========================================================================== */
+
+.modal-lg {
+  max-width: 960px;
+  width: 95%;
+  padding: 2.25rem;
+  text-align: left;
+  position: relative;
+  border: 1px solid var(--border-cyber-glow);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 30px rgba(139, 92, 246, 0.2);
+}
+
+.modal-close-icon {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-cyber);
+  color: var(--text-main);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.15rem;
+  font-weight: 700;
+  transition: var(--transition);
+  z-index: 20;
+}
+
+.modal-close-icon:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: #ef4444;
+  color: #ef4444;
+  transform: rotate(90deg) scale(1.1);
+}
+
+/* Detail Popup Header */
+.detail-popup-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-cyber);
+  padding-right: 2.5rem;
+}
+
+.detail-header-icon {
+  font-size: 2.5rem;
+  width: 68px;
+  height: 68px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card-glass);
+  border: 1px solid var(--border-cyber-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.25);
+}
+
+.detail-header-content {
+  flex: 1;
+}
+
+.detail-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.4rem;
+}
+
+.detail-highlight-pill {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  font-size: 0.775rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  letter-spacing: 0.3px;
+}
+
+.detail-popup-title {
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.25;
+  margin-bottom: 0.35rem;
+}
+
+.detail-popup-sub {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* 4 Key Metric Stat Cards */
+.metric-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.metric-stat-card {
+  background: var(--bg-card-glass);
+  border: 1px solid var(--border-cyber);
+  border-radius: var(--radius-md);
+  padding: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-ai-hero);
+  opacity: 0.7;
+}
+
+.metric-stat-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-ai-violet);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.stat-earning::before {
+  background: var(--gradient-ai-gold);
+}
+
+.stat-placement::before {
+  background: linear-gradient(90deg, #10b981, #06b6d4);
+}
+
+.stat-hours::before {
+  background: linear-gradient(90deg, #06b6d4, #3b82f6);
+}
+
+.stat-roles::before {
+  background: var(--gradient-ai-hero);
+}
+
+.metric-stat-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.metric-stat-icon {
+  font-size: 1.25rem;
+}
+
+.metric-stat-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.metric-stat-value {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin-bottom: 0.6rem;
+  line-height: 1.2;
+}
+
+.metric-stat-detail {
+  font-size: 0.785rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 0.5rem;
+}
+
+.stat-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: 0.35rem;
+}
+
+.stat-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #06b6d4);
+  border-radius: var(--radius-full);
+  transition: width 1s ease-in-out;
+}
+
+.role-tags-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.role-chip {
+  background: rgba(139, 92, 246, 0.15);
+  color: #c4b5fd;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+}
+
+/* Detail Section Block */
+.detail-section-block {
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid var(--border-cyber);
+  border-radius: var(--radius-md);
+  padding: 1.35rem;
+  margin-bottom: 1.25rem;
+}
+
+.detail-section-heading {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.detail-section-heading span {
+  font-size: 1.25rem;
+}
+
+.detail-section-text {
+  color: var(--text-muted);
+  font-size: 0.925rem;
+  line-height: 1.7;
+}
+
+/* Market Insight Callout */
+.market-insight-box {
+  margin-top: 1rem;
+  background: rgba(245, 158, 11, 0.08);
+  border-left: 3px solid #f59e0b;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 0.85rem 1rem;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  line-height: 1.55;
+}
+
+.insight-icon {
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+/* Tech Category Grid */
+.tech-category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.85rem;
+}
+
+.tech-cat-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem;
+}
+
+.tech-cat-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-ai-cyan);
+  font-family: var(--font-mono);
+  margin-bottom: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tech-chips-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.tech-chip-item {
+  background: rgba(6, 182, 212, 0.12);
+  color: var(--text-main);
+  font-size: 0.775rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  transition: var(--transition);
+}
+
+.tech-chip-item:hover {
+  background: rgba(6, 182, 212, 0.25);
+  border-color: var(--color-ai-cyan);
+  transform: translateY(-1px);
+}
+
+/* Projects Grid */
+.projects-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.85rem;
+}
+
+.project-detail-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  position: relative;
+  transition: var(--transition);
+}
+
+.project-detail-card:hover {
+  border-color: var(--color-ai-violet);
+  background: rgba(139, 92, 246, 0.05);
+}
+
+.project-number-badge {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  color: var(--color-ai-violet);
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+
+.project-card-title {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.4rem;
+}
+
+.project-card-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* Curriculum Syllabus */
+.curriculum-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.curriculum-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-main);
+  line-height: 1.5;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.curriculum-check {
+  color: var(--color-ai-emerald);
+  font-weight: 900;
+  font-size: 1rem;
+}
+
+/* Perks Guarantee Banner */
+.perks-guarantee-banner {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(6, 182, 212, 0.15));
+  border: 1px solid var(--border-cyber-glow);
+  border-radius: var(--radius-md);
+  padding: 1.15rem 1.35rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.perks-icon {
+  font-size: 2.2rem;
+  flex-shrink: 0;
+}
+
+/* Modal Footer CTA */
+.detail-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  border-top: 1px solid var(--border-cyber);
+  padding-top: 1.5rem;
+}
+
+.proceed-btn {
+  font-size: 1rem;
+  padding: 0.85rem 1.85rem;
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+}
+
+.proceed-btn:hover {
+  box-shadow: 0 6px 25px rgba(6, 182, 212, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Enhanced Internship Card Quick-Stats Strip */
+.track-stats-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.5rem;
+  margin-bottom: 1.15rem;
+  text-align: center;
+}
+
+.track-mini-stat-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  display: block;
+}
+
+.track-mini-stat-val {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.track-actions-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+  margin-top: auto;
+}
+
+.btn-detail-outline {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-cyber);
+  color: var(--text-main);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  text-align: center;
+}
+
+.btn-detail-outline:hover {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: var(--color-ai-violet);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .modal-lg {
+    padding: 1.5rem 1rem;
+    width: 95%;
+  }
+
+  .detail-popup-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-right: 1.5rem;
+  }
+
+  .detail-popup-title {
+    font-size: 1.35rem;
+  }
+
+  .metric-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .track-actions-row {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-modal-footer {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .detail-modal-footer button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Light Theme Adjustments for Modal */
+body.light-theme .modal-lg {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+}
+
+body.light-theme .detail-section-block,
+body.light-theme .metric-stat-card {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+body.light-theme .track-stats-strip {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
+body.light-theme .tech-cat-box,
+body.light-theme .project-detail-card,
+body.light-theme .curriculum-item {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+body.light-theme .tech-chip-item {
+  background: rgba(6, 182, 212, 0.1);
+  color: #0e7490;
+  border-color: rgba(6, 182, 212, 0.3);
+}
+
+body.light-theme .market-insight-box {
+  background: #fffbeb;
+  color: #92400e;
+  border-left-color: #f59e0b;
+}
+
+body.light-theme .perks-guarantee-banner {
+  background: linear-gradient(135deg, #f5f3ff, #ecfeff);
+  border-color: #cbd5e1;
+}
+
+/* Footer */
+
 /* Footer */
 .footer-section {
   background: rgba(5, 8, 15, 0.98);

@@ -13,6 +13,10 @@
   <!-- CSS Stylesheet -->
   <link rel="stylesheet" href="css/styles.css">
   
+  <!-- Dynamic Environment Configuration (.env) -->
+  <script src="/env.js"></script>
+  <script src="js/envConfig.js"></script>
+  
   <!-- Centralized Site Content Data Dictionary -->
   <script src="js/contentData.js"></script>
 
@@ -315,19 +319,42 @@
 
         <div class="internship-grid">
           <div class="internship-card" v-for="track in filteredInternships" :key="track.id">
-            <div class="internship-icon">{{ track.icon }}</div>
-            <span class="duration-pill">{{ track.duration }}</span>
-            <h3 style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; margin-bottom: 0.75rem;">{{ track.title }}</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.15rem; line-height: 1.6;">{{ track.description }}</p>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+              <div class="internship-icon">{{ track.icon }}</div>
+              <span class="duration-pill">{{ track.duration }}</span>
+            </div>
             
-            <div style="margin-bottom: 1.15rem;">
+            <div v-if="track.badge" class="detail-highlight-pill" style="margin-bottom: 0.65rem; font-size: 0.725rem;">
+              {{ track.badge }}
+            </div>
+
+            <h3 style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; margin-bottom: 0.6rem;">{{ track.title }}</h3>
+            <p style="color: var(--text-muted); font-size: 0.885rem; margin-bottom: 1rem; line-height: 1.6;">{{ track.description }}</p>
+            
+            <!-- Quick Metrics Strip -->
+            <div class="track-stats-strip">
+              <div>
+                <span class="track-mini-stat-label">Salary Range</span>
+                <span class="track-mini-stat-val text-gradient-gold">{{ track.earningPotential?.fresher || '₹4.5 - ₹7.5 LPA' }}</span>
+              </div>
+              <div>
+                <span class="track-mini-stat-label">Placement</span>
+                <span class="track-mini-stat-val" style="color: var(--color-ai-emerald);">{{ track.jobPlacementRate?.percentage || 95 }}% Rate</span>
+              </div>
+              <div>
+                <span class="track-mini-stat-label">Duration</span>
+                <span class="track-mini-stat-val" style="color: var(--color-ai-cyan);">{{ track.learningHours?.totalHours || '180+ Hrs' }}</span>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 1.25rem;">
               <div style="font-size: 0.825rem; font-weight: 700; color: var(--color-ai-cyan); margin-bottom: 0.4rem; font-family: var(--font-mono);">Technologies & Tools:</div>
               <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
                 <span class="skill-tag" v-for="tech in track.stack" :key="tech">{{ tech }}</span>
               </div>
             </div>
 
-            <button class="btn-primary" style="width: 100%; justify-content: center; margin-top: auto;" @click="openInternshipModal(track)">
+            <button class="btn-primary" style="width: 100%; justify-content: center; margin-top: auto; padding: 0.75rem 1.25rem;" @click="openCourseDetailModal(track)">
               <span>Apply for {{ track.shortName }}</span> 🚀
             </button>
           </div>
@@ -510,15 +537,18 @@
                 <div class="form-group">
                   <label class="form-label">Target Program <span class="req">*</span></label>
                   <select v-model="form.course" class="form-control" required>
-                    <option value="MERN Stack Internship (3/6 Mo)">MERN Stack IT Solution Internship</option>
-                    <option value="iOS Dev Internship (3/6 Mo)">iOS Development IT Solution Internship</option>
-                    <option value="Android Dev Internship (3/6 Mo)">Android Development IT Solution Internship</option>
-                    <option value="Digital Marketing Internship">Digital Marketing IT Solution Internship</option>
-                    <option value="NIELIT O Level">NIELIT O Level (Foundation)</option>
-                    <option value="NIELIT A Level">NIELIT A Level (Advance)</option>
-                    <option value="BCA - Subharti University">BCA - Subharti Univ Degree</option>
-                    <option value="MCA - Subharti University">MCA - Subharti Univ Degree</option>
-                    <option value="Tally ERP 9 & GST">Tally ERP 9 & Financial Accounting</option>
+                    <optgroup label="🚀 IT Solution & Production Internships (3 / 6 Months)">
+                      <option value="Web Development (MERN Stack & Cloud Architecture)">Web Development (MERN Stack & Cloud Architecture)</option>
+                      <option value="iOS Native App Development (Swift & SwiftUI)">iOS Native App Development (Swift & SwiftUI)</option>
+                      <option value="Android Native App Development (Kotlin & Jetpack Compose)">Android Native App Development (Kotlin & Jetpack Compose)</option>
+                      <option value="Digital Marketing, SEO & Growth Hacking">Digital Marketing, SEO & Growth Hacking</option>
+                    </optgroup>
+                    <optgroup label="📚 Accredited Diplomas & University Degrees">
+                      <option value='NIELIT "O" Level Diploma'>NIELIT "O" Level Diploma (Govt. of India)</option>
+                      <option value='NIELIT "A" Level Diploma'>NIELIT "A" Level Diploma (Graduate Diploma)</option>
+                      <option value="Subharti University Degree Courses (BCA / MCA)">Subharti University Degree (BCA / MCA)</option>
+                      <option value="Tally ERP 9 & GST">Tally ERP 9 & Financial Accounting</option>
+                    </optgroup>
                   </select>
                 </div>
 
@@ -564,6 +594,180 @@
         </div>
       </section>
     </main>
+
+    <!-- ================= IN-DEPTH COURSE / INTERNSHIP DETAIL POPUP MODAL ================= -->
+    <div class="modal-overlay" v-if="showDetailModal" @click.self="closeCourseDetailModal" tabindex="-1">
+      <div class="modal-card modal-lg course-detail-popup">
+        <!-- Close Button -->
+        <button class="modal-close-icon" @click="closeCourseDetailModal" title="Close Popup (Esc)">✕</button>
+
+        <!-- Header -->
+        <div class="detail-popup-header">
+          <div class="detail-header-icon">{{ selectedTrack.icon }}</div>
+          <div class="detail-header-content">
+            <div class="detail-badge-group">
+              <span class="duration-pill">⏱️ {{ selectedTrack.duration }}</span>
+              <span class="detail-highlight-pill" v-if="selectedTrack.badge">{{ selectedTrack.badge }}</span>
+            </div>
+            <h2 class="detail-popup-title">{{ selectedTrack.title }}</h2>
+            <div class="detail-popup-sub">IT Solutions & Production Internship Track 2026 • Live Project Lab</div>
+          </div>
+        </div>
+
+        <!-- 4 Key Metric Stat Cards -->
+        <div class="metric-stats-grid">
+          <!-- 1. Earning Potential in Current Scenario -->
+          <div class="metric-stat-card stat-earning">
+            <div class="metric-stat-top">
+              <span class="metric-stat-icon">💰</span>
+              <span class="metric-stat-tag">Earning Potential</span>
+            </div>
+            <div class="metric-stat-value text-gradient-gold">
+              {{ selectedTrack.earningPotential?.fresher || '₹4.5 - ₹7.5 LPA' }}
+            </div>
+            <div class="metric-stat-detail">
+              <div><strong>Fresher Salary:</strong> {{ selectedTrack.earningPotential?.fresher }}</div>
+              <div><strong>Experienced (2-3+ Yrs):</strong> {{ selectedTrack.earningPotential?.experienced }}</div>
+              <div><strong>Freelance / Remote:</strong> {{ selectedTrack.earningPotential?.freelance }}</div>
+            </div>
+          </div>
+
+          <!-- 2. Job Placement Rate Percentage -->
+          <div class="metric-stat-card stat-placement">
+            <div class="metric-stat-top">
+              <span class="metric-stat-icon">🎯</span>
+              <span class="metric-stat-tag">Job Success Rate</span>
+            </div>
+            <div class="metric-stat-value text-gradient">
+              {{ selectedTrack.jobPlacementRate?.percentage || 95 }}% Placement
+            </div>
+            <div class="metric-stat-detail">
+              <div class="stat-progress-bar">
+                <div class="stat-progress-fill" :style="{ width: (selectedTrack.jobPlacementRate?.percentage || 95) + '%' }"></div>
+              </div>
+              <div style="font-size: 0.775rem; color: var(--color-ai-emerald); font-weight: 700;">
+                ✓ {{ selectedTrack.jobPlacementRate?.demandLevel || 'Extremely High Industry Demand' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Learning Hours Required -->
+          <div class="metric-stat-card stat-hours">
+            <div class="metric-stat-top">
+              <span class="metric-stat-icon">⏱️</span>
+              <span class="metric-stat-tag">Learning Hours</span>
+            </div>
+            <div class="metric-stat-value" style="color: var(--color-ai-cyan);">
+              {{ selectedTrack.learningHours?.totalHours || '180+ Hours' }}
+            </div>
+            <div class="metric-stat-detail">
+              <div><strong>Weekly Commitment:</strong> {{ selectedTrack.learningHours?.weeklyHours || '12-15 Hrs/Wk' }}</div>
+              <div><strong>Live Lab Coding:</strong> {{ selectedTrack.learningHours?.liveLabHours || '120+ Hrs' }}</div>
+              <div><strong>Schedule:</strong> {{ selectedTrack.learningHours?.schedule || 'Daily 2 Hours Interactive Lab' }}</div>
+            </div>
+          </div>
+
+          <!-- 4. Career Target Roles -->
+          <div class="metric-stat-card stat-roles">
+            <div class="metric-stat-top">
+              <span class="metric-stat-icon">💼</span>
+              <span class="metric-stat-tag">Target Job Roles</span>
+            </div>
+            <div class="metric-stat-value" style="font-size: 1.15rem; color: var(--color-ai-violet);">
+              {{ selectedTrack.jobPlacementRate?.targetRoles?.[0] || 'Software Engineer' }}
+            </div>
+            <div class="metric-stat-detail">
+              <div class="role-tags-wrap">
+                <span class="role-chip" v-for="role in selectedTrack.jobPlacementRate?.targetRoles" :key="role">{{ role }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- In-Depth Technology & Architectural Scope -->
+        <div class="detail-section-block">
+          <h3 class="detail-section-heading">
+            <span>🔬</span> Details About Technology & Industry Scope
+          </h3>
+          <p class="detail-section-text">{{ selectedTrack.techDetails || selectedTrack.description }}</p>
+          
+          <div class="market-insight-box" v-if="selectedTrack.earningPotential?.overview">
+            <span class="insight-icon">💡</span>
+            <div>
+              <strong>Current Market Scenario:</strong> {{ selectedTrack.earningPotential.overview }}
+            </div>
+          </div>
+        </div>
+
+        <!-- What Technology You Will Learn (Categorized Grid) -->
+        <div class="detail-section-block">
+          <h3 class="detail-section-heading">
+            <span>💻</span> Technologies & Tools You Will Learn
+          </h3>
+          <div class="tech-category-grid" v-if="selectedTrack.technologiesLearned && selectedTrack.technologiesLearned.length">
+            <div class="tech-cat-box" v-for="cat in selectedTrack.technologiesLearned" :key="cat.category">
+              <div class="tech-cat-title">{{ cat.category }}</div>
+              <div class="tech-chips-list">
+                <span class="tech-chip-item" v-for="tech in cat.items" :key="tech">{{ tech }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="tech-chips-list" v-else>
+            <span class="tech-chip-item" v-for="tech in selectedTrack.stack" :key="tech">{{ tech }}</span>
+          </div>
+        </div>
+
+        <!-- Real-World Projects You Will Build -->
+        <div class="detail-section-block" v-if="selectedTrack.liveProjects && selectedTrack.liveProjects.length">
+          <h3 class="detail-section-heading">
+            <span>🚀</span> Real-World Production Projects You Will Build
+          </h3>
+          <div class="projects-detail-grid">
+            <div class="project-detail-card" v-for="(proj, pIdx) in selectedTrack.liveProjects" :key="proj.name">
+              <div class="project-number-badge">Project 0{{ pIdx + 1 }}</div>
+              <h4 class="project-card-title">{{ proj.name }}</h4>
+              <p class="project-card-desc">{{ proj.desc }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Curriculum Syllabus Breakdown -->
+        <div class="detail-section-block" v-if="selectedTrack.curriculumHighlights && selectedTrack.curriculumHighlights.length">
+          <h3 class="detail-section-heading">
+            <span>📚</span> Structured Curriculum Milestones
+          </h3>
+          <div class="curriculum-list">
+            <div class="curriculum-item" v-for="(module, mIdx) in selectedTrack.curriculumHighlights" :key="mIdx">
+              <span class="curriculum-check">✓</span>
+              <span>{{ module }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Perks & Placement Certification Banner -->
+        <div class="perks-guarantee-banner">
+          <div class="perks-icon">🏆</div>
+          <div>
+            <div style="font-weight: 800; font-size: 1rem; color: var(--text-main); margin-bottom: 0.25rem;">
+              Verified Internship Certification + Corporate Letter of Recommendation (LOR)
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">
+              Includes 100% placement assistance, resume masterclass, mock technical interviews, and GitHub production code portfolio review.
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Action Buttons Footer -->
+        <div class="detail-modal-footer">
+          <button type="button" class="btn-secondary" @click="closeCourseDetailModal">
+            Back to Tracks
+          </button>
+          <button type="button" class="btn-primary proceed-btn" @click="proceedToRegistration(selectedTrack)">
+            <span>Proceed to Registration</span> 📝 →
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Confirmation Modal -->
     <div class="modal-overlay" v-if="showModal" @click.self="showModal = false">
@@ -699,6 +903,9 @@
           courseFilter: 'all',
           selectedInternshipDuration: 'all',
           
+          showDetailModal: false,
+          selectedTrack: {},
+
           showModal: false,
           modalTitle: '',
           modalBody: '',
@@ -729,7 +936,7 @@
             dob: '',
             identityMark: '',
             gender: 'Male',
-            course: 'MERN Stack Internship (3/6 Mo)',
+            course: 'Web Development (MERN Stack & Cloud Architecture)',
             mobile: '',
             email: '',
             district: 'PRAYAGRAJ',
@@ -755,10 +962,24 @@
       },
 
       mounted() {
+        if (window.applyEnvToContent) {
+          window.applyEnvToContent();
+          this.content = window.CONTENT_DATA;
+        }
+
         const hash = window.location.hash.replace('#', '');
         if (['home', 'internships', 'courses', 'reviews', 'admission'].includes(hash)) {
           this.activeTab = hash;
         }
+
+        // Global ESC key listener to close modals
+        window.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            this.closeCourseDetailModal();
+            this.showModal = false;
+            this.showJobModal = false;
+          }
+        });
       },
 
       methods: {
@@ -772,13 +993,36 @@
           this.isDarkMode = !this.isDarkMode;
           document.body.classList.toggle('light-theme', !this.isDarkMode);
         },
+        openCourseDetailModal(track) {
+          this.selectedTrack = track;
+          this.showDetailModal = true;
+          document.body.style.overflow = 'hidden';
+        },
+        closeCourseDetailModal() {
+          this.showDetailModal = false;
+          document.body.style.overflow = '';
+        },
+        proceedToRegistration(track) {
+          this.closeCourseDetailModal();
+          if (track && track.title) {
+            this.form.course = track.title;
+          } else if (typeof track === 'string') {
+            this.form.course = track;
+          }
+          this.setTab('admission');
+          this.$nextTick(() => {
+            const formCard = document.querySelector('.admission-container') || document.querySelector('.form-card');
+            if (formCard) {
+              formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          });
+        },
         applyForCourse(courseTitle) {
           this.form.course = courseTitle;
           this.setTab('admission');
         },
         openInternshipModal(track) {
-          this.form.course = track.title + ' (3/6 Mo Internship)';
-          this.setTab('admission');
+          this.openCourseDetailModal(track);
         },
         openJobModal(job) {
           this.selectedJob = job;
