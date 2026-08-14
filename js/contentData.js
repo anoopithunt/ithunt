@@ -565,7 +565,7 @@ const CONTENT_DATA = {
     alumniList: [
       {
         id: 1,
-        name: "Rahul Sharma",
+        name: "Anup Mishra",
         avatar: "img/student-placeholder.svg",
         batch: "Batch of 2024",
         track: "MERN Stack & Cloud Architecture",
