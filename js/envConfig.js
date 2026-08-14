@@ -17,8 +17,8 @@
     APP_LOGO_IMAGE: "img/logo_ithunt.png",
     CONTACT_PHONE: "+91 9795771806",
     CONTACT_RAW_PHONE: "+919795771806",
-    CONTACT_EMAIL: "info@ithunt.edu.in",
-    CONTACT_LOCATION: "📍 Holagarh, Prayagraj (Allahabad), UP",
+    CONTACT_EMAIL: "softtechithunt@gmail.com",
+    CONTACT_LOCATION: "📍 Dahiyawa Holagarh(Near Mela Ground in Front of Kali Maa Mandir), Prayagraj (Allahabad), UP",
     WHATSAPP_NUMBER: "919795771806",
     DIRECTOR_NAME: "Mr. Lakshman Singh Chauhan",
     DIRECTOR_TITLE: "Director & Founder, IT HUNT | MCA (Computer Science)",
@@ -39,43 +39,45 @@
 
   // Function to apply ENV to CONTENT_DATA
   function applyEnvToContent() {
-    if (typeof window.CONTENT_DATA !== 'undefined') {
+    if (typeof window.CONTENT_DATA !== 'undefined' && window.CONTENT_DATA) {
       const C = window.CONTENT_DATA;
       const E = window.ENV_CONFIG;
 
+      const getVal = (key) => E[key] || E['VITE_' + key] || E['NEXT_PUBLIC_' + key] || E['REACT_APP_' + key];
+
       // Brand
-      if (E.APP_NAME) C.brand.name = E.APP_NAME;
-      if (E.APP_NAME_HIGHLIGHT) C.brand.nameHighlight = E.APP_NAME_HIGHLIGHT;
-      if (E.APP_TAGLINE) C.brand.tagline = E.APP_TAGLINE;
-      if (E.APP_TITLE) C.brand.metaTitle = E.APP_TITLE;
-      if (E.APP_ESTABLISHED_YEAR) C.brand.establishedYear = E.APP_ESTABLISHED_YEAR;
-      if (E.APP_LOGO_IMAGE) C.brand.logoImage = E.APP_LOGO_IMAGE;
+      if (getVal('APP_NAME')) C.brand.name = getVal('APP_NAME');
+      if (getVal('APP_NAME_HIGHLIGHT')) C.brand.nameHighlight = getVal('APP_NAME_HIGHLIGHT');
+      if (getVal('APP_TAGLINE')) C.brand.tagline = getVal('APP_TAGLINE');
+      if (getVal('APP_TITLE')) C.brand.metaTitle = getVal('APP_TITLE');
+      if (getVal('APP_ESTABLISHED_YEAR')) C.brand.establishedYear = getVal('APP_ESTABLISHED_YEAR');
+      if (getVal('APP_LOGO_IMAGE')) C.brand.logoImage = getVal('APP_LOGO_IMAGE');
 
       // Contact
-      if (E.CONTACT_PHONE) C.contact.phone = "📞 Mobile: " + E.CONTACT_PHONE.replace('📞 Mobile: ', '');
-      if (E.CONTACT_RAW_PHONE) C.contact.rawPhone = E.CONTACT_RAW_PHONE;
-      if (E.CONTACT_EMAIL) C.contact.email = "✉️ Email: " + E.CONTACT_EMAIL.replace('✉️ Email: ', '');
-      if (E.CONTACT_LOCATION) C.contact.location = E.CONTACT_LOCATION;
-      if (E.WHATSAPP_NUMBER) C.contact.whatsapp = E.WHATSAPP_NUMBER;
+      if (getVal('CONTACT_PHONE')) C.contact.phone = "📞 Mobile: " + getVal('CONTACT_PHONE').replace('📞 Mobile: ', '');
+      if (getVal('CONTACT_RAW_PHONE')) C.contact.rawPhone = getVal('CONTACT_RAW_PHONE');
+      if (getVal('CONTACT_EMAIL')) C.contact.email = "✉️ Email: " + getVal('CONTACT_EMAIL').replace('✉️ Email: ', '');
+      if (getVal('CONTACT_LOCATION')) C.contact.location = getVal('CONTACT_LOCATION');
+      if (getVal('WHATSAPP_NUMBER')) C.contact.whatsapp = getVal('WHATSAPP_NUMBER');
 
       // Director
-      if (E.DIRECTOR_NAME) C.director.name = E.DIRECTOR_NAME;
-      if (E.DIRECTOR_TITLE) C.director.title = E.DIRECTOR_TITLE;
-      if (E.DIRECTOR_IMAGE) C.director.image = E.DIRECTOR_IMAGE;
+      if (getVal('DIRECTOR_NAME')) C.director.name = getVal('DIRECTOR_NAME');
+      if (getVal('DIRECTOR_TITLE')) C.director.title = getVal('DIRECTOR_TITLE');
+      if (getVal('DIRECTOR_IMAGE')) C.director.image = getVal('DIRECTOR_IMAGE');
 
       // API config
       C.api = {
-        baseUrl: E.API_BASE_URL,
-        admission: E.ADMISSION_API_ENDPOINT,
-        jobApplication: E.JOB_APPLICATION_API_ENDPOINT,
-        reviews: E.REVIEWS_API_ENDPOINT
+        baseUrl: getVal('API_BASE_URL'),
+        admission: getVal('ADMISSION_API_ENDPOINT'),
+        jobApplication: getVal('JOB_APPLICATION_API_ENDPOINT'),
+        reviews: getVal('REVIEWS_API_ENDPOINT')
       };
 
       // Features
       C.features = {
-        analytics: E.ENABLE_ANALYTICS === 'true',
-        admissionPortal: E.ENABLE_ADMISSION_PORTAL !== 'false',
-        careersPortal: E.ENABLE_CAREERS_PORTAL !== 'false'
+        analytics: getVal('ENABLE_ANALYTICS') === 'true',
+        admissionPortal: getVal('ENABLE_ADMISSION_PORTAL') !== 'false',
+        careersPortal: getVal('ENABLE_CAREERS_PORTAL') !== 'false'
       };
     }
   }
