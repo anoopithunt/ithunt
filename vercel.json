@@ -13,20 +13,13 @@
       ]
     },
     {
-      "source": "/(css|img)/(.*)",
+      "source": "/(css|js|img)/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
-      ]
-    },
-    {
-      "source": "/(env.js|api/(.*))",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
       ]
     }
   ],
   "rewrites": [
-    { "source": "/env.js", "destination": "/api/env.js" },
     { "source": "/Home", "destination": "/Home.html" },
     { "source": "/AboutUs", "destination": "/AboutUs.html" },
     { "source": "/admission", "destination": "/admission.html" }
