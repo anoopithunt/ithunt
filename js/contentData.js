@@ -547,6 +547,115 @@ const CONTENT_DATA = {
     ]
   },
 
+  // Alumni Testimonials & Achievements Section
+  testimonialsSection: {
+    tagline: "PROVEN ALUMNI SUCCESS STORIES",
+    titlePrefix: "Our Alumni ",
+    titleGradient: "Experiences & Achievements",
+    description: "Discover how engineering students, freshers, and graduates transformed their careers and secured top-tier tech roles with IT HUNT.",
+    stats: [
+      { label: "Graduated Alumni", value: "500+", icon: "🎓" },
+      { label: "Highest Package", value: "₹18.5 LPA", icon: "💰" },
+      { label: "Average CTC", value: "₹6.2 LPA", icon: "📈" },
+      { label: "Placement Rate", value: "95%", icon: "🎯" }
+    ],
+    hiringPartners: [
+      "Paytm", "TCS", "Infosys", "Wipro", "Zomato", "Tech Mahindra", "Cognizant", "HCL Tech", "Swiggy", "Accenture"
+    ],
+    alumniList: [
+      {
+        id: 1,
+        name: "Rahul Sharma",
+        avatar: "img/anoop.png",
+        batch: "Batch of 2024",
+        track: "MERN Stack & Cloud Architecture",
+        trackCategory: "mern",
+        currentRole: "Software Engineer",
+        company: "Paytm Payments",
+        packageJump: "₹3.5 LPA ➔ ₹11.2 LPA (220% Jump)",
+        verified: true,
+        rating: 5,
+        projectBuilt: "Multi-Tenant SaaS CRM with Razorpay & Socket.io",
+        story: "Joining IT HUNT was the turning point in my engineering career. Before this, I only knew theoretical Java from college. At IT HUNT, under Director Mr. Lakshman Singh Chauhan's mentorship, I coded on real Git branches daily, built 3 full-stack MERN production web apps, and mastered Docker and MongoDB aggregation. The mock technical rounds directly helped me clear Paytm's 4-round technical interview!"
+      },
+      {
+        id: 2,
+        name: "Neha Upadhyay",
+        avatar: "img/vikash.png",
+        batch: "Batch of 2024",
+        track: "iOS Native App Development (Swift & SwiftUI)",
+        trackCategory: "ios",
+        currentRole: "iOS Developer",
+        company: "Zomato Tech",
+        packageJump: "Fresher ➔ ₹9.8 LPA Direct Offer",
+        verified: true,
+        rating: 5,
+        projectBuilt: "Live AVKit Streaming App & HealthKit Tracker",
+        story: "The Apple lab workstations and Xcode hands-on training at Holagarh are unmatched. We didn't just study SwiftUI theory; we published two native apps on TestFlight and the App Store. Learning Combine, CoreData, and Apple Human Interface Guidelines gave me a massive advantage over standard applicants. Highly recommend the 6-month masterclass!"
+      },
+      {
+        id: 3,
+        name: "Amit Kumar Srivastav",
+        avatar: "img/ithunt.jpg",
+        batch: "Batch of 2023",
+        track: "Android Native App Development (Kotlin & Compose)",
+        trackCategory: "android",
+        currentRole: "Senior Android Engineer",
+        company: "Infosys Digital",
+        packageJump: "₹4.0 LPA ➔ ₹14.5 LPA (3-Year Progression)",
+        verified: true,
+        rating: 5,
+        projectBuilt: "Fintech Wallet & QR Payment Engine with Biometrics",
+        story: "The faculty at IT HUNT has 4+ years of real industry experience. They taught us Clean MVVM architecture, Room database caching, Coroutines, and Hilt dependency injection exactly as top product companies write code. The corporate Letter of Recommendation (LOR) and verifiable certificate added immense weight to my resume."
+      },
+      {
+        id: 4,
+        name: "Saurabh Pandey",
+        avatar: "img/hacker.png",
+        batch: "Batch of 2025",
+        track: "Python, FastAPI & Applied Generative AI",
+        trackCategory: "ai",
+        currentRole: "AI / Backend Developer",
+        company: "Venture-Backed AI Startup",
+        packageJump: "Fresher ➔ ₹8.5 LPA + Stock Options",
+        verified: true,
+        rating: 5,
+        projectBuilt: "Enterprise RAG AI Knowledge Search & LangChain Bot",
+        story: "I joined the Applied Generative AI track to learn practical LLM orchestration. We built custom RAG pipelines with Pinecone, asynchronous APIs with FastAPI, and autonomous web agents. The hands-on project portfolio on my GitHub helped me get hired within 3 weeks of internship completion!"
+      },
+      {
+        id: 5,
+        name: "Pooja Verma",
+        avatar: "img/desktop.jpg",
+        batch: "Batch of 2023",
+        track: "NIELIT 'O' Level & 'A' Level Diploma",
+        trackCategory: "diploma",
+        currentRole: "Assistant IT Officer",
+        company: "State IT Department / Govt. Sector",
+        packageJump: "Diploma Certification ➔ Govt. Grade Pay",
+        verified: true,
+        rating: 5,
+        projectBuilt: "Comprehensive Government Office Automation & Database",
+        story: "IT HUNT is the premier NIELIT accredited center in Holagarh Prayagraj. The structured lab schedule, Python practice classes, and dedicated question bank revision helped me secure top grades in all O Level modules on my first attempt. Thank you to the entire IT HUNT team!"
+      },
+      {
+        id: 6,
+        name: "Vikas Singh",
+        avatar: "img/ithunt1.jpg",
+        batch: "Batch of 2024",
+        track: "Digital Marketing, SEO & Growth Hacking",
+        trackCategory: "marketing",
+        currentRole: "Growth & Performance Lead",
+        company: "Global E-Commerce Agency (Remote)",
+        packageJump: "₹3.0 LPA ➔ ₹8.0 LPA Remote",
+        verified: true,
+        rating: 5,
+        projectBuilt: "Live E-Commerce Meta & Google Ads Scaling (ROAS 4.5x)",
+        story: "Unlike other institutes that teach slides, IT HUNT had us manage live ad budgets, optimize real client SEO rankings, and run A/B testing on landing pages. I now manage remote US and Indian e-commerce ad accounts with confidence."
+      }
+    ]
+  },
+
   // Contact Information
   contact: {
     location: "📍Dahiyawa Holagarh(Near Mela Ground in Front of Kali Maa Mandir), Prayagraj (Allahabad), UP",

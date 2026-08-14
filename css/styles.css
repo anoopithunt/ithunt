@@ -2778,6 +2778,331 @@ body.light-theme .footer-bottom a {
   color: #ffffff !important;
 }
 
+/* ==========================================================================
+   ALUMNI TESTIMONIALS & ACHIEVEMENTS PAGE STYLING
+   ========================================================================== */
+
+.testimonials-page-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.alumni-hero-banner {
+  background: radial-gradient(circle at 50% 0%, rgba(249, 115, 22, 0.22) 0%, rgba(250, 204, 21, 0.1) 40%, rgba(12, 9, 6, 0) 80%);
+  padding: 4.5rem 1.5rem 3.5rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border-cyber);
+  position: relative;
+}
+
+.alumni-stats-ribbon {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  max-width: 1000px;
+  margin: 3rem auto 0;
+}
+
+.alumni-stat-card {
+  background: var(--bg-card-glass);
+  border: 1px solid var(--border-cyber);
+  backdrop-filter: blur(16px);
+  padding: 1.5rem 1.25rem;
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: var(--transition);
+}
+
+.alumni-stat-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-ai-orange);
+  box-shadow: 0 15px 35px rgba(249, 115, 22, 0.2);
+}
+
+.alumni-stat-icon {
+  font-size: 1.75rem;
+  margin-bottom: 0.35rem;
+}
+
+.alumni-stat-value {
+  font-family: var(--font-heading);
+  font-size: 1.85rem;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  margin-bottom: 0.25rem;
+}
+
+.alumni-stat-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Hiring Partners Strip */
+.alumni-partners-banner {
+  background: rgba(249, 115, 22, 0.06);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 2rem;
+  margin-bottom: 3rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.partners-label {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--color-ai-yellow);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: var(--font-mono);
+}
+
+.partners-logos-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.partner-pill {
+  background: var(--bg-card-glass);
+  border: 1px solid var(--border-cyber);
+  color: var(--text-main);
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full);
+  font-size: 0.825rem;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: var(--transition);
+}
+
+.partner-pill:hover {
+  border-color: var(--color-ai-orange);
+  transform: translateY(-2px);
+}
+
+/* Alumni Cards Grid */
+.alumni-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
+
+.alumni-card {
+  background: var(--bg-card-glass);
+  border: 1px solid var(--border-cyber);
+  backdrop-filter: blur(20px);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.alumni-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--color-ai-orange);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 35px rgba(249, 115, 22, 0.2);
+}
+
+.alumni-card-top {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.alumni-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.alumni-avatar-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-ai-orange);
+  box-shadow: 0 0 15px rgba(249, 115, 22, 0.35);
+}
+
+.alumni-verified-badge {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #059669;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.alumni-user-info {
+  flex: 1;
+}
+
+.alumni-name {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 0.25rem;
+  letter-spacing: -0.3px;
+}
+
+.alumni-role-company {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.35rem;
+}
+
+.alumni-company-tag {
+  background: rgba(249, 115, 22, 0.14);
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  color: var(--color-ai-yellow);
+  font-size: 0.775rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
+}
+
+.alumni-batch-tag {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Package Achievement Highlight Strip */
+.alumni-achievement-strip {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(250, 204, 21, 0.1));
+  border: 1px dashed rgba(249, 115, 22, 0.4);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.15rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.achievement-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.achievement-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.achievement-val {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+/* Story Text */
+.alumni-story-body {
+  position: relative;
+  flex: 1;
+  margin-bottom: 1.25rem;
+}
+
+.quote-symbol {
+  font-size: 3rem;
+  line-height: 1;
+  font-family: serif;
+  color: rgba(249, 115, 22, 0.25);
+  position: absolute;
+  top: -10px;
+  left: -5px;
+  pointer-events: none;
+}
+
+.alumni-story-text {
+  font-size: 0.925rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+  position: relative;
+  z-index: 1;
+  padding-left: 0.5rem;
+}
+
+/* Project Footer */
+.alumni-project-footer {
+  border-top: 1px solid var(--border-cyber);
+  padding-top: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.825rem;
+  flex-wrap: wrap;
+}
+
+.project-label {
+  font-weight: 700;
+  color: var(--color-ai-orange);
+}
+
+.project-val {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+/* Light Theme Overrides for Alumni Section */
+body.light-theme .alumni-hero-banner {
+  background: radial-gradient(circle at 50% 0%, rgba(249, 115, 22, 0.15) 0%, rgba(250, 204, 21, 0.08) 50%, rgba(255, 251, 245, 0) 100%);
+}
+
+body.light-theme .alumni-stat-card {
+  background: #ffffff;
+  border-color: #fed7aa;
+  box-shadow: 0 10px 25px rgba(249, 115, 22, 0.08);
+}
+
+body.light-theme .alumni-card {
+  background: #ffffff;
+  border-color: #fed7aa;
+  box-shadow: 0 15px 35px rgba(249, 115, 22, 0.06);
+}
+
+body.light-theme .alumni-card:hover {
+  box-shadow: 0 25px 45px rgba(249, 115, 22, 0.15);
+  border-color: #f97316;
+}
+
+body.light-theme .alumni-story-text {
+  color: #4b5563;
+}
+
+body.light-theme .alumni-stat-label,
+body.light-theme .alumni-batch-tag {
+  color: #6b7280;
+}
+
 /* Mobile Responsive Adjustments */
 @media (max-width: 1024px) {
   .hero-grid, .about-grid, .admission-container {
@@ -2818,9 +3143,14 @@ body.light-theme .footer-bottom a {
     grid-template-columns: 1fr;
   }
 
-  .internship-tracks-grid {
+  .internship-tracks-grid, .alumni-cards-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+  }
+
+  .alumni-stats-ribbon {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
   }
 
   .roadmap-grid, .internship-features-grid {
@@ -2846,8 +3176,36 @@ body.light-theme .footer-bottom a {
     grid-template-columns: 1fr 1fr;
   }
 
-  .courses-grid, .internship-grid, .internship-tracks-grid, .reviews-grid, .careers-grid, .team-grid, .roadmap-grid, .internship-features-grid {
+  .courses-grid, .internship-grid, .internship-tracks-grid, .reviews-grid, .careers-grid, .team-grid, .roadmap-grid, .internship-features-grid, .alumni-cards-grid {
     grid-template-columns: 1fr;
+  }
+
+  .alumni-stats-ribbon {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .alumni-card {
+    padding: 1.25rem;
+  }
+
+  .alumni-card-top {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .alumni-role-company {
+    justify-content: center;
+  }
+
+  .alumni-partners-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.25rem 1rem;
+  }
+
+  .partners-logos-wrap {
+    justify-content: center;
   }
 
   .internship-hero-banner {
