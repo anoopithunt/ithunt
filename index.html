@@ -976,6 +976,10 @@
         if (['home', 'internships', 'courses', 'reviews', 'admission'].includes(hash)) {
           this.activeTab = hash;
         }
+        // Clean URL so no #hash is shown in the address bar
+        if (window.location.hash && window.history && window.history.replaceState) {
+          window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
 
         // Global ESC key listener to close modals
         window.addEventListener('keydown', (e) => {
@@ -992,7 +996,10 @@
           this.activeTab = tabName;
           this.isMobileNavOpen = false;
           window.scrollTo({ top: 0, behavior: 'smooth' });
-          window.location.hash = tabName;
+          // Keep URL clean without #hash in browser address bar
+          if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, '', window.location.pathname + window.location.search);
+          }
         },
         toggleTheme() {
           this.isDarkMode = !this.isDarkMode;

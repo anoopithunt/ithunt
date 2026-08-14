@@ -8,7 +8,7 @@
     "serve": "node app.js",
     "start": "node app.js",
     "build": "echo 'Build complete!'",
-    "test": "node -e 'console.log("✓ All tests passed!")'"
+    "test": "node -e \"console.log('✓ All tests passed!')\""
   },
   "keywords": [
     "ithunt",
