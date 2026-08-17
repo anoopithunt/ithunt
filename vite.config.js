@@ -11,7 +11,7 @@ export default defineConfig({
     }
   },
   server: {
-    port: 5501,
+    port: 5500,
     host: true
   },
   build: {

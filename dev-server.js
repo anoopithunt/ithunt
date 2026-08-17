@@ -9,7 +9,7 @@ async function startServer() {
     configFile: path.resolve(__dirname, 'vite.config.js'),
     root: __dirname,
     server: {
-      port: 5501,
+      port: 5500,
       host: true
     }
   });
