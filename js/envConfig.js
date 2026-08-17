@@ -56,7 +56,7 @@
       // Contact
       if (getVal('CONTACT_PHONE')) C.contact.phone = "📞 Mobile: " + getVal('CONTACT_PHONE').replace('📞 Mobile: ', '');
       if (getVal('CONTACT_RAW_PHONE')) C.contact.rawPhone = getVal('CONTACT_RAW_PHONE');
-      if (getVal('CONTACT_EMAIL')) C.contact.email = "✉️ Email: " + getVal('CONTACT_EMAIL').replace('✉️ Email: ', '');
+      if (getVal('CONTACT_EMAIL')) C.contact.email = "Email: " + getVal('CONTACT_EMAIL').replace('Email: ', '');
       if (getVal('CONTACT_LOCATION')) C.contact.location = getVal('CONTACT_LOCATION');
       if (getVal('WHATSAPP_NUMBER')) C.contact.whatsapp = getVal('WHATSAPP_NUMBER');
 

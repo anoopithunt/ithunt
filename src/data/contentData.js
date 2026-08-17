@@ -1167,10 +1167,10 @@ const CONTENT_DATA = {
 
   // Contact Information
   contact: {
-    location: "📍Dahiyawa Holagarh(Near Mela Ground in Front of Kali Maa Mandir), Prayagraj (Allahabad), UP",
-    phone: "📞 Mobile: +91 9795771806",
+    location: "Dahiyawa Holagarh(Near Mela Ground in Front of Kali Maa Mandir), Prayagraj (Allahabad), UP",
+    phone: "Mobile: +91 9795771806",
     rawPhone: "+91 9795771806",
-    email: "✉️ Email: softtechithunt@gmail.com",
+    email: "Email: softtechithunt@gmail.com",
     rawEmail: "softtechithunt@gmail.com",
     districts: ["PRAYAGRAJ", "PRATAPGARH", "KAUSHAMBI", "GORAKHPUR", "LUCKNOW", "RAEBARELI", "VARANASI", "AMETHI"]
   },
