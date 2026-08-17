@@ -1155,33 +1155,51 @@ button, input, select, textarea {
 }
 
 .receipt-header {
-  border-bottom: 2px dashed rgba(249, 115, 22, 0.25);
-  padding-bottom: 1.15rem;
-  margin-bottom: 1.25rem;
-  text-align: center;
+  border-bottom: 2px dashed rgba(249, 115, 22, 0.35);
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.35rem;
+  text-align: left;
   position: relative;
+}
+
+.receipt-brand-logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+  margin-bottom: 1rem;
+}
+
+.receipt-logo-img {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(249, 115, 22, 0.4));
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px;
 }
 
 .receipt-stamp {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.25rem 0.75rem;
-  background: rgba(16, 185, 129, 0.15);
-  border: 1px solid rgba(16, 185, 129, 0.4);
+  gap: 0.45rem;
+  padding: 0.35rem 0.85rem;
+  background: rgba(16, 185, 129, 0.18);
+  border: 1.5px solid rgba(16, 185, 129, 0.5);
   color: #34d399;
   border-radius: var(--radius-full);
-  font-size: 0.725rem;
+  font-size: 0.775rem;
   font-weight: 800;
   letter-spacing: 0.75px;
   text-transform: uppercase;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.45rem;
   font-family: var(--font-mono);
 }
 
 .stamp-dot {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   background: #34d399;
   border-radius: 50%;
   animation: pulse 1.8s infinite;
@@ -1189,30 +1207,39 @@ button, input, select, textarea {
 
 .receipt-title {
   font-family: var(--font-heading);
-  font-size: 1.2rem;
-  font-weight: 800;
+  font-size: 1.35rem;
+  font-weight: 900;
   color: var(--text-main);
   margin-bottom: 0.25rem;
   letter-spacing: -0.3px;
 }
 
 .receipt-subtitle {
-  font-size: 0.775rem;
+  font-size: 0.825rem;
   color: var(--text-muted);
-  line-height: 1.4;
-  margin-bottom: 0.45rem;
+  line-height: 1.45;
+}
+
+.receipt-badges-row {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .receipt-reg-badge {
-  display: inline-block;
-  font-size: 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
   font-family: var(--font-mono);
-  font-weight: 700;
+  font-weight: 800;
   color: var(--color-ai-yellow);
-  background: rgba(250, 204, 21, 0.1);
-  padding: 0.15rem 0.5rem;
+  background: rgba(250, 204, 21, 0.12);
+  padding: 0.25rem 0.65rem;
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(250, 204, 21, 0.25);
+  border: 1px solid rgba(250, 204, 21, 0.35);
+  letter-spacing: 0.3px;
 }
 
 .receipt-body {
@@ -4534,4 +4561,354 @@ body.light-theme .upcoming-event-card {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   OFFICIAL ADMISSION PDF SLIP & PRINT STYLES (STRICT SINGLE-PAGE A4)
+   ========================================================================== */
+
+#printable-admission-slip {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 794px;
+  max-width: 794px;
+  background: #ffffff;
+  color: #0f172a;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  padding: 24px 28px 20px;
+  box-sizing: border-box;
+  border: 2px solid #ea580c;
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: -9999;
+  opacity: 0;
+  pointer-events: none;
+  page-break-after: avoid !important;
+  page-break-before: avoid !important;
+  page-break-inside: avoid !important;
+}
+
+#printable-admission-slip.pdf-render-active {
+  opacity: 1 !important;
+  z-index: 999999 !important;
+  pointer-events: auto !important;
+}
+
+.pdf-slip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #ea580c;
+  padding-bottom: 14px;
+  margin-bottom: 12px;
+}
+
+.pdf-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.pdf-logo-img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 8px rgba(234, 88, 12, 0.25));
+}
+
+.pdf-institute-name {
+  font-size: 26px;
+  font-weight: 900;
+  color: #ea580c;
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+
+.pdf-institute-tagline {
+  font-size: 11px;
+  font-weight: 800;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-top: 3px;
+}
+
+.pdf-institute-contact {
+  font-size: 10px;
+  color: #334155;
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
+.pdf-header-seal {
+  text-align: right;
+}
+
+.pdf-seal-badge {
+  display: inline-block;
+  background: #fff7ed;
+  border: 2px solid #ea580c;
+  color: #c2410c;
+  padding: 5px 14px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pdf-slip-title-bar {
+  background: linear-gradient(135deg, #ea580c 0%, #f59e0b 100%);
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.pdf-slip-title {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.pdf-slip-status {
+  font-size: 11px;
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 3px 10px;
+  border-radius: 4px;
+}
+
+.pdf-reg-highlight-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 8px 14px;
+  margin-bottom: 12px;
+}
+
+.pdf-highlight-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.pdf-highlight-lbl {
+  font-size: 9px;
+  color: #64748b;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.pdf-highlight-val {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+  font-family: 'Fira Code', monospace, sans-serif;
+}
+
+.pdf-two-col-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.pdf-col-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 10px 12px;
+  background: #ffffff;
+}
+
+.pdf-section-title {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #ea580c;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-bottom: 1px dashed #cbd5e1;
+  padding-bottom: 3px;
+}
+
+.pdf-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pdf-info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  line-height: 1.35;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 4px;
+}
+
+.pdf-info-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.pdf-info-lbl {
+  font-weight: 700;
+  color: #475569;
+  width: 42%;
+}
+
+.pdf-info-val {
+  font-weight: 600;
+  color: #0f172a;
+  width: 58%;
+  text-align: right;
+  word-break: break-word;
+}
+
+.pdf-info-val.highlight {
+  font-weight: 800;
+  color: #ea580c;
+}
+
+.pdf-guidelines-box {
+  background: #fefce8;
+  border: 1px solid #fef08a;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+}
+
+.pdf-guidelines-title {
+  font-size: 10px;
+  font-weight: 800;
+  color: #854d0e;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.pdf-guidelines-list {
+  font-size: 9.5px;
+  color: #713f12;
+  line-height: 1.4;
+  margin: 0;
+  padding-left: 14px;
+}
+
+.pdf-footer-signatures {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  border-top: 1.5px solid #e2e8f0;
+  padding-top: 10px;
+  margin-top: 8px;
+}
+
+.pdf-security-stamp {
+  font-size: 9px;
+  color: #64748b;
+  line-height: 1.35;
+}
+
+.pdf-sig-box {
+  text-align: right;
+}
+
+.pdf-sig-title {
+  font-size: 9px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.pdf-sig-name {
+  font-size: 12px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-top: 1px;
+}
+
+.pdf-sig-designation {
+  font-size: 9.5px;
+  color: #ea580c;
+  font-weight: 700;
+}
+
+/* Modal PDF Action Buttons */
+.modal-actions-group {
+  display: flex;
+  gap: 0.85rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.pdf-download-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+}
+
+.pdf-download-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5) !important;
+}
+
+/* Print CSS (Ensures strictly 1 Single Page Output) */
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+@media print {
+  html, body {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #ffffff !important;
+  }
+  
+  body * {
+    visibility: hidden !important;
+  }
+  
+  #printable-admission-slip,
+  #printable-admission-slip * {
+    visibility: visible !important;
+  }
+  
+  #printable-admission-slip {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: auto !important;
+    max-height: 100vh !important;
+    margin: 0 !important;
+    padding: 20px 26px !important;
+    border: none !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    page-break-after: avoid !important;
+    page-break-before: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}
+
 
