@@ -412,7 +412,10 @@ const triggerConfetti = () => {
 // Methods
 const setTab = (tab) => {
   activeTab.value = tab;
-  window.location.hash = tab;
+  // Keep URL completely clean without exposing hash fragment
+  if (window.history && window.history.replaceState) {
+    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+  }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
@@ -546,17 +549,18 @@ onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true });
   handleScroll();
 
-  const hash = window.location.hash.replace('#', '');
-  if (hash && ['home', 'internships', 'courses', 'reviews', 'testimonials', 'events', 'admission'].includes(hash)) {
-    activeTab.value = hash;
-  }
-
-  window.addEventListener('hashchange', () => {
-    const h = window.location.hash.replace('#', '');
-    if (h && ['home', 'internships', 'courses', 'reviews', 'testimonials', 'events', 'admission'].includes(h)) {
-      activeTab.value = h;
+  // If user arrived with a hash (e.g. #admission or #admisson), open the corresponding view then immediately clear the hash from the URL bar
+  if (window.location.hash) {
+    const rawHash = window.location.hash.replace('#', '').toLowerCase().trim();
+    if (rawHash === 'admission' || rawHash === 'admisson') {
+      activeTab.value = 'admission';
+    } else if (['home', 'internships', 'courses', 'reviews', 'testimonials', 'events'].includes(rawHash)) {
+      activeTab.value = rawHash;
     }
-  });
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+  }
 });
 
 onUnmounted(() => {
