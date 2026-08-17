@@ -1,16 +1,15 @@
-/**
- * IT HUNT - Production & Serverless Application Handler for Vercel & Local
- * Serves static assets, dynamically injects environment variables, and routes requests.
- */
+import http from 'http';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=UTF-8',
   '.css': 'text/css; charset=UTF-8',
   '.js': 'application/javascript; charset=UTF-8',
+  '.mjs': 'application/javascript; charset=UTF-8',
   '.json': 'application/json; charset=UTF-8',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
@@ -21,7 +20,8 @@ const MIME_TYPES = {
   '.webp': 'image/webp',
   '.woff2': 'font/woff2',
   '.woff': 'font/woff',
-  '.ttf': 'font/ttf'
+  '.ttf': 'font/ttf',
+  '.vue': 'application/javascript; charset=UTF-8'
 };
 
 function getEnvConfig() {
@@ -34,7 +34,7 @@ function getEnvConfig() {
     APP_TAGLINE: process.env.APP_TAGLINE || "Software Solutions & Tech Academy",
     APP_TITLE: process.env.APP_TITLE || "IT HUNT | Software Solutions & Tech Academy",
     APP_ESTABLISHED_YEAR: process.env.APP_ESTABLISHED_YEAR || "2012",
-    APP_LOGO_IMAGE: process.env.APP_LOGO_IMAGE || "img/logo_ithunt.png",
+    APP_LOGO_IMAGE: process.env.APP_LOGO_IMAGE || "/img/logo_ithunt.png",
     CONTACT_PHONE: process.env.CONTACT_PHONE || "+91 9795771806",
     CONTACT_RAW_PHONE: process.env.CONTACT_RAW_PHONE || "+919795771806",
     CONTACT_EMAIL: process.env.CONTACT_EMAIL || "softtechithunt@gmail.com",
@@ -42,7 +42,7 @@ function getEnvConfig() {
     WHATSAPP_NUMBER: process.env.WHATSAPP_NUMBER || "919795771806",
     DIRECTOR_NAME: process.env.DIRECTOR_NAME || "Mr. Lakshman Singh Chauhan",
     DIRECTOR_TITLE: process.env.DIRECTOR_TITLE || "Director & Founder, IT HUNT | MCA (Computer Science)",
-    DIRECTOR_IMAGE: process.env.DIRECTOR_IMAGE || "img/ithunt.jpg",
+    DIRECTOR_IMAGE: process.env.DIRECTOR_IMAGE || "/img/ithunt.jpg",
     API_BASE_URL: process.env.API_BASE_URL || "http://localhost:3000/api",
     ADMISSION_API_ENDPOINT: process.env.ADMISSION_API_ENDPOINT || "http://localhost:3000/api/admission",
     JOB_APPLICATION_API_ENDPOINT: process.env.JOB_APPLICATION_API_ENDPOINT || "http://localhost:3000/api/careers/apply",
@@ -54,7 +54,6 @@ function getEnvConfig() {
     ENABLE_CAREERS_PORTAL: process.env.ENABLE_CAREERS_PORTAL || "true"
   };
 
-  // Try parsing .env if present locally
   const envPath = path.join(process.cwd(), '.env');
   if (fs.existsSync(envPath)) {
     try {
@@ -65,22 +64,21 @@ function getEnvConfig() {
         if (!trimmed || trimmed.startsWith('#')) continue;
         const eqIdx = trimmed.indexOf('=');
         if (eqIdx !== -1) {
-          const k = trimmed.substring(0, eqIdx).trim();
-          let v = trimmed.substring(eqIdx + 1).trim();
-          if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
-            v = v.slice(1, -1);
+          const key = trimmed.substring(0, eqIdx).trim();
+          let val = trimmed.substring(eqIdx + 1).trim();
+          if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+            val = val.slice(1, -1);
           }
-          env[k] = v;
+          env[key] = val;
         }
       }
     } catch (e) {}
   }
+
   return env;
 }
 
-// Request Handler
-function requestHandler(req, res) {
-  // CORS Headers
+export function requestHandler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -116,24 +114,17 @@ function requestHandler(req, res) {
     return;
   }
 
-  // Rewrite root or clean URLs
   if (pathname === '/' || pathname === '') {
     pathname = '/index.html';
-  } else if (pathname === '/Home') {
-    pathname = '/Home.html';
-  } else if (pathname === '/AboutUs') {
-    pathname = '/AboutUs.html';
-  } else if (pathname === '/admission') {
-    pathname = '/admission.html';
-  } else if (pathname === '/events' || pathname === '/Events') {
-    pathname = '/Events.html';
   }
 
-  // Check possible root locations
   const relPath = pathname.startsWith('/') ? pathname.slice(1) : pathname;
-  const searchDirs = [process.cwd(), __dirname, path.join(__dirname, '..'), '/var/task', '/vercel/path0'];
-  let foundFilePath = null;
+  const distDir = path.join(__dirname, 'dist');
+  const searchDirs = fs.existsSync(distDir)
+    ? [distDir, path.join(__dirname, 'public'), __dirname]
+    : [__dirname, path.join(__dirname, 'public')];
 
+  let foundFilePath = null;
   for (const dir of searchDirs) {
     if (!dir || !fs.existsSync(dir)) continue;
     const candidate = path.resolve(dir, relPath);
@@ -148,39 +139,40 @@ function requestHandler(req, res) {
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
     res.writeHead(200, {
       'Content-Type': contentType,
-      'Cache-Control': ext.match(/\.(css|js)$/) ? 'no-cache, no-store, must-revalidate' : 'public, max-age=86400'
+      'Cache-Control': ext.match(/\.(css|js|mjs)$/) ? 'no-cache, no-store, must-revalidate' : 'public, max-age=86400'
     });
     fs.createReadStream(foundFilePath).pipe(res);
     return;
   }
 
-  // If file not found, try fallback to index.html for SPA routing
-  for (const dir of searchDirs) {
-    if (!dir || !fs.existsSync(dir)) continue;
-    const indexCandidate = path.resolve(dir, 'index.html');
-    if (fs.existsSync(indexCandidate) && fs.statSync(indexCandidate).isFile()) {
-      res.writeHead(200, {
-        'Content-Type': 'text/html; charset=UTF-8',
-        'Cache-Control': 'no-cache, no-store, must-revalidate'
-      });
-      fs.createReadStream(indexCandidate).pipe(res);
-      return;
+  // SPA fallback only for HTML / document navigation, NOT for JS/CSS assets
+  const ext = path.extname(pathname).toLowerCase();
+  if (!ext || ext === '.html') {
+    for (const dir of searchDirs) {
+      if (!dir || !fs.existsSync(dir)) continue;
+      const indexCandidate = path.resolve(dir, 'index.html');
+      if (fs.existsSync(indexCandidate) && fs.statSync(indexCandidate).isFile()) {
+        res.writeHead(200, {
+          'Content-Type': 'text/html; charset=UTF-8',
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
+        });
+        fs.createReadStream(indexCandidate).pipe(res);
+        return;
+      }
     }
   }
 
-  res.writeHead(404, { 'Content-Type': 'text/html; charset=UTF-8' });
-  res.end(`<h1>404 Not Found</h1><p>Requested file ${pathname} not found.</p>`);
+  res.writeHead(404, { 'Content-Type': 'text/plain; charset=UTF-8' });
+  res.end(`404 Not Found: ${pathname}`);
 }
 
 const server = http.createServer(requestHandler);
 
-// Export for Vercel Serverless Function & Node
-module.exports = requestHandler;
-module.exports.default = requestHandler;
-module.exports.server = server;
+export default requestHandler;
+export { server };
 
-// Standalone execution
-if (require.main === module) {
+const isDirectRun = process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
+if (isDirectRun) {
   const config = getEnvConfig();
   const PORT = parseInt(config.PORT, 10) || 5500;
   const HOST = config.HOST || 'localhost';
