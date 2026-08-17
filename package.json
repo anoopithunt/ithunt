@@ -1,17 +1,26 @@
 {
   "name": "ithunt-portal",
-  "version": "1.0.0",
-  "description": "IT HUNT - Software Solutions & Tech Academy Web Portal",
-  "main": "app.js",
+  "version": "2.0.0",
+  "type": "module",
+  "description": "IT HUNT - Software Solutions & Tech Academy Web Portal (Vue 3 + Vite)",
   "scripts": {
-    "dev": "node dev-server.js",
-    "serve": "node app.js",
-    "start": "node app.js",
-    "build": "echo 'Build complete!'",
+    "dev": "vite --port 5501 --host",
+    "build": "vite build",
+    "preview": "vite preview --port 5501",
     "test": "node -e \"console.log('✓ All tests passed!')\""
+  },
+  "dependencies": {
+    "vue": "^3.4.21",
+    "jspdf": "^2.5.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "vite": "^5.1.6"
   },
   "keywords": [
     "ithunt",
+    "vue3",
+    "vite",
     "internships",
     "courses",
     "mern",
@@ -19,8 +28,5 @@
     "android"
   ],
   "author": "IT HUNT",
-  "license": "ISC",
-  "devDependencies": {
-    "gh-pages": "^6.3.0"
-  }
+  "license": "ISC"
 }
