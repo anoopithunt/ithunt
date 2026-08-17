@@ -15,7 +15,7 @@
         <h2 class="event-detail-title">{{ event.title }}</h2>
         <p class="event-detail-subtitle">{{ event.subtitle }}</p>
         <div style="font-size: 0.85rem; color: var(--text-dim); margin-top: 0.5rem;">
-          📍 <strong>Venue:</strong> {{ event.venue }}
+          📍 <strong>{{ content?.modalTexts?.eventDetail?.venueLabel || 'Venue:' }}</strong> {{ event.venue }}
         </div>
       </div>
 
@@ -29,7 +29,7 @@
             @error="onImgError"
           >
           <div class="event-gallery-zoom-hint">
-            <span>🔍 Click to View Fullscreen</span>
+            <span>{{ content?.modalTexts?.eventDetail?.fullscreenHint || '🔍 Click to View Fullscreen' }}</span>
           </div>
           <div class="event-gallery-caption-overlay">
             <div class="event-gallery-caption-title">
@@ -59,26 +59,26 @@
       <div class="event-metrics-grid" v-if="event.metrics">
         <div class="event-metric-box">
           <div class="event-metric-val text-gradient">{{ event.metrics.teams }}</div>
-          <div class="event-metric-lbl">Participation</div>
+          <div class="event-metric-lbl">{{ content?.modalTexts?.eventDetail?.metrics?.teams || 'Participation' }}</div>
         </div>
         <div class="event-metric-box">
           <div class="event-metric-val text-gradient-gold">{{ event.metrics.prizePool }}</div>
-          <div class="event-metric-lbl">Prizes & Perks</div>
+          <div class="event-metric-lbl">{{ content?.modalTexts?.eventDetail?.metrics?.prizePool || 'Prizes & Perks' }}</div>
         </div>
         <div class="event-metric-box">
           <div class="event-metric-val" style="color: #34d399;">{{ event.metrics.projectsBuilt }}</div>
-          <div class="event-metric-lbl">Deliverables</div>
+          <div class="event-metric-lbl">{{ content?.modalTexts?.eventDetail?.metrics?.projectsBuilt || 'Deliverables' }}</div>
         </div>
         <div class="event-metric-box">
           <div class="event-metric-val" style="color: #f43f5e;">{{ event.metrics.hoursOfCoding }}</div>
-          <div class="event-metric-lbl">Format / Sprint</div>
+          <div class="event-metric-lbl">{{ content?.modalTexts?.eventDetail?.metrics?.hoursOfCoding || 'Format / Sprint' }}</div>
         </div>
       </div>
 
       <!-- Event Story / Overview -->
       <div class="event-detail-section" v-if="event.overview">
         <h3 class="event-detail-section-heading">
-          <span>📖</span> Event Overview & Campus Story
+          <span>📖</span> {{ content?.modalTexts?.eventDetail?.storyHeading || 'Event Overview & Campus Story' }}
         </h3>
         <p class="event-detail-story-text">{{ event.overview }}</p>
       </div>
@@ -86,7 +86,7 @@
       <!-- Event Agenda Timeline -->
       <div class="event-detail-section" v-if="event.agendaSchedule && event.agendaSchedule.length">
         <h3 class="event-detail-section-heading">
-          <span>⏱️</span> Official Event Schedule & Milestones
+          <span>⏱️</span> {{ content?.modalTexts?.eventDetail?.scheduleHeading || 'Official Event Schedule & Milestones' }}
         </h3>
         <div class="event-agenda-timeline">
           <div class="agenda-timeline-item" v-for="(item, aIdx) in event.agendaSchedule" :key="aIdx">
@@ -100,7 +100,7 @@
       <!-- Chief Dignitaries & Mentors -->
       <div class="event-detail-section" v-if="event.chiefGuests && event.chiefGuests.length">
         <h3 class="event-detail-section-heading">
-          <span>👨‍🏫</span> Chief Mentors & Dignitaries Lineup
+          <span>👨‍🏫</span> {{ content?.modalTexts?.eventDetail?.dignitariesHeading || 'Chief Mentors & Dignitaries Lineup' }}
         </h3>
         <div class="event-guests-grid">
           <div class="event-guest-card" v-for="guest in event.chiefGuests" :key="guest.name">
@@ -116,7 +116,7 @@
       <!-- Event Highlights & Key Outcomes -->
       <div class="event-detail-section" v-if="event.highlights && event.highlights.length">
         <h3 class="event-detail-section-heading">
-          <span>🏆</span> Key Outcomes & Milestones
+          <span>🏆</span> {{ content?.modalTexts?.eventDetail?.outcomesHeading || 'Key Outcomes & Milestones' }}
         </h3>
         <div class="event-highlights-list">
           <div class="event-highlight-item" v-for="(hl, hIdx) in event.highlights" :key="hIdx">
@@ -127,7 +127,9 @@
 
         <!-- Winners / Outcomes if present -->
         <div style="margin-top: 1.25rem;" v-if="event.outcomes && event.outcomes.length">
-          <h4 style="font-weight: 800; font-size: 0.95rem; color: var(--color-ai-yellow); margin-bottom: 0.5rem;">🥇 Honors & Winners Podium:</h4>
+          <h4 style="font-weight: 800; font-size: 0.95rem; color: var(--color-ai-yellow); margin-bottom: 0.5rem;">
+            {{ content?.modalTexts?.eventDetail?.podiumHeading || '🥇 Honors & Winners Podium:' }}
+          </h4>
           <div class="event-highlights-list">
             <div class="event-highlight-item" v-for="(out, oIdx) in event.outcomes" :key="oIdx">
               <span style="color: var(--color-ai-gold);">⭐</span>
@@ -146,10 +148,10 @@
       <!-- Modal Actions Footer -->
       <div class="event-modal-actions-footer">
         <button type="button" class="btn-secondary" @click="$emit('close')">
-          Back to All Events
+          {{ content?.modalTexts?.eventDetail?.backBtn || 'Back to All Events' }}
         </button>
         <button type="button" class="btn-primary" @click="$emit('apply')">
-          <span>Apply for IT HUNT Academy 2026</span> 🚀 →
+          <span>{{ content?.modalTexts?.eventDetail?.applyBtn || 'Apply for IT HUNT Academy 2026 🚀 →' }}</span>
         </button>
       </div>
     </div>
@@ -165,6 +167,10 @@ defineProps({
     default: false
   },
   event: {
+    type: Object,
+    default: () => ({})
+  },
+  content: {
     type: Object,
     default: () => ({})
   }

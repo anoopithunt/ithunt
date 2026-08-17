@@ -3,10 +3,10 @@
     <div class="container navbar-container">
       <!-- Brand Logo -->
       <div class="brand-logo" @click="$emit('set-tab', 'home')">
-        <img :src="content.brand.logoImage" :alt="content.brand.name + ' Logo'" class="brand-logo-img" @error="onImgError">
+        <img :src="content.brand?.logoImage" :alt="(content.brand?.name || 'IT HUNT') + ' Logo'" class="brand-logo-img" @error="onImgError">
         <div>
-          <div class="brand-title">IT <span class="text-gradient">{{ content.brand.nameHighlight }}</span></div>
-          <div class="brand-tagline">{{ content.brand.tagline }}</div>
+          <div class="brand-title">IT <span class="text-gradient">{{ content.brand?.nameHighlight }}</span></div>
+          <div class="brand-tagline">{{ content.brand?.tagline }}</div>
         </div>
       </div>
 
@@ -30,19 +30,19 @@
         <button 
           class="theme-toggle-btn" 
           @click="$emit('toggle-theme')" 
-          :title="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+          :title="isDarkMode ? (content.navbar?.lightModeTitle || 'Switch to Light Mode') : (content.navbar?.darkModeTitle || 'Switch to Dark Mode')"
         >
           <span>{{ isDarkMode ? '☀️' : '🌙' }}</span>
         </button>
         
         <button class="cta-btn-header" @click="$emit('set-tab', 'internships')">
-          <span>Apply Internship</span> ✨
+          <span>{{ content.navbar?.applyCtaText || 'Apply Internship' }}</span> {{ content.navbar?.applyCtaIcon || '✨' }}
         </button>
 
         <button 
           class="mobile-toggle-btn" 
           @click="isMobileNavOpen = !isMobileNavOpen" 
-          aria-label="Toggle Navigation"
+          :aria-label="content.navbar?.toggleNavAria || 'Toggle Navigation'"
         >
           <span>{{ isMobileNavOpen ? '✕' : '☰' }}</span>
         </button>
@@ -67,7 +67,7 @@
 <script setup>
 import { ref } from 'vue';
 
-const props = defineProps({
+defineProps({
   content: {
     type: Object,
     required: true

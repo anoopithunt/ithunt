@@ -2,16 +2,16 @@
   <div class="fullscreen-lightbox-overlay" v-if="isOpen" @click.self="$emit('close')">
     <div class="lightbox-header">
       <div class="lightbox-counter">
-        📸 Photo {{ currentIndex + 1 }} of {{ images.length }}
+        {{ content?.modalTexts?.lightbox?.counterPrefix || '📸 Photo' }} {{ currentIndex + 1 }} {{ content?.modalTexts?.lightbox?.counterOf || 'of' }} {{ images.length }}
       </div>
-      <button class="lightbox-close-btn" @click="$emit('close')" title="Close Lightbox (Esc)">✕</button>
+      <button class="lightbox-close-btn" @click="$emit('close')" :title="content?.modalTexts?.lightbox?.closeTooltip || 'Close Lightbox (Esc)'">✕</button>
     </div>
 
     <div class="lightbox-main-stage">
       <button 
         class="lightbox-arrow prev" 
         @click="prevImage" 
-        title="Previous Image (Left Arrow)" 
+        :title="content?.modalTexts?.lightbox?.prevTooltip || 'Previous Image (Left Arrow)'" 
         v-if="images.length > 1"
       >‹</button>
       <div class="lightbox-img-wrapper">
@@ -25,7 +25,7 @@
       <button 
         class="lightbox-arrow next" 
         @click="nextImage" 
-        title="Next Image (Right Arrow)" 
+        :title="content?.modalTexts?.lightbox?.nextTooltip || 'Next Image (Right Arrow)'" 
         v-if="images.length > 1"
       >›</button>
     </div>
@@ -52,6 +52,10 @@ const props = defineProps({
   currentIndex: {
     type: Number,
     default: 0
+  },
+  content: {
+    type: Object,
+    default: () => ({})
   }
 });
 
