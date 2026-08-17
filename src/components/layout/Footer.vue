@@ -13,9 +13,12 @@
         <p style="font-size: 0.875rem; line-height: 1.7; color: #ffffff;">
           {{ content.footer?.aboutText }}
         </p>
-        <div style="margin-top: 1.15rem;">
+        <div style="margin-top: 1.15rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <a href="#" @click.prevent="$emit('set-tab', 'reviews')" class="skill-tag" style="background: rgba(250, 204, 21, 0.15); color: var(--color-ai-yellow); border-color: rgba(250, 204, 21, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.9rem; font-weight: 800; font-size: 0.825rem; border-radius: var(--radius-full);">
             {{ content.footerSections?.reviewRatingBadge || '⭐ Student Reviews & Ratings (4.9 / 5.0) →' }}
+          </a>
+          <a href="#" @click.prevent="$emit('set-tab', 'careers')" class="skill-tag" style="background: rgba(249, 115, 22, 0.15); color: #fb923c; border-color: rgba(249, 115, 22, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.9rem; font-weight: 800; font-size: 0.825rem; border-radius: var(--radius-full);">
+            💼 We Are Hiring (Teachers & Devs) →
           </a>
         </div>
       </div>
@@ -29,6 +32,7 @@
           <li><a href="#" @click.prevent="$emit('set-tab', 'events')">🎪 Events & Media Gallery</a></li>
           <li><a href="#" @click.prevent="$emit('set-tab', 'testimonials')">🌟 Alumni Testimonials & Achievements</a></li>
           <li><a href="#" @click.prevent="$emit('set-tab', 'courses')">Accredited Courses</a></li>
+          <li><a href="#" @click.prevent="$emit('set-tab', 'careers')">💼 Careers & Faculty Openings</a></li>
           <li><a href="#" @click.prevent="$emit('set-tab', 'reviews')">⭐ Reviews & Feedback</a></li>
           <li><a href="#" @click.prevent="$emit('set-tab', 'admission')">Admission Portal</a></li>
         </ul>
@@ -57,6 +61,7 @@
     <div class="container footer-bottom">
       <div style="color: #ffffff;">{{ content.footer?.copyrightText }}</div>
       <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+        <a href="#" @click.prevent="$emit('set-tab', 'careers')">💼 Careers</a>
         <a href="#" @click.prevent="$emit('set-tab', 'reviews')">{{ content.ui?.reviewsAndRatings || '⭐ Reviews & Ratings' }}</a>
         <a href="#" @click.prevent="$emit('set-tab', 'events')">{{ content.ui?.eventsGallery || 'Events Gallery' }}</a>
         <a href="#" @click.prevent="$emit('set-tab', 'testimonials')">{{ content.ui?.alumniStories || 'Alumni Stories' }}</a>

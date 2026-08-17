@@ -96,7 +96,16 @@
           @review-submitted="handleReviewSubmitted" 
         />
 
-        <!-- 7. Dedicated Admission View -->
+        <!-- 7. Dedicated Careers & Hiring View -->
+        <CareersSection 
+          v-else-if="activeTab === 'careers'" 
+          key="careers"
+          :content="content" 
+          @set-tab="setTab" 
+          @open-job-modal="openJobModal" 
+        />
+
+        <!-- 8. Dedicated Admission View -->
         <AdmissionSection 
           v-else-if="activeTab === 'admission'" 
           key="admission"
@@ -322,6 +331,7 @@ import EventsSection from './components/sections/EventsSection.vue';
 import CoursesSection from './components/sections/CoursesSection.vue';
 import TestimonialsSection from './components/sections/TestimonialsSection.vue';
 import ReviewsSection from './components/sections/ReviewsSection.vue';
+import CareersSection from './components/sections/CareersSection.vue';
 import AdmissionSection from './components/sections/AdmissionSection.vue';
 
 import CourseDetailModal from './components/modals/CourseDetailModal.vue';
@@ -554,7 +564,7 @@ onMounted(() => {
     const rawHash = window.location.hash.replace('#', '').toLowerCase().trim();
     if (rawHash === 'admission' || rawHash === 'admisson') {
       activeTab.value = 'admission';
-    } else if (['home', 'internships', 'courses', 'reviews', 'testimonials', 'events'].includes(rawHash)) {
+    } else if (['home', 'internships', 'courses', 'careers', 'reviews', 'testimonials', 'events'].includes(rawHash)) {
       activeTab.value = rawHash;
     }
     if (window.history && window.history.replaceState) {
