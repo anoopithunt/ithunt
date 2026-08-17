@@ -125,6 +125,8 @@ function requestHandler(req, res) {
     pathname = '/AboutUs.html';
   } else if (pathname === '/admission') {
     pathname = '/admission.html';
+  } else if (pathname === '/events' || pathname === '/Events') {
+    pathname = '/Events.html';
   }
 
   // Check possible root locations
