@@ -200,6 +200,36 @@
           </div>
         </div>
 
+        <!-- Campus Events & Hackathons Spotlight on Home Tab -->
+        <div class="container" style="padding-bottom: 4rem;">
+          <div class="internship-banner" style="background: linear-gradient(135deg, rgba(249, 115, 22, 0.18), rgba(250, 204, 21, 0.12));">
+            <div>
+              <span class="duration-pill">🎪 CAMPUS EVENTS & GALLERY 2026</span>
+              <h2 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; margin-bottom: 0.85rem;">
+                Where Tech Innovation Meets <span class="text-gradient">Celebration</span>
+              </h2>
+              <p style="color: var(--text-muted); line-height: 1.7; margin-bottom: 1.25rem; font-size: 0.95rem;">
+                Explore our 24-hour coding hackathons, applied AI workshops, annual graduation convocation ceremonies, and mega campus placement drives.
+              </p>
+              <button class="btn-primary" @click="setTab('events')">
+                <span>Explore Events & Media Gallery</span> 🎪 →
+              </button>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div style="background: var(--bg-card-glass); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-cyber); text-align: center; cursor: pointer;" @click="setTab('events')">
+                <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">💻</div>
+                <div style="font-weight: 800; font-size: 0.95rem;">Hackathons</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">24-Hr Coding Sprints</div>
+              </div>
+              <div style="background: var(--bg-card-glass); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-cyber); text-align: center; cursor: pointer;" @click="setTab('events')">
+                <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">🏆</div>
+                <div style="font-weight: 800; font-size: 0.95rem;">Convocation</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Awards & Degrees</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- ================= BOTTOM SECTIONS ON HOME PAGE FLOW ================= -->
 
         <!-- 1. ABOUT US BOTTOM SECTION -->
@@ -743,6 +773,178 @@
         </div>
       </section>
 
+      <!-- ================= DEDICATED EVENTS & MEDIA GALLERY TAB ================= -->
+      <section v-if="activeTab === 'events'" class="events-page-section container">
+        <!-- Events Hero Banner -->
+        <div class="events-hero-banner">
+          <div class="events-badge-pill">
+            <span class="pulse-dot"></span>
+            <span>{{ content.eventsSection?.tagline || 'CAMPUS LIFE & TECH INNOVATION' }}</span>
+          </div>
+          <h1 class="events-hero-title">
+            {{ content.eventsSection?.titlePrefix || 'Flagship Events, Hackathons & ' }}<span class="text-gradient">{{ content.eventsSection?.titleGradient || 'Media Gallery' }}</span>
+          </h1>
+          <p class="events-hero-subtitle">
+            {{ content.eventsSection?.description }}
+          </p>
+
+          <!-- Aggregate Stats Ribbon -->
+          <div class="events-stats-ribbon" v-if="content.eventsSection?.stats">
+            <div class="event-stat-card" v-for="stat in content.eventsSection.stats" :key="stat.label">
+              <div class="event-stat-icon">{{ stat.icon }}</div>
+              <div>
+                <div class="event-stat-val text-gradient">{{ stat.value }}</div>
+                <div class="event-stat-lbl">{{ stat.label }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls Bar: Category Filters & Real-Time Search -->
+        <div class="events-controls-bar">
+          <div class="events-category-nav" v-if="content.eventsSection?.categories">
+            <button 
+              v-for="cat in content.eventsSection.categories" 
+              :key="cat.id"
+              class="event-cat-btn"
+              :class="{ active: selectedEventCategory === cat.id }"
+              @click="selectedEventCategory = cat.id"
+            >
+              <span>{{ cat.icon }}</span> {{ cat.label }}
+            </button>
+          </div>
+
+          <div class="events-search-box">
+            <span class="events-search-icon">🔍</span>
+            <input 
+              type="text" 
+              v-model="eventSearchQuery" 
+              class="events-search-input" 
+              placeholder="Search hackathons, workshops, guests..."
+            >
+            <button 
+              v-if="eventSearchQuery" 
+              class="events-search-clear" 
+              @click="eventSearchQuery = ''" 
+              title="Clear search"
+            >✕</button>
+          </div>
+        </div>
+
+        <!-- Empty State if search/filter returns zero -->
+        <div v-if="filteredEvents.length === 0" style="text-align: center; padding: 4rem 1.5rem; background: var(--bg-card-glass); border-radius: var(--radius-lg); border: 1px solid var(--border-cyber); margin-bottom: 3rem;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+          <h3 style="font-family: var(--font-heading); font-size: 1.4rem; color: var(--text-main); margin-bottom: 0.5rem;">No Events Found Matching "{{ eventSearchQuery }}"</h3>
+          <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Try selecting a different category or clearing your search filters.</p>
+          <button class="btn-primary" @click="selectedEventCategory = 'all'; eventSearchQuery = ''">Reset Filters 🔄</button>
+        </div>
+
+        <!-- Event Cards Showcase Grid -->
+        <div class="events-grid" v-else>
+          <div class="event-card" v-for="ev in filteredEvents" :key="ev.id">
+            <!-- Cover Media wrapper with Hover Zoom & Image Preview -->
+            <div class="event-card-media" @click="openEventDetailModal(ev)">
+              <img :src="ev.coverImage" :alt="ev.title" class="event-card-img" @error="onImgError">
+              <span class="event-card-badge" v-if="ev.badge">{{ ev.badge }}</span>
+              <span class="event-photo-count-pill">
+                <span>📸</span> {{ ev.galleryImages?.length || 1 }} Photos
+              </span>
+              <div class="event-card-overlay">
+                <span class="event-card-overlay-btn">View Event Album & Details 🔍</span>
+              </div>
+            </div>
+
+            <!-- Mini Thumbnails Carousel Strip -->
+            <div class="event-card-thumbnails" v-if="ev.galleryImages && ev.galleryImages.length > 1">
+              <img 
+                v-for="(img, gIdx) in ev.galleryImages.slice(0, 4)" 
+                :key="gIdx" 
+                :src="img.src" 
+                :alt="img.title" 
+                class="event-thumb-mini"
+                @click.stop="openLightbox(ev.galleryImages, gIdx)"
+                :title="'View: ' + img.title"
+                @error="onImgError"
+              >
+            </div>
+
+            <!-- Card Body & Detailing -->
+            <div class="event-card-body">
+              <div class="event-meta-row">
+                <span class="event-meta-item">📅 {{ ev.date }}</span>
+                <span class="event-meta-item">⏱️ {{ ev.time }}</span>
+              </div>
+
+              <h3 class="event-card-title">{{ ev.title }}</h3>
+              <p class="event-card-desc">{{ ev.subtitle }}</p>
+
+              <!-- Highlights Chips -->
+              <div class="event-chips-wrap" v-if="ev.highlights">
+                <span class="event-chip" v-for="(hl, hIdx) in ev.highlights.slice(0, 3)" :key="hIdx">
+                  ✓ {{ hl }}
+                </span>
+              </div>
+
+              <!-- Venue Details Strip -->
+              <div class="event-venue-strip">
+                <span>📍</span>
+                <span>{{ ev.venue }}</span>
+              </div>
+
+              <!-- Card Actions -->
+              <div class="event-card-actions">
+                <button class="event-explore-btn" @click="openEventDetailModal(ev)">
+                  <span>Explore Event Story & Photos</span> 📸 →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= UPCOMING EVENTS & REGISTRATIONS SECTION ================= -->
+        <div class="upcoming-events-section" v-if="content.eventsSection?.upcomingEvents && content.eventsSection.upcomingEvents.length">
+          <div class="section-header" style="text-align: left; margin-bottom: 2rem;">
+            <span class="section-tag">🌟 Registrations Open</span>
+            <h2 class="section-title">Upcoming <span class="text-gradient">Hackathons & Masterclasses</span></h2>
+            <p class="section-subtitle" style="text-align: left; margin: 0;">Reserve your free seat for our next campus innovation events and industry sprints.</p>
+          </div>
+
+          <div class="upcoming-banner-grid">
+            <div class="upcoming-event-card" v-for="upEv in content.eventsSection.upcomingEvents" :key="upEv.id">
+              <div class="upcoming-header-row">
+                <span class="duration-pill">{{ upEv.categoryBadge }}</span>
+                <span class="upcoming-seats-badge">🔥 {{ upEv.seatsRemaining }} Seats Left</span>
+              </div>
+
+              <h3 class="upcoming-event-title">{{ upEv.title }}</h3>
+              
+              <div class="event-meta-row" style="margin-bottom: 0.85rem;">
+                <span class="event-meta-item">📅 {{ upEv.date }}</span>
+                <span class="event-meta-item">⏱️ {{ upEv.time }}</span>
+              </div>
+
+              <div class="event-venue-strip" style="border: none; padding: 0; margin-bottom: 1rem;">
+                <span>📍 {{ upEv.venue }}</span>
+              </div>
+
+              <p class="upcoming-event-desc">{{ upEv.description }}</p>
+
+              <!-- Perks List -->
+              <div class="upcoming-perks-list">
+                <div class="upcoming-perk-item" v-for="(perk, pIdx) in upEv.perks" :key="pIdx">
+                  <span style="color: #22c55e;">✓</span>
+                  <span>{{ perk }}</span>
+                </div>
+              </div>
+
+              <button class="upcoming-action-btn" @click="openRsvpModal(upEv)">
+                <span>RSVP / Register Free for Event</span> 🚀 →
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- ================= DEDICATED ADMISSION TAB ================= -->
       <section v-if="activeTab === 'admission'" class="container" style="padding: 4rem 1.5rem;">
         <div class="section-header">
@@ -1059,6 +1261,239 @@
       </div>
     </div>
 
+    <!-- ================= IN-DEPTH EVENT DETAIL POPUP MODAL ================= -->
+    <div class="modal-overlay" v-if="showEventDetailModal" @click.self="closeEventDetailModal" tabindex="-1">
+      <div class="modal-card modal-lg event-detail-popup">
+        <!-- Close Button -->
+        <button class="modal-close-icon" @click="closeEventDetailModal" title="Close Popup (Esc)">✕</button>
+
+        <!-- Header -->
+        <div class="event-detail-header">
+          <div class="event-detail-badge-group">
+            <span class="event-category-pill">{{ selectedEvent.categoryLabel || selectedEvent.category }}</span>
+            <span class="event-date-pill">📅 {{ selectedEvent.date }}</span>
+            <span class="event-date-pill">⏱️ {{ selectedEvent.time }}</span>
+            <span class="event-date-pill" v-if="selectedEvent.attendeeCount">👥 {{ selectedEvent.attendeeCount }}</span>
+          </div>
+          <h2 class="event-detail-title">{{ selectedEvent.title }}</h2>
+          <p class="event-detail-subtitle">{{ selectedEvent.subtitle }}</p>
+          <div style="font-size: 0.85rem; color: var(--text-dim); margin-top: 0.5rem;">
+            📍 <strong>Venue:</strong> {{ selectedEvent.venue }}
+          </div>
+        </div>
+
+        <!-- Featured Interactive Photo Gallery -->
+        <div class="event-gallery-showcase" v-if="selectedEvent.galleryImages && selectedEvent.galleryImages.length">
+          <div class="event-gallery-main-view" @click="openLightbox(selectedEvent.galleryImages, activeGalleryIndex)">
+            <img 
+              :src="selectedEvent.galleryImages[activeGalleryIndex]?.src || selectedEvent.coverImage" 
+              :alt="selectedEvent.galleryImages[activeGalleryIndex]?.title || selectedEvent.title"
+              class="event-gallery-main-img"
+              @error="onImgError"
+            >
+            <div class="event-gallery-zoom-hint">
+              <span>🔍 Click to View Fullscreen</span>
+            </div>
+            <div class="event-gallery-caption-overlay">
+              <div class="event-gallery-caption-title">
+                {{ selectedEvent.galleryImages[activeGalleryIndex]?.title }}
+              </div>
+              <div class="event-gallery-caption-desc">
+                {{ selectedEvent.galleryImages[activeGalleryIndex]?.caption }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Thumbnail Strip Selector -->
+          <div class="event-gallery-thumbs-row">
+            <div 
+              v-for="(img, gIdx) in selectedEvent.galleryImages" 
+              :key="gIdx"
+              class="event-gallery-thumb-item"
+              :class="{ active: activeGalleryIndex === gIdx }"
+              @click="activeGalleryIndex = gIdx"
+            >
+              <img :src="img.src" :alt="img.title" @error="onImgError">
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Key Metrics Stat Cards -->
+        <div class="event-metrics-grid" v-if="selectedEvent.metrics">
+          <div class="event-metric-box">
+            <div class="event-metric-val text-gradient">{{ selectedEvent.metrics.teams }}</div>
+            <div class="event-metric-lbl">Participation</div>
+          </div>
+          <div class="event-metric-box">
+            <div class="event-metric-val text-gradient-gold">{{ selectedEvent.metrics.prizePool }}</div>
+            <div class="event-metric-lbl">Prizes & Perks</div>
+          </div>
+          <div class="event-metric-box">
+            <div class="event-metric-val" style="color: #34d399;">{{ selectedEvent.metrics.projectsBuilt }}</div>
+            <div class="event-metric-lbl">Deliverables</div>
+          </div>
+          <div class="event-metric-box">
+            <div class="event-metric-val" style="color: #f43f5e;">{{ selectedEvent.metrics.hoursOfCoding }}</div>
+            <div class="event-metric-lbl">Format / Sprint</div>
+          </div>
+        </div>
+
+        <!-- Event Story / Overview -->
+        <div class="event-detail-section" v-if="selectedEvent.overview">
+          <h3 class="event-detail-section-heading">
+            <span>📖</span> Event Overview & Campus Story
+          </h3>
+          <p class="event-detail-story-text">{{ selectedEvent.overview }}</p>
+        </div>
+
+        <!-- Event Agenda Timeline -->
+        <div class="event-detail-section" v-if="selectedEvent.agendaSchedule && selectedEvent.agendaSchedule.length">
+          <h3 class="event-detail-section-heading">
+            <span>⏱️</span> Official Event Schedule & Milestones
+          </h3>
+          <div class="event-agenda-timeline">
+            <div class="agenda-timeline-item" v-for="(item, aIdx) in selectedEvent.agendaSchedule" :key="aIdx">
+              <span class="agenda-time-pill">{{ item.time }}</span>
+              <h4 class="agenda-title">{{ item.title }}</h4>
+              <p class="agenda-desc">{{ item.desc }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chief Dignitaries & Mentors -->
+        <div class="event-detail-section" v-if="selectedEvent.chiefGuests && selectedEvent.chiefGuests.length">
+          <h3 class="event-detail-section-heading">
+            <span>👨‍🏫</span> Chief Mentors & Dignitaries Lineup
+          </h3>
+          <div class="event-guests-grid">
+            <div class="event-guest-card" v-for="guest in selectedEvent.chiefGuests" :key="guest.name">
+              <img :src="guest.image" :alt="guest.name" class="event-guest-avatar" @error="onImgError">
+              <div>
+                <div class="event-guest-name">{{ guest.name }}</div>
+                <div class="event-guest-role">{{ guest.role }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Event Highlights & Key Outcomes -->
+        <div class="event-detail-section" v-if="selectedEvent.highlights && selectedEvent.highlights.length">
+          <h3 class="event-detail-section-heading">
+            <span>🏆</span> Key Outcomes & Milestones
+          </h3>
+          <div class="event-highlights-list">
+            <div class="event-highlight-item" v-for="(hl, hIdx) in selectedEvent.highlights" :key="hIdx">
+              <span class="event-highlight-bullet">✓</span>
+              <span>{{ hl }}</span>
+            </div>
+          </div>
+
+          <!-- Winners / Outcomes if present -->
+          <div style="margin-top: 1.25rem;" v-if="selectedEvent.outcomes && selectedEvent.outcomes.length">
+            <h4 style="font-weight: 800; font-size: 0.95rem; color: var(--color-ai-yellow); margin-bottom: 0.5rem;">🥇 Honors & Winners Podium:</h4>
+            <div class="event-highlights-list">
+              <div class="event-highlight-item" v-for="(out, oIdx) in selectedEvent.outcomes" :key="oIdx">
+                <span style="color: var(--color-ai-gold);">⭐</span>
+                <span>{{ out }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Student Quote -->
+          <div class="event-quote-box" v-if="selectedEvent.quotes && selectedEvent.quotes.length">
+            <div class="event-quote-text">“{{ selectedEvent.quotes[0].text }}”</div>
+            <div class="event-quote-author">— {{ selectedEvent.quotes[0].author }}</div>
+          </div>
+        </div>
+
+        <!-- Modal Actions Footer -->
+        <div class="event-modal-actions-footer">
+          <button type="button" class="btn-secondary" @click="closeEventDetailModal">
+            Back to All Events
+          </button>
+          <button type="button" class="btn-primary" @click="closeEventDetailModal(); setTab('admission');">
+            <span>Apply for IT HUNT Academy 2026</span> 🚀 →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= FULLSCREEN PHOTO LIGHTBOX VIEWER ================= -->
+    <div class="fullscreen-lightbox-overlay" v-if="showFullscreenLightbox" @click.self="closeLightbox">
+      <div class="lightbox-header">
+        <div class="lightbox-counter">
+          📸 Photo {{ lightboxImageIndex + 1 }} of {{ lightboxImages.length }}
+        </div>
+        <button class="lightbox-close-btn" @click="closeLightbox" title="Close Lightbox (Esc)">✕</button>
+      </div>
+
+      <div class="lightbox-main-stage">
+        <button class="lightbox-arrow prev" @click="prevLightboxImage" title="Previous Image (Left Arrow)" v-if="lightboxImages.length > 1">‹</button>
+        <div class="lightbox-img-wrapper">
+          <img :src="lightboxImages[lightboxImageIndex]?.src" :alt="lightboxImages[lightboxImageIndex]?.title" class="lightbox-img" @error="onImgError">
+        </div>
+        <button class="lightbox-arrow next" @click="nextLightboxImage" title="Next Image (Right Arrow)" v-if="lightboxImages.length > 1">›</button>
+      </div>
+
+      <div class="lightbox-footer-caption" v-if="lightboxImages[lightboxImageIndex]">
+        <div class="lightbox-caption-title">{{ lightboxImages[lightboxImageIndex]?.title }}</div>
+        <div class="lightbox-caption-text">{{ lightboxImages[lightboxImageIndex]?.caption || lightboxImages[lightboxImageIndex]?.desc }}</div>
+      </div>
+    </div>
+
+    <!-- ================= UPCOMING EVENT RSVP MODAL ================= -->
+    <div class="modal-overlay" v-if="showRsvpModal" @click.self="showRsvpModal = false">
+      <div class="modal-card" style="max-width: 540px; text-align: left;">
+        <button class="modal-close-icon" @click="showRsvpModal = false" title="Close Modal (Esc)">✕</button>
+        <div class="duration-pill" style="margin-bottom: 0.5rem;">FREE EVENT PASS 2026</div>
+        <h3 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; margin-bottom: 0.3rem;">
+          Register for {{ selectedUpcomingEvent.title }}
+        </h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
+          📍 {{ selectedUpcomingEvent.venue }} • 📅 {{ selectedUpcomingEvent.date }}
+        </p>
+
+        <form @submit.prevent="submitEventRsvp">
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label">Full Name <span class="req">*</span></label>
+            <input type="text" v-model="rsvpForm.name" required class="form-control" placeholder="Candidate full name">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 0.85rem;">
+            <div class="form-group">
+              <label class="form-label">Mobile Number <span class="req">*</span></label>
+              <input type="tel" v-model="rsvpForm.phone" pattern="[0-9]{10}" required class="form-control" placeholder="10-digit mobile">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address <span class="req">*</span></label>
+              <input type="email" v-model="rsvpForm.email" required class="form-control" placeholder="name@example.com">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label">College / Organization <span class="req">*</span></label>
+            <input type="text" v-model="rsvpForm.college" required class="form-control" placeholder="e.g. Allahabad University / Shambhunath / BBS / UIET">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label">Primary Interest / Domain <span class="req">*</span></label>
+            <select v-model="rsvpForm.interest" class="form-control" required>
+              <option value="Full-Stack Web (MERN Stack)">Full-Stack Web (MERN Stack)</option>
+              <option value="Generative AI & Python">Generative AI & Python</option>
+              <option value="Mobile App (iOS / Android)">Mobile App (iOS / Android)</option>
+              <option value="Cybersecurity & Ethical Hacking">Cybersecurity & Ethical Hacking</option>
+              <option value="Other / General Tech Innovation">Other / General Tech Innovation</option>
+            </select>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+            <button type="button" class="btn-secondary" @click="showRsvpModal = false">Cancel</button>
+            <button type="submit" class="btn-primary">Confirm Free Registration 🎟️</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- Confirmation Modal -->
     <div class="modal-overlay" v-if="showModal" @click.self="showModal = false">
       <div class="modal-card">
@@ -1145,6 +1580,7 @@
           <ul class="footer-links">
             <li><a href="#" @click.prevent="setTab('home')">Home Overview</a></li>
             <li><a href="#" @click.prevent="setTab('internships')">IT Internships (3/6 Mo)</a></li>
+            <li><a href="#" @click.prevent="setTab('events')">🎪 Events & Media Gallery</a></li>
             <li><a href="#" @click.prevent="setTab('testimonials')">🌟 Alumni Testimonials & Achievements</a></li>
             <li><a href="#" @click.prevent="setTab('courses')">Accredited Courses</a></li>
             <li><a href="#" @click.prevent="setTab('reviews')">Reviews & Feedback</a></li>
@@ -1172,6 +1608,7 @@
       <div class="container footer-bottom">
         <div style="color: #ffffff;">{{ content.footer.copyrightText }}</div>
         <div style="display: flex; gap: 1.5rem;">
+          <a href="#" @click.prevent="setTab('events')">Events Gallery</a>
           <a href="#" @click.prevent="setTab('testimonials')">Alumni Stories</a>
           <a href="#">Privacy Policy</a>
           <a href="#">Terms & Conditions</a>
@@ -1198,6 +1635,25 @@
           selectedInternshipDuration: 'all',
           selectedAlumniCategory: 'all',
           
+          // Events Page States
+          selectedEventCategory: 'all',
+          eventSearchQuery: '',
+          showEventDetailModal: false,
+          selectedEvent: {},
+          activeGalleryIndex: 0,
+          showFullscreenLightbox: false,
+          lightboxImages: [],
+          lightboxImageIndex: 0,
+          showRsvpModal: false,
+          selectedUpcomingEvent: {},
+          rsvpForm: {
+            name: '',
+            phone: '',
+            email: '',
+            college: '',
+            interest: 'Full-Stack Web (MERN Stack)'
+          },
+
           showDetailModal: false,
           selectedTrack: {},
 
@@ -1261,6 +1717,25 @@
           if (!this.content || !this.content.testimonialsSection || !this.content.testimonialsSection.alumniList) return [];
           if (this.selectedAlumniCategory === 'all') return this.content.testimonialsSection.alumniList;
           return this.content.testimonialsSection.alumniList.filter(a => a.trackCategory === this.selectedAlumniCategory);
+        },
+        filteredEvents() {
+          if (!this.content || !this.content.eventsSection || !this.content.eventsSection.eventsList) return [];
+          let list = this.content.eventsSection.eventsList;
+          if (this.selectedEventCategory !== 'all') {
+            list = list.filter(e => e.category === this.selectedEventCategory);
+          }
+          if (this.eventSearchQuery && this.eventSearchQuery.trim() !== '') {
+            const q = this.eventSearchQuery.trim().toLowerCase();
+            list = list.filter(e => {
+              return (e.title && e.title.toLowerCase().includes(q)) ||
+                     (e.subtitle && e.subtitle.toLowerCase().includes(q)) ||
+                     (e.venue && e.venue.toLowerCase().includes(q)) ||
+                     (e.categoryLabel && e.categoryLabel.toLowerCase().includes(q)) ||
+                     (e.overview && e.overview.toLowerCase().includes(q)) ||
+                     (e.chiefGuests && e.chiefGuests.some(g => g.name.toLowerCase().includes(q)));
+            });
+          }
+          return list;
         }
       },
 
@@ -1271,20 +1746,40 @@
         }
 
         const hash = window.location.hash.replace('#', '');
-        if (['home', 'internships', 'courses', 'reviews', 'admission', 'testimonials'].includes(hash)) {
+        if (['home', 'internships', 'events', 'courses', 'reviews', 'admission', 'testimonials'].includes(hash)) {
           this.activeTab = hash;
         }
-        // Clean URL so no #hash is shown in the address bar
+
+        // Listen to hash changes (e.g. #events, #internships, back/forward buttons)
+        window.addEventListener('hashchange', () => {
+          const h = window.location.hash.replace('#', '');
+          if (['home', 'internships', 'events', 'courses', 'reviews', 'admission', 'testimonials'].includes(h)) {
+            this.activeTab = h;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        });
+
+        // Clean URL so no #hash is shown in the address bar on initial load
         if (window.location.hash && window.history && window.history.replaceState) {
           window.history.replaceState(null, '', window.location.pathname + window.location.search);
         }
 
-        // Global ESC key listener to close modals
+        // Global key listener for ESC, Left/Right arrow in lightbox
         window.addEventListener('keydown', (e) => {
           if (e.key === 'Escape') {
-            this.closeCourseDetailModal();
-            this.showModal = false;
-            this.showJobModal = false;
+            if (this.showFullscreenLightbox) {
+              this.closeLightbox();
+            } else {
+              this.closeCourseDetailModal();
+              this.closeEventDetailModal();
+              this.showModal = false;
+              this.showJobModal = false;
+              this.showRsvpModal = false;
+            }
+          } else if (e.key === 'ArrowRight' && this.showFullscreenLightbox) {
+            this.nextLightboxImage();
+          } else if (e.key === 'ArrowLeft' && this.showFullscreenLightbox) {
+            this.prevLightboxImage();
           }
         });
       },
@@ -1311,6 +1806,52 @@
         closeCourseDetailModal() {
           this.showDetailModal = false;
           document.body.style.overflow = '';
+        },
+        openEventDetailModal(ev) {
+          this.selectedEvent = ev;
+          this.activeGalleryIndex = 0;
+          this.showEventDetailModal = true;
+          document.body.style.overflow = 'hidden';
+        },
+        closeEventDetailModal() {
+          this.showEventDetailModal = false;
+          if (!this.showFullscreenLightbox && !this.showDetailModal) {
+            document.body.style.overflow = '';
+          }
+        },
+        openLightbox(images, index = 0) {
+          if (!images || images.length === 0) return;
+          this.lightboxImages = images;
+          this.lightboxImageIndex = index;
+          this.showFullscreenLightbox = true;
+          document.body.style.overflow = 'hidden';
+        },
+        closeLightbox() {
+          this.showFullscreenLightbox = false;
+          if (!this.showEventDetailModal && !this.showDetailModal) {
+            document.body.style.overflow = '';
+          }
+        },
+        nextLightboxImage() {
+          if (!this.lightboxImages || this.lightboxImages.length === 0) return;
+          this.lightboxImageIndex = (this.lightboxImageIndex + 1) % this.lightboxImages.length;
+        },
+        prevLightboxImage() {
+          if (!this.lightboxImages || this.lightboxImages.length === 0) return;
+          this.lightboxImageIndex = (this.lightboxImageIndex - 1 + this.lightboxImages.length) % this.lightboxImages.length;
+        },
+        openRsvpModal(upcomingEvent) {
+          this.selectedUpcomingEvent = upcomingEvent;
+          this.showRsvpModal = true;
+        },
+        submitEventRsvp() {
+          this.showRsvpModal = false;
+          const refId = 'EVT-' + Math.floor(100000 + Math.random() * 900000);
+          this.modalTitle = "Event Registration Confirmed! 🎟️";
+          this.modalBody = `Thank you ${this.rsvpForm.name}! Your free registration for "${this.selectedUpcomingEvent.title}" (${this.selectedUpcomingEvent.date}) has been confirmed. We look forward to seeing you at the campus!`;
+          this.submittedRegistrationNo = refId;
+          this.showModal = true;
+          this.rsvpForm = { name: '', phone: '', email: '', college: '', interest: 'Full-Stack Web (MERN Stack)' };
         },
         proceedToRegistration(track) {
           this.closeCourseDetailModal();

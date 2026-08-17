@@ -24,6 +24,7 @@ const CONTENT_DATA = {
   navigation: [
     { id: "home", label: "Home", icon: "🏠" },
     { id: "internships", label: "IT Internships", icon: "🚀" },
+    { id: "events", label: "Events & Gallery", icon: "🎪" },
     { id: "courses", label: "Courses", icon: "📚" },
     { id: "reviews", label: "Reviews & Ratings", icon: "⭐" },
     { id: "admission", label: "Apply Portal", icon: "📝" }
@@ -652,6 +653,515 @@ const CONTENT_DATA = {
         rating: 5,
         projectBuilt: "Live E-Commerce Meta & Google Ads Scaling (ROAS 4.5x)",
         story: "Unlike other institutes that teach slides, IT HUNT had us manage live ad budgets, optimize real client SEO rankings, and run A/B testing on landing pages. I now manage remote US and Indian e-commerce ad accounts with confidence."
+      }
+    ]
+  },
+
+  // Events & Media Gallery Section
+  eventsSection: {
+    tagline: "CAMPUS LIFE, TECH INNOVATION & CELEBRATIONS",
+    titlePrefix: "Flagship Events, Hackathons & ",
+    titleGradient: "Media Gallery",
+    description: "Explore our vibrant campus culture, 24-hour coding hackathons, technical masterclasses, graduation convocation ceremonies, and corporate placement drives at IT HUNT.",
+    stats: [
+      { value: "45+", label: "Events & Hackathons", icon: "🎪" },
+      { value: "3,500+", label: "Student Participants", icon: "👥" },
+      { value: "₹2.5L+", label: "Cash Prizes Awarded", icon: "💰" },
+      { value: "25+", label: "Industry Guest Mentors", icon: "👨‍🏫" }
+    ],
+    categories: [
+      { id: "all", label: "All Events", icon: "🌟" },
+      { id: "hackathon", label: "Hackathons & Bootcamps", icon: "💻" },
+      { id: "workshop", label: "AI & Tech Workshops", icon: "🤖" },
+      { id: "convocation", label: "Convocation & Awards", icon: "🏆" },
+      { id: "placement", label: "Placement Drives", icon: "💼" },
+      { id: "techfest", label: "Tech Fest & Expo", icon: "🎉" }
+    ],
+    eventsList: [
+      {
+        id: 1,
+        title: "Prayagraj Grand TechFest & 24-Hour Code Hackathon",
+        subtitle: "Inter-college software engineering challenge solving real-world AI, Web & Mobile problems.",
+        category: "hackathon",
+        categoryLabel: "Hackathon & Bootcamp",
+        date: "Aug 12 - 13, 2026",
+        year: "2026",
+        time: "09:00 AM (24-Hour Non-Stop Sprint)",
+        venue: "IT HUNT Main Innovation Hub & Lab 1, Holagarh, Prayagraj",
+        badge: "🔥 Flagship Hackathon",
+        status: "Completed",
+        coverImage: "img/event_hackathon.jpg",
+        galleryImages: [
+          {
+            src: "img/event_hackathon.jpg",
+            title: "Live 24-Hour Coding Arena",
+            caption: "48 student developer teams building production-grade SaaS products and AI systems under the clock."
+          },
+          {
+            src: "img/event_workshop.jpg",
+            title: "Midnight Mentor Architecture Reviews",
+            caption: "Senior tech leads providing live code debugging, API optimizations, and database indexing tips."
+          },
+          {
+            src: "img/event_convocation.jpg",
+            title: "Grand Trophy & Cash Prize Distribution",
+            caption: "Director Mr. Lakshman Singh Chauhan presenting ₹50,000 cash prize to the champion development team."
+          },
+          {
+            src: "img/event_techfest.jpg",
+            title: "Live Product Demonstrations & Public Booths",
+            caption: "Finalists presenting live interactive web applications to external industry jury members."
+          }
+        ],
+        attendeeCount: "200+ Developers (48 Teams)",
+        chiefGuests: [
+          {
+            name: "Mr. Lakshman Singh Chauhan",
+            role: "Director & Chief Patron, IT HUNT",
+            image: "img/ithunt.jpg"
+          },
+          {
+            name: "Anoop Mishra",
+            role: "Senior Full Stack Mentor & Hackathon Lead",
+            image: "img/anoop.png"
+          }
+        ],
+        metrics: {
+          teams: "48 Competing Teams",
+          prizePool: "₹50,000 Cash Prizes",
+          projectsBuilt: "36 Production Demos",
+          hoursOfCoding: "24 Hours Non-Stop"
+        },
+        overview: "The IT HUNT Grand Hackathon 2026 brought together over 200 passionate student developers, alumni, and tech enthusiasts from across Prayagraj, Pratapgarh, and Uttar Pradesh. Participants built end-to-end applications across MERN Stack, Generative AI, iOS Swift, and Android ecosystems, evaluated on code cleanliness, UI/UX polish, database architecture, and market viability.",
+        agendaSchedule: [
+          { time: "09:00 AM", title: "Inauguration & Problem Track Reveal", desc: "Keynote address by Director and release of 5 enterprise problem statements." },
+          { time: "01:30 PM", title: "Architecture & Git Repo Setup Review", desc: "First round mentor evaluations of schema models and API routes." },
+          { time: "11:00 PM", title: "Midnight Rapid Bug Buster Round", desc: "Deep debugging, Redux state troubleshooting, and UI optimization." },
+          { time: "08:00 AM (Day 2)", title: "Git Push Freeze & Live Deployments", desc: "Live deployments to Vercel, Render, and AWS cloud instances." },
+          { time: "11:30 AM", title: "Grand Jury Demo & Trophy Felicitation", desc: "Top 3 winning teams awarded trophies, certificates, and job interview fast-tracks." }
+        ],
+        highlights: [
+          "48 Teams competed non-stop for 24 hours with dedicated high-speed optical fiber workstations",
+          "36 Full-stack web and mobile apps deployed live on public cloud URLs",
+          "₹50,000 total cash prizes distributed alongside verified Corporate Recommendation Letters (LOR)",
+          "Top 5 performers received direct recruitment offers from IT HUNT Software Solutions"
+        ],
+        outcomes: [
+          "1st Place: Team CyberPulse (AI-Powered Medical Diagnostic Assistant)",
+          "2nd Place: Team DevSphere (Multi-Tenant Offline-First ERP for Local Retailers)",
+          "3rd Place: Team CodeCraft (Real-Time Driver Geolocation & Route Optimizer in Kotlin)"
+        ],
+        quotes: [
+          {
+            author: "Rahul Tiwari (3rd Year B.Tech CSE)",
+            text: "Coding all night in IT HUNT's air-conditioned lab with senior mentors guiding us through Docker and WebSocket issues was the best tech experience of my college life!"
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "Applied Generative AI & Cloud Microservices Masterclass Workshop",
+        subtitle: "Hands-on intensive masterclass on LLM orchestration, FastAPI backends, and Vector Databases.",
+        category: "workshop",
+        categoryLabel: "AI & Tech Workshop",
+        date: "Jul 26, 2026",
+        year: "2026",
+        time: "10:00 AM - 04:30 PM",
+        venue: "Advanced AI & Software Lab, IT HUNT Holagarh",
+        badge: "🤖 Next-Gen Workshop",
+        status: "Completed",
+        coverImage: "img/event_workshop.jpg",
+        galleryImages: [
+          {
+            src: "img/event_workshop.jpg",
+            title: "Interactive Generative AI Architecture Session",
+            caption: "Mentor illustrating RAG retrieval pipelines, vector embeddings, and LangChain agents on the digital display."
+          },
+          {
+            src: "img/event_hackathon.jpg",
+            title: "Hands-On Python & FastAPI Coding Labs",
+            caption: "Students deploying high-throughput asynchronous REST APIs with PostgreSQL database backends."
+          },
+          {
+            src: "img/event_techfest.jpg",
+            title: "Autonomous Agent Demonstrations",
+            caption: "Participants testing custom customer support bots connected to live ChromaDB vector indexes."
+          }
+        ],
+        attendeeCount: "120+ Enrolled Students & Developers",
+        chiefGuests: [
+          {
+            name: "Anoop Mishra",
+            role: "Senior AI & Full-Stack Instructor",
+            image: "img/anoop.png"
+          },
+          {
+            name: "Achal Singh Chauhan",
+            role: "Cyber Security & Systems Lead",
+            image: "img/hacker.png"
+          }
+        ],
+        metrics: {
+          teams: "120+ Participants",
+          prizePool: "Free Cloud GPU Credits",
+          projectsBuilt: "120 Live AI Bots Built",
+          hoursOfCoding: "6.5 Hours Masterclass"
+        },
+        overview: "A power-packed 1-day masterclass designed to bridge academic Python knowledge with enterprise-grade Generative AI engineering. Every attendee built a functional Retrieval-Augmented Generation (RAG) system utilizing Pinecone vector database, OpenAI API models, and asynchronous FastAPI microservices.",
+        agendaSchedule: [
+          { time: "10:00 AM", title: "LLM Fundamentals & Vector Embedding Mathematics", desc: "Understanding similarity search, tokens, chunking strategies, and cosine distance." },
+          { time: "12:00 PM", title: "Building Asynchronous APIs with FastAPI", desc: "Writing typed endpoints, Pydantic validation, and streaming HTTP responses." },
+          { time: "02:00 PM", title: "Hands-On RAG Pipeline Implementation", desc: "Connecting custom PDF documents to ChromaDB and generating context-grounded answers." },
+          { time: "03:45 PM", title: "Dockerization & Production Cloud Deployment", desc: "Containerizing AI apps and hosting them live on Render with automated CI/CD." }
+        ],
+        highlights: [
+          "Zero-to-One production deployment of Retrieval-Augmented Generation (RAG) applications",
+          "Dedicated high-performance cloud workstations provided for every attendee",
+          "100% of participants left with a working AI project link on their GitHub profile",
+          "Verifiable digital workshop certificate awarded to all attendees"
+        ],
+        outcomes: [
+          "120+ Working RAG AI web assistants deployed to public cloud endpoints",
+          "Comprehensive code repository and boilerplate template provided to all attendees",
+          "15 Students selected for advanced 6-month AI Internship track"
+        ],
+        quotes: [
+          {
+            author: "Neha Sharma (MCA Student)",
+            text: "This workshop demystified AI completely. In just 6 hours, I went from knowing basic Python to hosting my own intelligent document search API live on the web!"
+          }
+        ]
+      },
+      {
+        id: 3,
+        title: "Annual Convocation, ISO Certification & Merit Awards Gala",
+        subtitle: "Honoring our graduating batches in NIELIT O/A Level, MERN Stack, and Mobile Engineering.",
+        category: "convocation",
+        categoryLabel: "Convocation & Awards",
+        date: "Jun 18, 2026",
+        year: "2026",
+        time: "11:00 AM - 03:00 PM",
+        venue: "IT HUNT Grand Academic Auditorium, Holagarh Prayagraj",
+        badge: "🏆 Annual Convocation",
+        status: "Completed",
+        coverImage: "img/event_convocation.jpg",
+        galleryImages: [
+          {
+            src: "img/event_convocation.jpg",
+            title: "Stage Felicitation & Gold Medalist Honoring",
+            caption: "Director Mr. Lakshman Singh Chauhan presenting gold medals and honors to batch toppers."
+          },
+          {
+            src: "img/event_placement.jpg",
+            title: "Placement Achievers Recognition Ceremony",
+            caption: "Alumni placed in top MNCs and IT firms receiving corporate recommendation tokens and awards."
+          },
+          {
+            src: "img/event_techfest.jpg",
+            title: "Auditorium Address & Motivational Keynote",
+            caption: "Inspirational address on ethical engineering, career longevity, and modern software leadership."
+          }
+        ],
+        attendeeCount: "450+ Students, Alumni & Parents",
+        chiefGuests: [
+          {
+            name: "Mr. Lakshman Singh Chauhan",
+            role: "Director & Founder, IT HUNT",
+            image: "img/ithunt.jpg"
+          },
+          {
+            name: "Vikash Srivastav",
+            role: "Campus Administrator",
+            image: "img/vikash.png"
+          }
+        ],
+        metrics: {
+          teams: "180+ Graduates",
+          prizePool: "15 Gold Medals & Trophies",
+          projectsBuilt: "100% Verified Certifications",
+          hoursOfCoding: "Annual Celebration"
+        },
+        overview: "The IT HUNT Annual Convocation & Merit Awards is our flagship yearly celebration honoring the hard work and accomplishments of our graduating engineering interns, NIELIT diploma holders, and university degree candidates. The ceremony recognized exceptional coding aptitude, client project deliveries, and record-breaking placement offers.",
+        agendaSchedule: [
+          { time: "11:00 AM", title: "Ceremonial Lamp Lighting & Welcome Note", desc: "Traditional auspicious lamp lighting followed by Director's welcoming address." },
+          { time: "11:45 AM", title: "Presentation of NIELIT Diplomas & Internship Letters", desc: "Awarding official government recognized diplomas and corporate certificates." },
+          { time: "01:00 PM", title: "Gold Medals & Top Project Innovator Awards", desc: "Felicitation of the top 15 merit rankers with customized trophies and honors." },
+          { time: "02:15 PM", title: "Alumni Success Sharing & Networking Lunch", desc: "Graduates sharing their hiring interview journeys over a celebratory banquet." }
+        ],
+        highlights: [
+          "Over 180 students received verified ISO-accredited completion certificates and LORs",
+          "15 Gold medals awarded for academic excellence and outstanding live software contributions",
+          "Attended by distinguished academic dignitaries, alumni, and proud family members",
+          "Special felicitation for 100% attendance and peer-mentorship champions"
+        ],
+        outcomes: [
+          "180+ Certified software engineers and NIELIT diploma holders graduated into industry",
+          "95% of graduates successfully transitioned into corporate tech roles and higher degree programs"
+        ],
+        quotes: [
+          {
+            author: "Pooja Verma (Assistant IT Officer & NIELIT Topper)",
+            text: "Receiving my diploma and gold medal from Director Chauhan Sir on this stage was a moment of immense pride for me and my family."
+          }
+        ]
+      },
+      {
+        id: 4,
+        title: "Mega Campus Placement Drive & Corporate Hiring Fair",
+        subtitle: "Direct on-campus recruitment drive connecting IT HUNT talent with leading tech companies.",
+        category: "placement",
+        categoryLabel: "Placement Drive",
+        date: "May 08, 2026",
+        year: "2026",
+        time: "09:30 AM - 06:00 PM",
+        venue: "IT HUNT Career Development Wing & Interview Suites",
+        badge: "💼 Placement Drive",
+        status: "Completed",
+        coverImage: "img/event_placement.jpg",
+        galleryImages: [
+          {
+            src: "img/event_placement.jpg",
+            title: "Corporate Technical Interview Rooms",
+            caption: "HR directors and senior software architects evaluating candidate code portfolios and resumes."
+          },
+          {
+            src: "img/event_hackathon.jpg",
+            title: "Live Machine Coding & Algorithmic Rounds",
+            caption: "Candidates solving data structure problems and building REST endpoints under timed conditions."
+          },
+          {
+            src: "img/event_convocation.jpg",
+            title: "Instant Letter of Intent (LOI) Distribution",
+            caption: "Selected students celebrating on-the-spot job offer letters from participating tech firms."
+          }
+        ],
+        attendeeCount: "250+ Candidates • 18 Tech Companies",
+        chiefGuests: [
+          {
+            name: "Mr. Lakshman Singh Chauhan",
+            role: "Director & Placement Head",
+            image: "img/ithunt.jpg"
+          },
+          {
+            name: "Vikash Srivastav",
+            role: "Corporate Liaison Lead",
+            image: "img/vikash.png"
+          }
+        ],
+        metrics: {
+          teams: "18 Hiring Companies",
+          prizePool: "₹18.5 LPA Top Package",
+          projectsBuilt: "85+ On-Spot Offers",
+          hoursOfCoding: "Full Day Drive"
+        },
+        overview: "The IT HUNT Mega Placement Fair is an exclusive hiring initiative designed to place our trained software interns and diploma candidates in high-growth companies. Over 18 IT companies, software agencies, and startups conducted machine coding tests, technical interviews, and HR rounds right at our Holagarh campus.",
+        agendaSchedule: [
+          { time: "09:30 AM", title: "Company Pre-Placement Briefing (PPT)", desc: "Recruiters presenting company visions, job profiles, and package structures." },
+          { time: "11:00 AM", title: "Round 1: Online Coding Assessment & Aptitude", desc: "Algorithmic challenges, SQL queries, and React/Node debugging tests." },
+          { time: "02:00 PM", title: "Round 2: Technical Architecture & Portfolio Deep-Dive", desc: "1-on-1 code walkthroughs of GitHub repositories built during internship." },
+          { time: "05:00 PM", title: "Round 3: HR Discussion & On-The-Spot Offer Letters", desc: "Issuance of Letters of Intent (LOI) to selected candidates." }
+        ],
+        highlights: [
+          "18 Reputed IT firms and software agencies participated as hiring partners",
+          "85+ Job offers extended with packages ranging from ₹4.0 LPA to ₹18.5 LPA",
+          "100% Machine coding qualification rate for candidates completing the 6-month MERN/Mobile tracks",
+          "Extensive pre-drive mock interview prep and resume polishing support provided"
+        ],
+        outcomes: [
+          "85+ Students secured direct corporate placements",
+          "Highest CTC offered: ₹18.5 LPA | Average CTC: ₹6.2 LPA",
+          "100% positive recruiter satisfaction ratings on candidate practical coding skills"
+        ],
+        quotes: [
+          {
+            author: "Anup Mishra (Placed at Paytm Payments)",
+            text: "The recruiters specifically appreciated that we had live production projects with Docker and Redis on GitHub, rather than simple classroom toys."
+          }
+        ]
+      },
+      {
+        id: 5,
+        title: "National Youth Tech Fest & Smart IoT Project Expo",
+        subtitle: "Exhibition of student-engineered robotics, embedded IoT hardware, and AI innovations.",
+        category: "techfest",
+        categoryLabel: "Tech Fest & Expo",
+        date: "Apr 14, 2026",
+        year: "2026",
+        time: "10:00 AM - 05:00 PM",
+        venue: "IT HUNT Exhibition Lawn & Smart Hardware Lab",
+        badge: "🎉 Tech Fest & Expo",
+        status: "Completed",
+        coverImage: "img/event_techfest.jpg",
+        galleryImages: [
+          {
+            src: "img/event_techfest.jpg",
+            title: "Robotics & Smart Agriculture IoT Live Stalls",
+            caption: "Students demonstrating automated irrigation systems, robotic arms, and sensor dashboards."
+          },
+          {
+            src: "img/event_workshop.jpg",
+            title: "Interactive Mobile App Demonstrations",
+            caption: "Visitors experiencing native iOS and Android apps controlling real-time microcontrollers."
+          },
+          {
+            src: "img/event_hackathon.jpg",
+            title: "Junior Coding Challenge & Game Dev Zone",
+            caption: "High school and diploma students competing in rapid Python game creation tournaments."
+          }
+        ],
+        attendeeCount: "600+ Visitors, Students & Tech Lovers",
+        chiefGuests: [
+          {
+            name: "Mr. Lakshman Singh Chauhan",
+            role: "Director & Chief Patron",
+            image: "img/ithunt.jpg"
+          },
+          {
+            name: "Achal Singh Chauhan",
+            role: "Hardware & Robotics Mentor",
+            image: "img/hacker.png"
+          }
+        ],
+        metrics: {
+          teams: "35 Hardware Stalls",
+          prizePool: "₹25,000 Innovation Awards",
+          projectsBuilt: "35 Working Prototypes",
+          hoursOfCoding: "Day-Long Expo"
+        },
+        overview: "The National Youth Tech Fest celebrates the fusion of software intelligence with real-world electronics and smart automation. Students exhibited 35 innovative working prototypes including smart irrigation IoT monitors, solar tracking controllers, biometric campus security systems, and AI computer vision assistants.",
+        agendaSchedule: [
+          { time: "10:00 AM", title: "Grand Ribbon Cutting & Exhibition Walkthrough", desc: "Guests inspecting working hardware prototypes and student code." },
+          { time: "12:30 PM", title: "Public Innovation Voting & Live Demonstrations", desc: "Audience testing IoT sensors and mobile companion applications." },
+          { time: "03:00 PM", title: "Robo-Race & Micro-Drone Challenge", desc: "Autonomous obstacle navigation contest on custom obstacle tracks." },
+          { time: "04:30 PM", title: "Grand Innovation Trophy & Cash Awards", desc: "Best Innovator, Best Green Tech Project, and Best UI/UX design trophies." }
+        ],
+        highlights: [
+          "35 Live working prototypes demonstrated to over 600 visiting students and educators",
+          "Interdisciplinary projects combining Python, Node.js, Arduino, Raspberry Pi, and Swift",
+          "Cash innovation grants awarded to the top 3 sustainable technology projects",
+          "Wide regional media coverage highlighting rural tech empowerment in Holagarh Prayagraj"
+        ],
+        outcomes: [
+          "1st Place Winner: Smart Solar Agricultural Water Monitoring System",
+          "2nd Place Winner: Computer Vision Biometric Face-Scanner & Access Gate",
+          "3rd Place Winner: Bluetooth Low Energy (BLE) Medical Vitals Tracker"
+        ],
+        quotes: [
+          {
+            author: "Saurabh Pandey (AI Intern)",
+            text: "Seeing hundreds of school and college students interact with the smart robot arm we coded at IT HUNT was an unforgettable feeling of accomplishment!"
+          }
+        ]
+      },
+      {
+        id: 6,
+        title: "Native iOS & Android Mobile App Architecture Bootcamp",
+        subtitle: "Deep-dive weekend sprint on Swift 5, SwiftUI, Kotlin 2.0, and Jetpack Compose state architecture.",
+        category: "workshop",
+        categoryLabel: "Mobile Bootcamp",
+        date: "Feb 22, 2026",
+        year: "2026",
+        time: "10:00 AM - 05:00 PM",
+        venue: "Apple Mac & Android Testing Lab, IT HUNT Holagarh",
+        badge: "📱 Mobile Bootcamp",
+        status: "Completed",
+        coverImage: "img/event_workshop.jpg",
+        galleryImages: [
+          {
+            src: "img/event_workshop.jpg",
+            title: "SwiftUI Declarative Layouts & Combine Framework",
+            caption: "Instructor breaking down state hoisting, observable objects, and async/await networking in Swift."
+          },
+          {
+            src: "img/event_hackathon.jpg",
+            title: "Jetpack Compose & Kotlin Coroutines Lab",
+            caption: "Building reactive Android Material 3 user interfaces with clean MVVM architecture."
+          },
+          {
+            src: "img/event_convocation.jpg",
+            title: "TestFlight & Play Store Submission Session",
+            caption: "Demonstration of generating app bundles, provisioning profiles, and signing certificates."
+          }
+        ],
+        attendeeCount: "90+ Mobile Developers",
+        chiefGuests: [
+          {
+            name: "Mr. Lakshman Singh Chauhan",
+            role: "Director & Founder",
+            image: "img/ithunt.jpg"
+          },
+          {
+            name: "Anoop Mishra",
+            role: "Lead Mobile & Web Architect",
+            image: "img/anoop.png"
+          }
+        ],
+        metrics: {
+          teams: "90+ Mobile Devs",
+          prizePool: "App Store Publishing Passes",
+          projectsBuilt: "2 Native Apps Published",
+          hoursOfCoding: "7 Hours Intensive"
+        },
+        overview: "A masterclass dedicated to the nuances of modern declarative mobile app development. Interns built cross-compatible native mobile modules, connected secure REST APIs with token refreshing, implemented Room/CoreData offline persistence, and prepared production release builds for the Apple App Store and Google Play Store.",
+        agendaSchedule: [
+          { time: "10:00 AM", title: "Modern Mobile Architecture: MVVM vs Clean Architecture", desc: "Separation of concerns, repository pattern, and reactive data streams." },
+          { time: "11:45 AM", title: "Declarative UI Masterclass: SwiftUI & Jetpack Compose", desc: "Building responsive dynamic screens with modern state hoisting." },
+          { time: "02:00 PM", title: "Networking & Offline Caching", desc: "Retrofit/URLSession with encrypted Room database and SwiftData sync." },
+          { time: "04:00 PM", title: "App Store Connect & Play Store Release Pipelines", desc: "Managing app metadata, screenshots, certificates, and beta testing." }
+        ],
+        highlights: [
+          "Hands-on practice on dedicated Apple Mac workstations and high-speed Android test devices",
+          "Built and released two live native test applications to TestFlight during the session",
+          "Complete architectural boilerplate source code shared with all attendees",
+          "Exclusive guidance on landing high-paying remote iOS and Android contracts"
+        ],
+        outcomes: [
+          "90+ Developers upskilled in modern declarative mobile frameworks",
+          "2 Production demo apps approved on Apple TestFlight and Google Internal Testing"
+        ],
+        quotes: [
+          {
+            author: "Amit Kumar Srivastav (iOS Intern)",
+            text: "The Apple lab at IT HUNT is world-class. Learning how to architect scalable SwiftUI code under mentor guidance gave me the exact confidence I needed."
+          }
+        ]
+      }
+    ],
+    upcomingEvents: [
+      {
+        id: "up-1",
+        title: "Prayagraj Grand Web & AI Hackathon (Autumn Edition)",
+        date: "September 24 - 25, 2026",
+        time: "09:00 AM - Next Day 09:00 AM",
+        venue: "IT HUNT Innovation Arena & Lab 1",
+        category: "Hackathon",
+        categoryBadge: "🚀 Registrations Open",
+        seatsTotal: 60,
+        seatsRemaining: 18,
+        perks: [
+          "₹75,000 Total Cash Prize Pool",
+          "Free High-Speed Lab Workstations & Cloud GPUs",
+          "Verified Corporate Recommendation Letters (LOR)",
+          "Direct Placement Opportunities with IT HUNT"
+        ],
+        description: "Join the most anticipated 24-hour coding hackathon in Eastern UP. Build next-gen full-stack web platforms, AI agents, or mobile apps and compete for massive cash prizes and direct recruitment."
+      },
+      {
+        id: "up-2",
+        title: "Enterprise Cybersecurity & Ethical Hacking Masterclass",
+        date: "October 10, 2026",
+        time: "10:00 AM - 04:00 PM",
+        venue: "Cyber Defense Wing, IT HUNT Holagarh",
+        category: "Workshop",
+        categoryBadge: "🛡️ Free for Enrolled Students",
+        seatsTotal: 40,
+        seatsRemaining: 12,
+        perks: [
+          "Hands-on Penetration Testing & Web Vulnerability Lab",
+          "Wireshark, Burp Suite & Kali Linux Real-World Exercises",
+          "Official Cyber Defense Workshop Certificate"
+        ],
+        description: "Learn how modern cybersecurity specialists audit web applications, prevent SQL injection, mitigate DDoS attacks, and secure enterprise cloud infrastructure."
       }
     ]
   },
