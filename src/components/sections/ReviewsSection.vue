@@ -1,23 +1,25 @@
 <template>
   <section class="container" style="padding: 4rem 1.5rem;">
     <div class="section-header">
-      <span class="section-tag">{{ content.reviewsSection.tagline }}</span>
-      <h2 class="section-title">{{ content.reviewsSection.titlePrefix }}<span class="text-gradient">{{ content.reviewsSection.titleGradient }}</span></h2>
-      <p class="section-subtitle">{{ content.reviewsSection.description }}</p>
+      <span class="section-tag">{{ content.reviewsSection?.tagline }}</span>
+      <h2 class="section-title">{{ content.reviewsSection?.titlePrefix }}<span class="text-gradient">{{ content.reviewsSection?.titleGradient }}</span></h2>
+      <p class="section-subtitle">{{ content.reviewsSection?.description }}</p>
     </div>
 
     <!-- Rating Summary Card -->
     <div class="rating-summary-card">
       <div style="text-align: center;">
-        <div class="big-rating-score">{{ content.reviewsSection.overallScore }}</div>
-        <div class="star-rating-display">{{ content.reviewsSection.overallStars }}</div>
-        <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.4rem;">{{ content.reviewsSection.totalCountLabel }}</div>
+        <div class="big-rating-score">{{ content.reviewsSection?.overallScore }}</div>
+        <div class="star-rating-display">{{ content.reviewsSection?.overallStars }}</div>
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.4rem;">{{ content.reviewsSection?.totalCountLabel }}</div>
       </div>
 
       <div>
-        <h4 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem;">Facility & Development Evaluation Metrics</h4>
+        <h4 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem;">
+          {{ content.reviewsSectionUI?.metricsHeading || 'Facility & Development Evaluation Metrics' }}
+        </h4>
         
-        <div class="metric-bar-wrapper" v-for="metric in content.reviewsSection.facilityMetrics" :key="metric.name">
+        <div class="metric-bar-wrapper" v-for="metric in content.reviewsSection?.facilityMetrics" :key="metric.name">
           <div class="metric-bar-header">
             <span>{{ metric.name }}</span>
             <span style="font-weight: 700; color: var(--color-ai-cyan); font-family: var(--font-mono);">{{ metric.score }} / 5.0</span>
@@ -51,49 +53,56 @@
 
     <!-- Review Submission Form -->
     <div class="form-card" style="max-width: 750px; margin: 0 auto;">
-      <h3 class="form-title">Submit Your Review & Feedback</h3>
-      <p class="form-subtitle">Help us improve institute infrastructure, labs, and ease of technical development.</p>
+      <h3 class="form-title">{{ content.reviewsSectionUI?.formTitle || 'Submit Your Review & Feedback' }}</h3>
+      <p class="form-subtitle">{{ content.reviewsSectionUI?.formSubtitle || 'Help us improve institute infrastructure, labs, and ease of technical development.' }}</p>
 
       <form @submit.prevent="handleSubmitReview">
         <div class="form-grid">
           <div class="form-group">
-            <label class="form-label">Your Name <span class="req">*</span></label>
-            <input type="text" v-model="newReview.name" required class="form-control" placeholder="Full name">
+            <label class="form-label">{{ content.reviewsSectionUI?.fields?.nameLabel || 'Your Name' }} <span class="req">*</span></label>
+            <input type="text" v-model="newReview.name" required class="form-control" :placeholder="content.reviewsSectionUI?.fields?.namePlaceholder || 'Full name'">
           </div>
 
           <div class="form-group">
-            <label class="form-label">Course / Program Attended <span class="req">*</span></label>
-            <input type="text" v-model="newReview.role" required class="form-control" placeholder="e.g. MERN Stack Intern / O Level Student">
+            <label class="form-label">{{ content.reviewsSectionUI?.fields?.roleLabel || 'Course / Program Attended' }} <span class="req">*</span></label>
+            <input type="text" v-model="newReview.role" required class="form-control" :placeholder="content.reviewsSectionUI?.fields?.rolePlaceholder || 'e.g. MERN Stack Intern / O Level Student'">
           </div>
 
           <div class="form-group">
-            <label class="form-label">Overall Rating <span class="req">*</span></label>
+            <label class="form-label">{{ content.reviewsSectionUI?.fields?.ratingLabel || 'Overall Rating' }} <span class="req">*</span></label>
             <select v-model.number="newReview.rating" class="form-control" required>
-              <option :value="5">⭐⭐⭐⭐⭐ 5 Stars (Excellent)</option>
-              <option :value="4">⭐⭐⭐⭐ 4 Stars (Very Good)</option>
-              <option :value="3">⭐⭐⭐ 3 Stars (Average)</option>
+              <option 
+                v-for="opt in (content.reviewsSectionUI?.ratingOptions || [{ value: 5, label: '⭐⭐⭐⭐⭐ 5 Stars (Excellent)' }])"
+                :key="opt.value"
+                :value="opt.value"
+              >
+                {{ opt.label }}
+              </option>
             </select>
           </div>
 
           <div class="form-group">
-            <label class="form-label">Evaluation Category</label>
+            <label class="form-label">{{ content.reviewsSectionUI?.fields?.categoryLabel || 'Evaluation Category' }}</label>
             <select v-model="newReview.category" class="form-control">
-              <option value="Labs & Workstations">Labs & Computer Workstations</option>
-              <option value="Teaching & Mentorship">Teaching & Faculty Mentorship</option>
-              <option value="Placement & LOR">Placement & Internship LOR</option>
-              <option value="Course Curriculum">Course Curriculum & Ease of Learning</option>
+              <option 
+                v-for="cat in (content.reviewsSectionUI?.categoryOptions || ['Labs & Workstations', 'Teaching & Mentorship', 'Placement & LOR', 'Course Curriculum'])"
+                :key="cat"
+                :value="cat"
+              >
+                {{ cat }}
+              </option>
             </select>
           </div>
 
           <div class="form-group full-width">
-            <label class="form-label">Your Review <span class="req">*</span></label>
-            <textarea v-model="newReview.comment" rows="4" required class="form-control" placeholder="Share your experience regarding facility quality, faculty guidance, and ease of development..."></textarea>
+            <label class="form-label">{{ content.reviewsSectionUI?.fields?.reviewLabel || 'Your Review' }} <span class="req">*</span></label>
+            <textarea v-model="newReview.comment" rows="4" required class="form-control" :placeholder="content.reviewsSectionUI?.fields?.reviewPlaceholder || 'Share your experience regarding facility quality, faculty guidance, and ease of development...'"></textarea>
           </div>
         </div>
 
         <div style="margin-top: 1.25rem;">
           <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
-            <span>Post Review & Feedback</span> ⭐
+            <span>{{ content.reviewsSectionUI?.fields?.submitBtn || 'Post Review & Feedback ⭐' }}</span>
           </button>
         </div>
       </form>

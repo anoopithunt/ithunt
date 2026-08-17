@@ -4,10 +4,10 @@
     <div class="events-hero-banner">
       <div class="events-badge-pill">
         <span class="pulse-dot"></span>
-        <span>{{ content.eventsSection?.tagline || 'CAMPUS LIFE & TECH INNOVATION' }}</span>
+        <span>{{ content.eventsSectionUI?.tagline || content.eventsSection?.tagline || 'CAMPUS LIFE & TECH INNOVATION' }}</span>
       </div>
       <h1 class="events-hero-title">
-        {{ content.eventsSection?.titlePrefix || 'Flagship Events, Hackathons & ' }}<span class="text-gradient">{{ content.eventsSection?.titleGradient || 'Media Gallery' }}</span>
+        {{ content.eventsSectionUI?.titlePrefix || content.eventsSection?.titlePrefix || 'Flagship Events, Hackathons & ' }}<span class="text-gradient">{{ content.eventsSectionUI?.titleGradient || content.eventsSection?.titleGradient || 'Media Gallery' }}</span>
       </h1>
       <p class="events-hero-subtitle">
         {{ content.eventsSection?.description }}
@@ -45,13 +45,13 @@
           type="text" 
           v-model="searchQuery" 
           class="events-search-input" 
-          placeholder="Search hackathons, workshops, guests..."
+          :placeholder="content.eventsSectionUI?.searchPlaceholder || 'Search hackathons, workshops, guests...'"
         >
         <button 
           v-if="searchQuery" 
           class="events-search-clear" 
           @click="searchQuery = ''" 
-          title="Clear search"
+          :title="content.ui?.clearSearch || 'Clear search'"
         >✕</button>
       </div>
     </div>
@@ -59,9 +59,15 @@
     <!-- Empty State if search/filter returns zero -->
     <div v-if="filteredEvents.length === 0" style="text-align: center; padding: 4rem 1.5rem; background: var(--bg-card-glass); border-radius: var(--radius-lg); border: 1px solid var(--border-cyber); margin-bottom: 3rem;">
       <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
-      <h3 style="font-family: var(--font-heading); font-size: 1.4rem; color: var(--text-main); margin-bottom: 0.5rem;">No Events Found Matching "{{ searchQuery }}"</h3>
-      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Try selecting a different category or clearing your search filters.</p>
-      <button class="btn-primary" @click="selectedCategory = 'all'; searchQuery = ''">Reset Filters 🔄</button>
+      <h3 style="font-family: var(--font-heading); font-size: 1.4rem; color: var(--text-main); margin-bottom: 0.5rem;">
+        {{ content.eventsSectionUI?.emptySearchTitlePrefix || 'No Events Found Matching ' }} "{{ searchQuery }}"
+      </h3>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+        {{ content.eventsSectionUI?.emptySearchSubtitle || 'Try selecting a different category or clearing your search filters.' }}
+      </p>
+      <button class="btn-primary" @click="selectedCategory = 'all'; searchQuery = ''">
+        {{ content.ui?.resetFilters || 'Reset Filters 🔄' }}
+      </button>
     </div>
 
     <!-- Event Cards Showcase Grid -->
@@ -72,10 +78,10 @@
           <img :src="ev.coverImage" :alt="ev.title" class="event-card-img" @error="onImgError">
           <span class="event-card-badge" v-if="ev.badge">{{ ev.badge }}</span>
           <span class="event-photo-count-pill">
-            <span>📸</span> {{ ev.galleryImages?.length || 1 }} Photos
+            <span>📸</span> {{ ev.galleryImages?.length || 1 }} {{ content.ui?.photosCountSuffix || 'Photos' }}
           </span>
           <div class="event-card-overlay">
-            <span class="event-card-overlay-btn">View Event Album & Details 🔍</span>
+            <span class="event-card-overlay-btn">{{ content.ui?.viewAlbumDetails || 'View Event Album & Details 🔍' }}</span>
           </div>
         </div>
 
@@ -88,7 +94,7 @@
             :alt="img.title" 
             class="event-thumb-mini"
             @click.stop="$emit('open-lightbox', { images: ev.galleryImages, index: gIdx })"
-            :title="'View: ' + img.title"
+            :title="img.title"
             @error="onImgError"
           >
         </div>
@@ -119,7 +125,7 @@
           <!-- Card Actions -->
           <div class="event-card-actions">
             <button class="event-explore-btn" @click="$emit('open-detail', ev)">
-              <span>Explore Event Story & Photos</span> 📸 →
+              <span>{{ content.ui?.exploreEventStory || 'Explore Event Story & Photos 📸 →' }}</span>
             </button>
           </div>
         </div>
@@ -129,16 +135,16 @@
     <!-- UPCOMING EVENTS & REGISTRATIONS SECTION -->
     <div class="upcoming-events-section" v-if="content.eventsSection?.upcomingEvents && content.eventsSection.upcomingEvents.length">
       <div class="section-header" style="text-align: left; margin-bottom: 2rem;">
-        <span class="section-tag">🌟 Registrations Open</span>
-        <h2 class="section-title">Upcoming <span class="text-gradient">Hackathons & Masterclasses</span></h2>
-        <p class="section-subtitle" style="text-align: left; margin: 0;">Reserve your free seat for our next campus innovation events and industry sprints.</p>
+        <span class="section-tag">{{ content.eventsSectionUI?.upcomingSection?.tagline || '🌟 Registrations Open' }}</span>
+        <h2 class="section-title">{{ content.eventsSectionUI?.upcomingSection?.titlePrefix || 'Upcoming ' }}<span class="text-gradient">{{ content.eventsSectionUI?.upcomingSection?.titleGradient || 'Hackathons & Masterclasses' }}</span></h2>
+        <p class="section-subtitle" style="text-align: left; margin: 0;">{{ content.eventsSectionUI?.upcomingSection?.subtitle }}</p>
       </div>
 
       <div class="upcoming-banner-grid">
         <div class="upcoming-event-card" v-for="upEv in content.eventsSection.upcomingEvents" :key="upEv.id">
           <div class="upcoming-header-row">
             <span class="duration-pill">{{ upEv.categoryBadge }}</span>
-            <span class="upcoming-seats-badge">🔥 {{ upEv.seatsRemaining }} Seats Left</span>
+            <span class="upcoming-seats-badge">🔥 {{ upEv.seatsRemaining }} {{ content.eventsSectionUI?.upcomingSection?.seatsSuffix || 'Seats Left' }}</span>
           </div>
 
           <h3 class="upcoming-event-title">{{ upEv.title }}</h3>
@@ -163,7 +169,7 @@
           </div>
 
           <button class="upcoming-action-btn" @click="$emit('open-rsvp', upEv)">
-            <span>RSVP / Register Free for Event</span> 🚀 →
+            <span>{{ content.eventsSectionUI?.upcomingSection?.rsvpBtnText || 'RSVP / Register Free for Event 🚀 →' }}</span>
           </button>
         </div>
       </div>

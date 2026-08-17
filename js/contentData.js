@@ -1168,11 +1168,455 @@ const CONTENT_DATA = {
   // Contact Information
   contact: {
     location: "Dahiyawa Holagarh(Near Mela Ground in Front of Kali Maa Mandir), Prayagraj (Allahabad), UP",
-    phone: " Mobile: +91 9795771806",
+    phone: "Mobile: +91 9795771806",
     rawPhone: "+91 9795771806",
     email: "Email: softtechithunt@gmail.com",
     rawEmail: "softtechithunt@gmail.com",
     districts: ["PRAYAGRAJ", "PRATAPGARH", "KAUSHAMBI", "GORAKHPUR", "LUCKNOW", "RAEBARELI", "VARANASI", "AMETHI"]
+  },
+
+  // Centralized Global UI & Modal Dictionary
+  "navbar": {
+    "applyCtaText": "Apply Internship",
+    "applyCtaIcon": "✨",
+    "lightModeTitle": "Switch to Light Mode",
+    "darkModeTitle": "Switch to Dark Mode",
+    "toggleNavAria": "Toggle Navigation"
+  },
+  "ui": {
+    "backToTop": "⬆ Back to Top",
+    "privacyPolicy": "Privacy Policy",
+    "termsConditions": "Terms & Conditions",
+    "reviewsAndRatings": "⭐ Reviews & Ratings",
+    "eventsGallery": "Events Gallery",
+    "alumniStories": "Alumni Stories",
+    "gotIt": "Got It 👍",
+    "cancel": "Cancel",
+    "resetFilters": "Reset Filters 🔄",
+    "clearSearch": "Clear search",
+    "photosCountSuffix": "Photos",
+    "viewAlbumDetails": "View Event Album & Details 🔍",
+    "exploreEventStory": "Explore Event Story & Photos 📸 →",
+    "enrollCourseBtn": "Enroll in Course →",
+    "applyCourseBtnPrefix": "Apply for",
+    "applyJobBtnPrefix": "Apply for",
+    "minExpRequiredBadge": "Min 4+ Yrs Exp",
+    "fastApplyBtn": "Fast Apply ⚡",
+    "viewDetailsSyllabusBtn": "View Details & Syllabus 🔬",
+    "startAdmissionCta": "Start Admission Application 📝 →",
+    "chatWhatsappBtn": "Chat on WhatsApp 💬",
+    "exploreInternshipsBtn": "Explore Internship Tracks 🚀",
+    "exploreEventsGalleryBtn": "Explore Events & Media Gallery 🎪 →",
+    "confirmedBadge": "✓ CONFIRMED",
+    "verifiedAlumniBadge": "✓ Verified",
+    "topCompaniesHeading": "Top Companies Hiring IT HUNT Alumni:",
+    "placementAchievementLabel": "Placement & Salary Achievement:",
+    "keyProjectBuiltLabel": "🛠️ Key Project Built:",
+    "reviewSubmitSuccessTitle": "Review Published Successfully! ⭐",
+    "eventRsvpSuccessTitle": "Free Event Pass Confirmed! 🎟️",
+    "jobApplicationSuccessTitle": "Job Application Received! 💼",
+    "admissionSuccessTitle": "Admission Registered Successfully! 🎓",
+    "generatingPdfLabel": "⏳ Generating PDF...",
+    "downloadPdfSlipBtn": "📄 Download Registration Slip (PDF)",
+    "downloadVerifiedPdfBtn": "📄 Download Verified Admission Slip (PDF)",
+    "printSlipBtn": "Print Slip 🖨️"
+  },
+  "homeSpotlights": {
+    "internshipBanner": {
+      "track3MoTitle": "3-Month Track",
+      "track3MoDesc": "Fast-track Skill Acceleration",
+      "track6MoTitle": "6-Month Track",
+      "track6MoDesc": "Complete Industry Masterclass",
+      "ctaBtn": "Apply for Internship Track →"
+    },
+    "eventsBanner": {
+      "pillBadge": "🎪 CAMPUS EVENTS & GALLERY 2026",
+      "titlePrefix": "Where Tech Innovation Meets ",
+      "titleGradient": "Celebration",
+      "desc": "Explore our 24-hour coding hackathons, applied AI workshops, annual graduation convocation ceremonies, and mega campus placement drives.",
+      "ctaBtn": "Explore Events & Media Gallery 🎪 →",
+      "box1Title": "Hackathons",
+      "box1Desc": "24-Hr Coding Sprints",
+      "box2Title": "Convocation",
+      "box2Desc": "Awards & Degrees"
+    }
+  },
+  "internshipsSectionUI": {
+    "heroPill": "2026 BATCH ENROLLMENTS OPEN • PRODUCTION-GRADE SOFTWARE INCUBATOR",
+    "trustRibbon": [
+      {
+        "icon": "🚀",
+        "text": "100% Production Codebases"
+      },
+      {
+        "icon": "👨‍💻",
+        "text": "1-on-1 Senior Tech Mentorship"
+      },
+      {
+        "icon": "📜",
+        "text": "Corporate LOR & Certificate"
+      },
+      {
+        "icon": "💼",
+        "text": "95% Placement Assistance"
+      }
+    ],
+    "filterTabs": [
+      {
+        "id": "all",
+        "label": "All Tracks"
+      },
+      {
+        "id": "3 Months",
+        "label": "⚡ 3-Month Fast-Track"
+      },
+      {
+        "id": "6 Months",
+        "label": "🚀 6-Month Masterclass"
+      }
+    ],
+    "cardLabels": {
+      "salaryRange": "💰 Salary Range",
+      "placement": "🎯 Placement",
+      "totalHours": "⏱️ Total Hours",
+      "liveProjectsPrefix": "🛠️ Live Production Projects",
+      "liveProjectsSuffix": "Apps",
+      "moreProjectsText": "+1 More Live Project",
+      "techStackLabel": "Technologies & Frameworks:"
+    },
+    "advantageSection": {
+      "tagline": "THE IT HUNT ADVANTAGE",
+      "titlePrefix": "Why Engineering Students Choose ",
+      "titleGradient": "IT HUNT",
+      "subtitle": "Real workplace culture, corporate Git repositories, and direct industry hiring connections."
+    },
+    "roadmapSection": {
+      "tagline": "STRUCTURED LEARNING TIMELINE",
+      "titlePrefix": "Your 4-Phase ",
+      "titleGradient": "Career Launchpad",
+      "subtitle": "A proven step-by-step roadmap from fundamental coding to enterprise production and placement."
+    },
+    "bottomCta": {
+      "badgePill": "LIMITED SEATS AVAILABLE PER BATCH",
+      "headlinePrefix": "Ready to Transform from a Student to a ",
+      "headlineGradient": "Production Engineer?",
+      "subtext": "Book a free 1-on-1 counseling session with Director Mr. Lakshman Singh Chauhan, tour our Holagarh high-tech labs, and test drive our live workstation setups."
+    }
+  },
+  "eventsSectionUI": {
+    "tagline": "CAMPUS LIFE & TECH INNOVATION",
+    "titlePrefix": "Flagship Events, Hackathons & ",
+    "titleGradient": "Media Gallery",
+    "searchPlaceholder": "Search hackathons, workshops, guests...",
+    "emptySearchTitlePrefix": "No Events Found Matching ",
+    "emptySearchSubtitle": "Try selecting a different category or clearing your search filters.",
+    "upcomingSection": {
+      "tagline": "🌟 Registrations Open",
+      "titlePrefix": "Upcoming ",
+      "titleGradient": "Hackathons & Masterclasses",
+      "subtitle": "Reserve your free seat for our next campus innovation events and industry sprints.",
+      "seatsSuffix": "Seats Left",
+      "rsvpBtnText": "RSVP / Register Free for Event 🚀 →"
+    }
+  },
+  "testimonialsSectionUI": {
+    "heroPill": "PROVEN TRACK RECORD • 500+ SUCCESSFUL ALUMNI WORLDWIDE",
+    "filterTabs": [
+      {
+        "id": "all",
+        "label": "All Alumni Stories"
+      },
+      {
+        "id": "mern",
+        "label": "⚛️ MERN Full Stack"
+      },
+      {
+        "id": "ios",
+        "label": "🍎 iOS Swift"
+      },
+      {
+        "id": "android",
+        "label": "🤖 Android Kotlin"
+      },
+      {
+        "id": "ai",
+        "label": "🐍 Python & AI"
+      },
+      {
+        "id": "diploma",
+        "label": "📜 NIELIT Diplomas"
+      }
+    ],
+    "bottomCta": {
+      "badgePill": "NEXT BATCH ADMISSIONS OPEN",
+      "headlinePrefix": "Want to Be Our Next ",
+      "headlineGradient": "Alumni Success Story?",
+      "subtext": "Join our hands-on 3-Month or 6-Month IT Internship incubation in Prayagraj. Learn direct from senior MCA tech architects and build portfolio-worthy enterprise code."
+    }
+  },
+  "reviewsSectionUI": {
+    "metricsHeading": "Facility & Development Evaluation Metrics",
+    "formTitle": "Submit Your Review & Feedback",
+    "formSubtitle": "Help us improve institute infrastructure, labs, and ease of technical development.",
+    "fields": {
+      "nameLabel": "Your Name",
+      "namePlaceholder": "Full name",
+      "roleLabel": "Course / Program Attended",
+      "rolePlaceholder": "e.g. MERN Stack Intern / O Level Student",
+      "ratingLabel": "Overall Rating",
+      "categoryLabel": "Evaluation Category",
+      "reviewLabel": "Your Review",
+      "reviewPlaceholder": "Share your experience regarding facility quality, faculty guidance, and ease of development...",
+      "submitBtn": "Post Review & Feedback ⭐"
+    },
+    "ratingOptions": [
+      {
+        "value": 5,
+        "label": "⭐⭐⭐⭐⭐ 5 Stars (Excellent)"
+      },
+      {
+        "value": 4,
+        "label": "⭐⭐⭐⭐ 4 Stars (Very Good)"
+      },
+      {
+        "value": 3,
+        "label": "⭐⭐⭐ 3 Stars (Average)"
+      }
+    ],
+    "categoryOptions": [
+      "Labs & Workstations",
+      "Teaching & Mentorship",
+      "Placement & LOR",
+      "Course Curriculum"
+    ]
+  },
+  "admissionSection": {
+    "sectionTag": "Online Registration 2026",
+    "titlePrefix": "Candidate ",
+    "titleGradient": "Admission Application",
+    "formTitle": "Student Registration Details",
+    "formSubtitle": "Please enter accurate candidate information as per official records.",
+    "fields": {
+      "candidateName": "Candidate Name",
+      "candidateNamePlaceholder": "Full candidate name",
+      "fatherName": "Father's Name",
+      "fatherNamePlaceholder": "Father's full name",
+      "motherName": "Mother's Name",
+      "motherNamePlaceholder": "Mother's full name",
+      "dob": "Date of Birth",
+      "gender": "Gender",
+      "genderOptions": [
+        "Male",
+        "Female",
+        "Other"
+      ],
+      "course": "Target Program",
+      "mobile": "Mobile Number",
+      "mobilePlaceholder": "10-digit mobile",
+      "email": "Email Address",
+      "emailPlaceholder": "name@example.com",
+      "address": "Permanent Address",
+      "addressPlaceholder": "Full residential street address",
+      "submitBtn": "Submit Registration 🚀"
+    },
+    "courseOptgroups": [
+      {
+        "label": "🚀 IT Solution & Production Internships (3 / 6 Months)",
+        "options": [
+          "Web Development (MERN Stack & Cloud Architecture)",
+          "iOS Native App Development (Swift & SwiftUI)",
+          "Android Native App Development (Kotlin & Jetpack Compose)",
+          "Digital Marketing, SEO & Growth Hacking"
+        ]
+      },
+      {
+        "label": "📚 Accredited Diplomas & University Degrees",
+        "options": [
+          "NIELIT \"O\" Level Diploma",
+          "NIELIT \"A\" Level Diploma",
+          "Subharti University Degree Courses (BCA / MCA)",
+          "Tally ERP 9 & GST"
+        ]
+      }
+    ],
+    "previewCard": {
+      "stamp": "🏛️ OFFICIAL ADMISSION PREVIEW",
+      "title": "IT HUNT ACADEMY 2026",
+      "location": "Dahiyawa Holagarh, Prayagraj, UP - 212502",
+      "copyBadge": "📜 OFFICIAL CANDIDATE COPY",
+      "accreditedBadge": "✓ ISO 9001:2015 ACCREDITED",
+      "candidateNameLabel": "Candidate Name:",
+      "fatherNameLabel": "Father's Name:",
+      "programLabel": "Program Selected:",
+      "genderDobLabel": "Gender / DOB:",
+      "mobileLabel": "Contact Mobile:",
+      "districtLabel": "District & State:",
+      "typingPlaceholder": "— (Typing...)",
+      "securityNote": "Auto-generates official verified admission registration ID upon submission",
+      "signatoryTitle": "Authorized Signatory:",
+      "signatoryName": "Director Mr. Lakshman Singh Chauhan"
+    }
+  },
+  "modalTexts": {
+    "courseDetail": {
+      "subheading": "IT Solutions & Production Internship Track 2026 • Live Project Lab",
+      "earningTag": "Earning Potential",
+      "fresherLabel": "Fresher Salary:",
+      "experiencedLabel": "Experienced (2-3+ Yrs):",
+      "freelanceLabel": "Freelance / Remote:",
+      "marketOverviewLabel": "Current Market Scenario:",
+      "successRateTag": "Job Success Rate",
+      "placementSuffix": "% Placement",
+      "hoursTag": "Learning Hours",
+      "weeklyHoursLabel": "Weekly Commitment:",
+      "liveLabHoursLabel": "Live Lab Coding:",
+      "scheduleLabel": "Schedule:",
+      "targetRolesTag": "Target Job Roles",
+      "techScopeHeading": "Details About Technology & Industry Scope",
+      "techLearnedHeading": "Technologies & Tools You Will Learn",
+      "liveProjectsHeading": "Real-World Production Projects You Will Build",
+      "projectBadgePrefix": "Project 0",
+      "curriculumHeading": "Structured Curriculum Milestones",
+      "guaranteeTitle": "Verified Internship Certification + Corporate Letter of Recommendation (LOR)",
+      "guaranteeDesc": "Includes 100% placement assistance, resume masterclass, mock technical interviews, and GitHub production code portfolio review.",
+      "backBtn": "Back to Tracks",
+      "proceedBtn": "Proceed to Registration 📝 →"
+    },
+    "eventDetail": {
+      "venueLabel": "Venue:",
+      "fullscreenHint": "🔍 Click to View Fullscreen",
+      "metrics": {
+        "teams": "Participation",
+        "prizePool": "Prizes & Perks",
+        "projectsBuilt": "Deliverables",
+        "hoursOfCoding": "Format / Sprint"
+      },
+      "storyHeading": "Event Overview & Campus Story",
+      "scheduleHeading": "Official Event Schedule & Milestones",
+      "dignitariesHeading": "Chief Mentors & Dignitaries Lineup",
+      "outcomesHeading": "Key Outcomes & Milestones",
+      "podiumHeading": "🥇 Honors & Winners Podium:",
+      "backBtn": "Back to All Events",
+      "applyBtn": "Apply for IT HUNT Academy 2026 🚀 →"
+    },
+    "lightbox": {
+      "counterPrefix": "📸 Photo",
+      "counterOf": "of",
+      "closeTooltip": "Close Lightbox (Esc)",
+      "prevTooltip": "Previous Image (Left Arrow)",
+      "nextTooltip": "Next Image (Right Arrow)"
+    },
+    "eventRsvp": {
+      "passBadge": "FREE EVENT PASS 2026",
+      "headingPrefix": "Register for",
+      "nameLabel": "Full Name",
+      "namePlaceholder": "Candidate full name",
+      "phoneLabel": "Mobile Number",
+      "phonePlaceholder": "10-digit mobile",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "name@example.com",
+      "collegeLabel": "College / Organization",
+      "collegePlaceholder": "e.g. Allahabad University / Shambhunath / BBS / UIET",
+      "domainLabel": "Primary Interest / Domain",
+      "domainOptions": [
+        "Full-Stack Web (MERN Stack)",
+        "Generative AI & Python",
+        "Mobile App (iOS / Android)",
+        "Cybersecurity & Ethical Hacking",
+        "Other / General Tech Innovation"
+      ],
+      "cancelBtn": "Cancel",
+      "submitBtn": "Confirm Free Registration 🎟️"
+    },
+    "jobApplication": {
+      "headingPrefix": "Apply for",
+      "expWarning": "⚠️ Requirement: Minimum 4+ Years Experience Required",
+      "nameLabel": "Full Name",
+      "namePlaceholder": "Your full legal name",
+      "expLabel": "Total Exp",
+      "expOptions": [
+        {
+          "value": "4 Years",
+          "label": "4 Years Experience"
+        },
+        {
+          "value": "5 Years",
+          "label": "5 Years Experience"
+        },
+        {
+          "value": "6-8 Years",
+          "label": "6 - 8 Years Experience"
+        },
+        {
+          "value": "8+ Years",
+          "label": "8+ Years Experience"
+        }
+      ],
+      "phoneLabel": "Mobile",
+      "phonePlaceholder": "10-digit mobile",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "name@example.com",
+      "portfolioLabel": "Portfolio / LinkedIn Link",
+      "portfolioPlaceholder": "https://linkedin.com/in/username",
+      "cancelBtn": "Cancel",
+      "submitBtn": "Submit Job Application 💼"
+    },
+    "confirmation": {
+      "defaultTitle": "Application Submitted Successfully! 🎉",
+      "referencePrefix": "Reference ID:",
+      "receiptHeading": "📄 Official Admission Receipt",
+      "confirmedBadge": "✓ CONFIRMED",
+      "candidateNameLabel": "Candidate Name",
+      "registrationIdLabel": "Registration ID",
+      "fatherNameLabel": "Father's Name",
+      "mobileLabel": "Mobile Number",
+      "courseLabel": "Enrolled Program / Track",
+      "downloadPdfBtn": "📄 Download Registration Slip (PDF)",
+      "generatingPdfBtn": "⏳ Generating PDF...",
+      "printBtn": "Print Slip 🖨️",
+      "gotItBtn": "Got It 👍"
+    }
+  },
+  "printableSlip": {
+    "instituteName": "IT HUNT",
+    "instituteTagline": "Software Solutions & Tech Academy • Estd. 2012",
+    "instituteAddress": "Dahiyawa Holagarh, Prayagraj, UP - 212502",
+    "institutePhone": "+91 9795771806",
+    "instituteEmail": "softtechithunt@gmail.com",
+    "accreditationText": "ISO 9001:2015 Accredited",
+    "sealBadge": "OFFICIAL RECEIPT",
+    "sealSub": "ORIGINAL COPY",
+    "titleBar": "Admission & Internship Registration Acknowledgment",
+    "statusBadge": "STATUS: CONFIRMED",
+    "sessionText": "2026 - 2027",
+    "regNoLabel": "Official Registration No.",
+    "regDateLabel": "Registration Date",
+    "sessionLabel": "Academic Session",
+    "candidateTitle": "Candidate Particulars",
+    "programTitle": "Program & Training Allocation",
+    "campusValue": "IT HUNT Software Studio, Holagarh Campus",
+    "workstationValue": "Dedicated PC + High-Speed Fiber",
+    "certificationValue": "ISO 9001:2015 + Corporate LOR",
+    "reportingValue": "09:30 AM Onboarding",
+    "admittedStatusValue": "PROVISIONALLY ADMITTED",
+    "guidelinesTitle": "⚠️ Mandatory Candidate Instructions for Day 1:",
+    "guidelines": [
+      "Please present a printed or digital copy of this Registration Slip at the campus helpdesk.",
+      "Carry 2 recent passport-size color photographs and 1 government photo ID proof (Aadhaar / Voter ID).",
+      "Reporting time is 09:30 AM at IT HUNT Holagarh Campus for batch orientation and workstation allotment.",
+      "Access to corporate GitHub repositories, Discord community, and live project keys will be issued on Day 1."
+    ],
+    "securityNote": "System Generated Official Document",
+    "securitySub": "Verified via IT HUNT Central Academic Database",
+    "signatoryTitle": "Authorized Signatory",
+    "signatoryName": "Mr. Lakshman Singh Chauhan",
+    "signatoryDesignation": "Director & Founder, IT HUNT | MCA"
+  },
+  "footerSections": {
+    "quickLinksTitle": "Quick Links",
+    "internshipsTitle": "Internship Ventures",
+    "contactTitle": "Contact & Location",
+    "reviewRatingBadge": "⭐ Student Reviews & Ratings (4.9 / 5.0) →"
   },
 
   // Footer Text
@@ -1189,3 +1633,6 @@ if (typeof window !== 'undefined') {
     window.applyEnvToContent();
   }
 }
+
+export { CONTENT_DATA };
+export default CONTENT_DATA;

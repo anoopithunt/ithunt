@@ -1,13 +1,13 @@
 <template>
   <section class="container" style="padding: 4rem 1.5rem;">
     <div class="section-header">
-      <span class="section-tag">{{ content.coursesSection.tagline }}</span>
-      <h2 class="section-title">{{ content.coursesSection.titlePrefix }}<span class="text-gradient">{{ content.coursesSection.titleGradient }}</span></h2>
-      <p class="section-subtitle">{{ content.coursesSection.description }}</p>
+      <span class="section-tag">{{ content.coursesSection?.tagline }}</span>
+      <h2 class="section-title">{{ content.coursesSection?.titlePrefix }}<span class="text-gradient">{{ content.coursesSection?.titleGradient }}</span></h2>
+      <p class="section-subtitle">{{ content.coursesSection?.description }}</p>
     </div>
 
     <div class="courses-grid">
-      <div class="course-card" v-for="course in content.coursesSection.coursesList" :key="course.id">
+      <div class="course-card" v-for="course in content.coursesSection?.coursesList" :key="course.id">
         <div class="course-img-wrapper">
           <img :src="course.image" :alt="course.title" class="course-img" @error="onImgError">
           <span class="course-category-badge">{{ course.categoryName }}</span>
@@ -20,7 +20,7 @@
             <div class="course-meta-item">📜 {{ course.certification }}</div>
           </div>
           <button class="course-action-btn" @click="$emit('apply-course', course.title)">
-            <span>Apply for {{ course.code }}</span> →
+            <span>{{ content.ui?.applyCourseBtnPrefix || 'Apply for' }} {{ course.code }}</span> →
           </button>
         </div>
       </div>

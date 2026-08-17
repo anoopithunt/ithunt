@@ -4,25 +4,25 @@
       <!-- Brand Column -->
       <div class="footer-col">
         <div class="brand-logo" style="margin-bottom: 1rem;">
-          <img :src="content.brand.logoImage" :alt="content.brand.name + ' Logo'" class="brand-logo-img" @error="onImgError">
+          <img :src="content.brand?.logoImage" :alt="(content.brand?.name || 'IT HUNT') + ' Logo'" class="brand-logo-img" @error="onImgError">
           <div>
-            <div class="brand-title" style="color: #ffffff;">IT <span class="text-gradient">{{ content.brand.nameHighlight }}</span></div>
-            <div class="brand-tagline" style="color: #ffffff; opacity: 0.85;">{{ content.brand.tagline }}</div>
+            <div class="brand-title" style="color: #ffffff;">IT <span class="text-gradient">{{ content.brand?.nameHighlight }}</span></div>
+            <div class="brand-tagline" style="color: #ffffff; opacity: 0.85;">{{ content.brand?.tagline }}</div>
           </div>
         </div>
         <p style="font-size: 0.875rem; line-height: 1.7; color: #ffffff;">
-          {{ content.footer.aboutText }}
+          {{ content.footer?.aboutText }}
         </p>
         <div style="margin-top: 1.15rem;">
           <a href="#" @click.prevent="$emit('set-tab', 'reviews')" class="skill-tag" style="background: rgba(250, 204, 21, 0.15); color: var(--color-ai-yellow); border-color: rgba(250, 204, 21, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.9rem; font-weight: 800; font-size: 0.825rem; border-radius: var(--radius-full);">
-            ⭐ Student Reviews & Ratings (4.9 / 5.0) →
+            {{ content.footerSections?.reviewRatingBadge || '⭐ Student Reviews & Ratings (4.9 / 5.0) →' }}
           </a>
         </div>
       </div>
 
       <!-- Quick Links -->
       <div class="footer-col">
-        <h4>Quick Links</h4>
+        <h4>{{ content.footerSections?.quickLinksTitle || 'Quick Links' }}</h4>
         <ul class="footer-links">
           <li><a href="#" @click.prevent="$emit('set-tab', 'home')">Home Overview</a></li>
           <li><a href="#" @click.prevent="$emit('set-tab', 'internships')">IT Internships (3/6 Mo)</a></li>
@@ -36,9 +36,9 @@
 
       <!-- Internship Tracks -->
       <div class="footer-col">
-        <h4>Internship Ventures</h4>
+        <h4>{{ content.footerSections?.internshipsTitle || 'Internship Ventures' }}</h4>
         <ul class="footer-links">
-          <li v-for="tr in content.internshipVenture.tracks" :key="'foot-' + tr.id">
+          <li v-for="tr in content.internshipVenture?.tracks" :key="'foot-' + tr.id">
             <a href="#" @click.prevent="$emit('set-tab', 'internships')">{{ tr.shortName }} Track</a>
           </li>
         </ul>
@@ -46,23 +46,23 @@
 
       <!-- Contact & Location -->
       <div class="footer-col">
-        <h4>Contact & Location</h4>
-        <p style="font-size: 0.875rem; margin-bottom: 0.4rem; color: #ffffff;">📍 {{ content.contact.location }}</p>
-        <p style="font-size: 0.875rem; margin-bottom: 0.4rem; color: #ffffff;">📞 {{ content.contact.phone }}</p>
-        <p style="font-size: 0.875rem; margin-bottom: 1rem; color: #ffffff;">✉️ {{ content.contact.email }}</p>
+        <h4>{{ content.footerSections?.contactTitle || 'Contact & Location' }}</h4>
+        <p style="font-size: 0.875rem; margin-bottom: 0.4rem; color: #ffffff;">📍 {{ content.contact?.location }}</p>
+        <p style="font-size: 0.875rem; margin-bottom: 0.4rem; color: #ffffff;">📞 {{ content.contact?.phone }}</p>
+        <p style="font-size: 0.875rem; margin-bottom: 1rem; color: #ffffff;">✉️ {{ content.contact?.email }}</p>
       </div>
     </div>
 
     <!-- Footer Bottom Bar -->
     <div class="container footer-bottom">
-      <div style="color: #ffffff;">{{ content.footer.copyrightText }}</div>
+      <div style="color: #ffffff;">{{ content.footer?.copyrightText }}</div>
       <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
-        <a href="#" @click.prevent="$emit('set-tab', 'reviews')">⭐ Reviews & Ratings</a>
-        <a href="#" @click.prevent="$emit('set-tab', 'events')">Events Gallery</a>
-        <a href="#" @click.prevent="$emit('set-tab', 'testimonials')">Alumni Stories</a>
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms & Conditions</a>
-        <a href="#" @click.prevent="scrollToTop">⬆ Back to Top</a>
+        <a href="#" @click.prevent="$emit('set-tab', 'reviews')">{{ content.ui?.reviewsAndRatings || '⭐ Reviews & Ratings' }}</a>
+        <a href="#" @click.prevent="$emit('set-tab', 'events')">{{ content.ui?.eventsGallery || 'Events Gallery' }}</a>
+        <a href="#" @click.prevent="$emit('set-tab', 'testimonials')">{{ content.ui?.alumniStories || 'Alumni Stories' }}</a>
+        <a href="#">{{ content.ui?.privacyPolicy || 'Privacy Policy' }}</a>
+        <a href="#">{{ content.ui?.termsConditions || 'Terms & Conditions' }}</a>
+        <a href="#" @click.prevent="scrollToTop">{{ content.ui?.backToTop || '⬆ Back to Top' }}</a>
       </div>
     </div>
   </footer>

@@ -71,10 +71,11 @@
       />
     </main>
 
-    <!-- Modals -->
+    <!-- Modals with Dynamic Content Injection -->
     <CourseDetailModal 
       :isOpen="showDetailModal" 
       :track="selectedTrack" 
+      :content="content"
       @close="closeCourseDetailModal" 
       @proceed-register="proceedToRegistration" 
     />
@@ -82,6 +83,7 @@
     <EventDetailModal 
       :isOpen="showEventDetailModal" 
       :event="selectedEvent" 
+      :content="content"
       @close="closeEventDetailModal" 
       @open-lightbox="openLightbox" 
       @apply="closeEventDetailModal(); setTab('admission');" 
@@ -91,6 +93,7 @@
       :isOpen="showFullscreenLightbox" 
       :images="lightboxImages" 
       :currentIndex="lightboxImageIndex" 
+      :content="content"
       @close="showFullscreenLightbox = false" 
       @update:currentIndex="lightboxImageIndex = $event" 
     />
@@ -98,6 +101,7 @@
     <EventRsvpModal 
       :isOpen="showRsvpModal" 
       :event="selectedUpcomingEvent" 
+      :content="content"
       @close="showRsvpModal = false" 
       @submit-rsvp="submitEventRsvp" 
     />
@@ -105,6 +109,7 @@
     <JobApplicationModal 
       :isOpen="showJobModal" 
       :job="selectedJob" 
+      :content="content"
       @close="showJobModal = false" 
       @submit-job="submitJobApplication" 
     />
@@ -116,6 +121,7 @@
       :referenceId="submittedRegistrationNo" 
       :admission="lastSubmittedAdmission" 
       :isGeneratingPdf="isGeneratingPdf" 
+      :content="content"
       @close="showModal = false" 
       @download-pdf="downloadAdmissionPdf" 
       @print-slip="printAdmissionSlip" 
@@ -125,52 +131,52 @@
     <div id="printable-admission-slip" v-if="lastSubmittedAdmission">
       <div class="pdf-slip-header">
         <div class="pdf-header-brand">
-          <img :src="content.brand.logoImage" alt="IT HUNT Logo" class="pdf-logo-img">
+          <img :src="content.brand?.logoImage" :alt="(content.brand?.name || 'IT HUNT') + ' Logo'" class="pdf-logo-img">
           <div>
-            <div class="pdf-institute-name">IT HUNT</div>
-            <div class="pdf-institute-tagline">Software Solutions & Tech Academy • Estd. 2012</div>
+            <div class="pdf-institute-name">{{ content.printableSlip?.instituteName || content.brand?.name || 'IT HUNT' }}</div>
+            <div class="pdf-institute-tagline">{{ content.printableSlip?.instituteTagline || content.brand?.tagline }}</div>
             <div class="pdf-institute-contact">
-              Dahiyawa Holagarh, Prayagraj, UP - 212503<br>
-              Mobile: +91 9795771806 | ✉️ softtechithunt@gmail.com | 🌐 ISO 9001:2015 Accredited
+              {{ content.printableSlip?.instituteAddress || content.contact?.location }}<br>
+              Mobile: {{ content.printableSlip?.institutePhone || content.contact?.rawPhone }} | ✉️ {{ content.printableSlip?.instituteEmail || content.contact?.rawEmail }} | 🌐 {{ content.printableSlip?.accreditationText || 'ISO 9001:2015 Accredited' }}
             </div>
           </div>
         </div>
         <div class="pdf-header-seal">
-          <span class="pdf-seal-badge">OFFICIAL RECEIPT</span>
-          <div style="font-size: 10px; color: #64748b; margin-top: 4px; font-weight: 700;">ORIGINAL COPY</div>
+          <span class="pdf-seal-badge">{{ content.printableSlip?.sealBadge || 'OFFICIAL RECEIPT' }}</span>
+          <div style="font-size: 10px; color: #64748b; margin-top: 4px; font-weight: 700;">{{ content.printableSlip?.sealSub || 'ORIGINAL COPY' }}</div>
         </div>
       </div>
 
       <div class="pdf-slip-title-bar">
-        <span class="pdf-slip-title">Admission & Internship Registration Acknowledgment</span>
-        <span class="pdf-slip-status">STATUS: CONFIRMED</span>
+        <span class="pdf-slip-title">{{ content.printableSlip?.titleBar || 'Admission & Internship Registration Acknowledgment' }}</span>
+        <span class="pdf-slip-status">{{ content.printableSlip?.statusBadge || 'STATUS: CONFIRMED' }}</span>
       </div>
 
       <div class="pdf-reg-highlight-row">
         <div class="pdf-highlight-item">
-          <span class="pdf-highlight-lbl">Official Registration No.</span>
+          <span class="pdf-highlight-lbl">{{ content.printableSlip?.regNoLabel || 'Official Registration No.' }}</span>
           <span class="pdf-highlight-val" style="color: #ea580c;">{{ lastSubmittedAdmission.registrationNo }}</span>
         </div>
         <div class="pdf-highlight-item">
-          <span class="pdf-highlight-lbl">Registration Date</span>
+          <span class="pdf-highlight-lbl">{{ content.printableSlip?.regDateLabel || 'Registration Date' }}</span>
           <span class="pdf-highlight-val">{{ lastSubmittedAdmission.date }}</span>
         </div>
         <div class="pdf-highlight-item">
-          <span class="pdf-highlight-lbl">Academic Session</span>
-          <span class="pdf-highlight-val">2026 - 2027</span>
+          <span class="pdf-highlight-lbl">{{ content.printableSlip?.sessionLabel || 'Academic Session' }}</span>
+          <span class="pdf-highlight-val">{{ content.printableSlip?.sessionText || '2026 - 2027' }}</span>
         </div>
       </div>
 
       <div class="pdf-two-col-grid">
         <div class="pdf-col-card">
-          <div class="pdf-section-title"><span>👤</span> Candidate Particulars</div>
+          <div class="pdf-section-title"><span>👤</span> {{ content.printableSlip?.candidateTitle || 'Candidate Particulars' }}</div>
           <div class="pdf-info-list">
             <div class="pdf-info-row">
-              <span class="pdf-info-lbl">Full Name:</span>
+              <span class="pdf-info-lbl">{{ content.admissionSection?.previewCard?.candidateNameLabel || 'Full Name:' }}</span>
               <span class="pdf-info-val highlight">{{ lastSubmittedAdmission.candidateName }}</span>
             </div>
             <div class="pdf-info-row">
-              <span class="pdf-info-lbl">Father's Name:</span>
+              <span class="pdf-info-lbl">{{ content.admissionSection?.previewCard?.fatherNameLabel || "Father's Name:" }}</span>
               <span class="pdf-info-val">{{ lastSubmittedAdmission.fatherName }}</span>
             </div>
             <div class="pdf-info-row">
@@ -197,7 +203,7 @@
         </div>
 
         <div class="pdf-col-card">
-          <div class="pdf-section-title"><span>📚</span> Program & Training Allocation</div>
+          <div class="pdf-section-title"><span>📚</span> {{ content.printableSlip?.programTitle || 'Program & Training Allocation' }}</div>
           <div class="pdf-info-list">
             <div class="pdf-info-row">
               <span class="pdf-info-lbl">Enrolled Track:</span>
@@ -205,52 +211,51 @@
             </div>
             <div class="pdf-info-row">
               <span class="pdf-info-lbl">Campus / Center:</span>
-              <span class="pdf-info-val">IT HUNT Software Studio, Holagarh Campus</span>
+              <span class="pdf-info-val">{{ content.printableSlip?.campusValue || 'IT HUNT Software Studio, Holagarh Campus' }}</span>
             </div>
             <div class="pdf-info-row">
               <span class="pdf-info-lbl">Workstation:</span>
-              <span class="pdf-info-val">Dedicated PC + High-Speed Fiber</span>
+              <span class="pdf-info-val">{{ content.printableSlip?.workstationValue || 'Dedicated PC + High-Speed Fiber' }}</span>
             </div>
             <div class="pdf-info-row">
               <span class="pdf-info-lbl">Certification:</span>
-              <span class="pdf-info-val">ISO 9001:2015 + Corporate LOR</span>
+              <span class="pdf-info-val">{{ content.printableSlip?.certificationValue || 'ISO 9001:2015 + Corporate LOR' }}</span>
             </div>
             <div class="pdf-info-row">
               <span class="pdf-info-lbl">Session:</span>
-              <span class="pdf-info-val">Academic Batch 2026 - 2027</span>
+              <span class="pdf-info-val">Academic Batch {{ content.printableSlip?.sessionText || '2026 - 2027' }}</span>
             </div>
             <div class="pdf-info-row">
               <span class="pdf-info-lbl">Reporting:</span>
-              <span class="pdf-info-val">09:30 AM Onboarding</span>
+              <span class="pdf-info-val">{{ content.printableSlip?.reportingValue || '09:30 AM Onboarding' }}</span>
             </div>
             <div class="pdf-info-row">
               <span class="pdf-info-lbl">Status:</span>
-              <span class="pdf-info-val" style="color: #16a34a; font-weight: 800;">PROVISIONALLY ADMITTED</span>
+              <span class="pdf-info-val" style="color: #16a34a; font-weight: 800;">{{ content.printableSlip?.admittedStatusValue || 'PROVISIONALLY ADMITTED' }}</span>
             </div>
           </div>
         </div>
       </div>
 
       <div class="pdf-guidelines-box">
-        <div class="pdf-guidelines-title">⚠️ Mandatory Candidate Instructions for Day 1:</div>
+        <div class="pdf-guidelines-title">{{ content.printableSlip?.guidelinesTitle || '⚠️ Mandatory Candidate Instructions for Day 1:' }}</div>
         <ul class="pdf-guidelines-list">
-          <li>Please present a printed or digital copy of this Registration Slip at the campus helpdesk.</li>
-          <li>Carry 2 recent passport-size color photographs and 1 government photo ID proof (Aadhaar / Voter ID).</li>
-          <li>Reporting time is 09:30 AM at IT HUNT Holagarh Campus for batch orientation and workstation allotment.</li>
-          <li>Access to corporate GitHub repositories, Discord community, and live project keys will be issued on Day 1.</li>
+          <li v-for="(guide, gIdx) in (content.printableSlip?.guidelines || [])" :key="gIdx">
+            {{ guide }}
+          </li>
         </ul>
       </div>
 
       <div class="pdf-footer-signatures">
         <div class="pdf-security-stamp">
-          <div>🛡️ <strong>System Generated Official Document</strong></div>
-          <div>Verified via IT HUNT Central Academic Database</div>
+          <div>🛡️ <strong>{{ content.printableSlip?.securityNote || 'System Generated Official Document' }}</strong></div>
+          <div>{{ content.printableSlip?.securitySub || 'Verified via IT HUNT Central Academic Database' }}</div>
           <div>Generated on: {{ lastSubmittedAdmission.date }} at {{ lastSubmittedAdmission.time }}</div>
         </div>
         <div class="pdf-sig-box">
-          <div class="pdf-sig-title">Authorized Signatory</div>
-          <div class="pdf-sig-name">Mr. Lakshman Singh Chauhan</div>
-          <div class="pdf-sig-designation">Director & Founder, IT HUNT | MCA</div>
+          <div class="pdf-sig-title">{{ content.printableSlip?.signatoryTitle || 'Authorized Signatory' }}</div>
+          <div class="pdf-sig-name">{{ content.printableSlip?.signatoryName || content.director?.name || 'Mr. Lakshman Singh Chauhan' }}</div>
+          <div class="pdf-sig-designation">{{ content.printableSlip?.signatoryDesignation || 'Director & Founder, IT HUNT | MCA' }}</div>
         </div>
       </div>
     </div>
@@ -380,7 +385,7 @@ const openRsvpModal = (upEv) => {
 const submitEventRsvp = (rsvpData) => {
   showRsvpModal.value = false;
   submittedRegistrationNo.value = 'EVT-' + Math.floor(100000 + Math.random() * 900000);
-  modalTitle.value = 'Free Event Pass Confirmed! 🎟️';
+  modalTitle.value = content.value?.ui?.eventRsvpSuccessTitle || 'Free Event Pass Confirmed! 🎟️';
   modalBody.value = `Congratulations ${rsvpData.name}! Your free VIP entry pass for "${rsvpData.eventTitle}" has been booked. A confirmation SMS will be sent to +91 ${rsvpData.phone}.`;
   showModal.value = true;
 };
@@ -393,14 +398,14 @@ const openJobModal = (job) => {
 const submitJobApplication = (jobData) => {
   showJobModal.value = false;
   submittedRegistrationNo.value = 'JOB-' + Math.floor(100000 + Math.random() * 900000);
-  modalTitle.value = 'Job Application Received! 💼';
+  modalTitle.value = content.value?.ui?.jobApplicationSuccessTitle || 'Job Application Received! 💼';
   modalBody.value = `Thank you ${jobData.name}! Your application for "${jobData.jobTitle}" has been forwarded to our HR & Academic Board.`;
   showModal.value = true;
 };
 
 const handleReviewSubmitted = (review) => {
   submittedRegistrationNo.value = '';
-  modalTitle.value = 'Review Published Successfully! ⭐';
+  modalTitle.value = content.value?.ui?.reviewSubmitSuccessTitle || 'Review Published Successfully! ⭐';
   modalBody.value = `Thank you ${review.name} for rating IT HUNT ${review.rating} Stars! Your review is now live on our student ratings scorecard.`;
   showModal.value = true;
 };
@@ -428,7 +433,7 @@ const submitAdmission = (formData) => {
     address: formData.address
   };
 
-  modalTitle.value = 'Admission Registered Successfully! 🎓';
+  modalTitle.value = content.value?.ui?.admissionSuccessTitle || 'Admission Registered Successfully! 🎓';
   modalBody.value = `Congratulations ${formData.candidateName}! Your admission/internship application for "${formData.course}" has been confirmed. You can now download your official verified Admission Registration Slip in PDF format.`;
   showModal.value = true;
 };
