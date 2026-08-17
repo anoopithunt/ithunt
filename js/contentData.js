@@ -1175,6 +1175,72 @@ const CONTENT_DATA = {
     districts: ["PRAYAGRAJ", "PRATAPGARH", "KAUSHAMBI", "GORAKHPUR", "LUCKNOW", "RAEBARELI", "VARANASI", "AMETHI"]
   },
 
+  // Legal Documents (Privacy Policy & Terms)
+  "privacyPolicyData": {
+    "docTitle": "OFFICIAL PRIVACY & DATA PROTECTION POLICY",
+    "docSubtitle": "Candidate, Intern & Enterprise Client Information Governance",
+    "effectiveDate": "January 01, 2026",
+    "referenceCode": "ITH-POL-2026/01",
+    "sections": [
+      {
+        "title": "1. Information We Collect",
+        "content": "IT HUNT collects essential candidate details including legal name, contact numbers, email addresses, permanent address, educational credentials, and portfolio links submitted during online registration or on-campus admissions."
+      },
+      {
+        "title": "2. Purpose & Use of Collected Data",
+        "content": "Data is strictly utilized for academic enrollment, lab workstation allotment, generating ISO 9001:2015 verified certificates, publishing corporate recommendation letters (LOR), and facilitating direct placement drives with partner software firms."
+      },
+      {
+        "title": "3. Live Client Software & Non-Disclosure (NDA)",
+        "content": "Interns working on live client web, mobile, and AI solutions are bound by confidentiality. Source code repositories, client API keys, and database schemas remain the exclusive intellectual property of IT HUNT and client stakeholders."
+      },
+      {
+        "title": "4. Data Security & Storage Architecture",
+        "content": "We enforce enterprise-grade security protocols including encrypted data storage, restricted staff authorization, secure SSL communications, and automated backups. We do not sell, rent, or trade student records with third-party telemarketers."
+      },
+      {
+        "title": "5. Student Rights & Verification Access",
+        "content": "Enrolled students and alumni have the right to request official academic transcripts, update contact records, or request verification reports for employer background screening at any time."
+      },
+      {
+        "title": "6. Policy Inquiries & Data Officer",
+        "content": "For questions regarding this privacy policy or data corrections, contact the IT HUNT Administrative Desk at Dahiyawa Holagarh, Prayagraj, UP - 212502 or via email at softtechithunt@gmail.com."
+      }
+    ]
+  },
+  "termsConditionsData": {
+    "docTitle": "TERMS OF ADMISSION & ACADEMIC REGULATIONS",
+    "docSubtitle": "Production Internship & Accredited Computer Education Code",
+    "effectiveDate": "Academic Session 2026 - 2027",
+    "referenceCode": "ITH-TOC-2026/02",
+    "sections": [
+      {
+        "title": "1. Admission Eligibility & Candidate Representation",
+        "content": "Admission to IT HUNT production internships and NIELIT diploma tracks requires valid educational documentation. The candidate certifies that all submitted records are authentic and truthful."
+      },
+      {
+        "title": "2. Lab Workstations & Infrastructure Guidelines",
+        "content": "Students are allotted dedicated workstations and high-speed fiber internet. Unauthorized system modifications, software piracy, or hardware damage will result in immediate disciplinary review."
+      },
+      {
+        "title": "3. Sprint Deliverables, Attendance & Code Reviews",
+        "content": "Interns must maintain a minimum of 80% lab attendance and actively complete assigned sprint tasks, Git commits, and code review milestones to qualify for course completion."
+      },
+      {
+        "title": "4. Verified Certification & Letter of Recommendation (LOR)",
+        "content": "ISO 9001:2015 accredited certificates and Corporate LOR signed by the Director are awarded upon successful presentation of production capstone projects and mentor code audits."
+      },
+      {
+        "title": "5. 100% Career Placement Support Policy",
+        "content": "Placement assistance includes resume reviews, mock interviews, and direct interview scheduling with partner software firms. Offer conversion depends on the candidate technical performance in client rounds."
+      },
+      {
+        "title": "6. Fee Policy, Transparency & Jurisdiction",
+        "content": "All training fees are transparently structured. Any disputes arising under these terms and conditions shall be subject to the exclusive jurisdiction of the competent courts in Prayagraj (Allahabad), Uttar Pradesh."
+      }
+    ]
+  },
+
   // Centralized Global UI & Modal Dictionary
   "navbar": {
     "applyCtaText": "Apply Internship",

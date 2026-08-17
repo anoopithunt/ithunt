@@ -1,7 +1,7 @@
 <template>
   <section class="testimonials-page-section">
     <!-- 1. ALUMNI HERO HEADER BANNER -->
-    <div class="alumni-hero-banner">
+    <div class="alumni-hero-banner anim-stagger-1">
       <div class="container">
         <div class="internship-live-pill">
           <span class="pulse-dot"></span>
@@ -29,7 +29,7 @@
 
     <div class="container" style="padding: 3rem 1.5rem 5rem;">
       <!-- 2. HIRING PARTNERS STRIP -->
-      <div class="alumni-partners-banner" v-if="content.testimonialsSection?.hiringPartners">
+      <div class="alumni-partners-banner anim-stagger-2" v-if="content.testimonialsSection?.hiringPartners">
         <div class="partners-label">{{ content.ui?.topCompaniesHeading || 'Top Companies Hiring IT HUNT Alumni:' }}</div>
         <div class="partners-logos-wrap">
           <span class="partner-pill" v-for="partner in content.testimonialsSection.hiringPartners" :key="partner">
@@ -39,7 +39,7 @@
       </div>
 
       <!-- 3. CATEGORY FILTER CAPSULES -->
-      <div class="internship-filter-wrap" style="margin-bottom: 2.5rem;">
+      <div class="internship-filter-wrap anim-stagger-2" style="margin-bottom: 2.5rem;">
         <div class="internship-filter-capsule">
           <button 
             v-for="tab in (content.testimonialsSectionUI?.filterTabs || [{ id: 'all', label: 'All Alumni Stories' }])"
@@ -55,7 +55,7 @@
       </div>
 
       <!-- 4. ALUMNI TESTIMONIALS CARDS GRID -->
-      <div class="alumni-cards-grid">
+      <div class="alumni-cards-grid anim-stagger-3">
         <div class="alumni-card" v-for="alumni in filteredAlumni" :key="alumni.id">
           <!-- Card Header -->
           <div class="alumni-card-top">
@@ -96,7 +96,7 @@
       </div>
 
       <!-- 5. CALL TO ACTION BOTTOM BANNER -->
-      <div class="internship-bottom-cta" style="margin-top: 5rem;">
+      <div class="internship-bottom-cta anim-stagger-4" style="margin-top: 5rem;">
         <div class="cta-glow-backdrop"></div>
         <div class="cta-content-wrap">
           <div class="cta-badge-pill">{{ content.testimonialsSectionUI?.bottomCta?.badgePill || 'NEXT BATCH ADMISSIONS OPEN' }}</div>

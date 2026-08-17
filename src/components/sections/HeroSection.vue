@@ -3,7 +3,7 @@
     <!-- Hero Section -->
     <div class="hero-section">
       <div class="container hero-grid">
-        <div class="hero-content">
+        <div class="hero-content anim-stagger-1">
           <div class="hero-badge">
             <span class="hero-badge-dot"></span>
             <span>{{ content.hero?.badgeText }}</span>
@@ -31,7 +31,7 @@
         </div>
 
         <!-- Software Code Terminal Visual -->
-        <div class="hero-media-wrapper">
+        <div class="hero-media-wrapper anim-stagger-2">
           <div class="code-terminal-card">
             <div class="code-terminal-header">
               <div class="terminal-dots">
@@ -61,7 +61,7 @@
     </div>
 
     <!-- Stats Counter Section -->
-    <div class="container stats-section">
+    <div class="container stats-section anim-stagger-2">
       <div class="stats-grid">
         <div class="stat-card" v-for="(stat, idx) in content.stats" :key="idx">
           <div class="stat-number" :class="stat.isGradientPrimary ? 'text-gradient' : 'text-gradient-secondary'">{{ stat.number }}</div>
@@ -71,7 +71,7 @@
     </div>
 
     <!-- Internship Spotlight Banner -->
-    <div class="container" style="margin-bottom: 4rem;">
+    <div class="container anim-stagger-3" style="margin-bottom: 4rem;">
       <div class="internship-banner">
         <div>
           <span class="duration-pill">{{ content.internshipVenture?.spotlightBadge }}</span>
@@ -101,7 +101,7 @@
     </div>
 
     <!-- Featured Programs Preview -->
-    <div class="container" style="padding-bottom: 4rem;">
+    <div class="container anim-stagger-3" style="padding-bottom: 4rem;">
       <div class="section-header">
         <span class="section-tag">{{ content.coursesSection?.tagline }}</span>
         <h2 class="section-title">{{ content.coursesSection?.titlePrefix }}<span class="text-gradient">{{ content.coursesSection?.titleGradient }}</span></h2>
@@ -130,7 +130,7 @@
     </div>
 
     <!-- Campus Events & Hackathons Spotlight on Home Tab -->
-    <div class="container" style="padding-bottom: 4rem;">
+    <div class="container anim-stagger-4" style="padding-bottom: 4rem;">
       <div class="internship-banner" style="background: linear-gradient(135deg, rgba(249, 115, 22, 0.18), rgba(250, 204, 21, 0.12));">
         <div>
           <span class="duration-pill">{{ content.homeSpotlights?.eventsBanner?.pillBadge || '🎪 CAMPUS EVENTS & GALLERY 2026' }}</span>

@@ -60,8 +60,8 @@
         <a href="#" @click.prevent="$emit('set-tab', 'reviews')">{{ content.ui?.reviewsAndRatings || '⭐ Reviews & Ratings' }}</a>
         <a href="#" @click.prevent="$emit('set-tab', 'events')">{{ content.ui?.eventsGallery || 'Events Gallery' }}</a>
         <a href="#" @click.prevent="$emit('set-tab', 'testimonials')">{{ content.ui?.alumniStories || 'Alumni Stories' }}</a>
-        <a href="#">{{ content.ui?.privacyPolicy || 'Privacy Policy' }}</a>
-        <a href="#">{{ content.ui?.termsConditions || 'Terms & Conditions' }}</a>
+        <a href="#" @click.prevent="$emit('open-privacy-policy')">{{ content.ui?.privacyPolicy || 'Privacy Policy' }} 📄</a>
+        <a href="#" @click.prevent="$emit('open-terms-conditions')">{{ content.ui?.termsConditions || 'Terms & Conditions' }} 📜</a>
         <a href="#" @click.prevent="scrollToTop">{{ content.ui?.backToTop || '⬆ Back to Top' }}</a>
       </div>
     </div>
@@ -76,7 +76,7 @@ defineProps({
   }
 });
 
-defineEmits(['set-tab']);
+defineEmits(['set-tab', 'open-privacy-policy', 'open-terms-conditions']);
 
 const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });

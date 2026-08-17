@@ -1,5 +1,25 @@
 <template>
   <div id="app">
+    <!-- Top Scroll Progress Indicator -->
+    <div class="scroll-progress-bar" :style="{ width: scrollProgress + '%' }" aria-hidden="true"></div>
+
+    <!-- Floating Ambient Aurora Glow Mesh -->
+    <div class="ambient-glow-container" aria-hidden="true">
+      <div class="ambient-orb ambient-orb-1"></div>
+      <div class="ambient-orb ambient-orb-2"></div>
+      <div class="ambient-orb ambient-orb-3"></div>
+    </div>
+
+    <!-- Celebratory Floating Confetti System -->
+    <div class="confetti-container" v-if="showConfetti" aria-hidden="true">
+      <div 
+        v-for="item in confettiPieces" 
+        :key="item.id" 
+        class="confetti-piece" 
+        :style="item.style"
+      ></div>
+    </div>
+
     <!-- Navbar Component -->
     <Navbar 
       :content="content" 
@@ -9,69 +29,78 @@
       @toggle-theme="toggleTheme" 
     />
 
-    <!-- Main Dynamic Views -->
+    <!-- Main Dynamic Views with Animated Morph Transition -->
     <main>
-      <!-- 1. Home Flow -->
-      <HeroSection 
-        v-if="activeTab === 'home'" 
-        :content="content" 
-        @set-tab="setTab" 
-        @apply-course="applyForCourse" 
-        @open-job-modal="openJobModal" 
-      />
+      <Transition name="view-morph" mode="out-in">
+        <!-- 1. Home Flow -->
+        <HeroSection 
+          v-if="activeTab === 'home'" 
+          key="home"
+          :content="content" 
+          @set-tab="setTab" 
+          @apply-course="applyForCourse" 
+          @open-job-modal="openJobModal" 
+        />
 
-      <!-- 2. Dedicated Internships View -->
-      <InternshipsSection 
-        v-if="activeTab === 'internships'" 
-        :content="content" 
-        @set-tab="setTab" 
-        @open-detail="openCourseDetailModal" 
-        @fast-apply="proceedToRegistration" 
-      />
+        <!-- 2. Dedicated Internships View -->
+        <InternshipsSection 
+          v-else-if="activeTab === 'internships'" 
+          key="internships"
+          :content="content" 
+          @set-tab="setTab" 
+          @open-detail="openCourseDetailModal" 
+          @fast-apply="proceedToRegistration" 
+        />
 
-      <!-- 3. Dedicated Events & Gallery View -->
-      <EventsSection 
-        v-if="activeTab === 'events'" 
-        :content="content" 
-        @open-detail="openEventDetailModal" 
-        @open-lightbox="openLightbox" 
-        @open-rsvp="openRsvpModal" 
-      />
+        <!-- 3. Dedicated Events & Gallery View -->
+        <EventsSection 
+          v-else-if="activeTab === 'events'" 
+          key="events"
+          :content="content" 
+          @open-detail="openEventDetailModal" 
+          @open-lightbox="openLightbox" 
+          @open-rsvp="openRsvpModal" 
+        />
 
-      <!-- 4. Dedicated Courses View -->
-      <CoursesSection 
-        v-if="activeTab === 'courses'" 
-        :content="content" 
-        @apply-course="applyForCourse" 
-      />
+        <!-- 4. Dedicated Courses View -->
+        <CoursesSection 
+          v-else-if="activeTab === 'courses'" 
+          key="courses"
+          :content="content" 
+          @apply-course="applyForCourse" 
+        />
 
-      <!-- 5. Dedicated Testimonials View -->
-      <TestimonialsSection 
-        v-if="activeTab === 'testimonials'" 
-        :content="content" 
-        @set-tab="setTab" 
-      />
+        <!-- 5. Dedicated Testimonials View -->
+        <TestimonialsSection 
+          v-else-if="activeTab === 'testimonials'" 
+          key="testimonials"
+          :content="content" 
+          @set-tab="setTab" 
+        />
 
-      <!-- 6. Dedicated Reviews View -->
-      <ReviewsSection 
-        v-if="activeTab === 'reviews'" 
-        :content="content" 
-        @review-submitted="handleReviewSubmitted" 
-      />
+        <!-- 6. Dedicated Reviews View -->
+        <ReviewsSection 
+          v-else-if="activeTab === 'reviews'" 
+          key="reviews"
+          :content="content" 
+          @review-submitted="handleReviewSubmitted" 
+        />
 
-      <!-- 7. Dedicated Admission View -->
-      <AdmissionSection 
-        v-if="activeTab === 'admission'" 
-        :content="content" 
-        :form="form" 
-        :lastSubmittedAdmission="lastSubmittedAdmission" 
-        :isGeneratingPdf="isGeneratingPdf" 
-        @submit-admission="submitAdmission" 
-        @download-pdf="downloadAdmissionPdf" 
-      />
+        <!-- 7. Dedicated Admission View -->
+        <AdmissionSection 
+          v-else-if="activeTab === 'admission'" 
+          key="admission"
+          :content="content" 
+          :form="form" 
+          :lastSubmittedAdmission="lastSubmittedAdmission" 
+          :isGeneratingPdf="isGeneratingPdf" 
+          @submit-admission="submitAdmission" 
+          @download-pdf="downloadAdmissionPdf" 
+        />
+      </Transition>
     </main>
 
-    <!-- Modals with Dynamic Content Injection -->
+    <!-- Modals with Dynamic Content Injection & Spring Animations -->
     <CourseDetailModal 
       :isOpen="showDetailModal" 
       :track="selectedTrack" 
@@ -260,15 +289,20 @@
       </div>
     </div>
 
-    <!-- Footer Component -->
-    <Footer :content="content" @set-tab="setTab" />
+    <!-- Footer Component with Legal PDF Triggers -->
+    <Footer 
+      :content="content" 
+      @set-tab="setTab" 
+      @open-privacy-policy="openPrivacyPolicyPdf"
+      @open-terms-conditions="openTermsConditionsPdf"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import CONTENT_DATA from './data/contentData.js';
-import { generateAdmissionPdf } from './utils/pdfGenerator.js';
+import { generateAdmissionPdf, generatePrivacyPolicyPdf, generateTermsConditionsPdf } from './utils/pdfGenerator.js';
 
 import Navbar from './components/layout/Navbar.vue';
 import Footer from './components/layout/Footer.vue';
@@ -290,6 +324,9 @@ import ConfirmationModal from './components/modals/ConfirmationModal.vue';
 const content = ref(CONTENT_DATA);
 const activeTab = ref('home');
 const isDarkMode = ref(true);
+const scrollProgress = ref(0);
+const showConfetti = ref(false);
+const confettiPieces = ref([]);
 
 // Admission Form State
 const form = ref({
@@ -329,6 +366,38 @@ const showModal = ref(false);
 const modalTitle = ref('');
 const modalBody = ref('');
 const submittedRegistrationNo = ref('');
+
+// Scroll Progress Tracker
+const handleScroll = () => {
+  const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+  if (totalHeight > 0) {
+    scrollProgress.value = Math.min(100, Math.max(0, (window.scrollY / totalHeight) * 100));
+  }
+};
+
+// Trigger Celebratory Confetti Burst
+const triggerConfetti = () => {
+  const colors = ['#ff6b00', '#f97316', '#facc15', '#f59e0b', '#10b981', '#38bdf8', '#a855f7'];
+  const pieces = [];
+  for (let i = 0; i < 40; i++) {
+    pieces.push({
+      id: 'conf-' + i + '-' + Date.now(),
+      style: {
+        left: Math.random() * 100 + 'vw',
+        backgroundColor: colors[Math.floor(Math.random() * colors.length)],
+        transform: `rotate(${Math.random() * 360}deg)`,
+        animationDuration: 2.2 + Math.random() * 2 + 's',
+        animationDelay: Math.random() * 0.4 + 's'
+      }
+    });
+  }
+  confettiPieces.value = pieces;
+  showConfetti.value = true;
+  setTimeout(() => {
+    showConfetti.value = false;
+    confettiPieces.value = [];
+  }, 4200);
+};
 
 // Methods
 const setTab = (tab) => {
@@ -388,6 +457,7 @@ const submitEventRsvp = (rsvpData) => {
   modalTitle.value = content.value?.ui?.eventRsvpSuccessTitle || 'Free Event Pass Confirmed! 🎟️';
   modalBody.value = `Congratulations ${rsvpData.name}! Your free VIP entry pass for "${rsvpData.eventTitle}" has been booked. A confirmation SMS will be sent to +91 ${rsvpData.phone}.`;
   showModal.value = true;
+  triggerConfetti();
 };
 
 const openJobModal = (job) => {
@@ -401,6 +471,7 @@ const submitJobApplication = (jobData) => {
   modalTitle.value = content.value?.ui?.jobApplicationSuccessTitle || 'Job Application Received! 💼';
   modalBody.value = `Thank you ${jobData.name}! Your application for "${jobData.jobTitle}" has been forwarded to our HR & Academic Board.`;
   showModal.value = true;
+  triggerConfetti();
 };
 
 const handleReviewSubmitted = (review) => {
@@ -408,6 +479,7 @@ const handleReviewSubmitted = (review) => {
   modalTitle.value = content.value?.ui?.reviewSubmitSuccessTitle || 'Review Published Successfully! ⭐';
   modalBody.value = `Thank you ${review.name} for rating IT HUNT ${review.rating} Stars! Your review is now live on our student ratings scorecard.`;
   showModal.value = true;
+  triggerConfetti();
 };
 
 const submitAdmission = (formData) => {
@@ -436,6 +508,7 @@ const submitAdmission = (formData) => {
   modalTitle.value = content.value?.ui?.admissionSuccessTitle || 'Admission Registered Successfully! 🎓';
   modalBody.value = `Congratulations ${formData.candidateName}! Your admission/internship application for "${formData.course}" has been confirmed. You can now download your official verified Admission Registration Slip in PDF format.`;
   showModal.value = true;
+  triggerConfetti();
 };
 
 const downloadAdmissionPdf = () => {
@@ -447,11 +520,22 @@ const downloadAdmissionPdf = () => {
   }, 100);
 };
 
+const openPrivacyPolicyPdf = () => {
+  generatePrivacyPolicyPdf(content.value?.privacyPolicyData);
+};
+
+const openTermsConditionsPdf = () => {
+  generateTermsConditionsPdf(content.value?.termsConditionsData);
+};
+
 const printAdmissionSlip = () => {
   window.print();
 };
 
 onMounted(() => {
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  handleScroll();
+
   const hash = window.location.hash.replace('#', '');
   if (hash && ['home', 'internships', 'courses', 'reviews', 'testimonials', 'events', 'admission'].includes(hash)) {
     activeTab.value = hash;
@@ -463,5 +547,9 @@ onMounted(() => {
       activeTab.value = h;
     }
   });
+});
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll);
 });
 </script>

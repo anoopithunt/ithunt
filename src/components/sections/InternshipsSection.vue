@@ -1,7 +1,7 @@
 <template>
   <section class="internship-page-section">
     <!-- 1. INTERNSHIP HERO HEADER -->
-    <div class="internship-hero-banner">
+    <div class="internship-hero-banner anim-stagger-1">
       <div class="container">
         <div class="internship-live-pill">
           <span class="pulse-dot"></span>
@@ -28,7 +28,7 @@
 
     <div class="container" style="padding: 2.5rem 1.5rem 4rem;">
       <!-- 2. DURATION FILTER CAPSULES -->
-      <div class="internship-filter-wrap">
+      <div class="internship-filter-wrap anim-stagger-2">
         <div class="internship-filter-capsule">
           <button 
             v-for="tab in (content.internshipsSectionUI?.filterTabs || [{ id: 'all', label: 'All Tracks' }])"
@@ -44,7 +44,7 @@
       </div>
 
       <!-- 3. INTERNSHIP TRACKS GRID -->
-      <div class="internship-tracks-grid">
+      <div class="internship-tracks-grid anim-stagger-3">
         <div class="modern-track-card" v-for="track in filteredInternships" :key="track.id">
           <!-- Glow Header Banner -->
           <div class="track-card-header">
@@ -111,7 +111,7 @@
       </div>
 
       <!-- 4. WHY CHOOSE IT HUNT INTERNSHIPS PILLARS -->
-      <div class="internship-features-section" v-if="content.internshipVenture?.features">
+      <div class="internship-features-section anim-stagger-3" v-if="content.internshipVenture?.features">
         <div class="section-header" style="margin-bottom: 2.5rem;">
           <span class="section-tag">{{ content.internshipsSectionUI?.advantageSection?.tagline || 'THE IT HUNT ADVANTAGE' }}</span>
           <h2 class="section-title">{{ content.internshipsSectionUI?.advantageSection?.titlePrefix || 'Why Engineering Students Choose ' }}<span class="text-gradient">{{ content.internshipsSectionUI?.advantageSection?.titleGradient || 'IT HUNT' }}</span></h2>
@@ -128,7 +128,7 @@
       </div>
 
       <!-- 5. STRUCTURED 4-PHASE INTERNSHIP ROADMAP -->
-      <div class="internship-roadmap-section" v-if="content.internshipVenture?.roadmap">
+      <div class="internship-roadmap-section anim-stagger-4" v-if="content.internshipVenture?.roadmap">
         <div class="section-header" style="margin-bottom: 3rem;">
           <span class="section-tag">{{ content.internshipsSectionUI?.roadmapSection?.tagline || 'STRUCTURED LEARNING TIMELINE' }}</span>
           <h2 class="section-title">{{ content.internshipsSectionUI?.roadmapSection?.titlePrefix || 'Your 4-Phase ' }}<span class="text-gradient">{{ content.internshipsSectionUI?.roadmapSection?.titleGradient || 'Career Launchpad' }}</span></h2>
@@ -148,7 +148,7 @@
       </div>
 
       <!-- 6. FINAL CALL TO ACTION BANNER -->
-      <div class="internship-bottom-cta">
+      <div class="internship-bottom-cta anim-stagger-4">
         <div class="cta-glow-backdrop"></div>
         <div class="cta-content-wrap">
           <div class="cta-badge-pill">{{ content.internshipsSectionUI?.bottomCta?.badgePill || 'LIMITED SEATS AVAILABLE PER BATCH' }}</div>
