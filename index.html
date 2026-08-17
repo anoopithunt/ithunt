@@ -22,6 +22,9 @@
 
   <!-- Vue 3 JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+
+  <!-- html2pdf.js for Client-Side PDF Generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
   <div id="app">
@@ -1034,13 +1037,21 @@
           <div class="receipt-preview-card">
             <!-- Receipt Top Ribbon -->
             <div class="receipt-header">
-              <div class="receipt-stamp">
-                <span class="stamp-dot"></span>
-                <span>DRAFT RECEIPT PREVIEW</span>
+              <div class="receipt-brand-logo-wrap">
+                <img src="img/logo_ithunt.png" alt="IT HUNT Logo" class="receipt-logo-img" @error="onImgError">
+                <div>
+                  <div class="receipt-stamp">
+                    <span class="stamp-dot"></span>
+                    <span>🏛️ OFFICIAL ADMISSION PREVIEW</span>
+                  </div>
+                  <h4 class="receipt-title">IT HUNT ACADEMY 2026</h4>
+                  <div class="receipt-subtitle">📍 Near Bank of Baroda, Dahiyawa Road, Holagarh, Prayagraj, UP</div>
+                </div>
               </div>
-              <h4 class="receipt-title">IT HUNT ACADEMY 2026</h4>
-              <div class="receipt-subtitle">📍 Near Bank of Baroda, Dahiyawan Road, Holagarh, Prayagraj, UP</div>
-              <div class="receipt-reg-badge">OFFICIAL CANDIDATE COPY</div>
+              <div class="receipt-badges-row">
+                <span class="receipt-reg-badge">📜 OFFICIAL CANDIDATE COPY</span>
+                <span class="receipt-reg-badge" style="color: #34d399; border-color: rgba(52, 211, 153, 0.4); background: rgba(52, 211, 153, 0.1);">✓ ISO 9001:2015 ACCREDITED</span>
+              </div>
             </div>
 
             <!-- Receipt Content Rows -->
@@ -1081,6 +1092,13 @@
                 <div class="sig-title">Authorized Signatory:</div>
                 <div class="sig-name">Director Mr. Lakshman Singh Chauhan</div>
               </div>
+            </div>
+
+            <!-- Receipt Download Action if submitted -->
+            <div v-if="lastSubmittedAdmission" style="margin-top: 1.25rem; padding: 0 1.25rem 1.25rem;">
+              <button class="btn-primary pdf-download-btn" style="width: 100%; justify-content: center;" @click="downloadAdmissionPdf" :disabled="isGeneratingPdf">
+                <span>{{ isGeneratingPdf ? '⏳ Generating PDF...' : '📄 Download Verified Admission Slip (PDF)' }}</span>
+              </button>
             </div>
           </div>
         </div>
@@ -1494,21 +1512,215 @@
       </div>
     </div>
 
+    <!-- ================= HIDDEN PRINTABLE ADMISSION RECEIPT SLIP ================= -->
+    <div id="printable-admission-slip" v-if="lastSubmittedAdmission">
+      <!-- 1. Header with Logo & Institute Details -->
+      <div class="pdf-slip-header">
+        <div class="pdf-header-brand">
+          <img src="img/logo_ithunt.png" alt="IT HUNT Logo" class="pdf-logo-img" @error="onImgError">
+          <div>
+            <div class="pdf-institute-name">IT HUNT</div>
+            <div class="pdf-institute-tagline">Software Solutions & Tech Academy • Estd. 2012</div>
+            <div class="pdf-institute-contact">
+              📍 Dahiyawa Holagarh, Prayagraj, UP - 212502<br>
+              📞 Mobile: +91 9795771806 | ✉️ softtechithunt@gmail.com | 🌐 ISO 9001:2015 Accredited
+            </div>
+          </div>
+        </div>
+        <div class="pdf-header-seal">
+          <span class="pdf-seal-badge">OFFICIAL RECEIPT</span>
+          <div style="font-size: 10px; color: #64748b; margin-top: 4px; font-weight: 700;">ORIGINAL COPY</div>
+        </div>
+      </div>
+
+      <!-- 2. Title Ribbon -->
+      <div class="pdf-slip-title-bar">
+        <span class="pdf-slip-title">Admission & Internship Registration Acknowledgment</span>
+        <span class="pdf-slip-status">STATUS: CONFIRMED</span>
+      </div>
+
+      <!-- 3. Key Reference Identifiers -->
+      <div class="pdf-reg-highlight-row">
+        <div class="pdf-highlight-item">
+          <span class="pdf-highlight-lbl">Official Registration No.</span>
+          <span class="pdf-highlight-val" style="color: #ea580c;">{{ lastSubmittedAdmission.registrationNo }}</span>
+        </div>
+        <div class="pdf-highlight-item">
+          <span class="pdf-highlight-lbl">Registration Date</span>
+          <span class="pdf-highlight-val">{{ lastSubmittedAdmission.date }}</span>
+        </div>
+        <div class="pdf-highlight-item">
+          <span class="pdf-highlight-lbl">Academic Session</span>
+          <span class="pdf-highlight-val">2026 - 2027</span>
+        </div>
+      </div>
+
+      <!-- 4 & 5. Candidate Particulars & Enrolled Program (2-Column Compact Layout) -->
+      <div class="pdf-two-col-grid">
+        <!-- Col 1: Candidate Particulars -->
+        <div class="pdf-col-card">
+          <div class="pdf-section-title">
+            <span>👤</span> Candidate Particulars
+          </div>
+          <div class="pdf-info-list">
+            <div class="pdf-info-row">
+              <span class="pdf-info-lbl">Full Name:</span>
+              <span class="pdf-info-val highlight">{{ lastSubmittedAdmission.candidateName }}</span>
+            </div>
+            <div class="pdf-info-row">
+              <span class="pdf-info-lbl">Father's Name:</span>
+              <span class="pdf-info-val">{{ lastSubmittedAdmission.fatherName }}</span>
+            </div>
+            <div class="pdf-info-row">
+              <span class="pdf-info-lbl">Mother's Name:</span>
+              <span class="pdf-info-val">{{ lastSubmittedAdmission.motherName }}</span>
+            </div>
+            <div class="pdf-info-row">
+              <span class="pdf-info-lbl">DOB & Gender:</span>
+              <span class="pdf-info-val">{{ lastSubmittedAdmission.dob }} | {{ lastSubmittedAdmission.gender }}</span>
+            </div>
+            <div class="pdf-info-row">
+              <span class="pdf-info-lbl">Contact Mobile:</span>
+              <span class="pdf-info-val">{{ lastSubmittedAdmission.mobile }}</span>
+            </div>
+            <div class="pdf-info-row">
+              <span class="pdf-info-lbl">Email Address:</span>
+              <span class="pdf-info-val">{{ lastSubmittedAdmission.email }}</span>
+            </div>
+            <div class="pdf-info-row">
+              <span class="pdf-info-lbl">Address:</span>
+              <span class="pdf-info-val">{{ lastSubmittedAdmission.address }}, {{ lastSubmittedAdmission.district }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Col 2: Program & Campus Allocation -->
+        <div class="pdf-col-card">
+          <div class="pdf-section-title">
+            <span>📚</span> Program & Training Allocation
+          </div>
+          <div class="pdf-info-list">
+            <div class="pdf-info-row">
+              <span class="pdf-info-lbl">Enrolled Track:</span>
+              <span class="pdf-info-val highlight">{{ lastSubmittedAdmission.course }}</span>
+            </div>
+            <div class="pdf-info-row">
+              <span class="pdf-info-lbl">Campus / Center:</span>
+              <span class="pdf-info-val">IT HUNT Software Studio, Holagarh Campus</span>
+            </div>
+            <div class="pdf-info-row">
+              <span class="pdf-info-lbl">Workstation:</span>
+              <span class="pdf-info-val">Dedicated PC + High-Speed Fiber</span>
+            </div>
+            <div class="pdf-info-row">
+              <span class="pdf-info-lbl">Certification:</span>
+              <span class="pdf-info-val">ISO 9001:2015 + Corporate LOR</span>
+            </div>
+            <div class="pdf-info-row">
+              <span class="pdf-info-lbl">Session:</span>
+              <span class="pdf-info-val">Academic Batch 2026 - 2027</span>
+            </div>
+            <div class="pdf-info-row">
+              <span class="pdf-info-lbl">Reporting:</span>
+              <span class="pdf-info-val">09:30 AM Onboarding</span>
+            </div>
+            <div class="pdf-info-row">
+              <span class="pdf-info-lbl">Status:</span>
+              <span class="pdf-info-val" style="color: #16a34a; font-weight: 800;">PROVISIONALLY ADMITTED</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Important Guidelines on Day 1 -->
+      <div class="pdf-guidelines-box">
+        <div class="pdf-guidelines-title">⚠️ Mandatory Candidate Instructions for Day 1:</div>
+        <ul class="pdf-guidelines-list">
+          <li>Please present a printed or digital copy of this Registration Slip at the campus helpdesk.</li>
+          <li>Carry 2 recent passport-size color photographs and 1 government photo ID proof (Aadhaar / Voter ID).</li>
+          <li>Reporting time is 09:30 AM at IT HUNT Holagarh Campus for batch orientation and workstation allotment.</li>
+          <li>Access to corporate GitHub repositories, Discord community, and live project keys will be issued on Day 1.</li>
+        </ul>
+      </div>
+
+      <!-- 7. Signatures & Verification Footer -->
+      <div class="pdf-footer-signatures">
+        <div class="pdf-security-stamp">
+          <div>🛡️ <strong>System Generated Official Document</strong></div>
+          <div>Verified via IT HUNT Central Academic Database</div>
+          <div>Generated on: {{ lastSubmittedAdmission.date }} at {{ lastSubmittedAdmission.time }}</div>
+        </div>
+        <div class="pdf-sig-box">
+          <div class="pdf-sig-title">Authorized Signatory</div>
+          <div class="pdf-sig-name">Mr. Lakshman Singh Chauhan</div>
+          <div class="pdf-sig-designation">Director & Founder, IT HUNT | MCA</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Confirmation Modal -->
     <div class="modal-overlay" v-if="showModal" @click.self="showModal = false">
-      <div class="modal-card">
+      <div class="modal-card" style="max-width: 520px;">
         <div class="modal-icon-success">✓</div>
         <h3 style="font-family: var(--font-heading); font-size: 1.75rem; font-weight: 800; margin-bottom: 0.4rem;">{{ modalTitle }}</h3>
-        <p style="color: var(--text-muted); margin-bottom: 1.25rem; font-size: 0.95rem;">
+        <p style="color: var(--text-muted); margin-bottom: 1.25rem; font-size: 0.95rem; line-height: 1.6;">
           {{ modalBody }}
         </p>
 
-        <div v-if="submittedRegistrationNo" style="background: rgba(255, 255, 255, 0.05); padding: 0.85rem; border-radius: var(--radius-md); font-family: monospace; font-size: 1.05rem; color: #34d399; margin-bottom: 1.25rem; border: 1px solid var(--border-cyber);">
+        <div v-if="submittedRegistrationNo" style="background: rgba(255, 255, 255, 0.05); padding: 0.85rem; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 1.1rem; color: #34d399; margin-bottom: 1.25rem; border: 1px solid var(--border-cyber); font-weight: 800;">
           Reference ID: {{ submittedRegistrationNo }}
         </div>
 
-        <div style="display: flex; gap: 1rem; justify-content: center;">
-          <button class="btn-primary" @click="showModal = false">Got It 👍</button>
+        <!-- Live Admission Details Summary Card -->
+        <div v-if="lastSubmittedAdmission" style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-cyber); border-radius: var(--radius-md); padding: 1.1rem; margin-bottom: 1.25rem; text-align: left;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 0.5rem; margin-bottom: 0.75rem;">
+            <div style="font-size: 0.825rem; font-weight: 800; color: var(--color-ai-orange); text-transform: uppercase; letter-spacing: 0.5px;">📄 Official Admission Receipt</div>
+            <div style="font-size: 0.75rem; color: #34d399; font-weight: 800; background: rgba(52, 211, 153, 0.15); padding: 0.2rem 0.55rem; border-radius: 4px; border: 1px solid rgba(52, 211, 153, 0.3);">✓ CONFIRMED</div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 0.85rem;">
+            <div>
+              <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Candidate Name</div>
+              <div style="font-weight: 800; color: var(--text-main);">{{ lastSubmittedAdmission.candidateName }}</div>
+            </div>
+            <div>
+              <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Registration ID</div>
+              <div style="font-weight: 800; color: var(--color-ai-yellow); font-family: var(--font-mono);">{{ lastSubmittedAdmission.registrationNo }}</div>
+            </div>
+            <div>
+              <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Father's Name</div>
+              <div style="font-weight: 600; color: var(--text-main);">{{ lastSubmittedAdmission.fatherName || '—' }}</div>
+            </div>
+            <div>
+              <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Mobile Number</div>
+              <div style="font-weight: 600; color: #38bdf8; font-family: var(--font-mono);">{{ lastSubmittedAdmission.mobile }}</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Enrolled Program / Track</div>
+              <div style="font-weight: 800; color: var(--color-ai-orange);">{{ lastSubmittedAdmission.course }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions-group">
+          <button 
+            v-if="lastSubmittedAdmission" 
+            class="btn-primary pdf-download-btn" 
+            @click="downloadAdmissionPdf"
+            :disabled="isGeneratingPdf"
+          >
+            <span>{{ isGeneratingPdf ? '⏳ Generating PDF...' : '📄 Download Registration Slip (PDF)' }}</span>
+          </button>
+          
+          <button 
+            v-if="lastSubmittedAdmission" 
+            class="btn-secondary" 
+            @click="printAdmissionSlip"
+          >
+            <span>Print Slip 🖨️</span>
+          </button>
+
+          <button class="btn-secondary" @click="showModal = false">Got It 👍</button>
         </div>
       </div>
     </div>
@@ -1573,6 +1785,11 @@
           <p style="font-size: 0.875rem; line-height: 1.7; color: #ffffff;">
             {{ content.footer.aboutText }}
           </p>
+          <div style="margin-top: 1.15rem;">
+            <a href="#" @click.prevent="setTab('reviews')" class="skill-tag" style="background: rgba(250, 204, 21, 0.15); color: var(--color-ai-yellow); border-color: rgba(250, 204, 21, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.9rem; font-weight: 800; font-size: 0.825rem; border-radius: var(--radius-full);">
+              ⭐ Student Reviews & Ratings (4.9 / 5.0) →
+            </a>
+          </div>
         </div>
 
         <div class="footer-col">
@@ -1583,7 +1800,7 @@
             <li><a href="#" @click.prevent="setTab('events')">🎪 Events & Media Gallery</a></li>
             <li><a href="#" @click.prevent="setTab('testimonials')">🌟 Alumni Testimonials & Achievements</a></li>
             <li><a href="#" @click.prevent="setTab('courses')">Accredited Courses</a></li>
-            <li><a href="#" @click.prevent="setTab('reviews')">Reviews & Feedback</a></li>
+            <li><a href="#" @click.prevent="setTab('reviews')">⭐ Reviews & Feedback</a></li>
             <li><a href="#" @click.prevent="setTab('admission')">Admission Portal</a></li>
           </ul>
         </div>
@@ -1607,7 +1824,8 @@
 
       <div class="container footer-bottom">
         <div style="color: #ffffff;">{{ content.footer.copyrightText }}</div>
-        <div style="display: flex; gap: 1.5rem;">
+        <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+          <a href="#" @click.prevent="setTab('reviews')">⭐ Reviews & Ratings</a>
           <a href="#" @click.prevent="setTab('events')">Events Gallery</a>
           <a href="#" @click.prevent="setTab('testimonials')">Alumni Stories</a>
           <a href="#">Privacy Policy</a>
@@ -1661,6 +1879,8 @@
           modalTitle: '',
           modalBody: '',
           submittedRegistrationNo: '',
+          lastSubmittedAdmission: null,
+          isGeneratingPdf: false,
 
           showJobModal: false,
           selectedJob: {},
@@ -1846,6 +2066,7 @@
         },
         submitEventRsvp() {
           this.showRsvpModal = false;
+          this.lastSubmittedAdmission = null;
           const refId = 'EVT-' + Math.floor(100000 + Math.random() * 900000);
           this.modalTitle = "Event Registration Confirmed! 🎟️";
           this.modalBody = `Thank you ${this.rsvpForm.name}! Your free registration for "${this.selectedUpcomingEvent.title}" (${this.selectedUpcomingEvent.date}) has been confirmed. We look forward to seeing you at the campus!`;
@@ -1881,6 +2102,7 @@
         },
         submitJobApplication() {
           this.showJobModal = false;
+          this.lastSubmittedAdmission = null;
           this.modalTitle = "Job Application Received!";
           this.modalBody = `Thank you ${this.jobForm.name}! Your job application for ${this.selectedJob.title} (${this.jobForm.experience} Experience) has been submitted successfully to HR.`;
           this.submittedRegistrationNo = 'JOB-' + Math.floor(100000 + Math.random() * 900000);
@@ -1896,6 +2118,7 @@
             avatar: 'img/logo_ithunt.png',
             comment: this.newReview.comment
           });
+          this.lastSubmittedAdmission = null;
           this.modalTitle = "Review & Feedback Posted!";
           this.modalBody = `Thank you ${this.newReview.name}! Your valuable feedback on ${this.newReview.category} has been submitted. It helps us continually improve institute quality and ease of development.`;
           this.submittedRegistrationNo = '';
@@ -1908,10 +2131,94 @@
           e.target.src = 'img/logo_ithunt.png';
         },
         submitAdmission() {
-          this.modalTitle = "Application Submitted Successfully!";
-          this.modalBody = `Thank you ${this.form.candidateName}! Your admission/internship registration for ${this.form.course} has been registered.`;
-          this.submittedRegistrationNo = 'ITH-' + Math.floor(100000 + Math.random() * 900000);
+          const regNo = 'ITH-' + Math.floor(100000 + Math.random() * 900000);
+          this.submittedRegistrationNo = regNo;
+          this.lastSubmittedAdmission = {
+            registrationNo: regNo,
+            date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+            time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+            candidateName: this.form.candidateName,
+            fatherName: this.form.fatherName,
+            motherName: this.form.motherName,
+            dob: this.form.dob,
+            gender: this.form.gender,
+            course: this.form.course,
+            mobile: this.form.mobile,
+            email: this.form.email,
+            district: this.form.district || 'PRAYAGRAJ',
+            address: this.form.address
+          };
+          this.modalTitle = "Admission Registered Successfully! 🎓";
+          this.modalBody = `Congratulations ${this.form.candidateName}! Your admission/internship application for "${this.form.course}" has been confirmed. You can now download your official verified Admission Registration Slip in PDF format.`;
           this.showModal = true;
+        },
+        downloadAdmissionPdf() {
+          if (!this.lastSubmittedAdmission) return;
+          this.isGeneratingPdf = true;
+
+          this.$nextTick(() => {
+            const original = document.getElementById('printable-admission-slip');
+            if (!original) {
+              this.isGeneratingPdf = false;
+              window.print();
+              return;
+            }
+
+            // Create a dedicated clone element at root body for flawless capture regardless of scroll position
+            const clone = original.cloneNode(true);
+            clone.id = 'temp-pdf-slip-render';
+            clone.style.position = 'fixed';
+            clone.style.left = '0px';
+            clone.style.top = '0px';
+            clone.style.width = '794px';
+            clone.style.maxWidth = '794px';
+            clone.style.background = '#ffffff';
+            clone.style.color = '#0f172a';
+            clone.style.opacity = '1';
+            clone.style.visibility = 'visible';
+            clone.style.zIndex = '9999999';
+            clone.style.display = 'block';
+            clone.style.pointerEvents = 'none';
+            document.body.appendChild(clone);
+
+            const candidateCleanName = (this.lastSubmittedAdmission.candidateName || 'Student').replace(/[^a-zA-Z0-9]/g, '_');
+            const filename = `IT_HUNT_Admission_${this.lastSubmittedAdmission.registrationNo}_${candidateCleanName}.pdf`;
+
+            if (typeof html2pdf !== 'undefined') {
+              const opt = {
+                margin: [4, 4, 4, 4],
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                  scale: 2, 
+                  useCORS: true, 
+                  allowTaint: true,
+                  letterRendering: true, 
+                  backgroundColor: '#ffffff',
+                  scrollY: 0,
+                  scrollX: 0
+                },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+              };
+
+              html2pdf().set(opt).from(clone).save().then(() => {
+                if (clone.parentNode) clone.parentNode.removeChild(clone);
+                this.isGeneratingPdf = false;
+              }).catch((err) => {
+                console.error('PDF generation error:', err);
+                if (clone.parentNode) clone.parentNode.removeChild(clone);
+                this.isGeneratingPdf = false;
+                window.print();
+              });
+            } else {
+              if (clone.parentNode) clone.parentNode.removeChild(clone);
+              this.isGeneratingPdf = false;
+              window.print();
+            }
+          });
+        },
+        printAdmissionSlip() {
+          window.print();
         }
       }
     }).mount('#app');

@@ -26,7 +26,6 @@ const CONTENT_DATA = {
     { id: "internships", label: "IT Internships", icon: "🚀" },
     { id: "events", label: "Events & Gallery", icon: "🎪" },
     { id: "courses", label: "Courses", icon: "📚" },
-    { id: "reviews", label: "Reviews & Ratings", icon: "⭐" },
     { id: "admission", label: "Apply Portal", icon: "📝" }
   ],
 
