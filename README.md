@@ -876,7 +876,7 @@ ADMISSION_API_ENDPOINT
 The default API configuration points to:
 
 ```text
-http://localhost:3000/api/admission
+http://localhost:5500/api/admission
 ```
 
 The actual production API should be configured through environment variables before deployment.
@@ -897,10 +897,10 @@ REVIEWS_API_ENDPOINT=
 Default development values are:
 
 ```text
-http://localhost:3000/api
-http://localhost:3000/api/admission
-http://localhost:3000/api/careers/apply
-http://localhost:3000/api/reviews
+http://localhost:5500/api
+http://localhost:5500/api/admission
+http://localhost:5500/api/careers/apply
+http://localhost:5500/api/reviews
 ```
 
 These values are configuration targets; the repository itself is primarily the portal/frontend plus its Node.js serving layer rather than a complete implementation of those external business APIs.
