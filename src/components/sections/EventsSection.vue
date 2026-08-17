@@ -1,7 +1,7 @@
 <template>
   <section class="events-page-section container">
     <!-- Events Hero Banner -->
-    <div class="events-hero-banner">
+    <div class="events-hero-banner anim-stagger-1">
       <div class="events-badge-pill">
         <span class="pulse-dot"></span>
         <span>{{ content.eventsSectionUI?.tagline || content.eventsSection?.tagline || 'CAMPUS LIFE & TECH INNOVATION' }}</span>
@@ -26,7 +26,7 @@
     </div>
 
     <!-- Controls Bar: Category Filters & Real-Time Search -->
-    <div class="events-controls-bar">
+    <div class="events-controls-bar anim-stagger-2">
       <div class="events-category-nav" v-if="content.eventsSection?.categories">
         <button 
           v-for="cat in content.eventsSection.categories" 
@@ -57,7 +57,7 @@
     </div>
 
     <!-- Empty State if search/filter returns zero -->
-    <div v-if="filteredEvents.length === 0" style="text-align: center; padding: 4rem 1.5rem; background: var(--bg-card-glass); border-radius: var(--radius-lg); border: 1px solid var(--border-cyber); margin-bottom: 3rem;">
+    <div v-if="filteredEvents.length === 0" class="anim-stagger-2" style="text-align: center; padding: 4rem 1.5rem; background: var(--bg-card-glass); border-radius: var(--radius-lg); border: 1px solid var(--border-cyber); margin-bottom: 3rem;">
       <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
       <h3 style="font-family: var(--font-heading); font-size: 1.4rem; color: var(--text-main); margin-bottom: 0.5rem;">
         {{ content.eventsSectionUI?.emptySearchTitlePrefix || 'No Events Found Matching ' }} "{{ searchQuery }}"
@@ -71,7 +71,7 @@
     </div>
 
     <!-- Event Cards Showcase Grid -->
-    <div class="events-grid" v-else>
+    <div class="events-grid anim-stagger-3" v-else>
       <div class="event-card" v-for="ev in filteredEvents" :key="ev.id">
         <!-- Cover Media wrapper with Hover Zoom & Image Preview -->
         <div class="event-card-media" @click="$emit('open-detail', ev)">
@@ -133,7 +133,7 @@
     </div>
 
     <!-- UPCOMING EVENTS & REGISTRATIONS SECTION -->
-    <div class="upcoming-events-section" v-if="content.eventsSection?.upcomingEvents && content.eventsSection.upcomingEvents.length">
+    <div class="upcoming-events-section anim-stagger-4" v-if="content.eventsSection?.upcomingEvents && content.eventsSection.upcomingEvents.length">
       <div class="section-header" style="text-align: left; margin-bottom: 2rem;">
         <span class="section-tag">{{ content.eventsSectionUI?.upcomingSection?.tagline || '🌟 Registrations Open' }}</span>
         <h2 class="section-title">{{ content.eventsSectionUI?.upcomingSection?.titlePrefix || 'Upcoming ' }}<span class="text-gradient">{{ content.eventsSectionUI?.upcomingSection?.titleGradient || 'Hackathons & Masterclasses' }}</span></h2>

@@ -4916,3 +4916,365 @@ body.light-theme .upcoming-event-card {
 }
 
 
+
+/* ==========================================================================
+   AWESOME ANIMATION ENGINE & FUTURISTIC MOTION EFFECTS
+   ========================================================================== */
+
+/* 1. Scroll Progress Bar */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3.5px;
+  background: linear-gradient(90deg, #ff6b00, #f97316, #facc15, #f59e0b, #ff6b00);
+  background-size: 200% auto;
+  animation: progressShine 2s linear infinite;
+  z-index: 99999;
+  box-shadow: 0 0 14px rgba(249, 115, 22, 0.9), 0 0 24px rgba(250, 204, 21, 0.7);
+  transition: width 0.1s cubic-bezier(0.1, 0.9, 0.2, 1);
+  pointer-events: none;
+}
+
+@keyframes progressShine {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* 2. Floating Ambient Glow Orbs & Cyber Grid */
+.ambient-glow-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.32;
+  will-change: transform;
+}
+
+.ambient-orb-1 {
+  width: 520px;
+  height: 520px;
+  background: radial-gradient(circle, #f97316 0%, rgba(249, 115, 22, 0) 70%);
+  top: -12%;
+  left: 12%;
+  animation: orbFloat1 18s ease-in-out infinite alternate;
+}
+
+.ambient-orb-2 {
+  width: 560px;
+  height: 560px;
+  background: radial-gradient(circle, #facc15 0%, rgba(250, 204, 21, 0) 70%);
+  bottom: 0%;
+  right: 8%;
+  animation: orbFloat2 22s ease-in-out infinite alternate;
+}
+
+.ambient-orb-3 {
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, #ea580c 0%, rgba(234, 88, 12, 0) 70%);
+  top: 40%;
+  left: 50%;
+  animation: orbFloat3 16s ease-in-out infinite alternate;
+}
+
+@keyframes orbFloat1 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(70px, 90px) scale(1.15); }
+  100% { transform: translate(-50px, 130px) scale(0.92); }
+}
+
+@keyframes orbFloat2 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-90px, -70px) scale(1.12); }
+  100% { transform: translate(60px, -110px) scale(0.88); }
+}
+
+@keyframes orbFloat3 {
+  0% { transform: translate(0, 0) scale(0.9); }
+  50% { transform: translate(80px, -80px) scale(1.22); }
+  100% { transform: translate(-60px, 70px) scale(0.95); }
+}
+
+/* 3. Text Gradient Shimmer & Liquid Flow */
+.text-gradient, .text-gradient-gold, .text-gradient-secondary {
+  background-size: 200% auto !important;
+  animation: textGradientFlow 4s linear infinite;
+}
+
+@keyframes textGradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 4. Page View Morph Transitions */
+.view-morph-enter-active,
+.view-morph-leave-active {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.view-morph-enter-from {
+  opacity: 0;
+  transform: translateY(20px) scale(0.985);
+  filter: blur(6px);
+}
+
+.view-morph-leave-to {
+  opacity: 0;
+  transform: translateY(-14px) scale(0.99);
+  filter: blur(4px);
+}
+
+/* 5. Mindblowing Interactive Card Animations */
+.modern-track-card,
+.event-card,
+.course-card,
+.alumni-card,
+.stat-card,
+.team-card,
+.career-card,
+.feature-pillar-card,
+.roadmap-step-card,
+.upcoming-event-card,
+.rating-summary-card,
+.form-card,
+.receipt-preview-card,
+.director-spotlight-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), 
+              box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s ease,
+              background-color 0.3s ease;
+  will-change: transform, box-shadow;
+}
+
+.modern-track-card:hover,
+.event-card:hover,
+.course-card:hover,
+.alumni-card:hover,
+.team-card:hover,
+.career-card:hover,
+.upcoming-event-card:hover {
+  transform: translateY(-8px) scale(1.015);
+  border-color: rgba(249, 115, 22, 0.65) !important;
+  box-shadow: 0 22px 45px -10px rgba(0, 0, 0, 0.8), 0 0 35px rgba(249, 115, 22, 0.35) !important;
+}
+
+/* Light sweep reflection across cards */
+.modern-track-card::after,
+.event-card::after,
+.course-card::after,
+.alumni-card::after,
+.career-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.09) 50%,
+    transparent 60%
+  );
+  transform: translateX(-100%) rotate(25deg);
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.modern-track-card:hover::after,
+.event-card:hover::after,
+.course-card:hover::after,
+.alumni-card:hover::after,
+.career-card:hover::after {
+  transform: translateX(100%) rotate(25deg);
+}
+
+/* 6. Dynamic Floating Physics */
+.hero-floating-badge {
+  animation: floatingBob 4s ease-in-out infinite alternate;
+}
+
+@keyframes floatingBob {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+  100% { transform: translateY(4px) rotate(-1deg); }
+}
+
+.duration-pill, .internship-live-pill, .events-badge-pill, .hero-badge {
+  animation: subtleGlowPulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes subtleGlowPulse {
+  0% { box-shadow: 0 0 0 rgba(249, 115, 22, 0); }
+  100% { box-shadow: 0 0 18px rgba(249, 115, 22, 0.45); }
+}
+
+/* Multi-Ring Radar Wave for Pulse Dots */
+.pulse-dot, .hero-badge-dot {
+  position: relative;
+}
+
+.pulse-dot::before, .hero-badge-dot::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 50%;
+  background: inherit;
+  animation: radarWave 2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+  z-index: -1;
+}
+
+@keyframes radarWave {
+  0% { transform: scale(1); opacity: 0.85; }
+  100% { transform: scale(3.2); opacity: 0; }
+}
+
+/* 7. Button Hover Magic */
+.btn-primary, .cta-btn-header, .cta-action-btn, .track-view-btn, .course-action-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-primary:hover, .cta-btn-header:hover, .cta-action-btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 10px 25px -4px rgba(249, 115, 22, 0.6), 0 0 28px rgba(250, 204, 21, 0.45) !important;
+}
+
+.btn-primary:active, .cta-btn-header:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.btn-secondary {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-secondary:hover {
+  transform: translateY(-2px) scale(1.02);
+  border-color: var(--color-ai-orange) !important;
+  color: var(--color-ai-yellow) !important;
+  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.5), 0 0 18px rgba(249, 115, 22, 0.3) !important;
+}
+
+/* 8. Code Terminal CRT & Blinking Cursor Animation */
+.code-terminal-card {
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.85), 0 0 35px rgba(249, 115, 22, 0.28) !important;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.code-terminal-card:hover {
+  transform: translateY(-4px) rotate(0.5deg);
+  box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.95), 0 0 45px rgba(249, 115, 22, 0.38) !important;
+}
+
+.code-line {
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.code-line:hover {
+  background: rgba(249, 115, 22, 0.15);
+  transform: translateX(5px);
+}
+
+/* 9. Modal Spring Entrance */
+.modal-overlay {
+  animation: overlayFadeIn 0.3s ease-out;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; backdrop-filter: blur(0px); }
+  to { opacity: 1; backdrop-filter: blur(14px); }
+}
+
+.modal-card {
+  animation: modalSpringIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalSpringIn {
+  0% { opacity: 0; transform: scale(0.84) translateY(24px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* 10. Celebratory Confetti Particles Animation */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 99999;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 14px;
+  top: -20px;
+  opacity: 0.95;
+  border-radius: 2px;
+  animation: confettiFall 3.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(0) rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(105vh) rotateX(720deg) rotateY(540deg) rotateZ(360deg);
+    opacity: 0;
+  }
+}
+
+/* 11. Staggered Entrance Utility */
+.anim-stagger-1 { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both; }
+.anim-stagger-2 { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.16s both; }
+.anim-stagger-3 { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both; }
+.anim-stagger-4 { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.32s both; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 12. Glow Filter Capsules Animation */
+.filter-capsule-btn {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.filter-capsule-btn.active {
+  animation: capsuleActivePulse 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes capsuleActivePulse {
+  0% { box-shadow: 0 0 10px rgba(249, 115, 22, 0.35); }
+  100% { box-shadow: 0 0 22px rgba(250, 204, 21, 0.6); }
+}

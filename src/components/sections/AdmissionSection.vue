@@ -1,13 +1,13 @@
 <template>
   <section class="container" style="padding: 4rem 1.5rem;">
-    <div class="section-header">
+    <div class="section-header anim-stagger-1">
       <span class="section-tag">{{ content.admissionSection?.sectionTag || 'Online Registration 2026' }}</span>
       <h2 class="section-title">{{ content.admissionSection?.titlePrefix || 'Candidate ' }}<span class="text-gradient">{{ content.admissionSection?.titleGradient || 'Admission Application' }}</span></h2>
     </div>
 
     <div class="admission-container">
       <!-- Admission Form -->
-      <div class="form-card">
+      <div class="form-card anim-stagger-2">
         <h3 class="form-title">{{ content.admissionSection?.formTitle || 'Student Registration Details' }}</h3>
         <p class="form-subtitle">{{ content.admissionSection?.formSubtitle || 'Please enter accurate candidate information as per official records.' }}</p>
 
@@ -84,7 +84,7 @@
       </div>
 
       <!-- Live Receipt Preview Card -->
-      <div class="receipt-preview-card">
+      <div class="receipt-preview-card anim-stagger-3">
         <!-- Receipt Top Ribbon -->
         <div class="receipt-header">
           <div class="receipt-brand-logo-wrap">

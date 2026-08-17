@@ -1,13 +1,13 @@
 <template>
   <section class="container" style="padding: 4rem 1.5rem;">
-    <div class="section-header">
+    <div class="section-header anim-stagger-1">
       <span class="section-tag">{{ content.reviewsSection?.tagline }}</span>
       <h2 class="section-title">{{ content.reviewsSection?.titlePrefix }}<span class="text-gradient">{{ content.reviewsSection?.titleGradient }}</span></h2>
       <p class="section-subtitle">{{ content.reviewsSection?.description }}</p>
     </div>
 
     <!-- Rating Summary Card -->
-    <div class="rating-summary-card">
+    <div class="rating-summary-card anim-stagger-2">
       <div style="text-align: center;">
         <div class="big-rating-score">{{ content.reviewsSection?.overallScore }}</div>
         <div class="star-rating-display">{{ content.reviewsSection?.overallStars }}</div>
@@ -32,7 +32,7 @@
     </div>
 
     <!-- Reviews Grid -->
-    <div class="reviews-grid">
+    <div class="reviews-grid anim-stagger-3">
       <div class="review-card" v-for="review in reviewsList" :key="review.id">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
           <span class="star-rating-display">★★★★★</span>
@@ -52,7 +52,7 @@
     </div>
 
     <!-- Review Submission Form -->
-    <div class="form-card" style="max-width: 750px; margin: 0 auto;">
+    <div class="form-card anim-stagger-4" style="max-width: 750px; margin: 0 auto;">
       <h3 class="form-title">{{ content.reviewsSectionUI?.formTitle || 'Submit Your Review & Feedback' }}</h3>
       <p class="form-subtitle">{{ content.reviewsSectionUI?.formSubtitle || 'Help us improve institute infrastructure, labs, and ease of technical development.' }}</p>
 
