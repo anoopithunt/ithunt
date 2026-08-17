@@ -5419,3 +5419,173 @@ body.light-theme .starfield-wrapper {
 body.light-theme .stars-layer {
   filter: brightness(0.6) saturate(1.8);
 }
+
+/* ==========================================================================
+   CAREERS & HIRING PORTAL STYLES
+   ========================================================================== */
+
+.careers-hero-banner {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.careers-benefits-ribbon {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin-top: 2.5rem;
+  text-align: left;
+}
+
+.career-benefit-card {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: var(--bg-card-glass);
+  border: 1px solid var(--border-cyber);
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+}
+
+.career-benefit-card:hover {
+  border-color: var(--color-ai-gold);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(249, 115, 22, 0.12);
+}
+
+.benefit-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.benefit-title {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  margin-bottom: 0.25rem;
+}
+
+.benefit-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.careers-controls-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+}
+
+.career-points-box {
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid var(--border-cyber);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.15rem;
+  margin-bottom: 1.25rem;
+}
+
+.career-points-title {
+  font-size: 0.825rem;
+  font-weight: 800;
+  color: var(--color-ai-yellow);
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+}
+
+.career-points-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.career-points-list li {
+  font-size: 0.825rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.point-check {
+  color: #22c55e;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.career-skills-wrap {
+  margin-bottom: 0.5rem;
+}
+
+/* ==========================================================================
+   LIGHT THEME BADGE & TEXT CONTRAST OVERRIDES
+   ========================================================================== */
+
+body.light-theme .hero-badge {
+  color: #0f172a !important;
+  background: rgba(249, 115, 22, 0.16) !important;
+  border-color: rgba(249, 115, 22, 0.5) !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 12px rgba(249, 115, 22, 0.15) !important;
+}
+
+body.light-theme .hero-badge span {
+  color: #0f172a !important;
+}
+
+body.light-theme .internship-live-pill,
+body.light-theme .events-badge-pill,
+body.light-theme .duration-pill {
+  color: #0f172a !important;
+  background: rgba(249, 115, 22, 0.16) !important;
+  border-color: rgba(249, 115, 22, 0.45) !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .internship-live-pill span,
+body.light-theme .events-badge-pill span,
+body.light-theme .duration-pill span {
+  color: #0f172a !important;
+}
+
+body.light-theme .section-tag {
+  color: #ea580c !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .hero-subtitle,
+body.light-theme .section-subtitle,
+body.light-theme .internship-main-desc,
+body.light-theme .events-hero-subtitle {
+  color: #334155 !important;
+}
+
+body.light-theme .stat-label {
+  color: #1e293b !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .skill-tag {
+  color: #ea580c !important;
+  background: rgba(249, 115, 22, 0.12) !important;
+  border-color: rgba(249, 115, 22, 0.35) !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .exp-badge-required {
+  color: #b91c1c !important;
+  background: rgba(239, 68, 68, 0.12) !important;
+  border-color: rgba(239, 68, 68, 0.35) !important;
+  font-weight: 800 !important;
+}
