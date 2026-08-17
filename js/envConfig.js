@@ -31,7 +31,10 @@
     ENABLE_LIVE_RELOAD: "true",
     ENABLE_ANALYTICS: "false",
     ENABLE_ADMISSION_PORTAL: "true",
-    ENABLE_CAREERS_PORTAL: "true"
+    ENABLE_CAREERS_PORTAL: "true",
+    ACCREDITATION: "ISO 9001:2015 Accredited",
+    PRIVACY_POLICY_CODE: "ITH-POL-2026/01",
+    TERMS_CONDITIONS_CODE: "ITH-TOC-2026/02"
   };
 
   // Merge with window.ENV_CONFIG if already provided by /env.js
