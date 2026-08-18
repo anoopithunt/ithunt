@@ -38,10 +38,41 @@ a {
   text-decoration: none;
 }
 
-img {
+img, .protected-img, .lightbox-img {
   max-width: 100%;
   height: auto;
   display: block;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Protected Image Overlay Utilities */
+.protected-img-wrapper {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.protected-img-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  background: transparent;
+  pointer-events: auto;
+  -webkit-touch-callout: none;
 }
 
 button, input, select, textarea {
