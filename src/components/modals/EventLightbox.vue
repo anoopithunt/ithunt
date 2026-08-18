@@ -14,11 +14,15 @@
         :title="content?.modalTexts?.lightbox?.prevTooltip || 'Previous Image (Left Arrow)'" 
         v-if="images.length > 1"
       >‹</button>
-      <div class="lightbox-img-wrapper">
+      <div class="lightbox-img-wrapper protected-img-wrapper">
+        <div class="protected-img-overlay" @contextmenu.prevent></div>
         <img 
           :src="images[currentIndex]?.src" 
           :alt="images[currentIndex]?.title" 
-          class="lightbox-img" 
+          class="lightbox-img protected-img" 
+          draggable="false"
+          @contextmenu.prevent
+          @dragstart.prevent
           @error="onImgError"
         >
       </div>

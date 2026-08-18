@@ -74,8 +74,9 @@
     <div class="events-grid anim-stagger-3" v-else>
       <div class="event-card" v-for="ev in filteredEvents" :key="ev.id">
         <!-- Cover Media wrapper with Hover Zoom & Image Preview -->
-        <div class="event-card-media" @click="$emit('open-detail', ev)">
-          <img :src="ev.coverImage" :alt="ev.title" class="event-card-img" @error="onImgError">
+        <div class="event-card-media protected-img-wrapper" @click="$emit('open-detail', ev)">
+          <div class="protected-img-overlay" @contextmenu.prevent></div>
+          <img :src="ev.coverImage" :alt="ev.title" class="event-card-img protected-img" draggable="false" @contextmenu.prevent @dragstart.prevent @error="onImgError">
           <span class="event-card-badge" v-if="ev.badge">{{ ev.badge }}</span>
           <span class="event-photo-count-pill">
             <span>📸</span> {{ ev.galleryImages?.length || 1 }} {{ content.ui?.photosCountSuffix || 'Photos' }}
@@ -92,7 +93,10 @@
             :key="gIdx" 
             :src="img.src" 
             :alt="img.title" 
-            class="event-thumb-mini"
+            class="event-thumb-mini protected-img"
+            draggable="false"
+            @contextmenu.prevent
+            @dragstart.prevent
             @click.stop="$emit('open-lightbox', { images: ev.galleryImages, index: gIdx })"
             :title="img.title"
             @error="onImgError"

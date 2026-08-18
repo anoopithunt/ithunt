@@ -21,11 +21,15 @@
 
       <!-- Featured Interactive Photo Gallery -->
       <div class="event-gallery-showcase" v-if="event.galleryImages && event.galleryImages.length">
-        <div class="event-gallery-main-view" @click="$emit('open-lightbox', { images: event.galleryImages, index: activeIndex })">
+        <div class="event-gallery-main-view protected-img-wrapper" @click="$emit('open-lightbox', { images: event.galleryImages, index: activeIndex })">
+          <div class="protected-img-overlay" @contextmenu.prevent></div>
           <img 
             :src="event.galleryImages[activeIndex]?.src || event.coverImage" 
             :alt="event.galleryImages[activeIndex]?.title || event.title"
-            class="event-gallery-main-img"
+            class="event-gallery-main-img protected-img"
+            draggable="false"
+            @contextmenu.prevent
+            @dragstart.prevent
             @error="onImgError"
           >
           <div class="event-gallery-zoom-hint">
@@ -46,11 +50,12 @@
           <div 
             v-for="(img, gIdx) in event.galleryImages" 
             :key="gIdx"
-            class="event-gallery-thumb-item"
+            class="event-gallery-thumb-item protected-img-wrapper"
             :class="{ active: activeIndex === gIdx }"
             @click="activeIndex = gIdx"
           >
-            <img :src="img.src" :alt="img.title" @error="onImgError">
+            <div class="protected-img-overlay" @contextmenu.prevent></div>
+            <img :src="img.src" :alt="img.title" draggable="false" @contextmenu.prevent @dragstart.prevent @error="onImgError">
           </div>
         </div>
       </div>
