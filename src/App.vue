@@ -347,6 +347,7 @@
 import { ref, watch, onMounted, onUnmounted } from 'vue';
 import CONTENT_DATA from './data/contentData.js';
 import { generateAdmissionPdf, generatePrivacyPolicyPdf, generateTermsConditionsPdf } from './utils/pdfGenerator.js';
+import { sendAdmissionEmailNotification, sendJobEmailNotification, sendRsvpEmailNotification } from './utils/emailNotifier.js';
 
 import Navbar from './components/layout/Navbar.vue';
 import Footer from './components/layout/Footer.vue';
@@ -520,8 +521,7 @@ const submitEventRsvp = (rsvpData) => {
   const passId = 'EVT-' + Math.floor(100000 + Math.random() * 900000);
   submittedRegistrationNo.value = passId;
   
-  // Real-time sync into SuperAdmin registry
-  liveRsvpsList.value.unshift({
+  const rsvpRecord = {
     id: passId,
     date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
     name: rsvpData.name,
@@ -530,7 +530,13 @@ const submitEventRsvp = (rsvpData) => {
     eventTitle: rsvpData.eventTitle,
     college: rsvpData.college,
     status: 'VIP Entry Pass Confirmed'
-  });
+  };
+
+  // Real-time sync into SuperAdmin registry
+  liveRsvpsList.value.unshift(rsvpRecord);
+
+  // Send automatic email notification to softtechithunt@gmail.com
+  sendRsvpEmailNotification(rsvpRecord).catch(() => {});
 
   modalTitle.value = content.value?.ui?.eventRsvpSuccessTitle || 'Free Event Pass Confirmed! 🎟️';
   modalBody.value = `Congratulations ${rsvpData.name}! Your free VIP entry pass for "${rsvpData.eventTitle}" has been booked. A confirmation SMS will be sent to +91 ${rsvpData.phone}.`;
@@ -548,8 +554,7 @@ const submitJobApplication = (jobData) => {
   const appId = 'JOB-' + Math.floor(100000 + Math.random() * 900000);
   submittedRegistrationNo.value = appId;
   
-  // Real-time sync into SuperAdmin registry
-  liveJobApplicationsList.value.unshift({
+  const jobRecord = {
     id: appId,
     date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
     name: jobData.name,
@@ -560,7 +565,13 @@ const submitJobApplication = (jobData) => {
     portfolio: jobData.portfolio,
     currentCompany: jobData.currentCompany || 'Software Company',
     status: 'Reviewing Profile'
-  });
+  };
+
+  // Real-time sync into SuperAdmin registry
+  liveJobApplicationsList.value.unshift(jobRecord);
+
+  // Send automatic email notification to softtechithunt@gmail.com
+  sendJobEmailNotification(jobRecord).catch(() => {});
 
   modalTitle.value = content.value?.ui?.jobApplicationSuccessTitle || 'Job Application Received! 💼';
   modalBody.value = `Thank you ${jobData.name}! Your application for "${jobData.jobTitle}" has been forwarded to our HR & Academic Board.`;
@@ -602,6 +613,9 @@ const submitAdmission = (formData) => {
   submittedRegistrationNo.value = randomRegId;
   lastSubmittedAdmission.value = newAdmissionRecord;
   liveAdmissionsList.value.unshift(newAdmissionRecord);
+
+  // Trigger automatic email dispatch to softtechithunt@gmail.com
+  sendAdmissionEmailNotification(newAdmissionRecord).catch(() => {});
 
   modalTitle.value = content.value?.ui?.admissionSuccessTitle || 'Admission Registered Successfully! 🎓';
   modalBody.value = `Congratulations ${formData.candidateName}! Your admission/internship application for "${formData.course}" has been confirmed. You can now download your official verified Admission Registration Slip in PDF format.`;
