@@ -822,7 +822,7 @@ const CONTENT_DATA = {
       "experience": "Min 4+ Years Experience",
       "location": "Prayagraj Campus / Hybrid",
       "salary": "₹6.5L - ₹10.0L P.A.",
-      "description": "Lead our flagship MERN stack internship track, mentor students through live web applications, conduct sprint code reviews, and teach modern React/Node architecture.",
+      "description": "Lead our flagship MERN Stack internship track, mentor students through live web applications, conduct sprint code reviews, and teach modern React/Node architecture.",
       "teachingPoints": [
         "Deliver interactive daily lectures and hands-on live coding sessions on React 19, Node.js, Express, and MongoDB.",
         "Mentor internship batches in building production-grade SaaS web apps and microservices.",
