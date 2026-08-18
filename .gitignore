@@ -62,3 +62,6 @@ scratch/
 # Cloud & Deployment Artifacts
 .vercel
 .netlify
+
+# Documentation
+README.md
