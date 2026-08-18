@@ -761,7 +761,7 @@ The current faculty dataset includes four primary members:
 | Member                     | Role                                    |
 | -------------------------- | --------------------------------------- |
 | Mr. Lakshman Singh Chauhan | Director & Founder                      |
-| Anoop Mishra               | Software Developer & Senior Instructor  |
+| Anup Mishra                | Co-Founder & Lead Software Architect   |
 | Vikash Srivastav           | Institute Manager & Tally Specialist    |
 | Achal Singh Chauhan        | Ethical Hacking & Cyber Security Mentor |
 
@@ -769,13 +769,15 @@ The faculty information, biographies, roles and skills are maintained centrally 
 
 ---
 
-# 👤 Director
+# 👤 Executive Leadership
 
 **Mr. Lakshman Singh Chauhan**
-
 **Director & Founder, IT HUNT**
 
-The current content identifies him as an MCA Computer Science professional and describes his focus around technology education, public speaking, mentoring and career development.
+**Anup Mishra**
+**Co-Founder & Lead Software Architect, IT HUNT**
+
+The leadership team guides IT HUNT's vision across computer science education, production software engineering, public speaking, mentoring, and career development.
 
 ---
 

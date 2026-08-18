@@ -991,17 +991,29 @@ button, input, select, textarea {
   flex-shrink: 0;
 }
 
-/* Director Card Layout */
+/* Leadership Grid & Director / Co-Founder Cards */
+.leadership-spotlight-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 1.75rem;
+  margin-top: 2.5rem;
+}
+
 .director-spotlight-card {
   background: var(--bg-card-glass);
   border: 1px solid var(--border-cyber-glow);
   border-radius: var(--radius-lg);
-  padding: 2.5rem;
-  margin-top: 3rem;
+  padding: 2.25rem;
   display: grid;
-  grid-template-columns: 180px 1fr;
-  gap: 2.25rem;
+  grid-template-columns: 140px 1fr;
+  gap: 1.75rem;
   align-items: center;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.director-spotlight-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-ai-yellow);
 }
 
 .director-img {
