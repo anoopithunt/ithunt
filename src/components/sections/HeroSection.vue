@@ -180,18 +180,39 @@
           </div>
         </div>
 
-        <!-- Director Spotlight -->
-        <div class="director-spotlight-card">
-          <img :src="content.director?.image" :alt="content.director?.name" class="director-img" @error="onImgError">
-          <div>
-            <span class="section-tag">{{ content.director?.tagline }}</span>
-            <h3 style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; margin-bottom: 0.4rem;">{{ content.director?.name }}</h3>
-            <div style="color: var(--color-ai-cyan); font-weight: 700; margin-bottom: 0.85rem; font-size: 0.9rem; font-family: var(--font-mono);">{{ content.director?.title }}</div>
-            <p style="color: var(--text-muted); line-height: 1.7; margin-bottom: 1rem; font-size: 0.925rem;">
-              "{{ content.director?.message }}"
-            </p>
-            <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-              <span class="skill-tag" v-for="sk in content.director?.skills" :key="sk">{{ sk }}</span>
+        <!-- Executive Leadership Spotlight Grid -->
+        <div class="leadership-spotlight-grid">
+          <!-- Director Spotlight -->
+          <div class="director-spotlight-card protected-img-wrapper">
+            <div class="protected-img-overlay" @contextmenu.prevent></div>
+            <img :src="content.director?.image" :alt="content.director?.name" class="director-img protected-img" draggable="false" @contextmenu.prevent @dragstart.prevent @error="onImgError">
+            <div>
+              <span class="section-tag">{{ content.director?.tagline }}</span>
+              <h3 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; margin-bottom: 0.3rem;">{{ content.director?.name }}</h3>
+              <div style="color: var(--color-ai-cyan); font-weight: 700; margin-bottom: 0.65rem; font-size: 0.85rem; font-family: var(--font-mono);">{{ content.director?.title }}</div>
+              <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 0.85rem; font-size: 0.9rem;">
+                "{{ content.director?.message }}"
+              </p>
+              <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                <span class="skill-tag" v-for="sk in content.director?.skills" :key="sk">{{ sk }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Co-Founder Spotlight -->
+          <div class="director-spotlight-card protected-img-wrapper" v-if="content.coFounder">
+            <div class="protected-img-overlay" @contextmenu.prevent></div>
+            <img :src="content.coFounder?.image" :alt="content.coFounder?.name" class="director-img protected-img" draggable="false" @contextmenu.prevent @dragstart.prevent @error="onImgError">
+            <div>
+              <span class="section-tag">{{ content.coFounder?.tagline }}</span>
+              <h3 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; margin-bottom: 0.3rem;">{{ content.coFounder?.name }}</h3>
+              <div style="color: var(--color-ai-yellow); font-weight: 700; margin-bottom: 0.65rem; font-size: 0.85rem; font-family: var(--font-mono);">{{ content.coFounder?.title }}</div>
+              <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 0.85rem; font-size: 0.9rem;">
+                "{{ content.coFounder?.message }}"
+              </p>
+              <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                <span class="skill-tag" v-for="sk in content.coFounder?.skills" :key="sk">{{ sk }}</span>
+              </div>
             </div>
           </div>
         </div>
