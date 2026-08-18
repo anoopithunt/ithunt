@@ -20,6 +20,259 @@ const CONTENT_DATA = {
     metaDescription: "IT HUNT - Enterprise Software Solutions & IT Training Center in Holagarh Prayagraj. 3 & 6-month production internships in MERN Stack, iOS, Android, AI, and Digital Marketing."
   },
 
+  // SuperAdmin & Login Governance Architecture
+  "adminAuth": {
+    "defaultUsername": "admin@ithunt.com",
+    "defaultPassword": "admin@ithunt2026",
+    "superAdminName": "Mr. Lakshman Singh Chauhan",
+    "role": "Director & Chief Administrator",
+    "avatar": "img/ithunt.jpg",
+    "institute": "IT HUNT Software Solutions & Tech Academy"
+  },
+  "loginUI": {
+    "badge": "🔐 SECURE SUPERADMIN GATEWAY",
+    "titlePrefix": "Administrator ",
+    "titleGradient": "Portal Login",
+    "subtitle": "Authorized access for IT HUNT Directorate, Faculty Leads, and Academic Registry staff.",
+    "usernameLabel": "Admin Email or Username",
+    "usernamePlaceholder": "admin@ithunt.com",
+    "passwordLabel": "Security Password",
+    "passwordPlaceholder": "Enter administrator password",
+    "rememberMeLabel": "Keep me authenticated on this workstation",
+    "loginBtnText": "Sign In to SuperAdmin Console 🚀",
+    "demoAdminCredentialsText": "🔑 Demo Credentials: admin@ithunt.com / admin@ithunt2026",
+    "quickFillBtnText": "Auto-Fill SuperAdmin Credentials ⚡",
+    "backToHomeBtnText": "← Back to Public Website",
+    "securityNotice": "🛡️ 256-Bit Encrypted Session • ISO 9001:2015 Verified Academic Console"
+  },
+  "superAdminUI": {
+    "headerTagline": "DIRECTORATE & CHIEF GOVERNANCE CONSOLE",
+    "titlePrefix": "IT HUNT ",
+    "titleGradient": "SuperAdmin Dashboard",
+    "subtitle": "Real-time overview of candidate admissions, internship allocations, event passes, faculty recruitment, and system controls.",
+    "stats": [
+      {
+        "id": "admissions",
+        "title": "Total Admissions",
+        "value": "142",
+        "sub": "18 New This Week",
+        "icon": "🎓",
+        "trend": "+14.5%",
+        "color": "primary"
+      },
+      {
+        "id": "interns",
+        "title": "Active Interns",
+        "value": "88",
+        "sub": "5 Production Tracks",
+        "icon": "🚀",
+        "trend": "+22.0%",
+        "color": "warning"
+      },
+      {
+        "id": "rsvps",
+        "title": "Event RSVPs",
+        "value": "340",
+        "sub": "Hackathon & AI Summit",
+        "icon": "🎟️",
+        "trend": "+35.8%",
+        "color": "info"
+      },
+      {
+        "id": "jobs",
+        "title": "Job Applications",
+        "value": "32",
+        "sub": "Faculty & Dev Roles",
+        "icon": "💼",
+        "trend": "+8.2%",
+        "color": "secondary"
+      },
+      {
+        "id": "reviews",
+        "title": "Avg Rating",
+        "value": "4.92 / 5.0",
+        "sub": "128 Student Reviews",
+        "icon": "⭐",
+        "trend": "99.4% CSAT",
+        "color": "gold"
+      }
+    ],
+    "tabs": [
+      {
+        "id": "admissions",
+        "label": "🎓 Student Admissions",
+        "icon": "🎓"
+      },
+      {
+        "id": "internships",
+        "label": "🚀 Internship Tracks",
+        "icon": "🚀"
+      },
+      {
+        "id": "events",
+        "label": "🎪 Event RSVPs & Passes",
+        "icon": "🎪"
+      },
+      {
+        "id": "careers",
+        "label": "💼 Faculty & Dev Jobs",
+        "icon": "💼"
+      },
+      {
+        "id": "reviews",
+        "label": "⭐ Student Reviews",
+        "icon": "⭐"
+      },
+      {
+        "id": "settings",
+        "label": "⚙️ System Config",
+        "icon": "⚙️"
+      }
+    ]
+  },
+  "sampleAdmissions": [
+    {
+      "registrationNo": "ITH-982410",
+      "date": "18 Aug 2026",
+      "time": "11:30 AM",
+      "candidateName": "Rahul Sharma",
+      "fatherName": "Suresh Sharma",
+      "motherName": "Sunita Sharma",
+      "dob": "2002-05-14",
+      "gender": "Male",
+      "course": "Web Development (MERN Stack & Cloud Architecture)",
+      "mobile": "9876543210",
+      "email": "rahul.sharma@example.com",
+      "district": "PRAYAGRAJ",
+      "address": "24/B Civil Lines, Near High Court",
+      "status": "Confirmed"
+    },
+    {
+      "registrationNo": "ITH-761234",
+      "date": "17 Aug 2026",
+      "time": "04:15 PM",
+      "candidateName": "Priya Srivastava",
+      "fatherName": "Vikas Srivastava",
+      "motherName": "Anita Srivastava",
+      "dob": "2003-09-22",
+      "gender": "Female",
+      "course": "iOS Native App Development (Swift & SwiftUI)",
+      "mobile": "9123456789",
+      "email": "priya.srivastava@example.com",
+      "district": "PRAYAGRAJ",
+      "address": "Plot 42, Teliyarganj, Prayagraj",
+      "status": "Confirmed"
+    },
+    {
+      "registrationNo": "ITH-542190",
+      "date": "16 Aug 2026",
+      "time": "02:00 PM",
+      "candidateName": "Amitabh Verma",
+      "fatherName": "Dinesh Verma",
+      "motherName": "Kiran Verma",
+      "dob": "2001-11-08",
+      "gender": "Male",
+      "course": "Android App Engineering (Kotlin & Jetpack Compose)",
+      "mobile": "9834512789",
+      "email": "amitabh.verma@example.com",
+      "district": "PRATAPGARH",
+      "address": "Near Railway Station, Pratapgarh",
+      "status": "Verified"
+    },
+    {
+      "registrationNo": "ITH-432890",
+      "date": "15 Aug 2026",
+      "time": "10:45 AM",
+      "candidateName": "Ananya Gupta",
+      "fatherName": "Rajesh Gupta",
+      "motherName": "Meena Gupta",
+      "dob": "2004-01-30",
+      "gender": "Female",
+      "course": "Python Programming, Generative AI & Data Analytics",
+      "mobile": "9988776655",
+      "email": "ananya.gupta@example.com",
+      "district": "PRAYAGRAJ",
+      "address": "Dahiyawa Holagarh, Prayagraj",
+      "status": "Pending Verification"
+    },
+    {
+      "registrationNo": "ITH-312987",
+      "date": "14 Aug 2026",
+      "time": "03:20 PM",
+      "candidateName": "Mohd. Farhan",
+      "fatherName": "Abdul Rashid",
+      "motherName": "Fatima Begum",
+      "dob": "2002-07-19",
+      "gender": "Male",
+      "course": "Full-Funnel Digital Marketing & Growth Hacking",
+      "mobile": "9765432109",
+      "email": "farhan.mohd@example.com",
+      "district": "KAUSHAMBI",
+      "address": "Main Bazaar, Sirathu, Kaushambi",
+      "status": "Confirmed"
+    }
+  ],
+  "sampleJobApplications": [
+    {
+      "id": "JOB-90123",
+      "date": "18 Aug 2026",
+      "name": "Er. Deepak Jaiswal",
+      "email": "deepak.mern@example.com",
+      "phone": "9876501234",
+      "position": "Senior MERN Stack Developer & Technical Trainer",
+      "experience": "5.5 Years",
+      "portfolio": "https://github.com/deepak-mern-dev",
+      "currentCompany": "Infotech Solutions Pvt Ltd",
+      "status": "Shortlisted for Interview"
+    },
+    {
+      "id": "JOB-84512",
+      "date": "17 Aug 2026",
+      "name": "Dr. Saurabh Pandey",
+      "email": "saurabh.ai@example.com",
+      "phone": "9812345670",
+      "position": "Senior Python, Generative AI & Machine Learning Faculty",
+      "experience": "6 Years",
+      "portfolio": "https://huggingface.co/saurabh-ai",
+      "currentCompany": "Apex Tech Institute",
+      "status": "Reviewing Profile"
+    },
+    {
+      "id": "JOB-72901",
+      "date": "16 Aug 2026",
+      "name": "Vipin Kumar Maurya",
+      "email": "vipin.ios@example.com",
+      "phone": "9923456781",
+      "position": "Senior iOS Mobile Application Instructor & Swift Mentor",
+      "experience": "4.5 Years",
+      "portfolio": "https://apps.apple.com/developer/vipin-maurya",
+      "currentCompany": "Mobility Labs India",
+      "status": "Interview Scheduled"
+    }
+  ],
+  "sampleRsvps": [
+    {
+      "id": "EVT-882190",
+      "date": "18 Aug 2026",
+      "name": "Kavita Singh",
+      "email": "kavita.s@example.com",
+      "phone": "9845123980",
+      "eventTitle": "24-Hour Annual Campus Hackathon 2026",
+      "college": "United College of Engineering & Research",
+      "status": "VIP Entry Pass Confirmed"
+    },
+    {
+      "id": "EVT-719283",
+      "date": "17 Aug 2026",
+      "name": "Alok Kumar Bind",
+      "email": "alok.bind@example.com",
+      "phone": "9734561280",
+      "eventTitle": "Generative AI & LLM Engineering Masterclass",
+      "college": "Shambhunath Institute of Engineering & Technology",
+      "status": "VIP Entry Pass Confirmed"
+    }
+  ],
+
   // Header Navigation Items
   navigation: [
     { id: "home", label: "Home", icon: "🏠" },
