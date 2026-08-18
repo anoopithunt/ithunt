@@ -344,7 +344,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 import CONTENT_DATA from './data/contentData.js';
 import { generateAdmissionPdf, generatePrivacyPolicyPdf, generateTermsConditionsPdf } from './utils/pdfGenerator.js';
 
@@ -658,6 +658,70 @@ const printAdmissionSlip = () => {
   window.print();
 };
 
+// Dynamic SEO Metadata Updater for SPA Views
+const updateSeoMetadata = (tab) => {
+  if (typeof document === 'undefined') return;
+  const metaObj = content.value?.seoPages?.[tab] || content.value?.seoPages?.home || {};
+
+  // 1. Update Document Title
+  if (metaObj.title) {
+    document.title = metaObj.title;
+  }
+
+  // Helper to set or create <meta> tags
+  const setMetaTag = (selector, attrName, attrVal, contentVal) => {
+    if (!contentVal) return;
+    let el = document.querySelector(selector);
+    if (!el) {
+      el = document.createElement('meta');
+      el.setAttribute(attrName, attrVal);
+      document.head.appendChild(el);
+    }
+    el.setAttribute('content', contentVal);
+  };
+
+  // 2. Standard Description & Keywords
+  if (metaObj.description) {
+    setMetaTag('meta[name="description"]', 'name', 'description', metaObj.description);
+  }
+  if (metaObj.keywords) {
+    setMetaTag('meta[name="keywords"]', 'name', 'keywords', metaObj.keywords);
+  }
+
+  // 3. Open Graph Social Card Tags
+  if (metaObj.ogTitle || metaObj.title) {
+    setMetaTag('meta[property="og:title"]', 'property', 'og:title', metaObj.ogTitle || metaObj.title);
+  }
+  if (metaObj.ogDescription || metaObj.description) {
+    setMetaTag('meta[property="og:description"]', 'property', 'og:description', metaObj.ogDescription || metaObj.description);
+  }
+  setMetaTag('meta[property="og:type"]', 'property', 'og:type', 'website');
+  if (typeof window !== 'undefined') {
+    setMetaTag('meta[property="og:url"]', 'property', 'og:url', window.location.href);
+  }
+
+  // 4. Twitter Card Meta Tags
+  setMetaTag('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
+  setMetaTag('meta[name="twitter:title"]', 'name', 'twitter:title', metaObj.ogTitle || metaObj.title);
+  setMetaTag('meta[name="twitter:description"]', 'name', 'twitter:description', metaObj.ogDescription || metaObj.description);
+
+  // 5. Canonical URL Link Tag
+  if (typeof window !== 'undefined') {
+    let canonicalEl = document.querySelector('link[rel="canonical"]');
+    if (!canonicalEl) {
+      canonicalEl = document.createElement('link');
+      canonicalEl.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonicalEl);
+    }
+    canonicalEl.setAttribute('href', window.location.href);
+  }
+};
+
+// Synchronize SEO metadata whenever active tab changes
+watch(activeTab, (newTab) => {
+  updateSeoMetadata(newTab);
+});
+
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true });
   handleScroll();
@@ -687,6 +751,9 @@ onMounted(() => {
       window.history.replaceState(null, '', window.location.pathname + window.location.search);
     }
   }
+
+  // Initialize SEO Metadata for active view
+  updateSeoMetadata(activeTab.value);
 });
 
 onUnmounted(() => {
