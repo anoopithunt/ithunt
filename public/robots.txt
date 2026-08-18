@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Host
+Host: https://ithunt.vercel.app
+
+# Sitemap
+Sitemap: https://ithunt.vercel.app/sitemap.xml
