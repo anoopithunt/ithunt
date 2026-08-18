@@ -4,7 +4,11 @@
  */
 
 const TARGET_EMAIL = 'softtechithunt@gmail.com';
-const FORMSUBMIT_URL = `https://formsubmit.co/ajax/${TARGET_EMAIL}`;
+const FORMSUBMIT_TOKEN = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_FORMSUBMIT_TOKEN) 
+  ? import.meta.env.VITE_FORMSUBMIT_TOKEN 
+  : '1864b99a4972a64cd046dba2a86b13c8';
+
+const FORMSUBMIT_URL = `https://formsubmit.co/ajax/${FORMSUBMIT_TOKEN}`;
 
 /**
  * Send Email Notification when a candidate registers for Admission
