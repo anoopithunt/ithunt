@@ -654,14 +654,22 @@ const CONTENT_DATA = {
     ]
   },
 
-  // Director Spotlight Section
+  // Director & Co-Founder Spotlight Section
   director: {
-    tagline: "DIRECTOR'S SPOTLIGHT",
+    tagline: "FOUNDER & DIRECTOR'S SPOTLIGHT",
     name: "Mr. Lakshman Singh Chauhan",
     title: "Director & Founder, IT HUNT | MCA (Computer Science)",
     image: "img/ithunt.jpg",
     message: "Our mission is to empower every candidate with market-ready IT skills. With our new IT Solutions Internship Center and experienced senior faculty (min 4+ years experience), we deliver unparalleled quality and hands-on production experience.",
     skills: ["Public Speaking Expert", "Motivational Speaker", "Life Coach", "Spoken English Mentor"]
+  },
+  coFounder: {
+    tagline: "CO-FOUNDER'S SPOTLIGHT",
+    name: "Anup Mishra",
+    title: "Co-Founder & Lead Software Architect",
+    image: "img/anoop.png",
+    message: "We are committed to building production-grade software engineers and delivering state-of-the-art tech solutions, high-performance web platforms, and hands-on production engineering mentorship.",
+    skills: ["Full Stack Architecture", "Vue.js / React", "Node.js / Java", "Python", "Cloud Systems"]
   },
 
   // Team & Faculty Section
@@ -681,9 +689,9 @@ const CONTENT_DATA = {
       },
       {
         id: 2,
-        name: "Anoop Mishra",
-        role: "Software Developer & Senior Instructor (4+ Yrs Exp)",
-        bio: "Full stack developer specializing in modern Java, Python, Web Engineering, and computer science core subjects.",
+        name: "Anup Mishra",
+        role: "Co-Founder & Senior Software Architect (4+ Yrs Exp)",
+        bio: "Co-Founder & Lead Full Stack Developer specializing in modern Java, Python, Web Engineering, Vue.js, and enterprise software solutions.",
         image: "img/anoop.png",
         skills: ["Java", "Python", "C/C++", "Vue.js", "Full Stack"]
       },
@@ -724,8 +732,8 @@ const CONTENT_DATA = {
     reviewsList: [
       {
         id: 1,
-        name: "Anoop Mishra (4+ Yrs Exp)",
-        role: "Software Developer & Senior Instructor",
+        name: "Anup Mishra (Co-Founder)",
+        role: "Co-Founder & Senior Software Architect",
         rating: 5,
         date: "Aug 2026",
         avatar: "img/anoop.png",
