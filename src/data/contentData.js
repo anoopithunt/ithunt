@@ -278,8 +278,7 @@ const CONTENT_DATA = {
     { id: "home", label: "Home", icon: "🏠" },
     { id: "internships", label: "IT Internships", icon: "🚀" },
     { id: "events", label: "Events & Gallery", icon: "🎪" },
-    { id: "courses", label: "Courses", icon: "📚" },
-    { id: "admission", label: "Apply Portal", icon: "📝" }
+    { id: "courses", label: "Courses", icon: "📚" }
   ],
 
   // Hero Section Copy
