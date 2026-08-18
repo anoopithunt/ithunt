@@ -381,7 +381,7 @@ const adminUser = ref({
   name: 'Mr. Lakshman Singh Chauhan',
   role: 'Director & Chief Administrator',
   email: 'admin@ithunt.com',
-  avatar: 'img/ithunt.jpg'
+  avatar: 'img/ithunt.webp'
 });
 
 // Live registries synced dynamically

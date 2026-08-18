@@ -150,7 +150,7 @@ const handleLogin = () => {
         name: props.content.superAdminData?.adminAuth?.superAdminName || 'Mr. Lakshman Singh Chauhan',
         role: props.content.superAdminData?.adminAuth?.role || 'Director & Chief Administrator',
         email: validUsername,
-        avatar: props.content.director?.image || 'img/ithunt.jpg',
+        avatar: props.content.director?.image || 'img/ithunt.webp',
         loginTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
       };
 

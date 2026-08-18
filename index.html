@@ -11,10 +11,14 @@
   <link rel="canonical" href="https://ithunt.vercel.app/">
 
   <!-- Favicon & Apple Touch Icons -->
-  <link rel="shortcut icon" type="image/png" href="/img/logo_ithunt.png">
-  <link rel="apple-touch-icon" href="/img/logo_ithunt.png">
+  <link rel="shortcut icon" type="image/png" href="/img/logo_ithunt.webp">
+  <link rel="apple-touch-icon" href="/img/logo_ithunt.webp">
+  <!-- Preconnect & Asynchronous Preload for Google Fonts & LCP Image -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="preload" as="image" href="/img/logo_ithunt.webp" fetchpriority="high">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
@@ -22,14 +26,14 @@
   <meta property="og:site_name" content="IT HUNT">
   <meta property="og:title" content="IT HUNT | Software Solutions & Tech Academy Prayagraj">
   <meta property="og:description" content="IT HUNT - Premier IT Solution & Training Center in Holagarh Prayagraj. Offering 3 & 6-month software engineering internships, MERN Stack & NIELIT diplomas.">
-  <meta property="og:image" content="https://ithunt.vercel.app/img/logo_ithunt.png">
+  <meta property="og:image" content="https://ithunt.vercel.app/img/logo_ithunt.webp">
   <meta property="og:url" content="https://ithunt.vercel.app/">
 
   <!-- Twitter Cards -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="IT HUNT | Software Solutions & Tech Academy Prayagraj">
   <meta name="twitter:description" content="IT HUNT - Premier IT Solution & Training Center in Holagarh Prayagraj. Offering 3 & 6-month software engineering internships, MERN Stack & NIELIT diplomas.">
-  <meta name="twitter:image" content="https://ithunt.vercel.app/img/logo_ithunt.png">
+  <meta name="twitter:image" content="https://ithunt.vercel.app/img/logo_ithunt.webp">
 
   <!-- Schema.org Structured Data (JSON-LD) for SEObility & Google Rich Snippets -->
   <script type="application/ld+json">
@@ -42,8 +46,8 @@
         "name": "IT HUNT",
         "legalName": "IT HUNT Institute of Computer Technology & IT Solutions",
         "url": "https://ithunt.vercel.app/",
-        "logo": "https://ithunt.vercel.app/img/logo_ithunt.png",
-        "image": "https://ithunt.vercel.app/img/logo_ithunt.png",
+        "logo": "https://ithunt.vercel.app/img/logo_ithunt.webp",
+        "image": "https://ithunt.vercel.app/img/logo_ithunt.webp",
         "telephone": "+91-9795771806",
         "email": "softtechithunt@gmail.com",
         "address": {
@@ -80,6 +84,36 @@
         "publisher": {
           "@id": "https://ithunt.vercel.app/#organization"
         }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://ithunt.vercel.app/#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://ithunt.vercel.app/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Internships",
+            "item": "https://ithunt.vercel.app/#internships"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Courses",
+            "item": "https://ithunt.vercel.app/#courses"
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "name": "Admission",
+            "item": "https://ithunt.vercel.app/#admission"
+          }
+        ]
       }
     ]
   }
@@ -87,11 +121,30 @@
 </head>
 <body>
   <div id="app">
-    <!-- Static Crawl Fallback for Pre-Hydration Crawlers -->
-    <header style="display:none;" aria-hidden="true">
-      <h1>IT HUNT - Software Solutions & Tech Academy Holagarh Prayagraj</h1>
-      <p>Enterprise IT solutions, 3 & 6 month production software engineering internships, MERN Stack development, mobile app engineering, NIELIT computer diplomas in Holagarh Prayagraj UP India.</p>
+    <!-- Semantic Static HTML Pre-Hydration Body for Static SEO Crawlers -->
+    <header>
+      <nav>
+        <img src="/img/logo_ithunt.webp" alt="IT HUNT Software Solutions & Tech Academy Logo" width="180" height="50">
+        <a href="#home">Home</a>
+        <a href="#internships">IT Internships</a>
+        <a href="#courses">Computer Courses</a>
+        <a href="#events">Flagship Events</a>
+        <a href="#admission">Online Admission</a>
+      </nav>
     </header>
+    <main>
+      <article>
+        <h1>IT HUNT - Software Solutions & Tech Academy Prayagraj</h1>
+        <p>IT HUNT is a premier computer technology institute and IT solutions center in Holagarh, Prayagraj. Offering 3 & 6-month software engineering production internships, MERN Stack development, mobile app engineering, NIELIT O/A Level diplomas, and IT services.</p>
+        <h2>Production-Grade IT Internships & Software Engineering</h2>
+        <p>Work on real client projects, master Git/GitHub workflows, and earn official Corporate LOR and experience certificates under expert mentorship.</p>
+        <h3>Executive Leadership</h3>
+        <p>Directed by Mr. Lakshman Singh Chauhan (Director & Founder, 14+ Years Experience) and Anup Mishra (Co-Founder & Lead Software Architect).</p>
+      </article>
+    </main>
+    <footer>
+      <p>© 2026 IT HUNT Institute of Computer Technology & IT Solutions. All rights reserved.</p>
+    </footer>
   </div>
   <script type="module" src="/src/main.js"></script>
 </body>

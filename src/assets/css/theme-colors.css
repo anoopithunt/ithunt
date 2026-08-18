@@ -5,7 +5,7 @@
    glassmorphism, and sleek modern dark/light contrast.
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+/* Fonts preloaded asynchronously in index.html for maximum LCP speed */
 
 :root {
   /* Solar Dark Theme - Dark Mode (Default) */
