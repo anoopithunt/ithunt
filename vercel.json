@@ -18,7 +18,7 @@
       ]
     },
     {
-      "source": "/(.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico))",
+      "source": "/:path*.(png|jpg|jpeg|gif|webp|svg|ico)",
       "headers": [
         { "key": "Referrer-Policy", "value": "same-origin" },
         { "key": "X-Content-Type-Options", "value": "nosniff" },
