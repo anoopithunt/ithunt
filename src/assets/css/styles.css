@@ -5589,3 +5589,374 @@ body.light-theme .exp-badge-required {
   border-color: rgba(239, 68, 68, 0.35) !important;
   font-weight: 800 !important;
 }
+
+/* ==========================================================================
+   COMPREHENSIVE MULTI-DEVICE RESPONSIVE SUITE (320px - 1440px+)
+   ========================================================================== */
+
+/* 1. Global Touch & Viewport Fluidity */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+img, svg, video, canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Form input touch optimization (avoids iOS Safari auto-zoom) */
+input, select, textarea, button {
+  font-family: inherit;
+  font-size: 16px;
+}
+
+@media (min-width: 641px) {
+  input, select, textarea {
+    font-size: 0.95rem;
+  }
+}
+
+/* 2. Tablet & Medium Screen Optimizations (769px - 1024px) */
+@media (max-width: 1024px) {
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: 3rem;
+    text-align: center;
+  }
+
+  .hero-content {
+    max-width: 650px;
+    margin: 0 auto;
+  }
+
+  .hero-cta-group {
+    justify-content: center;
+  }
+
+  .stats-grid {
+    justify-content: center;
+  }
+
+  .admission-container {
+    grid-template-columns: 1fr !important;
+    gap: 2.5rem;
+  }
+
+  .rating-summary-card {
+    grid-template-columns: 1fr !important;
+    gap: 2rem;
+    padding: 2rem;
+  }
+
+  .rating-score-column {
+    border-right: none;
+    border-bottom: 1px solid var(--border-cyber);
+    padding-right: 0;
+    padding-bottom: 1.5rem;
+  }
+
+  .admin-grid-2col {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* 3. Small Tablet & Large Mobile (601px - 768px) */
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 2rem !important;
+  }
+
+  .hero-title {
+    font-size: 2.4rem !important;
+  }
+
+  .admin-control-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.5rem !important;
+    gap: 1.25rem;
+  }
+
+  .admin-quick-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .superadmin-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem;
+  }
+
+  .careers-benefits-ribbon {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 2rem;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+    justify-content: center;
+  }
+  
+  .footer-bottom > div:last-child {
+    justify-content: center;
+  }
+}
+
+/* 4. Standard Mobile Screens (481px - 600px) */
+@media (max-width: 600px) {
+  .container {
+    padding: 0 1.15rem !important;
+  }
+
+  .hero-title {
+    font-size: 2.1rem !important;
+  }
+
+  .hero-subtitle {
+    font-size: 0.92rem !important;
+  }
+
+  .hero-cta-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .hero-cta-group .btn-primary,
+  .hero-cta-group .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.85rem;
+  }
+
+  .stat-card {
+    padding: 1rem 0.85rem !important;
+  }
+
+  .stat-val {
+    font-size: 1.65rem !important;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .modal-card {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    padding: 1.5rem 1.15rem !important;
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+
+  .modal-lg {
+    width: 96vw !important;
+    max-width: 96vw !important;
+    padding: 1.25rem 0.95rem !important;
+  }
+
+  .review-highlight-card {
+    padding: 2rem 1.25rem !important;
+  }
+
+  .review-highlight-title {
+    font-size: 1.7rem !important;
+  }
+
+  .star-glow-btn {
+    font-size: 2.2rem !important;
+  }
+
+  .careers-benefits-ribbon {
+    grid-template-columns: 1fr !important;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2rem;
+  }
+}
+
+/* 5. Extra-Small Mobile Screens (320px - 480px) */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 0.85rem !important;
+  }
+
+  .brand-logo {
+    gap: 0.5rem;
+  }
+
+  .brand-logo-img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .brand-title {
+    font-size: 1.05rem !important;
+  }
+
+  .brand-tagline {
+    font-size: 0.65rem !important;
+  }
+
+  .hero-badge {
+    font-size: 0.68rem !important;
+    padding: 0.35rem 0.75rem !important;
+    white-space: normal !important;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  .hero-title {
+    font-size: 1.85rem !important;
+    line-height: 1.2;
+  }
+
+  .section-title {
+    font-size: 1.65rem !important;
+  }
+
+  .section-tag {
+    font-size: 0.72rem !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem;
+  }
+
+  .stat-card {
+    padding: 0.75rem 0.5rem !important;
+  }
+
+  .stat-val {
+    font-size: 1.4rem !important;
+  }
+
+  .stat-label {
+    font-size: 0.72rem !important;
+  }
+
+  .login-card {
+    padding: 1.75rem 1.15rem !important;
+    border-radius: var(--radius-lg) !important;
+  }
+
+  .login-title {
+    font-size: 1.65rem !important;
+  }
+
+  .review-highlight-card {
+    padding: 1.5rem 1rem !important;
+  }
+
+  .review-highlight-title {
+    font-size: 1.45rem !important;
+  }
+
+  .review-floating-pill {
+    font-size: 0.68rem !important;
+    padding: 0.35rem 0.75rem !important;
+  }
+
+  .star-glow-btn {
+    font-size: 1.85rem !important;
+    padding: 0 0.05rem !important;
+  }
+
+  .star-count-indicator {
+    font-size: 0.9rem !important;
+  }
+
+  .rating-interactive-card {
+    padding: 1rem 0.85rem !important;
+  }
+
+  .cat-chip-glow-btn {
+    font-size: 0.75rem !important;
+    padding: 0.4rem 0.75rem !important;
+  }
+
+  .review-submit-mega-btn {
+    padding: 0.95rem 1.25rem !important;
+    font-size: 0.95rem !important;
+  }
+
+  .admin-control-bar {
+    padding: 1.15rem 0.85rem !important;
+    border-radius: var(--radius-lg) !important;
+  }
+
+  .admin-user-name {
+    font-size: 1.15rem !important;
+  }
+
+  .superadmin-stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.6rem !important;
+  }
+
+  .admin-stat-card {
+    padding: 0.85rem 0.65rem !important;
+    gap: 0.6rem !important;
+  }
+
+  .admin-stat-icon-box {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 1.15rem !important;
+  }
+
+  .admin-stat-val {
+    font-size: 1.15rem !important;
+  }
+
+  .admin-stat-lbl {
+    font-size: 0.72rem !important;
+  }
+
+  .admin-nav-tab-btn {
+    padding: 0.6rem 0.9rem !important;
+    font-size: 0.78rem !important;
+  }
+
+  .events-search-box {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .reviews-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .reviews-filter-bar > div {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .receipt-preview-card {
+    padding: 1.25rem 0.85rem !important;
+    font-size: 0.82rem;
+  }
+
+  .receipt-title {
+    font-size: 1.15rem !important;
+  }
+}

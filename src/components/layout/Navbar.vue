@@ -27,6 +27,7 @@
 
       <!-- Action Buttons -->
       <div class="nav-actions">
+        <!-- Theme Toggle -->
         <button 
           class="theme-toggle-btn" 
           @click="$emit('toggle-theme')" 
@@ -35,10 +36,32 @@
           <span>{{ isDarkMode ? '☀️' : '🌙' }}</span>
         </button>
         
+        <!-- Quick Apply CTA -->
         <button class="cta-btn-header" @click="$emit('set-tab', 'internships')">
           <span>{{ content.navbar?.applyCtaText || 'Apply Internship' }}</span> {{ content.navbar?.applyCtaIcon || '✨' }}
         </button>
 
+        <!-- SuperAdmin / Login Portal Button -->
+        <button 
+          v-if="isAdminLoggedIn"
+          class="cta-btn-header" 
+          style="background: linear-gradient(135deg, #10b981, #059669); border-color: #34d399; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);"
+          @click="$emit('set-tab', 'superadmin')"
+          :title="'SuperAdmin Console Logged In'"
+        >
+          <span>⚡ SuperAdmin</span>
+        </button>
+        <button 
+          v-else
+          class="theme-toggle-btn" 
+          style="width: auto; padding: 0.45rem 0.85rem; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 700;"
+          @click="$emit('set-tab', 'login')"
+          :title="'SuperAdmin / Staff Login'"
+        >
+          <span>🔐 Login</span>
+        </button>
+
+        <!-- Mobile Drawer Toggle -->
         <button 
           class="mobile-toggle-btn" 
           @click="isMobileNavOpen = !isMobileNavOpen" 
@@ -60,6 +83,25 @@
       >
         {{ item.icon }} {{ item.label }}
       </button>
+
+      <button 
+        v-if="isAdminLoggedIn"
+        class="nav-item-btn" 
+        :class="{ active: activeTab === 'superadmin' }" 
+        @click="$emit('set-tab', 'superadmin'); isMobileNavOpen = false;"
+        style="color: #34d399; font-weight: 800;"
+      >
+        ⚡ SuperAdmin Dashboard
+      </button>
+      <button 
+        v-else
+        class="nav-item-btn" 
+        :class="{ active: activeTab === 'login' }" 
+        @click="$emit('set-tab', 'login'); isMobileNavOpen = false;"
+        style="color: var(--color-ai-yellow); font-weight: 800;"
+      >
+        🔐 Admin / Staff Login
+      </button>
     </div>
   </header>
 </template>
@@ -79,6 +121,10 @@ defineProps({
   isDarkMode: {
     type: Boolean,
     default: true
+  },
+  isAdminLoggedIn: {
+    type: Boolean,
+    default: false
   }
 });
 

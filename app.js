@@ -38,7 +38,7 @@ function getEnvConfig() {
     CONTACT_PHONE: process.env.CONTACT_PHONE || "+91 9795771806",
     CONTACT_RAW_PHONE: process.env.CONTACT_RAW_PHONE || "+919795771806",
     CONTACT_EMAIL: process.env.CONTACT_EMAIL || "softtechithunt@gmail.com",
-    CONTACT_LOCATION: process.env.CONTACT_LOCATION || "📍 Dahiyawa Holagarh(Near Mela Ground in Front of Kali Maa Mandir), Prayagraj (Allahabad), UP",
+    CONTACT_LOCATION: process.env.CONTACT_LOCATION || "📍 Dahiyawa Holagarh (Near Mela Ground in Front of Kali Maa Mandir), Prayagraj (Allahabad), UP",
     WHATSAPP_NUMBER: process.env.WHATSAPP_NUMBER || "919795771806",
     DIRECTOR_NAME: process.env.DIRECTOR_NAME || "Mr. Lakshman Singh Chauhan",
     DIRECTOR_TITLE: process.env.DIRECTOR_TITLE || "Director & Founder, IT HUNT | MCA (Computer Science)",

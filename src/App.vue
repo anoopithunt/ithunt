@@ -35,6 +35,7 @@
       :content="content" 
       :activeTab="activeTab" 
       :isDarkMode="isDarkMode" 
+      :isAdminLoggedIn="isAdminLoggedIn"
       @set-tab="setTab" 
       @toggle-theme="toggleTheme" 
     />
@@ -115,6 +116,30 @@
           :isGeneratingPdf="isGeneratingPdf" 
           @submit-admission="submitAdmission" 
           @download-pdf="downloadAdmissionPdf" 
+        />
+
+        <!-- 9. Dedicated Administrator Login View -->
+        <LoginSection 
+          v-else-if="activeTab === 'login'" 
+          key="login"
+          :content="content" 
+          @login-success="handleLoginSuccess" 
+          @set-tab="setTab" 
+        />
+
+        <!-- 10. Dedicated SuperAdmin Dashboard View -->
+        <SuperAdminSection 
+          v-else-if="activeTab === 'superadmin'" 
+          key="superadmin"
+          :content="content" 
+          :adminUser="adminUser"
+          :allAdmissions="liveAdmissionsList"
+          :allJobApplications="liveJobApplicationsList"
+          :allRsvps="liveRsvpsList"
+          @logout="handleAdminLogout"
+          @download-slip="downloadCustomAdmissionSlip"
+          @add-admission="handleDirectAdmission"
+          @set-tab="setTab" 
         />
       </Transition>
     </main>
@@ -333,6 +358,8 @@ import TestimonialsSection from './components/sections/TestimonialsSection.vue';
 import ReviewsSection from './components/sections/ReviewsSection.vue';
 import CareersSection from './components/sections/CareersSection.vue';
 import AdmissionSection from './components/sections/AdmissionSection.vue';
+import LoginSection from './components/sections/LoginSection.vue';
+import SuperAdminSection from './components/sections/SuperAdminSection.vue';
 
 import CourseDetailModal from './components/modals/CourseDetailModal.vue';
 import EventDetailModal from './components/modals/EventDetailModal.vue';
@@ -347,6 +374,20 @@ const isDarkMode = ref(true);
 const scrollProgress = ref(0);
 const showConfetti = ref(false);
 const confettiPieces = ref([]);
+
+// SuperAdmin & Auth Session State
+const isAdminLoggedIn = ref(false);
+const adminUser = ref({
+  name: 'Mr. Lakshman Singh Chauhan',
+  role: 'Director & Chief Administrator',
+  email: 'admin@ithunt.com',
+  avatar: 'img/ithunt.jpg'
+});
+
+// Live registries synced dynamically
+const liveAdmissionsList = ref([]);
+const liveJobApplicationsList = ref([]);
+const liveRsvpsList = ref([]);
 
 // Admission Form State
 const form = ref({
@@ -476,7 +517,21 @@ const openRsvpModal = (upEv) => {
 
 const submitEventRsvp = (rsvpData) => {
   showRsvpModal.value = false;
-  submittedRegistrationNo.value = 'EVT-' + Math.floor(100000 + Math.random() * 900000);
+  const passId = 'EVT-' + Math.floor(100000 + Math.random() * 900000);
+  submittedRegistrationNo.value = passId;
+  
+  // Real-time sync into SuperAdmin registry
+  liveRsvpsList.value.unshift({
+    id: passId,
+    date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+    name: rsvpData.name,
+    email: rsvpData.email,
+    phone: rsvpData.phone,
+    eventTitle: rsvpData.eventTitle,
+    college: rsvpData.college,
+    status: 'VIP Entry Pass Confirmed'
+  });
+
   modalTitle.value = content.value?.ui?.eventRsvpSuccessTitle || 'Free Event Pass Confirmed! 🎟️';
   modalBody.value = `Congratulations ${rsvpData.name}! Your free VIP entry pass for "${rsvpData.eventTitle}" has been booked. A confirmation SMS will be sent to +91 ${rsvpData.phone}.`;
   showModal.value = true;
@@ -490,7 +545,23 @@ const openJobModal = (job) => {
 
 const submitJobApplication = (jobData) => {
   showJobModal.value = false;
-  submittedRegistrationNo.value = 'JOB-' + Math.floor(100000 + Math.random() * 900000);
+  const appId = 'JOB-' + Math.floor(100000 + Math.random() * 900000);
+  submittedRegistrationNo.value = appId;
+  
+  // Real-time sync into SuperAdmin registry
+  liveJobApplicationsList.value.unshift({
+    id: appId,
+    date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+    name: jobData.name,
+    email: jobData.email,
+    phone: jobData.phone,
+    position: jobData.jobTitle,
+    experience: jobData.experience || '4+ Years',
+    portfolio: jobData.portfolio,
+    currentCompany: jobData.currentCompany || 'Software Company',
+    status: 'Reviewing Profile'
+  });
+
   modalTitle.value = content.value?.ui?.jobApplicationSuccessTitle || 'Job Application Received! 💼';
   modalBody.value = `Thank you ${jobData.name}! Your application for "${jobData.jobTitle}" has been forwarded to our HR & Academic Board.`;
   showModal.value = true;
@@ -511,8 +582,7 @@ const submitAdmission = (formData) => {
   const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
-  submittedRegistrationNo.value = randomRegId;
-  lastSubmittedAdmission.value = {
+  const newAdmissionRecord = {
     registrationNo: randomRegId,
     date: dateStr,
     time: timeStr,
@@ -525,13 +595,46 @@ const submitAdmission = (formData) => {
     mobile: formData.mobile,
     email: formData.email,
     district: formData.district || 'PRAYAGRAJ',
-    address: formData.address
+    address: formData.address,
+    status: 'Confirmed'
   };
+
+  submittedRegistrationNo.value = randomRegId;
+  lastSubmittedAdmission.value = newAdmissionRecord;
+  liveAdmissionsList.value.unshift(newAdmissionRecord);
 
   modalTitle.value = content.value?.ui?.admissionSuccessTitle || 'Admission Registered Successfully! 🎓';
   modalBody.value = `Congratulations ${formData.candidateName}! Your admission/internship application for "${formData.course}" has been confirmed. You can now download your official verified Admission Registration Slip in PDF format.`;
   showModal.value = true;
   triggerConfetti();
+};
+
+const handleLoginSuccess = (user) => {
+  isAdminLoggedIn.value = true;
+  adminUser.value = user;
+  activeTab.value = 'superadmin';
+  triggerConfetti();
+};
+
+const handleAdminLogout = () => {
+  isAdminLoggedIn.value = false;
+  try {
+    sessionStorage.removeItem('ithunt_superadmin_auth');
+  } catch (e) {}
+  activeTab.value = 'home';
+};
+
+const handleDirectAdmission = (newAdm) => {
+  lastSubmittedAdmission.value = newAdm;
+  triggerConfetti();
+};
+
+const downloadCustomAdmissionSlip = (adm) => {
+  isGeneratingPdf.value = true;
+  setTimeout(() => {
+    generateAdmissionPdf(adm);
+    isGeneratingPdf.value = false;
+  }, 100);
 };
 
 const downloadAdmissionPdf = () => {
@@ -559,11 +662,24 @@ onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true });
   handleScroll();
 
-  // If user arrived with a hash (e.g. #admission or #admisson), open the corresponding view then immediately clear the hash from the URL bar
+  // Restore saved admin session if any
+  try {
+    const savedAdmin = sessionStorage.getItem('ithunt_superadmin_auth');
+    if (savedAdmin) {
+      adminUser.value = JSON.parse(savedAdmin);
+      isAdminLoggedIn.value = true;
+    }
+  } catch (e) {}
+
+  // If user arrived with a hash (e.g. #admission, #login, #superadmin), open the corresponding view then immediately clear the hash from the URL bar
   if (window.location.hash) {
     const rawHash = window.location.hash.replace('#', '').toLowerCase().trim();
     if (rawHash === 'admission' || rawHash === 'admisson') {
       activeTab.value = 'admission';
+    } else if (rawHash === 'login') {
+      activeTab.value = 'login';
+    } else if (rawHash === 'superadmin' || rawHash === 'admin') {
+      activeTab.value = isAdminLoggedIn.value ? 'superadmin' : 'login';
     } else if (['home', 'internships', 'courses', 'careers', 'reviews', 'testimonials', 'events'].includes(rawHash)) {
       activeTab.value = rawHash;
     }
