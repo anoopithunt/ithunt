@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import Inspector from 'vite-plugin-vue-inspector';
 import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig(({ command }) => {
@@ -42,11 +41,6 @@ export default defineConfig(({ command }) => {
             ] : []
           }
         }
-      }),
-      Inspector({
-        toggleButtonVisibility: 'always',
-        toggleComboKey: 'alt-shift',
-        openInEditorHost: 'vscode'
       })
     ],
     resolve: {
