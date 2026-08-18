@@ -2,11 +2,6 @@
   "version": 2,
   "cleanUrls": true,
   "trailingSlash": false,
-  "functions": {
-    "app.js": {
-      "includeFiles": "{index.html,Home.html,AboutUs.html,admission.html,Events.html,admissionStyle.css,env.js,css/**,js/**,img/**}"
-    }
-  },
   "headers": [
     {
       "source": "/(.*)",
