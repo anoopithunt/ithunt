@@ -682,8 +682,8 @@ const CONTENT_DATA = {
       {
         id: 1,
         name: "Mr. Lakshman Singh Chauhan",
-        role: "Director & Founder (14+ Yrs Experience)",
-        bio: "Public speaking expert, motivational speaker, and life coach with MCA degree. Lead mentor with 14+ years experience in computer science & executive management.",
+        role: "Director & Founder (4+ Yrs Leader)",
+        bio: "Public speaking expert, motivational speaker, and life coach with MCA degree. Lead mentor in computer science & executive management.",
         image: "img/ithunt.jpg",
         skills: ["O/A Level", "MCA", "Public Speaking", "Life Coaching", "C/C++"]
       },
