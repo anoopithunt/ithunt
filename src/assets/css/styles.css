@@ -82,9 +82,6 @@ button, input, select, textarea {
 }
 
 /* Code Monospace Utility */
-.font-mono {
-  font-family: var(--font-mono);
-}
 
 /* Layout Container */
 .container {
@@ -95,7 +92,6 @@ button, input, select, textarea {
 }
 
 /* Typography Helpers */
-.font-heading { font-family: var(--font-heading); }
 
 .text-gradient {
   background: var(--gradient-ai-hero);
@@ -472,10 +468,6 @@ button, input, select, textarea {
   display: block;
 }
 
-.code-keyword { color: #ec4899; }
-.code-function { color: #38bdf8; }
-.code-string { color: #34d399; }
-
 /* Stats Counter Grid */
 .stats-section {
   padding: 2rem 0;
@@ -549,38 +541,6 @@ button, input, select, textarea {
 }
 
 /* Filter Controls */
-.filter-bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-  margin-bottom: 2.5rem;
-}
-
-.filter-btn {
-  background: var(--bg-card-glass);
-  border: 1px solid var(--border-cyber);
-  color: var(--text-muted);
-  font-weight: 600;
-  padding: 0.55rem 1.15rem;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition: var(--transition);
-  font-size: 0.85rem;
-}
-
-.filter-btn:hover {
-  color: var(--text-main);
-  border-color: var(--color-ai-violet);
-}
-
-.filter-btn.active {
-  background: var(--gradient-ai-btn);
-  color: #ffffff;
-  border-color: transparent;
-  box-shadow: 0 4px 15px var(--glow-violet);
-}
 
 /* Course Cards Grid */
 .courses-grid {
@@ -731,44 +691,6 @@ button, input, select, textarea {
   margin-bottom: 0.75rem;
   font-family: var(--font-mono);
   box-shadow: 0 0 10px var(--glow-orange);
-}
-
-.internship-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.75rem;
-  margin-bottom: 3.5rem;
-}
-
-.internship-card {
-  background: var(--bg-card-glass);
-  border: 1px solid var(--border-cyber);
-  border-radius: var(--radius-lg);
-  padding: 1.75rem;
-  display: flex;
-  flex-direction: column;
-  transition: var(--transition);
-  position: relative;
-}
-
-.internship-card:hover {
-  transform: translateY(-6px);
-  border-color: var(--color-ai-cyan);
-  box-shadow: 0 10px 30px rgba(6, 182, 212, 0.25);
-}
-
-.internship-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: var(--radius-md);
-  background: rgba(6, 182, 212, 0.12);
-  color: var(--color-ai-cyan);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.6rem;
-  margin-bottom: 1.15rem;
-  box-shadow: 0 0 12px var(--glow-cyan);
 }
 
 /* Monospace Skill Tags */
@@ -1942,65 +1864,6 @@ body.light-theme .sig-name {
 }
 
 /* Enhanced Internship Card Quick-Stats Strip */
-.track-stats-strip {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 0.35rem;
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: var(--radius-sm);
-  padding: 0.6rem 0.5rem;
-  margin-bottom: 1.15rem;
-  text-align: center;
-}
-
-.track-mini-stat-label {
-  font-size: 0.65rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  font-family: var(--font-mono);
-  font-weight: 700;
-  display: block;
-}
-
-.track-mini-stat-val {
-  font-size: 0.8rem;
-  font-weight: 800;
-  color: var(--text-main);
-  font-family: var(--font-mono);
-  white-space: nowrap;
-}
-
-.track-actions-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.65rem;
-  margin-top: auto;
-}
-
-.btn-detail-outline {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border-cyber);
-  color: var(--text-main);
-  font-weight: 700;
-  font-size: 0.85rem;
-  padding: 0.65rem 0.85rem;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: var(--transition);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  text-align: center;
-}
-
-.btn-detail-outline:hover {
-  background: rgba(249, 115, 22, 0.15);
-  border-color: var(--color-ai-orange);
-  color: #fff;
-  transform: translateY(-2px);
-}
 
 @media (max-width: 768px) {
   .modal-lg {
@@ -2019,10 +1882,6 @@ body.light-theme .sig-name {
   }
 
   .metric-stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .track-actions-row {
     grid-template-columns: 1fr;
   }
 
@@ -2047,11 +1906,6 @@ body.light-theme .modal-lg {
 body.light-theme .detail-section-block,
 body.light-theme .metric-stat-card {
   background: #f8fafc;
-  border-color: #e2e8f0;
-}
-
-body.light-theme .track-stats-strip {
-  background: #f1f5f9;
   border-color: #e2e8f0;
 }
 
@@ -3246,7 +3100,7 @@ body.light-theme .alumni-batch-tag {
     grid-template-columns: 1fr 1fr;
   }
 
-  .courses-grid, .internship-grid, .internship-tracks-grid, .reviews-grid, .careers-grid, .team-grid, .roadmap-grid, .internship-features-grid, .alumni-cards-grid {
+  .courses-grid, .internship-tracks-grid, .reviews-grid, .careers-grid, .team-grid, .roadmap-grid, .internship-features-grid, .alumni-cards-grid {
     grid-template-columns: 1fr;
   }
 
@@ -4631,12 +4485,6 @@ body.light-theme .upcoming-event-card {
   page-break-inside: avoid !important;
 }
 
-#printable-admission-slip.pdf-render-active {
-  opacity: 1 !important;
-  z-index: 999999 !important;
-  pointer-events: auto !important;
-}
-
 .pdf-slip-header {
   display: flex;
   align-items: center;
@@ -5062,22 +4910,6 @@ body.light-theme .upcoming-event-card {
 }
 
 /* 4. Page View Morph Transitions */
-.view-morph-enter-active,
-.view-morph-leave-active {
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.view-morph-enter-from {
-  opacity: 0;
-  transform: translateY(20px) scale(0.985);
-  filter: blur(6px);
-}
-
-.view-morph-leave-to {
-  opacity: 0;
-  transform: translateY(-14px) scale(0.99);
-  filter: blur(4px);
-}
 
 /* 5. Mindblowing Interactive Card Animations */
 .modern-track-card,
@@ -5647,7 +5479,7 @@ html, body {
   box-sizing: border-box;
 }
 
-img, svg, video, canvas {
+img, svg {
   max-width: 100%;
   height: auto;
 }
@@ -5790,10 +5622,6 @@ input, select, textarea, button {
     padding: 1rem 0.85rem !important;
   }
 
-  .stat-val {
-    font-size: 1.65rem !important;
-  }
-
   .form-grid {
     grid-template-columns: 1fr !important;
   }
@@ -5885,10 +5713,6 @@ input, select, textarea, button {
 
   .stat-card {
     padding: 0.75rem 0.5rem !important;
-  }
-
-  .stat-val {
-    font-size: 1.4rem !important;
   }
 
   .stat-label {
