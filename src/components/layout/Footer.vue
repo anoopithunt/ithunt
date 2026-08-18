@@ -20,6 +20,9 @@
           <a href="#" @click.prevent="$emit('set-tab', 'careers')" class="skill-tag" style="background: rgba(249, 115, 22, 0.15); color: #fb923c; border-color: rgba(249, 115, 22, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.9rem; font-weight: 800; font-size: 0.825rem; border-radius: var(--radius-full);">
             💼 We Are Hiring (Teachers & Devs) →
           </a>
+          <a href="#" @click.prevent="$emit('set-tab', 'login')" class="skill-tag" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.9rem; font-weight: 800; font-size: 0.825rem; border-radius: var(--radius-full);">
+            🔐 SuperAdmin Portal →
+          </a>
         </div>
       </div>
 
@@ -35,6 +38,7 @@
           <li><a href="#" @click.prevent="$emit('set-tab', 'careers')">💼 Careers & Faculty Openings</a></li>
           <li><a href="#" @click.prevent="$emit('set-tab', 'reviews')">⭐ Reviews & Feedback</a></li>
           <li><a href="#" @click.prevent="$emit('set-tab', 'admission')">Admission Portal</a></li>
+          <li><a href="#" @click.prevent="$emit('set-tab', 'login')">🔐 SuperAdmin Console</a></li>
         </ul>
       </div>
 
@@ -65,6 +69,7 @@
         <a href="#" @click.prevent="$emit('set-tab', 'reviews')">{{ content.ui?.reviewsAndRatings || '⭐ Reviews & Ratings' }}</a>
         <a href="#" @click.prevent="$emit('set-tab', 'events')">{{ content.ui?.eventsGallery || 'Events Gallery' }}</a>
         <a href="#" @click.prevent="$emit('set-tab', 'testimonials')">{{ content.ui?.alumniStories || 'Alumni Stories' }}</a>
+        <a href="#" @click.prevent="$emit('set-tab', 'login')">🔐 SuperAdmin</a>
         <a href="#" @click.prevent="$emit('open-privacy-policy')">{{ content.ui?.privacyPolicy || 'Privacy Policy' }} 📄</a>
         <a href="#" @click.prevent="$emit('open-terms-conditions')">{{ content.ui?.termsConditions || 'Terms & Conditions' }} 📜</a>
         <a href="#" @click.prevent="scrollToTop">{{ content.ui?.backToTop || '⬆ Back to Top' }}</a>
