@@ -660,7 +660,7 @@ const CONTENT_DATA = {
     name: "Mr. Lakshman Singh Chauhan",
     title: "Director & Founder, IT HUNT | MCA (Computer Science)",
     image: "img/ithunt.jpg",
-    message: "Our mission is to empower every candidate with market-ready IT skills. With our new IT Solutions Internship Center and experienced senior faculty (min 4+ years experience), we deliver unparalleled quality and hands-on production experience.",
+    message: "Our mission is to empower every candidate with market-ready IT skills. With our new IT Solutions Internship Center and experienced senior faculty (min 14+ years experience), we deliver unparalleled quality and hands-on production experience.",
     skills: ["Public Speaking Expert", "Motivational Speaker", "Life Coach", "Spoken English Mentor"]
   },
   coFounder: {
