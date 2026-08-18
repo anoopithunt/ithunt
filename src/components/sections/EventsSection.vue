@@ -76,7 +76,7 @@
         <!-- Cover Media wrapper with Hover Zoom & Image Preview -->
         <div class="event-card-media protected-img-wrapper" @click="$emit('open-detail', ev)">
           <div class="protected-img-overlay" @contextmenu.prevent></div>
-          <img :src="ev.coverImage" :alt="ev.title" class="event-card-img protected-img" draggable="false" @contextmenu.prevent @dragstart.prevent @error="onImgError">
+          <img :src="ev.coverImage" :alt="ev.title" class="event-card-img protected-img" loading="lazy" decoding="async" draggable="false" @contextmenu.prevent @dragstart.prevent @error="onImgError">
           <span class="event-card-badge" v-if="ev.badge">{{ ev.badge }}</span>
           <span class="event-photo-count-pill">
             <span>📸</span> {{ ev.galleryImages?.length || 1 }} {{ content.ui?.photosCountSuffix || 'Photos' }}
@@ -94,6 +94,8 @@
             :src="img.src" 
             :alt="img.title" 
             class="event-thumb-mini protected-img"
+            loading="lazy"
+            decoding="async"
             draggable="false"
             @contextmenu.prevent
             @dragstart.prevent

@@ -14,7 +14,7 @@ const CONTENT_DATA = {
     name: "IT HUNT",
     nameHighlight: "HUNT",
     tagline: "Software Solutions & Tech Academy",
-    logoImage: "img/logo_ithunt.png",
+    logoImage: "img/logo_ithunt.webp",
     establishedYear: "2012",
     metaTitle: "IT HUNT | Software Solutions & Tech Academy",
     metaDescription: "IT HUNT - Enterprise Software Solutions & IT Training Center in Holagarh Prayagraj. 3 & 6-month production internships in MERN Stack, iOS, Android, AI, and Digital Marketing."
@@ -26,7 +26,7 @@ const CONTENT_DATA = {
     "defaultPassword": "admin@ithunt2026",
     "superAdminName": "Mr. Lakshman Singh Chauhan",
     "role": "Director & Chief Administrator",
-    "avatar": "img/ithunt.jpg",
+    "avatar": "img/ithunt.webp",
     "institute": "IT HUNT Software Solutions & Tech Academy"
   },
   "loginUI": {
@@ -605,7 +605,7 @@ const CONTENT_DATA = {
         categoryName: "NIELIT Accredited",
         duration: "1 Year (2 Semesters)",
         certification: "Govt. of India Recognized",
-        image: "img/O level.png",
+        image: "img/O level.webp",
         description: "Foundation diploma equivalent to PGDCA. Covers IT Tools, Web Designing, Python Programming, and Internet of Things (IoT).",
         topics: ["IT Fundamentals", "HTML5 & CSS3", "Python Scripting", "IoT Sensors"]
       },
@@ -617,7 +617,7 @@ const CONTENT_DATA = {
         categoryName: "NIELIT Accredited",
         duration: "1 Year (2 Semesters)",
         certification: "Advance Graduate Diploma",
-        image: "img/A level.png",
+        image: "img/A level.webp",
         description: "Advanced IT engineering diploma covering Data Structures, Computer Networks, Database Management, and Software Engineering.",
         topics: ["Data Structures C++", "DBMS & SQL", "Computer Networks", "Software Eng"]
       },
@@ -629,7 +629,7 @@ const CONTENT_DATA = {
         categoryName: "UGC / AICTE Approved",
         duration: "1 - 3 Years",
         certification: "Regular / Distance Degree",
-        image: "img/shubharati.png",
+        image: "img/shubharati.webp",
         description: "Comprehensive degree courses in computer applications run via Distance Education approved by UGC, AICTE, and DEC joint committee.",
         topics: ["Computer Architecture", "Object Oriented Programming", "Operating Systems"]
       }
@@ -642,8 +642,8 @@ const CONTENT_DATA = {
     titlePrefix: "Building High-Tech Solutions in ",
     titleGradient: "Prayagraj & India",
     description: "IT HUNT in Holagarh, Prayagraj is a top-tier Computer Technology & IT Solution Training Institute. Established with a vision to make digital literacy and modern software skills accessible to all, we specialize in rapidly evolving fields like MERN Stack, iOS/Android Development, Cyber Security, and Financial Accounting.",
-    mainImage: "img/ithunt1.jpg",
-    subImage: "img/desktop.jpg",
+    mainImage: "img/ithunt1.webp",
+    subImage: "img/desktop.webp",
     features: [
       "✓ NIELIT Accredited Center",
       "✓ Subharti Univ Partner",
@@ -659,7 +659,7 @@ const CONTENT_DATA = {
     tagline: "FOUNDER & DIRECTOR'S SPOTLIGHT",
     name: "Mr. Lakshman Singh Chauhan",
     title: "Director & Founder, IT HUNT | MCA (Computer Science)",
-    image: "img/ithunt.jpg",
+    image: "img/ithunt.webp",
     message: "Our mission is to empower every candidate with market-ready IT skills. With our new IT Solutions Internship Center and experienced senior faculty (min 14+ years experience), we deliver unparalleled quality and hands-on production experience.",
     skills: ["Public Speaking Expert", "Motivational Speaker", "Life Coach", "Spoken English Mentor"]
   },
@@ -667,7 +667,7 @@ const CONTENT_DATA = {
     tagline: "CO-FOUNDER'S SPOTLIGHT",
     name: "Anup Mishra",
     title: "Co-Founder & Lead Software Architect",
-    image: "img/anoop.png",
+    image: "img/anoop.webp",
     message: "We are committed to building production-grade software engineers and delivering state-of-the-art tech solutions, high-performance web platforms, and hands-on production engineering mentorship.",
     skills: ["Full Stack Architecture", "Vue.js / React", "Node.js / Java", "Python", "Cloud Systems"]
   },
@@ -684,7 +684,7 @@ const CONTENT_DATA = {
         name: "Mr. Lakshman Singh Chauhan",
         role: "Director & Founder (14+ Yrs Experience)",
         bio: "Public speaking expert, motivational speaker, and life coach with MCA degree. Lead mentor with 14+ years experience in computer science & executive management.",
-        image: "img/ithunt.jpg",
+        image: "img/ithunt.webp",
         skills: ["O/A Level", "MCA", "Public Speaking", "Life Coaching", "C/C++"]
       },
       {
@@ -692,7 +692,7 @@ const CONTENT_DATA = {
         name: "Anup Mishra",
         role: "Co-Founder & Senior Software Architect (4+ Yrs Exp)",
         bio: "Co-Founder & Lead Full Stack Developer specializing in modern Java, Python, Web Engineering, Vue.js, and enterprise software solutions.",
-        image: "img/anoop.png",
+        image: "img/anoop.webp",
         skills: ["Java", "Python", "C/C++", "Vue.js", "Full Stack"]
       },
       {
@@ -700,7 +700,7 @@ const CONTENT_DATA = {
         name: "Vikash Srivastav",
         role: "Institute Manager & Tally Specialist (4+ Yrs Exp)",
         bio: "Accounting specialist with expertise in Tally ERP 9, financial inventory management, HTML/CSS, and campus management.",
-        image: "img/vikash.png",
+        image: "img/vikash.webp",
         skills: ["Tally ERP 9", "CA Accounting", "HTML", "CSS", "JavaScript"]
       },
       {
@@ -708,7 +708,7 @@ const CONTENT_DATA = {
         name: "Achal Singh Chauhan",
         role: "Ethical Hacking & Cyber Security Mentor (4+ Yrs Exp)",
         bio: "Cyber security specialist, hackathon winner, and instructor for Java, C++, and penetration testing tracks.",
-        image: "img/hacker.png",
+        image: "img/hacker.webp",
         skills: ["Ethical Hacking", "Cyber Security", "Python", "Java", "Hackathons"]
       }
     ]
@@ -736,7 +736,7 @@ const CONTENT_DATA = {
         role: "Co-Founder & Senior Software Architect",
         rating: 5,
         date: "Aug 2026",
-        avatar: "img/anoop.png",
+        avatar: "img/anoop.webp",
         comment: "The 6-month MERN Stack internship transformed my practical coding skills! The mentors have 4+ years of real industry experience and guided us on live client projects."
       },
       {
@@ -745,7 +745,7 @@ const CONTENT_DATA = {
         role: "NIELIT O Level Student",
         rating: 5,
         date: "Jul 2026",
-        avatar: "img/vikash.png",
+        avatar: "img/vikash.webp",
         comment: "Exceptional facilities and lab infrastructure in Holagarh Prayagraj! Teachers make complex Python and Web topics very easy to learn."
       },
       {
@@ -754,7 +754,7 @@ const CONTENT_DATA = {
         role: "iOS App Development Intern",
         rating: 5,
         date: "Jun 2026",
-        avatar: "img/vikash.png",
+        avatar: "img/vikash.webp",
         comment: "Great experience learning Swift & SwiftUI! The lab workstations and ease of development support helped me build 2 production apps on App Store."
       }
     ]
@@ -1280,25 +1280,25 @@ const CONTENT_DATA = {
         venue: "IT HUNT Main Innovation Hub & Lab 1, Holagarh, Prayagraj",
         badge: "🔥 Flagship Hackathon",
         status: "Completed",
-        coverImage: "img/event_hackathon.jpg",
+        coverImage: "img/event_hackathon.webp",
         galleryImages: [
           {
-            src: "img/event_hackathon.jpg",
+            src: "img/event_hackathon.webp",
             title: "Live 24-Hour Coding Arena",
             caption: "48 student developer teams building production-grade SaaS products and AI systems under the clock."
           },
           {
-            src: "img/event_workshop.jpg",
+            src: "img/event_workshop.webp",
             title: "Midnight Mentor Architecture Reviews",
             caption: "Senior tech leads providing live code debugging, API optimizations, and database indexing tips."
           },
           {
-            src: "img/event_convocation.jpg",
+            src: "img/event_convocation.webp",
             title: "Grand Trophy & Cash Prize Distribution",
             caption: "Director Mr. Lakshman Singh Chauhan presenting ₹50,000 cash prize to the champion development team."
           },
           {
-            src: "img/event_techfest.jpg",
+            src: "img/event_techfest.webp",
             title: "Live Product Demonstrations & Public Booths",
             caption: "Finalists presenting live interactive web applications to external industry jury members."
           }
@@ -1308,12 +1308,12 @@ const CONTENT_DATA = {
           {
             name: "Mr. Lakshman Singh Chauhan",
             role: "Director & Chief Patron, IT HUNT",
-            image: "img/ithunt.jpg"
+            image: "img/ithunt.webp"
           },
           {
             name: "Anoop Mishra",
             role: "Senior Full Stack Mentor & Hackathon Lead",
-            image: "img/anoop.png"
+            image: "img/anoop.webp"
           }
         ],
         metrics: {
@@ -1360,20 +1360,20 @@ const CONTENT_DATA = {
         venue: "Advanced AI & Software Lab, IT HUNT Holagarh",
         badge: "🤖 Next-Gen Workshop",
         status: "Completed",
-        coverImage: "img/event_workshop.jpg",
+        coverImage: "img/event_workshop.webp",
         galleryImages: [
           {
-            src: "img/event_workshop.jpg",
+            src: "img/event_workshop.webp",
             title: "Interactive Generative AI Architecture Session",
             caption: "Mentor illustrating RAG retrieval pipelines, vector embeddings, and LangChain agents on the digital display."
           },
           {
-            src: "img/event_hackathon.jpg",
+            src: "img/event_hackathon.webp",
             title: "Hands-On Python & FastAPI Coding Labs",
             caption: "Students deploying high-throughput asynchronous REST APIs with PostgreSQL database backends."
           },
           {
-            src: "img/event_techfest.jpg",
+            src: "img/event_techfest.webp",
             title: "Autonomous Agent Demonstrations",
             caption: "Participants testing custom customer support bots connected to live ChromaDB vector indexes."
           }
@@ -1383,12 +1383,12 @@ const CONTENT_DATA = {
           {
             name: "Anoop Mishra",
             role: "Senior AI & Full-Stack Instructor",
-            image: "img/anoop.png"
+            image: "img/anoop.webp"
           },
           {
             name: "Achal Singh Chauhan",
             role: "Cyber Security & Systems Lead",
-            image: "img/hacker.png"
+            image: "img/hacker.webp"
           }
         ],
         metrics: {
@@ -1434,20 +1434,20 @@ const CONTENT_DATA = {
         venue: "IT HUNT Grand Academic Auditorium, Holagarh Prayagraj",
         badge: "🏆 Annual Convocation",
         status: "Completed",
-        coverImage: "img/event_convocation.jpg",
+        coverImage: "img/event_convocation.webp",
         galleryImages: [
           {
-            src: "img/event_convocation.jpg",
+            src: "img/event_convocation.webp",
             title: "Stage Felicitation & Gold Medalist Honoring",
             caption: "Director Mr. Lakshman Singh Chauhan presenting gold medals and honors to batch toppers."
           },
           {
-            src: "img/event_placement.jpg",
+            src: "img/event_placement.webp",
             title: "Placement Achievers Recognition Ceremony",
             caption: "Alumni placed in top MNCs and IT firms receiving corporate recommendation tokens and awards."
           },
           {
-            src: "img/event_techfest.jpg",
+            src: "img/event_techfest.webp",
             title: "Auditorium Address & Motivational Keynote",
             caption: "Inspirational address on ethical engineering, career longevity, and modern software leadership."
           }
@@ -1457,12 +1457,12 @@ const CONTENT_DATA = {
           {
             name: "Mr. Lakshman Singh Chauhan",
             role: "Director & Founder, IT HUNT",
-            image: "img/ithunt.jpg"
+            image: "img/ithunt.webp"
           },
           {
             name: "Vikash Srivastav",
             role: "Campus Administrator",
-            image: "img/vikash.png"
+            image: "img/vikash.webp"
           }
         ],
         metrics: {
@@ -1507,20 +1507,20 @@ const CONTENT_DATA = {
         venue: "IT HUNT Career Development Wing & Interview Suites",
         badge: "💼 Placement Drive",
         status: "Completed",
-        coverImage: "img/event_placement.jpg",
+        coverImage: "img/event_placement.webp",
         galleryImages: [
           {
-            src: "img/event_placement.jpg",
+            src: "img/event_placement.webp",
             title: "Corporate Technical Interview Rooms",
             caption: "HR directors and senior software architects evaluating candidate code portfolios and resumes."
           },
           {
-            src: "img/event_hackathon.jpg",
+            src: "img/event_hackathon.webp",
             title: "Live Machine Coding & Algorithmic Rounds",
             caption: "Candidates solving data structure problems and building REST endpoints under timed conditions."
           },
           {
-            src: "img/event_convocation.jpg",
+            src: "img/event_convocation.webp",
             title: "Instant Letter of Intent (LOI) Distribution",
             caption: "Selected students celebrating on-the-spot job offer letters from participating tech firms."
           }
@@ -1530,12 +1530,12 @@ const CONTENT_DATA = {
           {
             name: "Mr. Lakshman Singh Chauhan",
             role: "Director & Placement Head",
-            image: "img/ithunt.jpg"
+            image: "img/ithunt.webp"
           },
           {
             name: "Vikash Srivastav",
             role: "Corporate Liaison Lead",
-            image: "img/vikash.png"
+            image: "img/vikash.webp"
           }
         ],
         metrics: {
@@ -1581,20 +1581,20 @@ const CONTENT_DATA = {
         venue: "IT HUNT Exhibition Lawn & Smart Hardware Lab",
         badge: "🎉 Tech Fest & Expo",
         status: "Completed",
-        coverImage: "img/event_techfest.jpg",
+        coverImage: "img/event_techfest.webp",
         galleryImages: [
           {
-            src: "img/event_techfest.jpg",
+            src: "img/event_techfest.webp",
             title: "Robotics & Smart Agriculture IoT Live Stalls",
             caption: "Students demonstrating automated irrigation systems, robotic arms, and sensor dashboards."
           },
           {
-            src: "img/event_workshop.jpg",
+            src: "img/event_workshop.webp",
             title: "Interactive Mobile App Demonstrations",
             caption: "Visitors experiencing native iOS and Android apps controlling real-time microcontrollers."
           },
           {
-            src: "img/event_hackathon.jpg",
+            src: "img/event_hackathon.webp",
             title: "Junior Coding Challenge & Game Dev Zone",
             caption: "High school and diploma students competing in rapid Python game creation tournaments."
           }
@@ -1604,12 +1604,12 @@ const CONTENT_DATA = {
           {
             name: "Mr. Lakshman Singh Chauhan",
             role: "Director & Chief Patron",
-            image: "img/ithunt.jpg"
+            image: "img/ithunt.webp"
           },
           {
             name: "Achal Singh Chauhan",
             role: "Hardware & Robotics Mentor",
-            image: "img/hacker.png"
+            image: "img/hacker.webp"
           }
         ],
         metrics: {
@@ -1655,20 +1655,20 @@ const CONTENT_DATA = {
         venue: "Apple Mac & Android Testing Lab, IT HUNT Holagarh",
         badge: "📱 Mobile Bootcamp",
         status: "Completed",
-        coverImage: "img/event_workshop.jpg",
+        coverImage: "img/event_workshop.webp",
         galleryImages: [
           {
-            src: "img/event_workshop.jpg",
+            src: "img/event_workshop.webp",
             title: "SwiftUI Declarative Layouts & Combine Framework",
             caption: "Instructor breaking down state hoisting, observable objects, and async/await networking in Swift."
           },
           {
-            src: "img/event_hackathon.jpg",
+            src: "img/event_hackathon.webp",
             title: "Jetpack Compose & Kotlin Coroutines Lab",
             caption: "Building reactive Android Material 3 user interfaces with clean MVVM architecture."
           },
           {
-            src: "img/event_convocation.jpg",
+            src: "img/event_convocation.webp",
             title: "TestFlight & Play Store Submission Session",
             caption: "Demonstration of generating app bundles, provisioning profiles, and signing certificates."
           }
@@ -1678,12 +1678,12 @@ const CONTENT_DATA = {
           {
             name: "Mr. Lakshman Singh Chauhan",
             role: "Director & Founder",
-            image: "img/ithunt.jpg"
+            image: "img/ithunt.webp"
           },
           {
             name: "Anoop Mishra",
             role: "Lead Mobile & Web Architect",
-            image: "img/anoop.png"
+            image: "img/anoop.webp"
           }
         ],
         metrics: {

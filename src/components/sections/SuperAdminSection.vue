@@ -4,7 +4,7 @@
     <div class="admin-control-bar anim-stagger-1">
       <div class="admin-profile-info">
         <div class="admin-avatar-wrap">
-          <img :src="adminUser.avatar || content.director?.image || 'img/ithunt.jpg'" :alt="adminUser.name" class="admin-avatar-img" @error="onAvatarError">
+          <img :src="adminUser.avatar || content.director?.image || 'img/ithunt.webp'" :alt="adminUser.name" class="admin-avatar-img" @error="onAvatarError">
           <span class="admin-live-status-dot" title="Admin Active"></span>
         </div>
         <div>
@@ -549,7 +549,7 @@ const props = defineProps({
       name: 'Mr. Lakshman Singh Chauhan',
       role: 'Director & Chief Administrator',
       email: 'admin@ithunt.com',
-      avatar: 'img/ithunt.jpg'
+      avatar: 'img/ithunt.webp'
     })
   },
   allAdmissions: {
