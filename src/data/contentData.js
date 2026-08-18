@@ -677,7 +677,7 @@ const CONTENT_DATA = {
     tagline: "EXPERT TECH LEADERSHIP",
     titlePrefix: "Meet Our Senior ",
     titleGradient: "Instructors & Tech Mentors",
-    description: "Dedicated tech leaders with minimum 4+ years industry and teaching experience.",
+    description: "Dedicated tech leaders with minimum 14+ years industry and teaching experience.",
     members: [
       {
         id: 1,
