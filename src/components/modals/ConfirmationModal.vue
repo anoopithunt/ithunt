@@ -58,14 +58,34 @@
         </div>
       </div>
 
-      <div class="modal-actions-group">
+      <div class="modal-actions-group" style="display: flex; flex-wrap: wrap; gap: 0.6rem;">
         <button 
           v-if="admission" 
           class="btn-primary pdf-download-btn" 
           @click="$emit('download-pdf')" 
           :disabled="isGeneratingPdf"
         >
-          <span>{{ isGeneratingPdf ? (content?.ui?.generatingPdfLabel || '⏳ Generating PDF...') : (content?.ui?.downloadPdfSlipBtn || '📄 Download Registration Slip (PDF)') }}</span>
+          <span>{{ isGeneratingPdf ? (content?.ui?.generatingPdfLabel || '⏳ Generating PDF...') : (content?.ui?.downloadPdfSlipBtn || '📄 Download Slip (PDF)') }}</span>
+        </button>
+
+        <button 
+          v-if="admission && admission.mobile" 
+          class="btn-primary" 
+          style="background: linear-gradient(135deg, #25D366, #128C7E); border-color: #25D366; color: #ffffff;"
+          @click="sendWhatsAppNotification(admission)"
+          title="Send Official Admission Confirmation Pass on WhatsApp"
+        >
+          <span>💬 WhatsApp Pass</span>
+        </button>
+
+        <button 
+          v-if="admission && admission.mobile" 
+          class="btn-secondary" 
+          style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;"
+          @click="sendDeviceSmsNotification(admission)"
+          title="Send Confirmation via Mobile SMS"
+        >
+          <span>📱 Mobile SMS</span>
         </button>
         
         <button 
@@ -73,7 +93,7 @@
           class="btn-secondary" 
           @click="$emit('print-slip')"
         >
-          <span>{{ content?.ui?.printSlipBtn || 'Print Slip 🖨️' }}</span>
+          <span>{{ content?.ui?.printSlipBtn || 'Print 🖨️' }}</span>
         </button>
 
         <button class="btn-secondary" @click="$emit('close')">{{ content?.ui?.gotIt || 'Got It 👍' }}</button>
@@ -83,6 +103,8 @@
 </template>
 
 <script setup>
+import { sendWhatsAppNotification, sendDeviceSmsNotification } from '../../utils/smsNotifier.js';
+
 defineProps({
   isOpen: {
     type: Boolean,
