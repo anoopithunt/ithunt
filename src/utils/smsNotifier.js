@@ -91,47 +91,111 @@ export function sendDeviceSmsNotification(adm) {
   return true;
 }
 
+const SMS_WEBHOOK_URL = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_SMS_WEBHOOK_URL)
+  ? import.meta.env.VITE_SMS_WEBHOOK_URL
+  : null;
+
+const MSG91_AUTH_KEY = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_MSG91_AUTH_KEY)
+  ? import.meta.env.VITE_MSG91_AUTH_KEY
+  : null;
+
 /**
  * Send automated transactional SMS via Fast2SMS gateway if API key is provided
  * @param {Object} adm 
  */
 export async function sendFast2SmsApiNotification(adm) {
-  if (!adm || !adm.mobile || !FAST2SMS_API_KEY) {
-    return { success: false, reason: 'Missing mobile or Fast2SMS API key' };
+  if (!adm || !adm.mobile) {
+    return { success: false, reason: 'Missing candidate mobile' };
   }
 
   const rawDigits = String(adm.mobile).replace(/[^0-9]/g, '').slice(-10);
-  const messageText = `IT HUNT Admission Confirmed! Candidate: ${adm.candidateName}, Reg ID: ${adm.registrationNo}, Program: ${adm.course}. Reporting 09:30 AM at Holagarh Prayagraj Campus.`;
+  const messageText = `IT HUNT Academy Admission CONFIRMED! Candidate: ${adm.candidateName}, Reg ID: ${adm.registrationNo}, Course: ${adm.course}. Day 1 Reporting: 09:30 AM Holagarh Campus Prayagraj.`;
 
-  try {
-    const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
-      method: 'POST',
-      headers: {
-        'authorization': FAST2SMS_API_KEY,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        route: 'v3',
-        sender_id: 'TXTIND',
-        message: messageText,
-        language: 'english',
-        flash: 0,
-        numbers: rawDigits
-      })
-    });
+  // 1. Fast2SMS Provider
+  if (FAST2SMS_API_KEY) {
+    try {
+      const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
+        method: 'POST',
+        headers: {
+          'authorization': FAST2SMS_API_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          route: 'v3',
+          sender_id: 'TXTIND',
+          message: messageText,
+          language: 'english',
+          flash: 0,
+          numbers: rawDigits
+        })
+      });
 
-    const data = await response.json();
-    if (data && data.return) {
-      console.log(`✓ Fast2SMS notification sent successfully to +91 ${rawDigits}`);
-      return { success: true, data };
-    } else {
-      console.warn('Fast2SMS returned error:', data);
-      return { success: false, data };
+      const data = await response.json();
+      if (data && data.return) {
+        console.log(`✓ Fast2SMS delivered to +91 ${rawDigits}`);
+        return { success: true, data };
+      }
+    } catch (err) {
+      console.warn('Fast2SMS dispatch error:', err);
     }
-  } catch (err) {
-    console.error('Fast2SMS dispatch failed:', err);
-    return { success: false, error: err.message };
   }
+
+  // 2. Custom SMS Webhook Endpoint
+  if (SMS_WEBHOOK_URL) {
+    try {
+      const response = await fetch(SMS_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: `+91${rawDigits}`,
+          mobile: rawDigits,
+          message: messageText,
+          candidateName: adm.candidateName,
+          registrationNo: adm.registrationNo,
+          course: adm.course
+        })
+      });
+      if (response.ok) {
+        console.log(`✓ Custom SMS Webhook delivered to +91 ${rawDigits}`);
+        return { success: true };
+      }
+    } catch (err) {
+      console.warn('SMS Webhook dispatch error:', err);
+    }
+  }
+
+  // 3. MSG91 Gateway Integration
+  if (MSG91_AUTH_KEY) {
+    try {
+      const response = await fetch(`https://control.msg91.com/api/v5/flow/`, {
+        method: 'POST',
+        headers: {
+          'authkey': MSG91_AUTH_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          template_id: 'ithunt_admission_confirm',
+          short_url: '1',
+          recipients: [
+            {
+              mobiles: `91${rawDigits}`,
+              name: adm.candidateName,
+              regno: adm.registrationNo,
+              course: adm.course
+            }
+          ]
+        })
+      });
+      if (response.ok) {
+        console.log(`✓ MSG91 SMS delivered to +91 ${rawDigits}`);
+        return { success: true };
+      }
+    } catch (err) {
+      console.warn('MSG91 dispatch error:', err);
+    }
+  }
+
+  return { success: false, reason: 'No active SMS Gateway API key configured in .env' };
 }
 
 /**
@@ -141,13 +205,15 @@ export async function sendFast2SmsApiNotification(adm) {
 export async function triggerMobileMessageNotification(adm) {
   if (!adm) return false;
 
-  // Try Fast2SMS backend API dispatch if key is configured
-  if (FAST2SMS_API_KEY) {
-    sendFast2SmsApiNotification(adm).catch(() => {});
+  // Attempt background SMS Gateway API dispatch
+  const apiResult = await sendFast2SmsApiNotification(adm);
+
+  if (apiResult.success) {
+    console.log(`✓ Automated Mobile SMS delivered to candidate ${adm.candidateName} (+91 ${adm.mobile})`);
+  } else {
+    console.log(`📱 Candidate registered: +91 ${adm.mobile} (Ready for instant WhatsApp / SMS Pass trigger)`);
   }
 
-  // Also log confirmation dispatch status
-  console.log(`📱 Mobile message ready for candidate ${adm.candidateName} (+91 ${adm.mobile})`);
   return true;
 }
 
