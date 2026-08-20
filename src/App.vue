@@ -346,7 +346,7 @@
 <script setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue';
 import CONTENT_DATA from './data/contentData.js';
-import { generateAdmissionPdf, generatePrivacyPolicyPdf, generateTermsConditionsPdf } from './utils/pdfGenerator.js';
+import { generateAdmissionPdf, generatePrivacyPolicyPdf, generateTermsConditionsPdf, getAdmissionPdfBlob } from './utils/pdfGenerator.js';
 import { sendAdmissionEmailNotification, sendJobEmailNotification, sendRsvpEmailNotification } from './utils/emailNotifier.js';
 
 import Navbar from './components/layout/Navbar.vue';
@@ -614,8 +614,9 @@ const submitAdmission = (formData) => {
   lastSubmittedAdmission.value = newAdmissionRecord;
   liveAdmissionsList.value.unshift(newAdmissionRecord);
 
-  // Trigger automatic email dispatch to softtechithunt@gmail.com
-  sendAdmissionEmailNotification(newAdmissionRecord).catch(() => {});
+  // Generate PDF Blob & trigger automatic email dispatch to softtechithunt@gmail.com with PDF attachment
+  const pdfBlob = getAdmissionPdfBlob(newAdmissionRecord);
+  sendAdmissionEmailNotification(newAdmissionRecord, pdfBlob).catch(() => {});
 
   modalTitle.value = content.value?.ui?.admissionSuccessTitle || 'Admission Registered Successfully! 🎓';
   modalBody.value = `Congratulations ${formData.candidateName}! Your admission/internship application for "${formData.course}" has been confirmed. You can now download your official verified Admission Registration Slip in PDF format.`;

@@ -69,11 +69,12 @@ function drawHeader(doc, margin, contentWidth, pageWidth, docCode, badgeTitle) {
 }
 
 /**
- * Generates and downloads an official 1-page A4 vector Admission Registration Slip.
+ * Helper to build and return a jsPDF instance for Admission Slip
  * @param {Object} adm - Candidate admission details
+ * @returns {jsPDF|null}
  */
-export function generateAdmissionPdf(adm) {
-  if (!adm) return false;
+export function createAdmissionPdfDoc(adm) {
+  if (!adm) return null;
 
   try {
     const doc = new jsPDF({
@@ -290,6 +291,35 @@ export function generateAdmissionPdf(adm) {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8);
     doc.text('Director & Founder, IT HUNT | MCA', sigX, curY + 15);
+
+    return doc;
+  } catch (err) {
+    console.error('Error building Admission PDF document:', err);
+    return null;
+  }
+}
+
+/**
+ * Returns a PDF Blob of the Admission Registration Slip
+ * @param {Object} adm - Candidate admission details
+ * @returns {Blob|null}
+ */
+export function getAdmissionPdfBlob(adm) {
+  const doc = createAdmissionPdfDoc(adm);
+  if (!doc) return null;
+  return doc.output('blob');
+}
+
+/**
+ * Generates and downloads an official 1-page A4 vector Admission Registration Slip.
+ * @param {Object} adm - Candidate admission details
+ */
+export function generateAdmissionPdf(adm) {
+  if (!adm) return false;
+
+  try {
+    const doc = createAdmissionPdfDoc(adm);
+    if (!doc) return false;
 
     // Save PDF
     const candidateCleanName = (adm.candidateName || 'Student').replace(/[^a-zA-Z0-9]/g, '_');
