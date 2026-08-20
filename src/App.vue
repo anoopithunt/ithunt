@@ -348,6 +348,7 @@ import { ref, watch, onMounted, onUnmounted } from 'vue';
 import CONTENT_DATA from './data/contentData.js';
 import { generateAdmissionPdf, generatePrivacyPolicyPdf, generateTermsConditionsPdf, getAdmissionPdfBlob } from './utils/pdfGenerator.js';
 import { sendAdmissionEmailNotification, sendJobEmailNotification, sendRsvpEmailNotification } from './utils/emailNotifier.js';
+import { triggerMobileMessageNotification } from './utils/smsNotifier.js';
 
 import Navbar from './components/layout/Navbar.vue';
 import Footer from './components/layout/Footer.vue';
@@ -617,6 +618,9 @@ const submitAdmission = (formData) => {
   // Generate PDF Blob & trigger automatic email dispatch to softtechithunt@gmail.com with PDF attachment
   const pdfBlob = getAdmissionPdfBlob(newAdmissionRecord);
   sendAdmissionEmailNotification(newAdmissionRecord, pdfBlob).catch(() => {});
+
+  // Trigger mobile SMS & WhatsApp messaging dispatch
+  triggerMobileMessageNotification(newAdmissionRecord).catch(() => {});
 
   modalTitle.value = content.value?.ui?.admissionSuccessTitle || 'Admission Registered Successfully! 🎓';
   modalBody.value = `Congratulations ${formData.candidateName}! Your admission/internship application for "${formData.course}" has been confirmed. You can now download your official verified Admission Registration Slip in PDF format.`;

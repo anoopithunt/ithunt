@@ -144,8 +144,8 @@
           </div>
         </div>
 
-        <!-- Receipt Download Action if submitted -->
-        <div v-if="lastSubmittedAdmission" style="margin-top: 1.25rem; padding: 0 1.25rem 1.25rem;">
+        <!-- Receipt Actions if submitted -->
+        <div v-if="lastSubmittedAdmission" style="margin-top: 1.25rem; padding: 0 1.25rem 1.25rem; display: flex; flex-direction: column; gap: 0.6rem;">
           <button 
             class="btn-primary pdf-download-btn" 
             style="width: 100%; justify-content: center;" 
@@ -154,6 +154,26 @@
           >
             <span>{{ isGeneratingPdf ? (content.ui?.generatingPdfLabel || '⏳ Generating PDF...') : (content.ui?.downloadVerifiedPdfBtn || '📄 Download Verified Admission Slip (PDF)') }}</span>
           </button>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
+            <button 
+              class="btn-primary" 
+              style="justify-content: center; background: linear-gradient(135deg, #25D366, #128C7E); border-color: #25D366; color: #ffffff;"
+              @click="sendWhatsAppNotification(lastSubmittedAdmission)"
+              title="Send Confirmation Pass on WhatsApp"
+            >
+              <span>💬 WhatsApp Pass</span>
+            </button>
+
+            <button 
+              class="btn-secondary" 
+              style="justify-content: center; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;"
+              @click="sendDeviceSmsNotification(lastSubmittedAdmission)"
+              title="Send Confirmation via Device SMS"
+            >
+              <span>📱 Mobile SMS</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -161,6 +181,8 @@
 </template>
 
 <script setup>
+import { sendWhatsAppNotification, sendDeviceSmsNotification } from '../../utils/smsNotifier.js';
+
 const props = defineProps({
   content: {
     type: Object,
