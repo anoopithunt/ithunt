@@ -73,6 +73,12 @@ export async function sendAdmissionEmailNotification(admissionRecord, pdfBlob = 
       addField('_template', 'table');
       addField('_captcha', 'false');
 
+      if (admissionRecord.email && admissionRecord.email.includes('@')) {
+        addField('_cc', admissionRecord.email);
+        addField('email', admissionRecord.email);
+        addField('_autoresponse', `Dear ${admissionRecord.candidateName || 'Candidate'},\n\nThank you for registering with IT HUNT Academy!\nYour admission/internship registration for "${admissionRecord.course || 'Selected Track'}" has been provisionally confirmed.\n\nPlease find your official Admission Registration Slip attached in PDF format.\n\nBest regards,\nIT HUNT Directorate\n📍 Holagarh Campus, Prayagraj, UP – 212502`);
+      }
+
       addField('ACADEMY HEADER', '🟢 🏛️ OFFICIAL ADMISSION PREVIEW');
       addField('INSTITUTION', 'IT HUNT ACADEMY 2026');
       addField('CAMPUS LOCATION', '📍 Dahiyawa Holagarh, Prayagraj, UP – 212502');
@@ -113,7 +119,7 @@ export async function sendAdmissionEmailNotification(admissionRecord, pdfBlob = 
         }
       }, 3000);
 
-      console.log(`✓ Admission email notification with attached PDF (${filename}) submitted to ${TARGET_EMAIL}`);
+      console.log(`✓ Admission email notification with attached PDF (${filename}) submitted to ${TARGET_EMAIL} and CC to ${admissionRecord.email || 'Candidate'}`);
       return { success: true };
     } catch (err) {
       console.warn('Hidden form submission for attachment failed, falling back to AJAX:', err);
@@ -148,6 +154,11 @@ export async function sendAdmissionEmailNotification(admissionRecord, pdfBlob = 
       'Registration Time': admissionRecord.time || new Date().toLocaleTimeString('en-US')
     };
 
+    if (admissionRecord.email && admissionRecord.email.includes('@')) {
+      payload._cc = admissionRecord.email;
+      payload.email = admissionRecord.email;
+    }
+
     const response = await fetch(FORMSUBMIT_AJAX_URL, {
       method: 'POST',
       headers: {
@@ -158,7 +169,7 @@ export async function sendAdmissionEmailNotification(admissionRecord, pdfBlob = 
     });
 
     if (response.ok) {
-      console.log(`✓ Admission email notification sent to ${TARGET_EMAIL}`);
+      console.log(`✓ Admission email notification sent to ${TARGET_EMAIL} and ${admissionRecord.email}`);
       return { success: true };
     } else {
       console.warn(`FormSubmit status: ${response.status}`);
@@ -193,8 +204,13 @@ export async function sendJobEmailNotification(jobRecord) {
     'Application Date': jobRecord.date || new Date().toLocaleDateString('en-GB')
   };
 
+  if (jobRecord.email && jobRecord.email.includes('@')) {
+    payload._cc = jobRecord.email;
+    payload.email = jobRecord.email;
+  }
+
   try {
-    await fetch(FORMSUBMIT_URL, {
+    await fetch(FORMSUBMIT_AJAX_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -229,8 +245,13 @@ export async function sendRsvpEmailNotification(rsvpRecord) {
     'RSVP Date': rsvpRecord.date || new Date().toLocaleDateString('en-GB')
   };
 
+  if (rsvpRecord.email && rsvpRecord.email.includes('@')) {
+    payload._cc = rsvpRecord.email;
+    payload.email = rsvpRecord.email;
+  }
+
   try {
-    await fetch(FORMSUBMIT_URL, {
+    await fetch(FORMSUBMIT_AJAX_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
