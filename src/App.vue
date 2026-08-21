@@ -38,6 +38,7 @@
       :isAdminLoggedIn="isAdminLoggedIn"
       @set-tab="setTab" 
       @toggle-theme="toggleTheme" 
+      @open-nielit-modal="showNielitModal = true"
     />
 
     <!-- Main Dynamic Views with Animated Morph Transition -->
@@ -61,6 +62,7 @@
           @set-tab="setTab" 
           @open-detail="openCourseDetailModal" 
           @fast-apply="proceedToRegistration" 
+          @open-nielit-modal="showNielitModal = true"
         />
 
         <!-- 3. Dedicated Events & Gallery View -->
@@ -185,6 +187,12 @@
       :content="content"
       @close="showJobModal = false" 
       @submit-job="submitJobApplication" 
+    />
+
+    <NielitProjectModal 
+      v-if="showNielitModal" 
+      @close="showNielitModal = false" 
+      @submit-nielit-project="submitNielitProject" 
     />
 
     <ConfirmationModal 
@@ -347,7 +355,8 @@
 import { ref, watch, onMounted, onUnmounted } from 'vue';
 import CONTENT_DATA from './data/contentData.js';
 import { generateAdmissionPdf, generatePrivacyPolicyPdf, generateTermsConditionsPdf, getAdmissionPdfBlob } from './utils/pdfGenerator.js';
-import { sendAdmissionEmailNotification, sendJobEmailNotification, sendRsvpEmailNotification } from './utils/emailNotifier.js';
+import { generateNielitProjectPdf, getNielitProjectPdfBlob } from './utils/nielitPdfGenerator.js';
+import { sendAdmissionEmailNotification, sendJobEmailNotification, sendRsvpEmailNotification, sendNielitProjectEmailNotification } from './utils/emailNotifier.js';
 import { triggerMobileMessageNotification } from './utils/smsNotifier.js';
 
 import Navbar from './components/layout/Navbar.vue';
@@ -368,6 +377,7 @@ import EventDetailModal from './components/modals/EventDetailModal.vue';
 import EventLightbox from './components/modals/EventLightbox.vue';
 import EventRsvpModal from './components/modals/EventRsvpModal.vue';
 import JobApplicationModal from './components/modals/JobApplicationModal.vue';
+import NielitProjectModal from './components/modals/NielitProjectModal.vue';
 import ConfirmationModal from './components/modals/ConfirmationModal.vue';
 
 const content = ref(CONTENT_DATA);
@@ -424,6 +434,8 @@ const selectedUpcomingEvent = ref({});
 
 const showJobModal = ref(false);
 const selectedJob = ref({});
+
+const showNielitModal = ref(false);
 
 const showModal = ref(false);
 const modalTitle = ref('');
@@ -576,6 +588,28 @@ const submitJobApplication = (jobData) => {
 
   modalTitle.value = content.value?.ui?.jobApplicationSuccessTitle || 'Job Application Received! 💼';
   modalBody.value = `Thank you ${jobData.name}! Your application for "${jobData.jobTitle}" has been forwarded to our HR & Academic Board.`;
+  showModal.value = true;
+  triggerConfetti();
+};
+
+const submitNielitProject = (projectData) => {
+  showNielitModal.value = false;
+  const regId = projectData.nielitRegNo || ('NIELIT-' + Math.floor(100000 + Math.random() * 900000));
+  submittedRegistrationNo.value = regId;
+
+  // 1. Generate & download 4-Page PDF Document
+  generateNielitProjectPdf(projectData);
+
+  // 2. Dispatch email notification with 4-page PDF attachment
+  try {
+    const pdfBlob = getNielitProjectPdfBlob(projectData);
+    sendNielitProjectEmailNotification(projectData, pdfBlob).catch(() => {});
+  } catch (e) {
+    sendNielitProjectEmailNotification(projectData).catch(() => {});
+  }
+
+  modalTitle.value = 'NIELIT Project Submitted Successfully! 📜';
+  modalBody.value = `Congratulations ${projectData.candidateName}! Your official 4-Page NIELIT Project Submission Document (Reg No: ${regId}) has been generated and downloaded. A copy has been dispatched to ${projectData.email}.`;
   showModal.value = true;
   triggerConfetti();
 };
