@@ -18,46 +18,55 @@ import { getAdmissionPdfBlob } from './pdfGenerator.js';
  * @param {Object} admissionRecord 
  * @param {Blob|null} [pdfBlob] Optional pre-generated PDF Blob
  */
-export async function sendAdmissionEmailNotification(admissionRecord, pdfBlob = null) {
-  if (!admissionRecord) return { success: false, error: 'Empty record' };
+/**
+ * Send Email Notification when a candidate registers for Admission (with PDF attachment)
+ * Sends Admin email with Admin content to softtechithunt@gmail.com and Student email with Student content to candidate.
+ * @param {Object} admissionRecord 
+ * @param {Blob|null} [pdfBlob] Optional pre-generated PDF Blob
+ */
+/**
+ * Dispatch distinct Admin Email Notification with Admin PDF Record attachment
+ * @param {Object} admissionRecord 
+ * @param {Blob|null} adminPdfBlob 
+ */
+export async function sendAdminAdmissionEmail(admissionRecord, adminPdfBlob = null) {
+  if (!admissionRecord) return { success: false };
 
+  const regNo = admissionRecord.registrationNo || 'ITH-000000';
+  const candName = admissionRecord.candidateName || 'Candidate';
+  const courseTitle = admissionRecord.course || 'Selected Program';
   const genderDobFormatted = `${admissionRecord.gender || 'Male'} | ${admissionRecord.dob || 'N/A'}`;
   const districtStateFormatted = `${(admissionRecord.district || 'PRAYAGRAJ').toUpperCase()}, UP`;
+  const candidateCleanName = candName.replace(/[^a-zA-Z0-9]/g, '_');
+  const filename = `IT_HUNT_Admin_Record_${regNo}_${candidateCleanName}.pdf`;
+  const subjectText = `👑 [ADMIN CONTROL PANEL] New Student Admission: ${candName} [Reg: ${regNo}]`;
 
-  // Auto-generate PDF blob if not passed explicitly
-  if (!pdfBlob) {
+  // Auto-generate Admin PDF blob if missing
+  if (!adminPdfBlob) {
     try {
-      pdfBlob = getAdmissionPdfBlob(admissionRecord);
+      adminPdfBlob = getAdmissionPdfBlob(admissionRecord, 'admin');
     } catch (e) {
-      console.warn('Could not auto-generate PDF blob for email:', e);
+      console.warn('Could not auto-generate Admin PDF blob:', e);
     }
   }
 
-  const subjectText = `🟢 🏛️ OFFICIAL ADMISSION PREVIEW: ${admissionRecord.candidateName || 'Candidate'} [Reg: ${admissionRecord.registrationNo}]`;
-  const replyToEmail = admissionRecord.email || TARGET_EMAIL;
-  const candidateCleanName = (admissionRecord.candidateName || 'Candidate').replace(/[^a-zA-Z0-9]/g, '_');
-  const filename = `IT_HUNT_Admission_${admissionRecord.registrationNo || 'Slip'}_${candidateCleanName}.pdf`;
-
-  // FormSubmit requires standard HTML form submission (not AJAX) for file attachments.
-  // We construct a dynamic multipart form targeting a hidden iframe so the SPA UI does not redirect.
-  if (pdfBlob && typeof document !== 'undefined') {
+  // Submit via iframe multipart form to attach Admin PDF file
+  if (adminPdfBlob && typeof document !== 'undefined') {
     try {
-      // 1. Ensure hidden iframe exists in body
-      let iframe = document.getElementById('formsubmit_hidden_iframe');
+      let iframe = document.getElementById('formsubmit_admin_iframe');
       if (!iframe) {
         iframe = document.createElement('iframe');
-        iframe.id = 'formsubmit_hidden_iframe';
-        iframe.name = 'formsubmit_hidden_iframe';
+        iframe.id = 'formsubmit_admin_iframe';
+        iframe.name = 'formsubmit_admin_iframe';
         iframe.style.display = 'none';
         document.body.appendChild(iframe);
       }
 
-      // 2. Create dynamic multipart form targeting the iframe
       const form = document.createElement('form');
       form.action = FORMSUBMIT_FORM_URL;
       form.method = 'POST';
       form.enctype = 'multipart/form-data';
-      form.target = 'formsubmit_hidden_iframe';
+      form.target = 'formsubmit_admin_iframe';
       form.style.display = 'none';
 
       const addField = (name, value) => {
@@ -69,116 +78,253 @@ export async function sendAdmissionEmailNotification(admissionRecord, pdfBlob = 
       };
 
       addField('_subject', subjectText);
-      addField('_replyto', replyToEmail);
+      addField('_replyto', admissionRecord.email || TARGET_EMAIL);
       addField('_template', 'table');
       addField('_captcha', 'false');
 
-      if (admissionRecord.email && admissionRecord.email.includes('@')) {
-        addField('_cc', admissionRecord.email);
-        addField('email', admissionRecord.email);
-        addField('_autoresponse', `Dear ${admissionRecord.candidateName || 'Candidate'},\n\nThank you for registering with IT HUNT Academy!\nYour admission/internship registration for "${admissionRecord.course || 'Selected Track'}" has been provisionally confirmed.\n\nPlease find your official Admission Registration Slip attached in PDF format.\n\nBest regards,\nIT HUNT Directorate\n📍 Holagarh Campus, Prayagraj, UP – 212502`);
-      }
+      // Admin Email Body Content
+      addField('NOTIFICATION TYPE', '👑 SUPERADMIN CONTROL PANEL ALERT');
+      addField('ADMIN NOTICE', 'A new candidate admission has been provisionally submitted.');
+      addField('REGISTRATION ID', regNo);
+      addField('CANDIDATE FULL NAME', candName);
+      addField("FATHER'S NAME", admissionRecord.fatherName || 'N/A');
+      addField("MOTHER'S NAME", admissionRecord.motherName || 'N/A');
+      addField('COURSE ENROLLED', courseTitle);
+      addField('GENDER / DOB', genderDobFormatted);
+      addField('CONTACT MOBILE', admissionRecord.mobile || 'N/A');
+      addField('CANDIDATE EMAIL', admissionRecord.email || 'N/A');
+      addField('DISTRICT & STATE', districtStateFormatted);
+      addField('PERMANENT ADDRESS', admissionRecord.address || 'N/A');
+      addField('REGISTRATION TIMESTAMP', `${admissionRecord.date || ''} ${admissionRecord.time || ''}`);
+      addField('ADMIN ACTION REQUIRED', 'Log in to SuperAdmin Portal to verify credentials, fee receipt, and assign lab workstation.');
 
-      addField('ACADEMY HEADER', '🟢 🏛️ OFFICIAL ADMISSION PREVIEW');
-      addField('INSTITUTION', 'IT HUNT ACADEMY 2026');
-      addField('CAMPUS LOCATION', '📍 Dahiyawa Holagarh, Prayagraj, UP – 212502');
-      addField('OFFICIAL BADGES', '📜 OFFICIAL CANDIDATE COPY | ✓ ISO 9001:2015 ACCREDITED');
-      addField('REGISTRATION NUMBER', admissionRecord.registrationNo || 'ITH-000000');
-
-      addField('Candidate Name', admissionRecord.candidateName || 'N/A');
-      addField("Father's Name", admissionRecord.fatherName || 'N/A');
-      addField('Program Selected', admissionRecord.course || 'N/A');
-      addField('Gender / DOB', genderDobFormatted);
-      addField('Contact Mobile', admissionRecord.mobile || 'N/A');
-      addField('District & State', districtStateFormatted);
-
-      addField("Mother's Name", admissionRecord.motherName || 'N/A');
-      addField('Email Address', admissionRecord.email || 'N/A');
-      addField('Full Address', admissionRecord.address || 'N/A');
-      addField('Registration Date', admissionRecord.date || new Date().toLocaleDateString('en-GB'));
-      addField('Registration Time', admissionRecord.time || new Date().toLocaleTimeString('en-US'));
-
-      // 3. Attach file via DataTransfer API to input[name="attachment"]
       const fileInput = document.createElement('input');
       fileInput.type = 'file';
       fileInput.name = 'attachment';
 
-      const pdfFile = new File([pdfBlob], filename, { type: 'application/pdf' });
+      const pdfFile = new File([adminPdfBlob], filename, { type: 'application/pdf' });
       const dt = new DataTransfer();
       dt.items.add(pdfFile);
       fileInput.files = dt.files;
       form.appendChild(fileInput);
 
-      // 4. Submit form in background and clean up
       document.body.appendChild(form);
       form.submit();
 
       setTimeout(() => {
-        if (form.parentNode) {
-          form.parentNode.removeChild(form);
-        }
+        if (form.parentNode) form.parentNode.removeChild(form);
       }, 3000);
 
-      console.log(`✓ Admission email notification with attached PDF (${filename}) submitted to ${TARGET_EMAIL} and CC to ${admissionRecord.email || 'Candidate'}`);
+      console.log(`✓ Admin email (${subjectText}) with attached Admin Record PDF submitted to ${TARGET_EMAIL}`);
       return { success: true };
     } catch (err) {
-      console.warn('Hidden form submission for attachment failed, falling back to AJAX:', err);
+      console.warn('Admin hidden form submission failed, executing AJAX fallback:', err);
     }
   }
 
-  // Fallback to AJAX POST (without attachment if DOM is unavailable)
+  // AJAX fallback for Admin Email
   try {
     const payload = {
       _subject: subjectText,
-      _replyto: replyToEmail,
+      _replyto: admissionRecord.email || TARGET_EMAIL,
       _template: 'table',
       _captcha: 'false',
-
-      'ACADEMY HEADER': '🟢 🏛️ OFFICIAL ADMISSION PREVIEW',
-      'INSTITUTION': 'IT HUNT ACADEMY 2026',
-      'CAMPUS LOCATION': '📍 Dahiyawa Holagarh, Prayagraj, UP – 212502',
-      'OFFICIAL BADGES': '📜 OFFICIAL CANDIDATE COPY | ✓ ISO 9001:2015 ACCREDITED',
-      'REGISTRATION NUMBER': admissionRecord.registrationNo || 'ITH-000000',
-
-      'Candidate Name': admissionRecord.candidateName || 'N/A',
-      "Father's Name": admissionRecord.fatherName || 'N/A',
-      'Program Selected': admissionRecord.course || 'N/A',
-      'Gender / DOB': genderDobFormatted,
-      'Contact Mobile': admissionRecord.mobile || 'N/A',
-      'District & State': districtStateFormatted,
-
-      "Mother's Name": admissionRecord.motherName || 'N/A',
-      'Email Address': admissionRecord.email || 'N/A',
-      'Full Address': admissionRecord.address || 'N/A',
-      'Registration Date': admissionRecord.date || new Date().toLocaleDateString('en-GB'),
-      'Registration Time': admissionRecord.time || new Date().toLocaleTimeString('en-US')
+      'NOTIFICATION TYPE': '👑 SUPERADMIN CONTROL PANEL ALERT',
+      'ADMIN NOTICE': 'A new candidate admission has been provisionally submitted.',
+      'REGISTRATION ID': regNo,
+      'CANDIDATE FULL NAME': candName,
+      "FATHER'S NAME": admissionRecord.fatherName || 'N/A',
+      "MOTHER'S NAME": admissionRecord.motherName || 'N/A',
+      'COURSE ENROLLED': courseTitle,
+      'GENDER / DOB': genderDobFormatted,
+      'CONTACT MOBILE': admissionRecord.mobile || 'N/A',
+      'CANDIDATE EMAIL': admissionRecord.email || 'N/A',
+      'DISTRICT & STATE': districtStateFormatted,
+      'PERMANENT ADDRESS': admissionRecord.address || 'N/A',
+      'REGISTRATION TIMESTAMP': `${admissionRecord.date || ''} ${admissionRecord.time || ''}`,
+      'ADMIN ACTION REQUIRED': 'Log in to SuperAdmin Portal to verify credentials, fee receipt, and assign lab workstation.'
     };
 
-    if (admissionRecord.email && admissionRecord.email.includes('@')) {
-      payload._cc = admissionRecord.email;
-      payload.email = admissionRecord.email;
-    }
-
-    const response = await fetch(FORMSUBMIT_AJAX_URL, {
+    await fetch(FORMSUBMIT_AJAX_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
     });
-
-    if (response.ok) {
-      console.log(`✓ Admission email notification sent to ${TARGET_EMAIL} and ${admissionRecord.email}`);
-      return { success: true };
-    } else {
-      console.warn(`FormSubmit status: ${response.status}`);
-      return { success: false, status: response.status };
-    }
+    return { success: true };
   } catch (err) {
-    console.error('Failed to dispatch admission email notification:', err);
+    console.error('Failed to send Admin email:', err);
     return { success: false, error: err.message };
   }
+}
+
+/**
+ * Dispatch distinct Student Email Notification with Student PDF Slip attachment
+ * @param {Object} admissionRecord 
+ * @param {Blob|null} studentPdfBlob 
+ */
+/**
+ * Dispatch distinct Student Email Notification with Student PDF Slip attachment
+ * @param {Object} admissionRecord 
+ * @param {Blob|null} studentPdfBlob 
+ */
+export async function sendStudentAdmissionEmail(admissionRecord, studentPdfBlob = null) {
+  if (!admissionRecord || !admissionRecord.email || !admissionRecord.email.includes('@')) {
+    return { success: false, reason: 'Invalid or missing candidate email' };
+  }
+
+  const regNo = admissionRecord.registrationNo || 'ITH-000000';
+  const candName = admissionRecord.candidateName || 'Candidate';
+  const courseTitle = admissionRecord.course || 'Selected Program';
+  const candidateCleanName = candName.replace(/[^a-zA-Z0-9]/g, '_');
+  const filename = `IT_HUNT_Student_Slip_${regNo}_${candidateCleanName}.pdf`;
+  const subjectText = `🎓 [STUDENT CONFIRMATION] Welcome ${candName} to IT HUNT Academy! [Reg: ${regNo}]`;
+
+  // Auto-generate Student PDF blob if missing
+  if (!studentPdfBlob) {
+    try {
+      studentPdfBlob = getAdmissionPdfBlob(admissionRecord, 'student');
+    } catch (e) {
+      console.warn('Could not auto-generate Student PDF blob:', e);
+    }
+  }
+
+  // Submit via verified FORMSUBMIT_FORM_URL with _cc set to student email so FormSubmit delivers the PDF attachment directly to candidate
+  if (studentPdfBlob && typeof document !== 'undefined') {
+    try {
+      let iframe = document.getElementById('formsubmit_student_iframe');
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'formsubmit_student_iframe';
+        iframe.name = 'formsubmit_student_iframe';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+      }
+
+      const form = document.createElement('form');
+      form.action = FORMSUBMIT_FORM_URL;
+      form.method = 'POST';
+      form.enctype = 'multipart/form-data';
+      form.target = 'formsubmit_student_iframe';
+      form.style.display = 'none';
+
+      const addField = (name, value) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value || '';
+        form.appendChild(input);
+      };
+
+      addField('_subject', subjectText);
+      addField('_replyto', TARGET_EMAIL);
+      addField('_template', 'table');
+      addField('_captcha', 'false');
+      addField('_cc', admissionRecord.email);
+      addField('email', admissionRecord.email);
+
+      // Student Email Body Content
+      addField('ACKNOWLEDGMENT', '🎓 IT HUNT ACADEMY - OFFICIAL ADMISSION CONFIRMATION');
+      addField('WELCOME GREETING', `Dear ${candName}, Welcome to IT HUNT Academy & Software Solutions! Your registration is provisionally confirmed.`);
+      addField('REGISTRATION ID', regNo);
+      addField('STUDENT FULL NAME', candName);
+      addField('ENROLLED PROGRAM', courseTitle);
+      addField("FATHER'S NAME", admissionRecord.fatherName || 'N/A');
+      addField('CONTACT MOBILE', admissionRecord.mobile || 'N/A');
+      addField('REGISTERED DATE', admissionRecord.date || new Date().toLocaleDateString('en-GB'));
+      addField('DAY 1 ONBOARDING', 'Reporting Time: 09:30 AM Onboarding Day 1 at Holagarh Campus');
+      addField('MANDATORY DOCUMENTS TO BRING', `1. Printed or Digital Admission Slip (${regNo})\n2. 2 Passport Photos & Photo ID Proof (Aadhaar / Voter ID)`);
+      addField('TRAINING CAMPUS LOCATION', '📍 IT HUNT Software Studio, Dahiyawa Holagarh, Prayagraj, UP – 212502');
+      addField('ACADEMIC HELPLINES', '📞 +91 9795771806 | +91 8299544315 | 📧 softtechithunt@gmail.com');
+
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.name = 'attachment';
+
+      const pdfFile = new File([studentPdfBlob], filename, { type: 'application/pdf' });
+      const dt = new DataTransfer();
+      dt.items.add(pdfFile);
+      fileInput.files = dt.files;
+      form.appendChild(fileInput);
+
+      document.body.appendChild(form);
+      form.submit();
+
+      setTimeout(() => {
+        if (form.parentNode) form.parentNode.removeChild(form);
+      }, 3000);
+
+      console.log(`✓ Student email (${subjectText}) with attached Student Slip PDF (${filename}) submitted to ${admissionRecord.email}`);
+      return { success: true };
+    } catch (err) {
+      console.warn('Student hidden form submission failed, executing AJAX fallback:', err);
+    }
+  }
+
+  // AJAX fallback for Student Email
+  try {
+    const payload = {
+      _subject: subjectText,
+      _replyto: TARGET_EMAIL,
+      _template: 'table',
+      _captcha: 'false',
+      _cc: admissionRecord.email,
+      email: admissionRecord.email,
+      'ACKNOWLEDGMENT': '🎓 IT HUNT ACADEMY - OFFICIAL ADMISSION CONFIRMATION',
+      'WELCOME GREETING': `Dear ${candName}, Welcome to IT HUNT Academy & Software Solutions! Your registration is provisionally confirmed.`,
+      'REGISTRATION ID': regNo,
+      'STUDENT FULL NAME': candName,
+      'ENROLLED PROGRAM': courseTitle,
+      "FATHER'S NAME": admissionRecord.fatherName || 'N/A',
+      'CONTACT MOBILE': admissionRecord.mobile || 'N/A',
+      'REGISTERED DATE': admissionRecord.date || new Date().toLocaleDateString('en-GB'),
+      'DAY 1 ONBOARDING': 'Reporting Time: 09:30 AM Onboarding Day 1 at Holagarh Campus',
+      'MANDATORY DOCUMENTS TO BRING': `1. Printed or Digital Admission Slip (${regNo})\n2. 2 Passport Photos & Photo ID Proof (Aadhaar / Voter ID)`,
+      'TRAINING CAMPUS LOCATION': '📍 IT HUNT Software Studio, Dahiyawa Holagarh, Prayagraj, UP – 212502',
+      'ACADEMIC HELPLINES': '📞 +91 9795771806 | +91 8299544315 | 📧 softtechithunt@gmail.com'
+    };
+
+    await fetch(FORMSUBMIT_AJAX_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    return { success: true };
+  } catch (err) {
+    console.error('Failed to send Student email:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Master dispatch for Admission Emails: Sends distinct Admin Email (with Admin PDF) and distinct Student Email (with Student PDF)
+ * @param {Object} admissionRecord 
+ * @param {Blob|null} [pdfBlob] Optional pre-generated PDF Blob
+ */
+export async function sendAdmissionEmailNotification(admissionRecord, pdfBlob = null) {
+  if (!admissionRecord) return { success: false, error: 'Empty record' };
+
+  // Generate distinct Admin and Student PDF Blobs
+  let adminPdfBlob = pdfBlob;
+  let studentPdfBlob = pdfBlob;
+
+  try {
+    adminPdfBlob = getAdmissionPdfBlob(admissionRecord, 'admin');
+    studentPdfBlob = getAdmissionPdfBlob(admissionRecord, 'student');
+  } catch (e) {
+    console.warn('Could not generate distinct PDF blobs:', e);
+  }
+
+  // 1. Dispatch Admin Email (Admin Body + Admin PDF)
+  const adminRes = await sendAdminAdmissionEmail(admissionRecord, adminPdfBlob);
+
+  // 2. Dispatch Student Email (Student Body + Student PDF) with slight delay to ensure clean form submission
+  let studentRes = { success: false };
+  if (admissionRecord.email && admissionRecord.email.includes('@')) {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    studentRes = await sendStudentAdmissionEmail(admissionRecord, studentPdfBlob);
+  }
+
+  return { success: adminRes.success || studentRes.success };
 }
 
 /**

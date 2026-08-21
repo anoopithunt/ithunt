@@ -645,6 +645,14 @@ const handleAdminLogout = () => {
 
 const handleDirectAdmission = (newAdm) => {
   lastSubmittedAdmission.value = newAdm;
+  // Trigger dual email notification for Admin & Student as well as mobile notifications
+  try {
+    const pdfBlob = getAdmissionPdfBlob(newAdm);
+    sendAdmissionEmailNotification(newAdm, pdfBlob).catch(() => {});
+  } catch (e) {
+    sendAdmissionEmailNotification(newAdm).catch(() => {});
+  }
+  triggerMobileMessageNotification(newAdm).catch(() => {});
   triggerConfetti();
 };
 

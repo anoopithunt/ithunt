@@ -73,8 +73,21 @@ function drawHeader(doc, margin, contentWidth, pageWidth, docCode, badgeTitle) {
  * @param {Object} adm - Candidate admission details
  * @returns {jsPDF|null}
  */
-export function createAdmissionPdfDoc(adm) {
+/**
+ * Helper to build and return a jsPDF instance for Admission Slip
+ * @param {Object} adm - Candidate admission details
+ * @param {String} [copyType='student'] - 'student' for candidate slip, 'admin' for institution record
+ * @returns {jsPDF|null}
+ */
+export function createAdmissionPdfDoc(adm, copyType = 'student') {
   if (!adm) return null;
+
+  const isAdminCopy = copyType === 'admin';
+  const docCode = isAdminCopy ? 'SUPERADMIN VERIFICATION COPY' : 'CANDIDATE ORIGINAL COPY';
+  const badgeTitle = isAdminCopy ? 'OFFICIAL ADMIN RECORD' : 'OFFICIAL RECEIPT';
+  const ribbonTitle = isAdminCopy 
+    ? 'ADMINISTRATIVE ADMISSION & ENROLLMENT CONTROL RECORD'
+    : 'STUDENT ADMISSION & INTERNSHIP ACKNOWLEDGMENT SLIP';
 
   try {
     const doc = new jsPDF({
@@ -91,16 +104,16 @@ export function createAdmissionPdfDoc(adm) {
     doc.setFillColor(255, 255, 255);
     doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
-    drawHeader(doc, margin, contentWidth, pageWidth, 'CANDIDATE ORIGINAL COPY', 'OFFICIAL RECEIPT');
+    drawHeader(doc, margin, contentWidth, pageWidth, docCode, badgeTitle);
 
     // 3. Title Ribbon
     let curY = margin + 35;
-    doc.setFillColor(234, 88, 12);
+    doc.setFillColor(isAdminCopy ? 194 : 234, isAdminCopy ? 65 : 88, isAdminCopy ? 12 : 12);
     doc.rect(margin + 2, curY, contentWidth - 4, 9, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10.5);
-    doc.text('ADMISSION & INTERNSHIP REGISTRATION ACKNOWLEDGMENT', pageWidth / 2, curY + 6.2, { align: 'center' });
+    doc.text(ribbonTitle, pageWidth / 2, curY + 6.2, { align: 'center' });
 
     // 4. Highlight Identifiers Box
     curY += 12;
@@ -233,30 +246,56 @@ export function createAdmissionPdfDoc(adm) {
 
     curY += (programRows.length * 8.5) + 5;
 
-    // 7. Section 3: Mandatory Candidate Instructions
-    doc.setFillColor(254, 252, 232);
-    doc.setDrawColor(254, 240, 138);
-    doc.setLineWidth(0.4);
-    doc.roundedRect(margin + 2, curY, contentWidth - 4, 30, 2, 2, 'FD');
+    // 7. Section 3: Distinct Section Content for Admin vs Student
+    if (isAdminCopy) {
+      doc.setFillColor(241, 245, 249);
+      doc.setDrawColor(203, 213, 225);
+      doc.setLineWidth(0.4);
+      doc.roundedRect(margin + 2, curY, contentWidth - 4, 30, 2, 2, 'FD');
 
-    doc.setTextColor(133, 77, 14);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8.5);
-    doc.text('MANDATORY CANDIDATE INSTRUCTIONS FOR DAY 1:', margin + 6, curY + 6.5);
+      doc.setTextColor(30, 41, 59);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.5);
+      doc.text('3. SUPERADMIN VERIFICATION & BATCH AUDIT DESK:', margin + 6, curY + 6.5);
 
-    const instructions = [
-      '1. Please present a printed or digital copy of this Registration Slip at the campus helpdesk.',
-      '2. Carry 2 recent passport-size color photographs and 1 government photo ID proof (Aadhaar / Voter ID).',
-      '3. Reporting time is 09:30 AM at IT HUNT Holagarh Campus for orientation and workstation allotment.',
-      '4. Official corporate GitHub repository access and live project keys will be issued on Day 1.'
-    ];
+      const adminNotes = [
+        '1. Check Aadhaar Card & 10th/12th Marksheets for physical identity verification.',
+        '2. Verify provisional registration deposit receipt & assign student roll number.',
+        '3. Assign dedicated PC workstation unit in Lab 1 / Lab 2 and configure LMS portal account.',
+        '4. Official approval granted by Chief Administrator Mr. Lakshman Singh Chauhan.'
+      ];
 
-    doc.setTextColor(113, 63, 18);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    instructions.forEach((inst, iIdx) => {
-      doc.text(inst, margin + 6, curY + 12 + (iIdx * 4.5));
-    });
+      doc.setTextColor(51, 65, 85);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      adminNotes.forEach((note, nIdx) => {
+        doc.text(note, margin + 6, curY + 12 + (nIdx * 4.5));
+      });
+    } else {
+      doc.setFillColor(254, 252, 232);
+      doc.setDrawColor(254, 240, 138);
+      doc.setLineWidth(0.4);
+      doc.roundedRect(margin + 2, curY, contentWidth - 4, 30, 2, 2, 'FD');
+
+      doc.setTextColor(133, 77, 14);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.5);
+      doc.text('3. MANDATORY CANDIDATE INSTRUCTIONS FOR DAY 1:', margin + 6, curY + 6.5);
+
+      const instructions = [
+        '1. Please present a printed or digital copy of this Registration Slip at the campus helpdesk.',
+        '2. Carry 2 recent passport-size color photographs and 1 government photo ID proof (Aadhaar / Voter ID).',
+        '3. Reporting time is 09:30 AM at IT HUNT Holagarh Campus for orientation and workstation allotment.',
+        '4. Official corporate GitHub repository access and live project keys will be issued on Day 1.'
+      ];
+
+      doc.setTextColor(113, 63, 18);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      instructions.forEach((inst, iIdx) => {
+        doc.text(inst, margin + 6, curY + 12 + (iIdx * 4.5));
+      });
+    }
 
     curY += 34;
 
@@ -269,7 +308,7 @@ export function createAdmissionPdfDoc(adm) {
     doc.setTextColor(100, 116, 139);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8);
-    doc.text('SECURITY VERIFIED OFFICIAL DOCUMENT', margin + 6, curY + 4);
+    doc.text(isAdminCopy ? 'INSTITUTION ADMINISTRATIVE COPY' : 'SECURITY VERIFIED OFFICIAL DOCUMENT', margin + 6, curY + 4);
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
@@ -302,10 +341,11 @@ export function createAdmissionPdfDoc(adm) {
 /**
  * Returns a PDF Blob of the Admission Registration Slip
  * @param {Object} adm - Candidate admission details
+ * @param {String} [copyType='student'] - 'student' for candidate slip, 'admin' for institution record
  * @returns {Blob|null}
  */
-export function getAdmissionPdfBlob(adm) {
-  const doc = createAdmissionPdfDoc(adm);
+export function getAdmissionPdfBlob(adm, copyType = 'student') {
+  const doc = createAdmissionPdfDoc(adm, copyType);
   if (!doc) return null;
   return doc.output('blob');
 }
@@ -313,17 +353,19 @@ export function getAdmissionPdfBlob(adm) {
 /**
  * Generates and downloads an official 1-page A4 vector Admission Registration Slip.
  * @param {Object} adm - Candidate admission details
+ * @param {String} [copyType='student'] - 'student' for candidate slip, 'admin' for institution record
  */
-export function generateAdmissionPdf(adm) {
+export function generateAdmissionPdf(adm, copyType = 'student') {
   if (!adm) return false;
 
   try {
-    const doc = createAdmissionPdfDoc(adm);
+    const doc = createAdmissionPdfDoc(adm, copyType);
     if (!doc) return false;
 
     // Save PDF
     const candidateCleanName = (adm.candidateName || 'Student').replace(/[^a-zA-Z0-9]/g, '_');
-    const filename = `IT_HUNT_Admission_${adm.registrationNo}_${candidateCleanName}.pdf`;
+    const prefix = copyType === 'admin' ? 'IT_HUNT_Admin_Record' : 'IT_HUNT_Student_Slip';
+    const filename = `${prefix}_${adm.registrationNo}_${candidateCleanName}.pdf`;
     
     // Open preview in new tab and download
     const blobUrl = doc.output('bloburl');
