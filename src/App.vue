@@ -364,6 +364,7 @@ import { generateAdmissionPdf, generatePrivacyPolicyPdf, generateTermsConditions
 import { generateNielitProjectPdf, getNielitProjectPdfBlob } from './utils/nielitPdfGenerator.js';
 import { sendAdmissionEmailNotification, sendJobEmailNotification, sendRsvpEmailNotification, sendNielitProjectEmailNotification } from './utils/emailNotifier.js';
 import { triggerMobileMessageNotification } from './utils/smsNotifier.js';
+import { saveNielitProjectRecord, saveAdmissionRecord, saveJobApplicationRecord, saveRsvpRecord } from './utils/firebase.js';
 
 import Navbar from './components/layout/Navbar.vue';
 import Footer from './components/layout/Footer.vue';
@@ -557,6 +558,9 @@ const submitEventRsvp = (rsvpData) => {
   // Real-time sync into SuperAdmin registry
   liveRsvpsList.value.unshift(rsvpRecord);
 
+  // Save to Firebase Firestore & local storage
+  saveRsvpRecord(rsvpRecord).catch(() => {});
+
   // Send automatic email notification to softtechithunt@gmail.com
   sendRsvpEmailNotification(rsvpRecord).catch(() => {});
 
@@ -592,6 +596,9 @@ const submitJobApplication = (jobData) => {
   // Real-time sync into SuperAdmin registry
   liveJobApplicationsList.value.unshift(jobRecord);
 
+  // Save to Firebase Firestore & local storage
+  saveJobApplicationRecord(jobRecord).catch(() => {});
+
   // Send automatic email notification to softtechithunt@gmail.com
   sendJobEmailNotification(jobRecord).catch(() => {});
 
@@ -608,6 +615,12 @@ const submitNielitProject = (projectData) => {
 
   const regId = projectData.nielitRegNo || ('NIELIT-' + Math.floor(100000 + Math.random() * 900000));
   submittedRegistrationNo.value = regId;
+
+  // Save to Firebase Firestore & local storage
+  saveNielitProjectRecord({
+    ...projectData,
+    registrationNo: regId
+  }).catch(() => {});
 
   // Dispatch email notification with 4-page PDF attachment EXCLUSIVELY to Admin
   try {
@@ -654,6 +667,9 @@ const submitAdmission = (formData) => {
   submittedRegistrationNo.value = randomRegId;
   lastSubmittedAdmission.value = newAdmissionRecord;
   liveAdmissionsList.value.unshift(newAdmissionRecord);
+
+  // Save to Firebase Firestore & local storage
+  saveAdmissionRecord(newAdmissionRecord).catch(() => {});
 
   // Generate PDF Blob & trigger automatic email dispatch to softtechithunt@gmail.com with PDF attachment
   const pdfBlob = getAdmissionPdfBlob(newAdmissionRecord);
