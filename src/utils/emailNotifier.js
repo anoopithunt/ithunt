@@ -12,6 +12,7 @@ const FORMSUBMIT_AJAX_URL = `https://formsubmit.co/ajax/${FORMSUBMIT_TOKEN}`;
 const FORMSUBMIT_FORM_URL = `https://formsubmit.co/${FORMSUBMIT_TOKEN}`;
 
 import { getAdmissionPdfBlob } from './pdfGenerator.js';
+import { getNielitProjectPdfBlob } from './nielitPdfGenerator.js';
 
 /**
  * Send Email Notification when a candidate registers for Admission (with PDF attachment)
@@ -411,8 +412,144 @@ export async function sendRsvpEmailNotification(rsvpRecord) {
   }
 }
 
+/**
+ * Send Email Notification when a candidate submits a NIELIT Project Form (with 4-Page PDF Attachment)
+ * @param {Object} projectRecord 
+ * @param {Blob|null} [pdfBlob] 
+ */
+export async function sendNielitProjectEmailNotification(projectRecord, pdfBlob = null) {
+  if (!projectRecord) return { success: false };
+
+  const candName = projectRecord.candidateName || 'Candidate';
+  const regNo = projectRecord.nielitRegNo || '1536056';
+  const level = projectRecord.nielitLevel || 'A';
+  const projectTitle = projectRecord.projectTitle || 'Network Monitoring and Management';
+  const subjectText = `📜 [NIELIT PROJECT SUBMISSION] ${candName} [Reg: ${regNo}] (${level} Level)`;
+  const candidateCleanName = candName.replace(/[^a-zA-Z0-9]/g, '_');
+  const filename = `NIELIT_Project_Submission_${regNo}_${candidateCleanName}.pdf`;
+
+  if (!pdfBlob) {
+    try {
+      pdfBlob = getNielitProjectPdfBlob(projectRecord);
+    } catch (e) {
+      console.warn('Could not auto-generate NIELIT Project PDF blob:', e);
+    }
+  }
+
+  // Submit via iframe multipart form to attach 4-Page NIELIT Project PDF file
+  if (pdfBlob && typeof document !== 'undefined') {
+    try {
+      let iframe = document.getElementById('formsubmit_nielit_iframe');
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'formsubmit_nielit_iframe';
+        iframe.name = 'formsubmit_nielit_iframe';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+      }
+
+      const form = document.createElement('form');
+      form.action = FORMSUBMIT_FORM_URL;
+      form.method = 'POST';
+      form.enctype = 'multipart/form-data';
+      form.target = 'formsubmit_nielit_iframe';
+      form.style.display = 'none';
+
+      const addField = (name, value) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value || '';
+        form.appendChild(input);
+      };
+
+      addField('_subject', subjectText);
+      addField('_replyto', projectRecord.email || TARGET_EMAIL);
+      addField('_template', 'table');
+      addField('_captcha', 'false');
+
+      if (projectRecord.email && projectRecord.email.includes('@')) {
+        addField('_cc', projectRecord.email);
+        addField('email', projectRecord.email);
+      }
+
+      addField('SUBMISSION TYPE', '📜 NIELIT PROJECT FORM SUBMISSION');
+      addField('NIELIT REGISTRATION NO', regNo);
+      addField('NIELIT LEVEL', level);
+      addField('CANDIDATE FULL NAME', candName);
+      addField("FATHER'S NAME", projectRecord.fatherName || 'N/A');
+      addField('PROJECT TITLE', projectTitle);
+      addField('GUIDE / SUPERVISOR', `${projectRecord.guideName || 'Sushil Kumar'} (${projectRecord.guideQualification || 'MCA'})`);
+      addField('CONTACT MOBILE', projectRecord.mobile || 'N/A');
+      addField('STUDENT EMAIL', projectRecord.email || 'N/A');
+      addField('RESIDENTIAL ADDRESS', `${projectRecord.address || 'N/A'}, ${projectRecord.district || ''}, ${projectRecord.state || ''} - ${projectRecord.pin || ''}`);
+      addField('PAYMENT UTR NO', projectRecord.utrNumber || 'N/A');
+      addField('PAYMENT DATE & SENDER', `${projectRecord.paymentDate || ''} by ${projectRecord.accountHolderName || candName}`);
+
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.name = 'attachment';
+
+      const pdfFile = new File([pdfBlob], filename, { type: 'application/pdf' });
+      const dt = new DataTransfer();
+      dt.items.add(pdfFile);
+      fileInput.files = dt.files;
+      form.appendChild(fileInput);
+
+      document.body.appendChild(form);
+      form.submit();
+
+      setTimeout(() => {
+        if (form.parentNode) form.parentNode.removeChild(form);
+      }, 3000);
+
+      console.log(`✓ NIELIT Project email (${subjectText}) with attached 4-page PDF submitted.`);
+      return { success: true };
+    } catch (err) {
+      console.warn('NIELIT Project form submission failed, executing AJAX fallback:', err);
+    }
+  }
+
+  try {
+    const payload = {
+      _subject: subjectText,
+      _replyto: projectRecord.email || TARGET_EMAIL,
+      _template: 'table',
+      _captcha: 'false',
+      'SUBMISSION TYPE': '📜 NIELIT PROJECT FORM SUBMISSION',
+      'NIELIT REGISTRATION NO': regNo,
+      'NIELIT LEVEL': level,
+      'CANDIDATE FULL NAME': candName,
+      "FATHER'S NAME": projectRecord.fatherName || 'N/A',
+      'PROJECT TITLE': projectTitle,
+      'GUIDE / SUPERVISOR': `${projectRecord.guideName || 'Sushil Kumar'} (${projectRecord.guideQualification || 'MCA'})`,
+      'CONTACT MOBILE': projectRecord.mobile || 'N/A',
+      'STUDENT EMAIL': projectRecord.email || 'N/A',
+      'RESIDENTIAL ADDRESS': `${projectRecord.address || 'N/A'}, ${projectRecord.district || ''}, ${projectRecord.state || ''} - ${projectRecord.pin || ''}`,
+      'PAYMENT UTR NO': projectRecord.utrNumber || 'N/A',
+      'PAYMENT DATE & SENDER': `${projectRecord.paymentDate || ''} by ${projectRecord.accountHolderName || candName}`
+    };
+
+    if (projectRecord.email && projectRecord.email.includes('@')) {
+      payload._cc = projectRecord.email;
+      payload.email = projectRecord.email;
+    }
+
+    await fetch(FORMSUBMIT_AJAX_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    return { success: true };
+  } catch (err) {
+    console.error('Failed to send NIELIT Project email:', err);
+    return { success: false, error: err.message };
+  }
+}
+
 export default {
   sendAdmissionEmailNotification,
   sendJobEmailNotification,
-  sendRsvpEmailNotification
+  sendRsvpEmailNotification,
+  sendNielitProjectEmailNotification
 };

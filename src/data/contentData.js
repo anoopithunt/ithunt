@@ -276,7 +276,7 @@ const CONTENT_DATA = {
   // Header Navigation Items
   navigation: [
     { id: "home", label: "Home", icon: "🏠" },
-    { id: "internships", label: "IT Internships", icon: "🚀" },
+    { id: "internships", label: "NIELIT Project", icon: "🚀" },
     { id: "events", label: "Events & Gallery", icon: "🎪" },
     { id: "courses", label: "Courses", icon: "📚" }
   ],
@@ -287,7 +287,7 @@ const CONTENT_DATA = {
     titlePrefix: "Architecting Next-Gen ",
     titleGradient: "Software & AI Solutions",
     subtitle: "IT HUNT is a premier software development studio & technology academy in Prayagraj. We build production-ready software solutions while empowering engineers with 3-Month & 6-Month hands-on internships in MERN Stack, iOS, Android, and Digital Marketing.",
-    primaryCtaText: "Explore IT Internships 🚀",
+    primaryCtaText: "Explore NIELIT Project 🚀",
     secondaryCtaText: "Start Application 2026 📝",
     highlights: [
       "✓ 3 & 6 Months Production Internships",
@@ -1834,7 +1834,7 @@ const CONTENT_DATA = {
 
   // Centralized Global UI & Modal Dictionary
   "navbar": {
-    "applyCtaText": "Apply Internship",
+    "applyCtaText": "Apply NIELIT Project",
     "applyCtaIcon": "✨",
     "lightModeTitle": "Switch to Light Mode",
     "darkModeTitle": "Switch to Dark Mode",

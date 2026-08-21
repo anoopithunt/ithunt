@@ -37,8 +37,8 @@
         </button>
         
         <!-- Quick Apply CTA -->
-        <button class="cta-btn-header" @click="$emit('set-tab', 'internships')">
-          <span>{{ content.navbar?.applyCtaText || 'Apply Internship' }}</span> {{ content.navbar?.applyCtaIcon || '✨' }}
+        <button class="cta-btn-header" @click="$emit('open-nielit-modal')">
+          <span>{{ content.navbar?.applyCtaText || 'Apply NIELIT Project' }}</span> {{ content.navbar?.applyCtaIcon || '✨' }}
         </button>
 
         <!-- SuperAdmin / Login Portal Button -->
@@ -128,7 +128,7 @@ defineProps({
   }
 });
 
-defineEmits(['set-tab', 'toggle-theme']);
+defineEmits(['set-tab', 'toggle-theme', 'open-nielit-modal']);
 
 const isMobileNavOpen = ref(false);
 

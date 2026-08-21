@@ -16,6 +16,12 @@
           {{ content.internshipVenture?.description }}
         </p>
 
+        <div style="margin-top: 1.25rem;">
+          <button class="btn-primary" @click="$emit('open-nielit-modal')" style="padding: 0.75rem 1.6rem; font-size: 1rem; border-radius: var(--radius-full);">
+            <span>Submit NIELIT Project Form 📜</span>
+          </button>
+        </div>
+
         <!-- Trust Highlights Ribbon -->
         <div class="internship-trust-ribbon">
           <div class="trust-item" v-for="(trust, tIdx) in (content.internshipsSectionUI?.trustRibbon || [])" :key="tIdx">
@@ -180,7 +186,7 @@ const props = defineProps({
   }
 });
 
-defineEmits(['set-tab', 'open-detail', 'fast-apply']);
+defineEmits(['set-tab', 'open-detail', 'fast-apply', 'open-nielit-modal']);
 
 const selectedDuration = ref('all');
 
