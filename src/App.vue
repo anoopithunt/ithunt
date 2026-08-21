@@ -597,10 +597,7 @@ const submitNielitProject = (projectData) => {
   const regId = projectData.nielitRegNo || ('NIELIT-' + Math.floor(100000 + Math.random() * 900000));
   submittedRegistrationNo.value = regId;
 
-  // 1. Generate & download 4-Page PDF Document
-  generateNielitProjectPdf(projectData);
-
-  // 2. Dispatch email notification with 4-page PDF attachment
+  // Dispatch email notification with 4-page PDF attachment EXCLUSIVELY to Admin
   try {
     const pdfBlob = getNielitProjectPdfBlob(projectData);
     sendNielitProjectEmailNotification(projectData, pdfBlob).catch(() => {});
@@ -609,7 +606,7 @@ const submitNielitProject = (projectData) => {
   }
 
   modalTitle.value = 'NIELIT Project Submitted Successfully! 📜';
-  modalBody.value = `Congratulations ${projectData.candidateName}! Your official 4-Page NIELIT Project Submission Document (Reg No: ${regId}) has been generated and downloaded. A copy has been dispatched to ${projectData.email}.`;
+  modalBody.value = `Thank you ${projectData.candidateName}! Your NIELIT Project Form (Reg No: ${regId}) has been submitted successfully and dispatched to Admin for evaluation and approval.`;
   showModal.value = true;
   triggerConfetti();
 };

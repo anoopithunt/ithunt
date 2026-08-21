@@ -6,7 +6,7 @@
       <div class="modal-header">
         <span class="modal-badge-pill">📜 OFFICIAL NIELIT PORTAL</span>
         <h3 class="modal-title">NIELIT Project Form Submission</h3>
-        <p class="modal-subtitle">Fill in your candidate, project guide, and fee details to generate your official 4-Page NIELIT Project Submission Document (Annexure II, III, Certificate & Fee Details).</p>
+        <p class="modal-subtitle">Fill in candidate, guide, and fee details. The official 4-Page NIELIT Project Document (Annexure II, III, Certificate & Fee Details) will be generated and sent directly to Admin for verification.</p>
       </div>
 
       <form @submit.prevent="handleSubmit" class="nielit-form">
@@ -140,7 +140,7 @@
         <div class="modal-actions" style="margin-top: 1.5rem;">
           <button type="button" class="btn-secondary" @click="$emit('close')">Cancel</button>
           <button type="submit" class="btn-primary">
-            <span>Submit & Generate 4-Page PDF 🚀</span>
+            <span>Submit NIELIT Project Form 🚀</span>
           </button>
         </div>
       </form>
