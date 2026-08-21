@@ -18,11 +18,25 @@ function drawHeader(doc, margin, contentWidth, pageWidth, docCode, badgeTitle) {
 
   const logoImg = document.querySelector('.receipt-logo-img') || document.querySelector('.brand-logo-img');
   let logoDrawn = false;
-  if (logoImg && logoImg.complete && logoImg.naturalWidth > 0) {
+  if (logoImg && logoImg.complete && (logoImg.naturalWidth > 0 || logoImg.width > 0)) {
     try {
-      doc.addImage(logoImg, 'PNG', margin + 6, margin + 4, 22, 22);
+      const canvas = document.createElement('canvas');
+      const w = logoImg.naturalWidth || logoImg.width || 200;
+      const h = logoImg.naturalHeight || logoImg.height || 200;
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      // Fill background with top banner color (#fff7ed) to prevent jsPDF transparent WebP/PNG black background artifact
+      ctx.fillStyle = '#fff7ed';
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(logoImg, 0, 0, w, h);
+
+      const logoDataUrl = canvas.toDataURL('image/png');
+      doc.addImage(logoDataUrl, 'PNG', margin + 6, margin + 4, 22, 22);
       logoDrawn = true;
     } catch (e) {
+      console.warn('Could not render transparent logo on canvas for PDF:', e);
       logoDrawn = false;
     }
   }
