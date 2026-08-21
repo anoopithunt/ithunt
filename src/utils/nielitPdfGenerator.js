@@ -325,53 +325,53 @@ export function createNielitProjectPdfDoc(data) {
     doc.addPage('a4', 'landscape');
 
     const landWidth = 297;
+    const landHeight = 210;
     const landMargin = 15;
-    const landContentW = landWidth - (landMargin * 2);
+    const landContentW = landWidth - (landMargin * 2); // 267mm available width
 
-    let landY = 25;
+    // Column widths sum up to exactly 267mm matching landContentW
+    const colWList = [12, 25, 52, 15, 18, 34, 48, 44, 19];
+    const candidateSectionW = colWList[0] + colWList[1] + colWList[2] + colWList[3]; // 104mm
+    const paymentSectionW = landContentW - candidateSectionW; // 163mm
 
-    // Table Container
+    const r1H = 12; // Title: O/A/B/C Project Fee Details
+    const r2H = 12; // Subtitle: NIELIT HQ,NEW DELHI
+    const r3H = 14; // Section Header: Candidate Details | Payment Details
+    const r4H = 14; // Column Headers
+    const r5H = 14; // Data Row
+    const totalTblH = r1H + r2H + r3H + r4H + r5H; // 66mm total table height
+
+    let landY = 55; // Vertically balanced on 210mm page
+
+    // Outer boundary box
     doc.setLineWidth(0.4);
     doc.setDrawColor(0, 0, 0);
-
-    const tblW = landContentW;
-    const r1H = 10;
-    const r2H = 10;
-    const r3H = 12;
-    const r4H = 12;
-    const totalTblH = r1H + r2H + r3H + r4H;
-
-    doc.rect(landMargin, landY, tblW, totalTblH);
+    doc.rect(landMargin, landY, landContentW, totalTblH);
 
     // Row 1: Header Title
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(11);
-    doc.text('O/A/B/C Project Fee Details', landWidth / 2, landY + 6.5, { align: 'center' });
-    doc.line(landMargin, landY + r1H, landMargin + tblW, landY + r1H);
+    doc.text('O/A/B/C Project Fee Details', landWidth / 2, landY + 7.5, { align: 'center' });
+    doc.line(landMargin, landY + r1H, landMargin + landContentW, landY + r1H);
 
     // Row 2: Subtitle
     landY += r1H;
-    doc.text('NIELIT HQ,NEW DELHI', landWidth / 2, landY + 6.5, { align: 'center' });
-    doc.line(landMargin, landY + r2H, landMargin + tblW, landY + r2H);
+    doc.text('NIELIT HQ,NEW DELHI', landWidth / 2, landY + 7.5, { align: 'center' });
+    doc.line(landMargin, landY + r2H, landMargin + landContentW, landY + r2H);
 
-    // Row 3 & 4 Columns Grid Calculation
+    // Row 3: Section Headers (Candidate Details | Payment Details)
     landY += r2H;
+    doc.setFontSize(10);
+    doc.text('Candidate Details', landMargin + (candidateSectionW / 2), landY + 8.5, { align: 'center' });
+    doc.text('Payment Details', landMargin + candidateSectionW + (paymentSectionW / 2), landY + 8.5, { align: 'center' });
 
-    // Candidate Details spans: S.No (14), Regn No (26), Name of Cand (55), Level (16) = 111mm
-    // Payment Details spans: Amount (20), Transaction Date (36), Transaction No/UTR (52), Payment Sender Name (42), Remark (21) = 171mm
-    const colWList = [14, 26, 55, 16, 20, 36, 52, 42, 21];
-    const candidateSectionW = colWList[0] + colWList[1] + colWList[2] + colWList[3]; // 111mm
+    // Vertical line separating Candidate Details & Payment Details across rows 3, 4, 5
+    doc.line(landMargin + candidateSectionW, landY, landMargin + candidateSectionW, landY + r3H + r4H + r5H);
+    doc.line(landMargin, landY + r3H, landMargin + landContentW, landY + r3H);
 
-    // Row 3 Header Text
-    doc.text('Candidate Details', landMargin + (candidateSectionW / 2), landY + 7.5, { align: 'center' });
-    doc.line(landMargin + candidateSectionW, landY, landMargin + candidateSectionW, landY + r3H + r4H);
-
-    doc.text('Payment Details', landMargin + candidateSectionW + ((tblW - candidateSectionW) / 2), landY + 7.5, { align: 'center' });
-    doc.line(landMargin, landY + r3H, landMargin + tblW, landY + r3H);
-
-    // Row 4 Column Headers
+    // Row 4: Column Headers
     landY += r3H;
-    doc.setFontSize(9.5);
+    doc.setFontSize(9);
 
     const headers = [
       'S. No.', 'Regn. No.', 'Name of Cand.', 'Level', 
@@ -382,16 +382,17 @@ export function createNielitProjectPdfDoc(data) {
     for (let i = 0; i < headers.length; i++) {
       const w = colWList[i];
       if (i > 0) {
-        doc.line(currX, landY, currX, landY + r4H);
+        doc.line(currX, landY, currX, landY + r4H + r5H);
       }
-      
-      doc.text(headers[i], currX + (w / 2), landY + 7.5, { align: 'center' });
+      doc.text(headers[i], currX + (w / 2), landY + 8.5, { align: 'center' });
       currX += w;
     }
-    doc.line(landMargin, landY + r4H, landMargin + tblW, landY + r4H);
+    doc.line(landMargin, landY + r4H, landMargin + landContentW, landY + r4H);
 
-    // Row 5 Data Values
+    // Row 5: Data Row
     landY += r4H;
+    doc.setFontSize(9);
+
     const rowValues = [
       '1.',
       regNo,
@@ -407,10 +408,7 @@ export function createNielitProjectPdfDoc(data) {
     currX = landMargin;
     for (let i = 0; i < rowValues.length; i++) {
       const w = colWList[i];
-      if (i > 0) {
-        doc.line(currX, landY, currX, landY + r4H);
-      }
-      doc.text(String(rowValues[i]), currX + (w / 2), landY + 7.5, { align: 'center' });
+      doc.text(String(rowValues[i]), currX + (w / 2), landY + 8.5, { align: 'center' });
       currX += w;
     }
 
