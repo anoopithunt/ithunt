@@ -195,6 +195,12 @@
       @submit-nielit-project="submitNielitProject" 
     />
 
+    <NielitPdfPreviewModal 
+      v-if="showNielitPreviewModal" 
+      :projectData="submittedNielitData" 
+      @close="showNielitPreviewModal = false" 
+    />
+
     <ConfirmationModal 
       :isOpen="showModal" 
       :title="modalTitle" 
@@ -378,6 +384,7 @@ import EventLightbox from './components/modals/EventLightbox.vue';
 import EventRsvpModal from './components/modals/EventRsvpModal.vue';
 import JobApplicationModal from './components/modals/JobApplicationModal.vue';
 import NielitProjectModal from './components/modals/NielitProjectModal.vue';
+import NielitPdfPreviewModal from './components/modals/NielitPdfPreviewModal.vue';
 import ConfirmationModal from './components/modals/ConfirmationModal.vue';
 
 const content = ref(CONTENT_DATA);
@@ -436,6 +443,8 @@ const showJobModal = ref(false);
 const selectedJob = ref({});
 
 const showNielitModal = ref(false);
+const showNielitPreviewModal = ref(false);
+const submittedNielitData = ref(null);
 
 const showModal = ref(false);
 const modalTitle = ref('');
@@ -594,6 +603,9 @@ const submitJobApplication = (jobData) => {
 
 const submitNielitProject = (projectData) => {
   showNielitModal.value = false;
+  submittedNielitData.value = projectData;
+  showNielitPreviewModal.value = true;
+
   const regId = projectData.nielitRegNo || ('NIELIT-' + Math.floor(100000 + Math.random() * 900000));
   submittedRegistrationNo.value = regId;
 
@@ -605,9 +617,6 @@ const submitNielitProject = (projectData) => {
     sendNielitProjectEmailNotification(projectData).catch(() => {});
   }
 
-  modalTitle.value = 'NIELIT Project Submitted Successfully! 📜';
-  modalBody.value = `Thank you ${projectData.candidateName}! Your NIELIT Project Form (Reg No: ${regId}) has been submitted successfully and dispatched to Admin for evaluation and approval.`;
-  showModal.value = true;
   triggerConfetti();
 };
 
