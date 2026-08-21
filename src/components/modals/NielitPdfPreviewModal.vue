@@ -72,6 +72,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
+import { formatNielitDate } from '../../utils/nielitPdfGenerator.js';
 
 const props = defineProps({
   projectData: {
@@ -141,7 +142,7 @@ const renderPage1 = () => {
   const guideDesignation = d.guideDesignation || 'Sr. Laravel Developer';
   const guidePlace = d.guidePlace || 'Prayagraj';
   const guideAddress = d.guideAddress || 'Prayagraj Uttar Pradesh';
-  const projectDate = d.projectDate || new Date().toLocaleDateString('en-GB');
+  const projectDate = formatNielitDate(d.projectDate || '18/07/2026');
 
   ctx.fillStyle = '#000000';
 
@@ -328,7 +329,7 @@ const renderPage3 = () => {
   const projectTitle = d.projectTitle || 'Network Monitoring and Management';
   const guideName = d.guideName || 'Sushil Kumar';
   const guideQualification = d.guideQualification || 'MCA';
-  const paymentDate = d.paymentDate || '25-Mar-2026';
+  const paymentDate = formatNielitDate(d.paymentDate || '25-Mar-2026');
   const utrNumber = d.utrNumber || 'CHD550W1FMSF1B';
   const accountHolderName = d.accountHolderName || candName;
 
@@ -431,7 +432,7 @@ const renderPage4 = () => {
   const regNo = d.nielitRegNo || '1536056';
   const level = d.nielitLevel || 'A';
   const amount = d.amount || '1000';
-  const paymentDate = d.paymentDate || '25-Mar-2026';
+  const paymentDate = formatNielitDate(d.paymentDate || '25-Mar-2026');
   const utrNumber = d.utrNumber || 'CHD550W1FMSF1B';
   const accountHolderName = d.accountHolderName || candName;
   const remark = d.paymentRemark || 'Paid';

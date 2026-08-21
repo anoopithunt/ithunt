@@ -1,5 +1,34 @@
 import { jsPDF } from 'jspdf';
 
+export function formatNielitDate(dateInput) {
+  if (!dateInput) return '25-Mar-2026';
+  const str = String(dateInput).trim();
+  if (/^\d{1,2}-[A-Za-z]{3}-\d{4}$/.test(str)) return str;
+  if (/^\d{1,2}\s+[A-Za-z]{3}\s+\d{4}$/.test(str)) return str.replace(/\s+/g, '-');
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(str)) {
+    const parts = str.split('/');
+    const day = parts[0].padStart(2, '0');
+    const monthIdx = parseInt(parts[1], 10) - 1;
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${day}-${months[monthIdx] || 'Aug'}-${parts[2]}`;
+  }
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+    const parts = str.split('-');
+    const day = parts[2].padStart(2, '0');
+    const monthIdx = parseInt(parts[1], 10) - 1;
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${day}-${months[monthIdx] || 'Aug'}-${parts[0]}`;
+  }
+  try {
+    const d = new Date(str);
+    if (!isNaN(d.getTime())) {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return `${String(d.getDate()).padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear()}`;
+    }
+  } catch (e) {}
+  return str || '25-Mar-2026';
+}
+
 /**
  * Creates and returns a 4-page jsPDF document for NIELIT Project Submission
  * @param {Object} data Candidate, project, guide, and payment details
@@ -30,7 +59,7 @@ export function createNielitProjectPdfDoc(data) {
     const guideQualification = data.guideQualification || 'MCA';
     const guidePlace = data.guidePlace || 'Prayagraj';
     const guideAddress = data.guideAddress || 'Prayagraj Uttar Pradesh';
-    const projectDate = data.projectDate || new Date().toLocaleDateString('en-GB');
+    const projectDate = formatNielitDate(data.projectDate || '18/07/2026');
 
     const residentialAddress = data.address || 'Buhana Jhunjhunu';
     const district = data.district || 'Jhunjhunu';
@@ -39,7 +68,7 @@ export function createNielitProjectPdfDoc(data) {
     const mobile = data.mobile || '7740854811';
     const email = (data.email || 'praveensoni11@gmail.com').toUpperCase();
 
-    const paymentDate = data.paymentDate || '25-Mar-2026';
+    const paymentDate = formatNielitDate(data.paymentDate || '25-Mar-2026');
     const utrNumber = data.utrNumber || 'CHD550W1FMSF1B';
     const accountHolderName = data.accountHolderName || data.candidateName || 'Praveen Kumar Soni';
     const amount = data.amount || '1000';
