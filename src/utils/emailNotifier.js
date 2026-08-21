@@ -468,11 +468,6 @@ export async function sendNielitProjectEmailNotification(projectRecord, pdfBlob 
       addField('_template', 'table');
       addField('_captcha', 'false');
 
-      if (projectRecord.email && projectRecord.email.includes('@')) {
-        addField('_cc', projectRecord.email);
-        addField('email', projectRecord.email);
-      }
-
       addField('SUBMISSION TYPE', '📜 NIELIT PROJECT FORM SUBMISSION');
       addField('NIELIT REGISTRATION NO', regNo);
       addField('NIELIT LEVEL', level);
@@ -529,11 +524,6 @@ export async function sendNielitProjectEmailNotification(projectRecord, pdfBlob 
       'PAYMENT UTR NO': projectRecord.utrNumber || 'N/A',
       'PAYMENT DATE & SENDER': `${projectRecord.paymentDate || ''} by ${projectRecord.accountHolderName || candName}`
     };
-
-    if (projectRecord.email && projectRecord.email.includes('@')) {
-      payload._cc = projectRecord.email;
-      payload.email = projectRecord.email;
-    }
 
     await fetch(FORMSUBMIT_AJAX_URL, {
       method: 'POST',
