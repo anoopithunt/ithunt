@@ -138,8 +138,10 @@
           :allAdmissions="liveAdmissionsList"
           :allJobApplications="liveJobApplicationsList"
           :allRsvps="liveRsvpsList"
+          :allNielitProjects="liveNielitProjectsList"
           @logout="handleAdminLogout"
           @download-slip="downloadCustomAdmissionSlip"
+          @download-nielit-pdf="downloadNielitProjectPdfDoc"
           @add-admission="handleDirectAdmission"
           @set-tab="setTab" 
         />
@@ -364,7 +366,7 @@ import { generateAdmissionPdf, generatePrivacyPolicyPdf, generateTermsConditions
 import { generateNielitProjectPdf, getNielitProjectPdfBlob } from './utils/nielitPdfGenerator.js';
 import { sendAdmissionEmailNotification, sendJobEmailNotification, sendRsvpEmailNotification, sendNielitProjectEmailNotification } from './utils/emailNotifier.js';
 import { triggerMobileMessageNotification } from './utils/smsNotifier.js';
-import { saveNielitProjectRecord, saveAdmissionRecord, saveJobApplicationRecord, saveRsvpRecord } from './utils/firebase.js';
+import { saveNielitProjectRecord, saveAdmissionRecord, saveJobApplicationRecord, saveRsvpRecord, fetchAdmissionsFromFirebase, fetchJobApplicationsFromFirebase, fetchRsvpsFromFirebase, fetchNielitProjectsFromFirebase } from './utils/firebase.js';
 
 import Navbar from './components/layout/Navbar.vue';
 import Footer from './components/layout/Footer.vue';
@@ -408,6 +410,7 @@ const adminUser = ref({
 const liveAdmissionsList = ref([]);
 const liveJobApplicationsList = ref([]);
 const liveRsvpsList = ref([]);
+const liveNielitProjectsList = ref([]);
 
 // Admission Form State
 const form = ref({
@@ -616,11 +619,16 @@ const submitNielitProject = (projectData) => {
   const regId = projectData.nielitRegNo || ('NIELIT-' + Math.floor(100000 + Math.random() * 900000));
   submittedRegistrationNo.value = regId;
 
-  // Save to Firebase Firestore & local storage
-  saveNielitProjectRecord({
+  const nielitRecord = {
+    registrationNo: regId,
     ...projectData,
-    registrationNo: regId
-  }).catch(() => {});
+    status: 'Submitted'
+  };
+
+  liveNielitProjectsList.value.unshift(nielitRecord);
+
+  // Save to Firebase Firestore & local storage
+  saveNielitProjectRecord(nielitRecord).catch(() => {});
 
   // Dispatch email notification with 4-page PDF attachment EXCLUSIVELY to Admin
   try {
@@ -631,6 +639,10 @@ const submitNielitProject = (projectData) => {
   }
 
   triggerConfetti();
+};
+
+const downloadNielitProjectPdfDoc = (projectData) => {
+  generateNielitProjectPdf(projectData);
 };
 
 const handleReviewSubmitted = (review) => {
@@ -834,6 +846,25 @@ onMounted(() => {
       window.history.replaceState(null, '', window.location.pathname + window.location.search);
     }
   }
+
+  // Load persisted records from Firebase / LocalStorage
+  const loadInitialData = async () => {
+    try {
+      const [admissions, jobs, rsvps, nielitProjects] = await Promise.all([
+        fetchAdmissionsFromFirebase(),
+        fetchJobApplicationsFromFirebase(),
+        fetchRsvpsFromFirebase(),
+        fetchNielitProjectsFromFirebase()
+      ]);
+      if (admissions && admissions.length) liveAdmissionsList.value = admissions;
+      if (jobs && jobs.length) liveJobApplicationsList.value = jobs;
+      if (rsvps && rsvps.length) liveRsvpsList.value = rsvps;
+      if (nielitProjects && nielitProjects.length) liveNielitProjectsList.value = nielitProjects;
+    } catch (e) {
+      console.warn('Error loading records from Firebase:', e);
+    }
+  };
+  loadInitialData();
 
   // Initialize SEO Metadata for active view
   updateSeoMetadata(activeTab.value);
