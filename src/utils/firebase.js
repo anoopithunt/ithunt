@@ -1,28 +1,72 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from 'firebase/firestore';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
+import { getAnalytics, isSupported } from 'firebase/analytics';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL || '',
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'ithunt-3a42d',
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '',
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || ''
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '649496257816',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:649496257816:web:47fe9d549e7494198aaa6d',
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || ''
 };
 
 let app;
 let db = null;
+let auth = null;
+let analytics = null;
 
 try {
   if (firebaseConfig.apiKey) {
     app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
     db = getFirestore(app);
-    console.log('🔥 Firebase initialized successfully.');
+    auth = getAuth(app);
+    isSupported().then(supported => {
+      if (supported && firebaseConfig.measurementId) {
+        analytics = getAnalytics(app);
+      }
+    }).catch(() => {});
+    console.log('🔥 Firebase Firestore, Authentication & Analytics initialized successfully.');
   } else {
     console.info('ℹ️ Firebase API Key not provided in .env. Operating with local database persistence mode.');
   }
 } catch (err) {
   console.warn('Firebase initialization warning:', err.message);
+}
+
+/**
+ * Sign in user with Email and Password
+ */
+export async function loginWithEmailPassword(email, password) {
+  if (!auth) throw new Error('Firebase Auth not initialized. Check VITE_FIREBASE_API_KEY in .env.');
+  return await signInWithEmailAndPassword(auth, email, password);
+}
+
+/**
+ * Register new user with Email and Password
+ */
+export async function registerWithEmailPassword(email, password) {
+  if (!auth) throw new Error('Firebase Auth not initialized. Check VITE_FIREBASE_API_KEY in .env.');
+  return await createUserWithEmailAndPassword(auth, email, password);
+}
+
+/**
+ * Sign out current user
+ */
+export async function logoutUser() {
+  if (!auth) return;
+  return await signOut(auth);
+}
+
+/**
+ * Listen to auth state changes
+ */
+export function onAuthUserChanged(callback) {
+  if (!auth) return () => {};
+  return onAuthStateChanged(auth, callback);
 }
 
 /**
@@ -227,6 +271,10 @@ export async function fetchRsvpsFromFirebase() {
 }
 
 export default {
+  loginWithEmailPassword,
+  registerWithEmailPassword,
+  logoutUser,
+  onAuthUserChanged,
   saveNielitProjectRecord,
   saveAdmissionRecord,
   saveJobApplicationRecord,
