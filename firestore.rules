@@ -1,0 +1,30 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users collection (Students, Faculty, Candidates)
+    match /users/{docId} {
+      allow create, read, update, delete: if true;
+    }
+
+    // Candidate Admissions collection
+    match /admissions/{docId} {
+      allow create, read, update, delete: if true;
+    }
+
+    // NIELIT Student Projects collection
+    match /nielit_projects/{docId} {
+      allow create, read, update, delete: if true;
+    }
+
+    // Job Applications collection
+    match /job_applications/{docId} {
+      allow create, read, update, delete: if true;
+    }
+
+    // Event RSVPs collection
+    match /event_rsvps/{docId} {
+      allow create, read, update, delete: if true;
+    }
+  }
+}
