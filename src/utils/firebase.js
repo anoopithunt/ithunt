@@ -89,6 +89,22 @@ export async function saveNielitProjectRecord(data) {
     timestamp: serverTimestamp ? serverTimestamp() : new Date().toISOString()
   };
 
+  const userPayload = {
+    name: data.candidateName || data.name || 'Student Candidate',
+    email: data.email || '',
+    mobile: data.mobile || data.phone || '',
+    role: 'Student',
+    category: 'NIELIT_PROJECT_STUDENT',
+    registrationNo: data.nielitRegNo || data.registrationNo || '',
+    nielitLevel: data.nielitLevel || 'O',
+    projectTitle: data.projectTitle || '',
+    guideName: data.guideName || '',
+    district: data.district || '',
+    state: data.state || '',
+    createdAt: new Date().toISOString(),
+    timestamp: serverTimestamp ? serverTimestamp() : new Date().toISOString()
+  };
+
   // Local storage fallback
   try {
     const existing = JSON.parse(localStorage.getItem('ithunt_nielit_projects') || '[]');
@@ -99,13 +115,21 @@ export async function saveNielitProjectRecord(data) {
   if (rtdb) {
     try {
       rtdbPush(rtdbRef(rtdb, 'nielit_projects'), { ...payload, timestamp: Date.now() });
-      console.log('✓ NIELIT Project record pushed to Firebase Realtime DB');
+      rtdbPush(rtdbRef(rtdb, 'users'), { ...userPayload, timestamp: Date.now() });
+      console.log('✓ NIELIT Project & Student User pushed to Firebase Realtime DB');
     } catch (e) {
       console.warn('Realtime DB push warning:', e.message);
     }
   }
 
   if (db) {
+    try {
+      await addDoc(collection(db, 'users'), userPayload);
+      console.log('✓ Student user record saved to Firebase Firestore "users" collection');
+    } catch (e) {
+      console.warn('Could not save to users collection:', e.message);
+    }
+
     try {
       const docRef = await addDoc(collection(db, 'nielit_projects'), payload);
       console.log('✓ NIELIT Project record saved to Firebase Firestore ID:', docRef.id);
@@ -131,6 +155,21 @@ export async function saveAdmissionRecord(data) {
     timestamp: serverTimestamp ? serverTimestamp() : new Date().toISOString()
   };
 
+  const userPayload = {
+    name: data.candidateName || data.name || 'Enrolled Student',
+    email: data.email || '',
+    mobile: data.mobile || '',
+    role: 'Student',
+    category: 'ADMISSION_STUDENT',
+    registrationNo: data.registrationNo || '',
+    course: data.course || '',
+    fatherName: data.fatherName || '',
+    district: data.district || '',
+    address: data.address || '',
+    createdAt: new Date().toISOString(),
+    timestamp: serverTimestamp ? serverTimestamp() : new Date().toISOString()
+  };
+
   try {
     const existing = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
     existing.unshift(payload);
@@ -140,13 +179,21 @@ export async function saveAdmissionRecord(data) {
   if (rtdb) {
     try {
       rtdbPush(rtdbRef(rtdb, 'admissions'), { ...payload, timestamp: Date.now() });
-      console.log('✓ Admission record pushed to Firebase Realtime DB');
+      rtdbPush(rtdbRef(rtdb, 'users'), { ...userPayload, timestamp: Date.now() });
+      console.log('✓ Admission record & Student User pushed to Firebase Realtime DB');
     } catch (e) {
       console.warn('Realtime DB push warning:', e.message);
     }
   }
 
   if (db) {
+    try {
+      await addDoc(collection(db, 'users'), userPayload);
+      console.log('✓ Enrolled Student record saved to Firebase Firestore "users" collection');
+    } catch (e) {
+      console.warn('Could not save to users collection:', e.message);
+    }
+
     try {
       const docRef = await addDoc(collection(db, 'admissions'), payload);
       console.log('✓ Admission record saved to Firebase Firestore ID:', docRef.id);
@@ -313,6 +360,22 @@ export async function fetchRsvpsFromFirebase() {
   } catch (e) { return []; }
 }
 
+/**
+ * Fetch all stored users from Firebase Firestore
+ */
+export async function fetchUsersFromFirebase() {
+  if (db) {
+    try {
+      const q = query(collection(db, 'users'), orderBy('createdAt', 'desc'));
+      const snap = await getDocs(q);
+      return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (e) {
+      console.warn('Fetching users from Firestore failed:', e.message);
+    }
+  }
+  return [];
+}
+
 export default {
   loginWithEmailPassword,
   registerWithEmailPassword,
@@ -325,5 +388,6 @@ export default {
   fetchNielitProjectsFromFirebase,
   fetchAdmissionsFromFirebase,
   fetchJobApplicationsFromFirebase,
-  fetchRsvpsFromFirebase
+  fetchRsvpsFromFirebase,
+  fetchUsersFromFirebase
 };
