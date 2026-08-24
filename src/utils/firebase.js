@@ -1,21 +1,23 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from 'firebase/firestore';
+import { getDatabase, ref as rtdbRef, push as rtdbPush, get as rtdbGet } from 'firebase/database';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
-  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL || '',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyAgYRupnwQdIDC-MfBGSJApvOQDMxJZbeI',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'ithunt-3a42d.firebaseapp.com',
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL || 'https://ithunt-3a42d-default-rtdb.firebaseio.com',
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'ithunt-3a42d',
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'ithunt-3a42d.firebasestorage.app',
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '649496257816',
   appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:649496257816:web:47fe9d549e7494198aaa6d',
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || ''
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || 'G-Q441K5VDH5'
 };
 
 let app;
 let db = null;
+let rtdb = null;
 let auth = null;
 let analytics = null;
 
@@ -23,13 +25,18 @@ try {
   if (firebaseConfig.apiKey) {
     app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
     db = getFirestore(app);
+    try {
+      if (firebaseConfig.databaseURL) {
+        rtdb = getDatabase(app);
+      }
+    } catch (e) {}
     auth = getAuth(app);
     isSupported().then(supported => {
       if (supported && firebaseConfig.measurementId) {
         analytics = getAnalytics(app);
       }
     }).catch(() => {});
-    console.log('🔥 Firebase Firestore, Authentication & Analytics initialized successfully.');
+    console.log('🔥 Firebase Firestore, Realtime DB & Auth initialized successfully.');
   } else {
     console.info('ℹ️ Firebase API Key not provided in .env. Operating with local database persistence mode.');
   }
@@ -89,6 +96,15 @@ export async function saveNielitProjectRecord(data) {
     localStorage.setItem('ithunt_nielit_projects', JSON.stringify(existing));
   } catch (e) {}
 
+  if (rtdb) {
+    try {
+      rtdbPush(rtdbRef(rtdb, 'nielit_projects'), { ...payload, timestamp: Date.now() });
+      console.log('✓ NIELIT Project record pushed to Firebase Realtime DB');
+    } catch (e) {
+      console.warn('Realtime DB push warning:', e.message);
+    }
+  }
+
   if (db) {
     try {
       const docRef = await addDoc(collection(db, 'nielit_projects'), payload);
@@ -103,7 +119,7 @@ export async function saveNielitProjectRecord(data) {
 }
 
 /**
- * Save Admission registration record to Firestore
+ * Save Admission registration record to Firestore & Realtime DB
  * @param {Object} data 
  */
 export async function saveAdmissionRecord(data) {
@@ -121,6 +137,15 @@ export async function saveAdmissionRecord(data) {
     localStorage.setItem('ithunt_admissions', JSON.stringify(existing));
   } catch (e) {}
 
+  if (rtdb) {
+    try {
+      rtdbPush(rtdbRef(rtdb, 'admissions'), { ...payload, timestamp: Date.now() });
+      console.log('✓ Admission record pushed to Firebase Realtime DB');
+    } catch (e) {
+      console.warn('Realtime DB push warning:', e.message);
+    }
+  }
+
   if (db) {
     try {
       const docRef = await addDoc(collection(db, 'admissions'), payload);
@@ -135,7 +160,7 @@ export async function saveAdmissionRecord(data) {
 }
 
 /**
- * Save Job Application record to Firestore
+ * Save Job Application record to Firestore & Realtime DB
  * @param {Object} data 
  */
 export async function saveJobApplicationRecord(data) {
@@ -153,6 +178,15 @@ export async function saveJobApplicationRecord(data) {
     localStorage.setItem('ithunt_job_applications', JSON.stringify(existing));
   } catch (e) {}
 
+  if (rtdb) {
+    try {
+      rtdbPush(rtdbRef(rtdb, 'job_applications'), { ...payload, timestamp: Date.now() });
+      console.log('✓ Job Application record pushed to Firebase Realtime DB');
+    } catch (e) {
+      console.warn('Realtime DB push warning:', e.message);
+    }
+  }
+
   if (db) {
     try {
       const docRef = await addDoc(collection(db, 'job_applications'), payload);
@@ -167,7 +201,7 @@ export async function saveJobApplicationRecord(data) {
 }
 
 /**
- * Save Event RSVP record to Firestore
+ * Save Event RSVP record to Firestore & Realtime DB
  * @param {Object} data 
  */
 export async function saveRsvpRecord(data) {
@@ -184,6 +218,15 @@ export async function saveRsvpRecord(data) {
     existing.unshift(payload);
     localStorage.setItem('ithunt_event_rsvps', JSON.stringify(existing));
   } catch (e) {}
+
+  if (rtdb) {
+    try {
+      rtdbPush(rtdbRef(rtdb, 'event_rsvps'), { ...payload, timestamp: Date.now() });
+      console.log('✓ Event RSVP record pushed to Firebase Realtime DB');
+    } catch (e) {
+      console.warn('Realtime DB push warning:', e.message);
+    }
+  }
 
   if (db) {
     try {
