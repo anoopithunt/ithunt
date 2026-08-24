@@ -77,16 +77,20 @@ export function onAuthUserChanged(callback) {
 }
 
 /**
- * Save NIELIT Project submission record to Firestore
+ * Save NIELIT Project submission record to Firestore & Realtime DB
  * @param {Object} data 
  */
 export async function saveNielitProjectRecord(data) {
   if (!data) return { success: false };
+  
+  const nowIso = new Date().toISOString();
+  const nowMs = Date.now();
+
   const payload = {
     ...data,
     type: 'NIELIT_PROJECT',
-    createdAt: new Date().toISOString(),
-    timestamp: serverTimestamp ? serverTimestamp() : new Date().toISOString()
+    createdAt: nowIso,
+    createdAtMs: nowMs
   };
 
   const userPayload = {
@@ -101,8 +105,8 @@ export async function saveNielitProjectRecord(data) {
     guideName: data.guideName || '',
     district: data.district || '',
     state: data.state || '',
-    createdAt: new Date().toISOString(),
-    timestamp: serverTimestamp ? serverTimestamp() : new Date().toISOString()
+    createdAt: nowIso,
+    createdAtMs: nowMs
   };
 
   // Local storage fallback
@@ -112,28 +116,41 @@ export async function saveNielitProjectRecord(data) {
     localStorage.setItem('ithunt_nielit_projects', JSON.stringify(existing));
   } catch (e) {}
 
+  // 1. Realtime Database Write
   if (rtdb) {
     try {
-      rtdbPush(rtdbRef(rtdb, 'nielit_projects'), { ...payload, timestamp: Date.now() });
-      rtdbPush(rtdbRef(rtdb, 'users'), { ...userPayload, timestamp: Date.now() });
+      rtdbPush(rtdbRef(rtdb, 'nielit_projects'), payload);
+      rtdbPush(rtdbRef(rtdb, 'users'), userPayload);
       console.log('✓ NIELIT Project & Student User pushed to Firebase Realtime DB');
     } catch (e) {
-      console.warn('Realtime DB push warning:', e.message);
+      console.warn('Realtime DB push notice:', e.message);
     }
   }
 
+  // 2. Cloud Firestore Database Write
   if (db) {
+    let usersDocId = null;
+    let projectDocId = null;
+
     try {
-      await addDoc(collection(db, 'users'), userPayload);
-      console.log('✓ Student user record saved to Firebase Firestore "users" collection');
+      const userRef = await addDoc(collection(db, 'users'), {
+        ...userPayload,
+        timestamp: serverTimestamp ? serverTimestamp() : nowIso
+      });
+      usersDocId = userRef.id;
+      console.log('✓ Student user record saved to Firestore "users" collection ID:', usersDocId);
     } catch (e) {
-      console.warn('Could not save to users collection:', e.message);
+      console.warn('Could not save to Firestore users collection:', e.message);
     }
 
     try {
-      const docRef = await addDoc(collection(db, 'nielit_projects'), payload);
-      console.log('✓ NIELIT Project record saved to Firebase Firestore ID:', docRef.id);
-      return { success: true, id: docRef.id };
+      const docRef = await addDoc(collection(db, 'nielit_projects'), {
+        ...payload,
+        timestamp: serverTimestamp ? serverTimestamp() : nowIso
+      });
+      projectDocId = docRef.id;
+      console.log('✓ NIELIT Project record saved to Firestore "nielit_projects" collection ID:', projectDocId);
+      return { success: true, id: projectDocId, userId: usersDocId };
     } catch (err) {
       console.error('❌ Could not save NIELIT project to Firebase Firestore:', err);
       return { success: true, localOnly: true, error: err.message };
@@ -148,11 +165,15 @@ export async function saveNielitProjectRecord(data) {
  */
 export async function saveAdmissionRecord(data) {
   if (!data) return { success: false };
+
+  const nowIso = new Date().toISOString();
+  const nowMs = Date.now();
+
   const payload = {
     ...data,
     type: 'ADMISSION',
-    createdAt: new Date().toISOString(),
-    timestamp: serverTimestamp ? serverTimestamp() : new Date().toISOString()
+    createdAt: nowIso,
+    createdAtMs: nowMs
   };
 
   const userPayload = {
@@ -166,8 +187,8 @@ export async function saveAdmissionRecord(data) {
     fatherName: data.fatherName || '',
     district: data.district || '',
     address: data.address || '',
-    createdAt: new Date().toISOString(),
-    timestamp: serverTimestamp ? serverTimestamp() : new Date().toISOString()
+    createdAt: nowIso,
+    createdAtMs: nowMs
   };
 
   try {
@@ -176,27 +197,35 @@ export async function saveAdmissionRecord(data) {
     localStorage.setItem('ithunt_admissions', JSON.stringify(existing));
   } catch (e) {}
 
+  // Realtime Database Push
   if (rtdb) {
     try {
-      rtdbPush(rtdbRef(rtdb, 'admissions'), { ...payload, timestamp: Date.now() });
-      rtdbPush(rtdbRef(rtdb, 'users'), { ...userPayload, timestamp: Date.now() });
+      rtdbPush(rtdbRef(rtdb, 'admissions'), payload);
+      rtdbPush(rtdbRef(rtdb, 'users'), userPayload);
       console.log('✓ Admission record & Student User pushed to Firebase Realtime DB');
     } catch (e) {
-      console.warn('Realtime DB push warning:', e.message);
+      console.warn('Realtime DB push notice:', e.message);
     }
   }
 
+  // Cloud Firestore Write
   if (db) {
     try {
-      await addDoc(collection(db, 'users'), userPayload);
-      console.log('✓ Enrolled Student record saved to Firebase Firestore "users" collection');
+      await addDoc(collection(db, 'users'), {
+        ...userPayload,
+        timestamp: serverTimestamp ? serverTimestamp() : nowIso
+      });
+      console.log('✓ Enrolled Student record saved to Firestore "users" collection');
     } catch (e) {
       console.warn('Could not save to users collection:', e.message);
     }
 
     try {
-      const docRef = await addDoc(collection(db, 'admissions'), payload);
-      console.log('✓ Admission record saved to Firebase Firestore ID:', docRef.id);
+      const docRef = await addDoc(collection(db, 'admissions'), {
+        ...payload,
+        timestamp: serverTimestamp ? serverTimestamp() : nowIso
+      });
+      console.log('✓ Admission record saved to Firestore "admissions" collection ID:', docRef.id);
       return { success: true, id: docRef.id };
     } catch (err) {
       console.error('❌ Could not save Admission to Firebase Firestore:', err);
@@ -212,11 +241,15 @@ export async function saveAdmissionRecord(data) {
  */
 export async function saveJobApplicationRecord(data) {
   if (!data) return { success: false };
+
+  const nowIso = new Date().toISOString();
+  const nowMs = Date.now();
+
   const payload = {
     ...data,
     type: 'JOB_APPLICATION',
-    createdAt: new Date().toISOString(),
-    timestamp: serverTimestamp ? serverTimestamp() : new Date().toISOString()
+    createdAt: nowIso,
+    createdAtMs: nowMs
   };
 
   try {
@@ -227,17 +260,20 @@ export async function saveJobApplicationRecord(data) {
 
   if (rtdb) {
     try {
-      rtdbPush(rtdbRef(rtdb, 'job_applications'), { ...payload, timestamp: Date.now() });
+      rtdbPush(rtdbRef(rtdb, 'job_applications'), payload);
       console.log('✓ Job Application record pushed to Firebase Realtime DB');
     } catch (e) {
-      console.warn('Realtime DB push warning:', e.message);
+      console.warn('Realtime DB push notice:', e.message);
     }
   }
 
   if (db) {
     try {
-      const docRef = await addDoc(collection(db, 'job_applications'), payload);
-      console.log('✓ Job Application record saved to Firebase Firestore ID:', docRef.id);
+      const docRef = await addDoc(collection(db, 'job_applications'), {
+        ...payload,
+        timestamp: serverTimestamp ? serverTimestamp() : nowIso
+      });
+      console.log('✓ Job Application record saved to Firestore "job_applications" collection ID:', docRef.id);
       return { success: true, id: docRef.id };
     } catch (err) {
       console.error('❌ Could not save Job Application to Firebase Firestore:', err);
@@ -253,11 +289,15 @@ export async function saveJobApplicationRecord(data) {
  */
 export async function saveRsvpRecord(data) {
   if (!data) return { success: false };
+
+  const nowIso = new Date().toISOString();
+  const nowMs = Date.now();
+
   const payload = {
     ...data,
     type: 'EVENT_RSVP',
-    createdAt: new Date().toISOString(),
-    timestamp: serverTimestamp ? serverTimestamp() : new Date().toISOString()
+    createdAt: nowIso,
+    createdAtMs: nowMs
   };
 
   try {
@@ -376,6 +416,56 @@ export async function fetchUsersFromFirebase() {
   return [];
 }
 
+/**
+ * Save Student Record directly to Firestore "users" collection
+ * @param {string} studentName 
+ * @param {string} studentEmail 
+ * @param {Object} [extraData] 
+ */
+export async function saveStudentRecord(studentName, studentEmail, extraData = {}) {
+  if (!db) {
+    console.warn('Firestore database is not initialized. Check VITE_FIREBASE_API_KEY in .env.');
+    return { success: false, error: 'Database not initialized' };
+  }
+  try {
+    const docRef = await addDoc(collection(db, "users"), {
+      name: studentName,
+      email: studentEmail,
+      role: "student",
+      createdAt: new Date().toISOString(),
+      timestamp: serverTimestamp ? serverTimestamp() : new Date().toISOString(),
+      ...extraData
+    });
+    console.log("Student record stored successfully with ID: ", docRef.id);
+    return { success: true, id: docRef.id };
+  } catch (error) {
+    console.error("Error adding student record: ", error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Fetch all students from Firestore "users" collection
+ */
+export async function fetchAllStudents() {
+  if (!db) {
+    console.warn('Firestore database is not initialized. Check VITE_FIREBASE_API_KEY in .env.');
+    return [];
+  }
+  try {
+    const querySnapshot = await getDocs(collection(db, "users"));
+    const students = [];
+    querySnapshot.forEach((doc) => {
+      console.log(`Student ID: ${doc.id}`, doc.data());
+      students.push({ id: doc.id, ...doc.data() });
+    });
+    return students;
+  } catch (error) {
+    console.error("Error fetching students: ", error);
+    return [];
+  }
+}
+
 export default {
   loginWithEmailPassword,
   registerWithEmailPassword,
@@ -385,9 +475,11 @@ export default {
   saveAdmissionRecord,
   saveJobApplicationRecord,
   saveRsvpRecord,
+  saveStudentRecord,
   fetchNielitProjectsFromFirebase,
   fetchAdmissionsFromFirebase,
   fetchJobApplicationsFromFirebase,
   fetchRsvpsFromFirebase,
-  fetchUsersFromFirebase
+  fetchUsersFromFirebase,
+  fetchAllStudents
 };

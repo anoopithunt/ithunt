@@ -116,6 +116,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import { loginWithEmailPassword } from '../../utils/firebase.js';
 
 const props = defineProps({
   content: {
@@ -133,23 +134,23 @@ const rememberMe = ref(true);
 const isLoading = ref(false);
 const errorMessage = ref('');
 
-const handleLogin = () => {
+const handleLogin = async () => {
   errorMessage.value = '';
   isLoading.value = true;
 
-  const validUsername = props.content.superAdminData?.adminAuth?.defaultUsername || 'admin@ithunt.com';
-  const validPassword = props.content.superAdminData?.adminAuth?.defaultPassword || 'admin@ithunt2026';
+  const inputUser = username.value.trim();
+  const inputPass = password.value.trim();
 
-  setTimeout(() => {
-    const trimmedUser = username.value.trim().toLowerCase();
-    const inputPass = password.value.trim();
-
-    if ((trimmedUser === validUsername.toLowerCase() || trimmedUser === 'admin') && 
-        (inputPass === validPassword || inputPass === 'admin123' || inputPass === 'admin@ithunt2026')) {
+  // 1. Try Live Firebase Email/Password Authentication
+  try {
+    const userCredential = await loginWithEmailPassword(inputUser, inputPass);
+    if (userCredential && userCredential.user) {
+      const authUser = userCredential.user;
       const adminUser = {
-        name: props.content.superAdminData?.adminAuth?.superAdminName || 'Mr. Lakshman Singh Chauhan',
-        role: props.content.superAdminData?.adminAuth?.role || 'Director & Chief Administrator',
-        email: validUsername,
+        uid: authUser.uid,
+        name: authUser.displayName || 'Authenticated Administrator',
+        role: 'Director & Chief Administrator',
+        email: authUser.email,
         avatar: props.content.director?.image || 'img/ithunt.webp',
         loginTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
       };
@@ -162,11 +163,38 @@ const handleLogin = () => {
 
       isLoading.value = false;
       emit('login-success', adminUser);
-    } else {
-      isLoading.value = false;
-      errorMessage.value = 'Invalid administrator credentials. Please check your email and password, or click "Auto-Fill SuperAdmin Credentials".';
+      return;
     }
-  }, 600);
+  } catch (firebaseErr) {
+    console.info('Firebase Authentication notice:', firebaseErr.message);
+  }
+
+  // 2. Fallback check for default SuperAdmin portal credentials
+  const validUsername = props.content.superAdminData?.adminAuth?.defaultUsername || 'admin@ithunt.com';
+  const validPassword = props.content.superAdminData?.adminAuth?.defaultPassword || 'admin@ithunt2026';
+
+  if ((inputUser.toLowerCase() === validUsername.toLowerCase() || inputUser === 'admin') && 
+      (inputPass === validPassword || inputPass === 'admin123' || inputPass === 'admin@ithunt2026')) {
+    const adminUser = {
+      name: props.content.superAdminData?.adminAuth?.superAdminName || 'Mr. Lakshman Singh Chauhan',
+      role: props.content.superAdminData?.adminAuth?.role || 'Director & Chief Administrator',
+      email: validUsername,
+      avatar: props.content.director?.image || 'img/ithunt.webp',
+      loginTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+    };
+
+    if (rememberMe.value) {
+      try {
+        sessionStorage.setItem('ithunt_superadmin_auth', JSON.stringify(adminUser));
+      } catch (e) {}
+    }
+
+    isLoading.value = false;
+    emit('login-success', adminUser);
+  } else {
+    isLoading.value = false;
+    errorMessage.value = 'Invalid administrator credentials. Verify your email & password or click "Auto-Fill SuperAdmin Credentials".';
+  }
 };
 
 const quickFillCredentials = () => {
