@@ -4,7 +4,7 @@ import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimest
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'ithunt-portal',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'ithunt-3a42d',
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '',
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
   appId: import.meta.env.VITE_FIREBASE_APP_ID || ''
@@ -51,8 +51,8 @@ export async function saveNielitProjectRecord(data) {
       console.log('✓ NIELIT Project record saved to Firebase Firestore ID:', docRef.id);
       return { success: true, id: docRef.id };
     } catch (err) {
-      console.warn('Could not save to Firebase Firestore, record saved locally:', err.message);
-      return { success: true, localOnly: true };
+      console.error('❌ Could not save NIELIT project to Firebase Firestore:', err);
+      return { success: true, localOnly: true, error: err.message };
     }
   }
   return { success: true, localOnly: true };
@@ -83,8 +83,8 @@ export async function saveAdmissionRecord(data) {
       console.log('✓ Admission record saved to Firebase Firestore ID:', docRef.id);
       return { success: true, id: docRef.id };
     } catch (err) {
-      console.warn('Could not save to Firebase Firestore, record saved locally:', err.message);
-      return { success: true, localOnly: true };
+      console.error('❌ Could not save Admission to Firebase Firestore:', err);
+      return { success: true, localOnly: true, error: err.message };
     }
   }
   return { success: true, localOnly: true };
@@ -115,8 +115,8 @@ export async function saveJobApplicationRecord(data) {
       console.log('✓ Job Application record saved to Firebase Firestore ID:', docRef.id);
       return { success: true, id: docRef.id };
     } catch (err) {
-      console.warn('Could not save to Firebase Firestore, record saved locally:', err.message);
-      return { success: true, localOnly: true };
+      console.error('❌ Could not save Job Application to Firebase Firestore:', err);
+      return { success: true, localOnly: true, error: err.message };
     }
   }
   return { success: true, localOnly: true };
@@ -147,8 +147,8 @@ export async function saveRsvpRecord(data) {
       console.log('✓ Event RSVP record saved to Firebase Firestore ID:', docRef.id);
       return { success: true, id: docRef.id };
     } catch (err) {
-      console.warn('Could not save to Firebase Firestore, record saved locally:', err.message);
-      return { success: true, localOnly: true };
+      console.error('❌ Could not save Event RSVP to Firebase Firestore:', err);
+      return { success: true, localOnly: true, error: err.message };
     }
   }
   return { success: true, localOnly: true };

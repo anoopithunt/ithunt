@@ -86,6 +86,16 @@
           <div class="admin-stat-trend">🏆 4.92 / 5.0 Star Rating</div>
         </div>
       </div>
+
+      <!-- NIELIT Submitted Projects -->
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon-box gold-glow">📜</div>
+        <div class="admin-stat-content">
+          <div class="admin-stat-val text-gradient-gold">{{ nielitProjectsList.length }}</div>
+          <div class="admin-stat-lbl">NIELIT Project Submissions</div>
+          <div class="admin-stat-trend">⚡ Official 4-Page Verification</div>
+        </div>
+      </div>
     </div>
 
     <!-- 3. INTERACTIVE NAVIGATION TABS -->
@@ -100,6 +110,7 @@
         <span>{{ tab.icon }}</span>
         <span>{{ tab.label }}</span>
         <span class="tab-badge-counter" v-if="tab.id === 'admissions'">{{ admissionsList.length }}</span>
+        <span class="tab-badge-counter" v-else-if="tab.id === 'nielit'">{{ nielitProjectsList.length }}</span>
         <span class="tab-badge-counter" v-else-if="tab.id === 'careers'">{{ jobApplicationsList.length }}</span>
         <span class="tab-badge-counter" v-else-if="tab.id === 'events'">{{ rsvpsList.length }}</span>
       </button>
@@ -214,6 +225,128 @@
                 <td colspan="8" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
                   <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔍</div>
                   <div>No candidate admissions found matching your criteria.</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: NIELIT STUDENT PROJECTS -->
+    <div v-else-if="currentTab === 'nielit'" class="admin-tab-panel anim-stagger-3">
+      <div class="panel-header-controls">
+        <div>
+          <h3 class="panel-title">📜 NIELIT Student Project Submissions</h3>
+          <p class="panel-subtitle">Review candidate project forms, guide declarations, fee UTR details, and official 4-Page PDF verification documents.</p>
+        </div>
+
+        <div class="panel-filter-group">
+          <!-- Search input -->
+          <div class="events-search-box" style="margin: 0; min-width: 260px;">
+            <span class="events-search-icon">🔍</span>
+            <input 
+              type="text" 
+              v-model="nielitSearch" 
+              class="events-search-input" 
+              placeholder="Search by candidate name, reg no, project..."
+            >
+            <button v-if="nielitSearch" class="events-search-clear" @click="nielitSearch = ''">✕</button>
+          </div>
+
+          <!-- Status filter -->
+          <select v-model="nielitStatusFilter" class="form-control admin-select-filter">
+            <option value="all">All Statuses</option>
+            <option value="Submitted">Submitted</option>
+            <option value="Under Review">Under Review</option>
+            <option value="Verified & Approved">Verified & Approved</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- NIELIT Projects Table -->
+      <div class="admin-table-card">
+        <div class="table-responsive">
+          <table class="admin-data-table">
+            <thead>
+              <tr>
+                <th>Reg & Level</th>
+                <th>Candidate Particulars</th>
+                <th>Project & Guide</th>
+                <th>Fee & UTR Details</th>
+                <th>Date & Location</th>
+                <th>Verification Status</th>
+                <th style="text-align: right;">Official Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="p in filteredNielitProjects" :key="p.registrationNo || p.nielitRegNo">
+                <td>
+                  <span class="admin-reg-pill">{{ p.nielitRegNo || p.registrationNo }}</span>
+                  <div style="margin-top: 4px;">
+                    <span class="admin-track-pill" style="background: rgba(249, 115, 22, 0.15); color: #f97316;">
+                      '{{ p.nielitLevel || 'O' }}' Level
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <div style="font-weight: 800; color: var(--text-main);">{{ p.candidateName }}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-dim);">Father: {{ p.fatherName }}</div>
+                  <div style="font-size: 0.75rem; color: var(--color-ai-cyan);">📞 {{ p.mobile }} | {{ p.email }}</div>
+                </td>
+                <td>
+                  <div style="font-weight: 700; color: var(--color-ai-yellow);">{{ p.projectTitle }}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Guide: {{ p.guideName }} ({{ p.guideQualification || 'MCA' }})</div>
+                  <div style="font-size: 0.725rem; color: var(--text-dim);">{{ p.guideDesignation }}</div>
+                </td>
+                <td>
+                  <div style="font-weight: 800; color: #22c55e;">₹{{ p.amount || '1000' }} ({{ p.paymentRemark || 'Paid' }})</div>
+                  <div style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--color-ai-cyan);">UTR: {{ p.utrNumber || 'N/A' }}</div>
+                  <div style="font-size: 0.725rem; color: var(--text-dim);">Date: {{ p.paymentDate }}</div>
+                </td>
+                <td style="font-size: 0.8rem; font-family: var(--font-mono); white-space: nowrap;">
+                  <div>📅 {{ p.projectDate || p.createdAt || 'Recent' }}</div>
+                  <div style="color: var(--text-dim);">📍 {{ p.district || 'Prayagraj' }}, {{ p.state || 'UP' }}</div>
+                </td>
+                <td>
+                  <span 
+                    class="admin-status-chip"
+                    :class="{
+                      'status-confirmed': p.status === 'Verified & Approved',
+                      'status-verified': p.status === 'Under Review',
+                      'status-pending': !p.status || p.status === 'Submitted'
+                    }"
+                    @click="cycleNielitStatus(p)"
+                    title="Click to toggle project verification status"
+                  >
+                    {{ p.status || 'Submitted' }}
+                  </span>
+                </td>
+                <td style="text-align: right;">
+                  <div class="admin-row-actions">
+                    <button 
+                      class="admin-icon-btn" 
+                      @click="$emit('download-nielit-pdf', p)" 
+                      title="Download Official 4-Page NIELIT Project PDF Document"
+                      style="color: var(--color-ai-yellow);"
+                    >
+                      📜 PDF
+                    </button>
+                    <button 
+                      class="admin-icon-btn" 
+                      @click="deleteNielitProject(p)" 
+                      title="Delete Project Submission"
+                      style="color: #ef4444;"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="filteredNielitProjects.length === 0">
+                <td colspan="7" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                  <div style="font-size: 2rem; margin-bottom: 0.5rem;">📜</div>
+                  <div>No NIELIT student project submissions found matching your search.</div>
                 </td>
               </tr>
             </tbody>
@@ -536,7 +669,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 
 const props = defineProps({
   content: {
@@ -563,14 +696,20 @@ const props = defineProps({
   allRsvps: {
     type: Array,
     default: () => []
+  },
+  allNielitProjects: {
+    type: Array,
+    default: () => []
   }
 });
 
-const emit = defineEmits(['logout', 'download-slip', 'add-admission']);
+const emit = defineEmits(['logout', 'download-slip', 'download-nielit-pdf', 'add-admission']);
 
 const currentTab = ref('admissions');
 const admissionSearch = ref('');
 const admissionStatusFilter = ref('all');
+const nielitSearch = ref('');
+const nielitStatusFilter = ref('all');
 const sessionTime = ref('Active Now');
 
 const featureAdmissionPortal = ref(true);
@@ -588,6 +727,7 @@ const quickForm = ref({
 
 const defaultTabs = [
   { id: 'admissions', label: '🎓 Student Admissions', icon: '🎓' },
+  { id: 'nielit', label: '📜 NIELIT Projects', icon: '📜' },
   { id: 'internships', label: '🚀 Internship Tracks', icon: '🚀' },
   { id: 'events', label: '🎪 Event RSVPs & Passes', icon: '🎪' },
   { id: 'careers', label: '💼 Faculty & Dev Jobs', icon: '💼' },
@@ -596,24 +736,37 @@ const defaultTabs = [
 ];
 
 // Reactive dataset states
-const admissionsList = ref([
-  ...(props.allAdmissions || []),
-  ...(props.content.superAdminData?.sampleAdmissions || [])
-]);
-
-const jobApplicationsList = ref([
-  ...(props.allJobApplications || []),
-  ...(props.content.superAdminData?.sampleJobApplications || [])
-]);
-
-const rsvpsList = ref([
-  ...(props.allRsvps || []),
-  ...(props.content.superAdminData?.sampleRsvps || [])
-]);
-
+const admissionsList = ref([]);
+const jobApplicationsList = ref([]);
+const rsvpsList = ref([]);
+const nielitProjectsList = ref([]);
 const reviewsList = ref([
   ...(props.content.reviewsSection?.reviewsList || [])
 ]);
+
+watch(() => props.allAdmissions, (val) => {
+  const samples = props.content.superAdminData?.sampleAdmissions || props.content.sampleAdmissions || [];
+  const existingIds = new Set((val || []).map(a => a.registrationNo));
+  admissionsList.value = [...(val || []), ...samples.filter(s => !existingIds.has(s.registrationNo))];
+}, { immediate: true, deep: true });
+
+watch(() => props.allJobApplications, (val) => {
+  const samples = props.content.superAdminData?.sampleJobApplications || props.content.sampleJobApplications || [];
+  const existingIds = new Set((val || []).map(j => j.id));
+  jobApplicationsList.value = [...(val || []), ...samples.filter(s => !existingIds.has(s.id))];
+}, { immediate: true, deep: true });
+
+watch(() => props.allRsvps, (val) => {
+  const samples = props.content.superAdminData?.sampleRsvps || props.content.sampleRsvps || [];
+  const existingIds = new Set((val || []).map(r => r.id));
+  rsvpsList.value = [...(val || []), ...samples.filter(s => !existingIds.has(s.id))];
+}, { immediate: true, deep: true });
+
+watch(() => props.allNielitProjects, (val) => {
+  const samples = props.content.sampleNielitProjects || [];
+  const existingIds = new Set((val || []).map(n => n.registrationNo || n.nielitRegNo));
+  nielitProjectsList.value = [...(val || []), ...samples.filter(s => !existingIds.has(s.registrationNo || s.nielitRegNo))];
+}, { immediate: true, deep: true });
 
 const filteredAdmissions = computed(() => {
   return admissionsList.value.filter(adm => {
@@ -632,6 +785,39 @@ const filteredAdmissions = computed(() => {
     return matchStatus && matchQuery;
   });
 });
+
+const filteredNielitProjects = computed(() => {
+  return nielitProjectsList.value.filter(p => {
+    const matchStatus = nielitStatusFilter.value === 'all' || p.status === nielitStatusFilter.value;
+    const query = nielitSearch.value.trim().toLowerCase();
+    if (!query) return matchStatus;
+
+    const matchQuery = 
+      (p.candidateName && p.candidateName.toLowerCase().includes(query)) ||
+      (p.fatherName && p.fatherName.toLowerCase().includes(query)) ||
+      (p.registrationNo && p.registrationNo.toLowerCase().includes(query)) ||
+      (p.nielitRegNo && p.nielitRegNo.toLowerCase().includes(query)) ||
+      (p.mobile && p.mobile.includes(query)) ||
+      (p.projectTitle && p.projectTitle.toLowerCase().includes(query)) ||
+      (p.guideName && p.guideName.toLowerCase().includes(query));
+
+    return matchStatus && matchQuery;
+  });
+});
+
+const cycleNielitStatus = (p) => {
+  if (!p.status || p.status === 'Submitted') p.status = 'Under Review';
+  else if (p.status === 'Under Review') p.status = 'Verified & Approved';
+  else p.status = 'Submitted';
+};
+
+const deleteNielitProject = (p) => {
+  if (confirm(`Remove NIELIT project submission for ${p.candidateName} (${p.nielitRegNo || p.registrationNo})?`)) {
+    nielitProjectsList.value = nielitProjectsList.value.filter(item => 
+      item.registrationNo !== p.registrationNo && item.nielitRegNo !== p.nielitRegNo
+    );
+  }
+};
 
 const cycleAdmissionStatus = (adm) => {
   if (adm.status === 'Confirmed') adm.status = 'Verified';
@@ -714,6 +900,7 @@ const exportDataToJson = () => {
     exportDate: new Date().toISOString(),
     institute: props.content.brand?.name || 'IT HUNT',
     admissions: admissionsList.value,
+    nielitProjects: nielitProjectsList.value,
     jobApplications: jobApplicationsList.value,
     eventRsvps: rsvpsList.value,
     studentReviews: reviewsList.value
