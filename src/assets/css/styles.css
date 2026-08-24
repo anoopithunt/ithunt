@@ -5827,3 +5827,88 @@ input, select, textarea, button {
     font-size: 1.15rem !important;
   }
 }
+
+/* ==========================================================================
+   6. Universal Responsive System & Fluid Viewport Enhancements
+   ========================================================================== */
+
+/* Prevent iOS input zoom on mobile focus */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Fluid Responsive Table Scroll Wrappers */
+.table-responsive,
+.admin-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-md, 12px);
+  margin-bottom: 1rem;
+}
+
+.table-responsive table,
+.admin-table-wrap table {
+  min-width: 650px;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Universal Touch Target Enhancements */
+@media (max-width: 640px) {
+  .btn-primary,
+  .btn-secondary,
+  .admin-nav-tab-btn,
+  .modal-close-btn,
+  .star-glow-btn {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Responsive Grid Adjustments */
+  .form-grid-2,
+  .form-grid-3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .superadmin-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Canvas and PDF Document Responsiveness */
+  canvas,
+  iframe,
+  embed,
+  object {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .superadmin-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-nav-tabs {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .admin-nav-tab-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
