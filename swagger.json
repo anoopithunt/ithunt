@@ -1,0 +1,192 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "IT HUNT Backend REST API",
+    "description": "Production REST API backend for IT HUNT Software Solutions & Tech Academy (Prayagraj, UP). Serving Admissions, Careers, Reviews, NIELIT Projects, Courses, and SuperAdmin metrics.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "IT HUNT Director & Lead",
+      "email": "softtechithunt@gmail.com",
+      "url": "https://ithunt.in"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local Development Server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "Server Health Check",
+        "responses": {
+          "200": { "description": "Server is online and healthy" }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "summary": "Register a new student/user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string" },
+                  "password": { "type": "string" },
+                  "phone": { "type": "string" },
+                  "role": { "type": "string", "example": "student" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User created successfully" }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Authenticate user & return JWT token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Authentication token issued" }
+        }
+      }
+    },
+    "/api/admissions": {
+      "post": {
+        "summary": "Submit online admission or internship registration",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fullName": { "type": "string" },
+                  "email": { "type": "string" },
+                  "phone": { "type": "string" },
+                  "course": { "type": "string" },
+                  "track": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Admission registration confirmed" }
+        }
+      },
+      "get": {
+        "summary": "Get all admissions (Admin authentication required)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Admissions list" }
+        }
+      }
+    },
+    "/api/admissions/{id}/slip": {
+      "get": {
+        "summary": "Generate official digital registration slip",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Registration slip metadata payload" }
+        }
+      }
+    },
+    "/api/careers/apply": {
+      "post": {
+        "summary": "Submit job or faculty application",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string" },
+                  "phone": { "type": "string" },
+                  "position": { "type": "string" },
+                  "resumeLink": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Application recorded" }
+        }
+      }
+    },
+    "/api/reviews": {
+      "get": {
+        "summary": "Fetch public verified student reviews",
+        "responses": {
+          "200": { "description": "Verified reviews list" }
+        }
+      },
+      "post": {
+        "summary": "Submit a new student review",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "role": { "type": "string" },
+                  "rating": { "type": "number", "example": 5 },
+                  "reviewText": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Review created" }
+        }
+      }
+    },
+    "/api/admin/stats": {
+      "get": {
+        "summary": "Fetch SuperAdmin executive statistics",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Dashboard stats" }
+        }
+      }
+    }
+  }
+}
