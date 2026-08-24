@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
@@ -154,9 +154,85 @@ export async function saveRsvpRecord(data) {
   return { success: true, localOnly: true };
 }
 
+/**
+ * Fetch all stored NIELIT Projects from Firebase Firestore or local storage
+ */
+export async function fetchNielitProjectsFromFirebase() {
+  if (db) {
+    try {
+      const q = query(collection(db, 'nielit_projects'), orderBy('createdAt', 'desc'));
+      const snap = await getDocs(q);
+      return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (e) {
+      console.warn('Fetching from Firestore failed, reading local storage:', e.message);
+    }
+  }
+  try {
+    return JSON.parse(localStorage.getItem('ithunt_nielit_projects') || '[]');
+  } catch (e) { return []; }
+}
+
+/**
+ * Fetch all stored Admissions from Firebase Firestore or local storage
+ */
+export async function fetchAdmissionsFromFirebase() {
+  if (db) {
+    try {
+      const q = query(collection(db, 'admissions'), orderBy('createdAt', 'desc'));
+      const snap = await getDocs(q);
+      return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (e) {
+      console.warn('Fetching from Firestore failed, reading local storage:', e.message);
+    }
+  }
+  try {
+    return JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
+  } catch (e) { return []; }
+}
+
+/**
+ * Fetch all stored Job Applications from Firebase Firestore or local storage
+ */
+export async function fetchJobApplicationsFromFirebase() {
+  if (db) {
+    try {
+      const q = query(collection(db, 'job_applications'), orderBy('createdAt', 'desc'));
+      const snap = await getDocs(q);
+      return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (e) {
+      console.warn('Fetching from Firestore failed, reading local storage:', e.message);
+    }
+  }
+  try {
+    return JSON.parse(localStorage.getItem('ithunt_job_applications') || '[]');
+  } catch (e) { return []; }
+}
+
+/**
+ * Fetch all stored Event RSVPs from Firebase Firestore or local storage
+ */
+export async function fetchRsvpsFromFirebase() {
+  if (db) {
+    try {
+      const q = query(collection(db, 'event_rsvps'), orderBy('createdAt', 'desc'));
+      const snap = await getDocs(q);
+      return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (e) {
+      console.warn('Fetching from Firestore failed, reading local storage:', e.message);
+    }
+  }
+  try {
+    return JSON.parse(localStorage.getItem('ithunt_event_rsvps') || '[]');
+  } catch (e) { return []; }
+}
+
 export default {
   saveNielitProjectRecord,
   saveAdmissionRecord,
   saveJobApplicationRecord,
-  saveRsvpRecord
+  saveRsvpRecord,
+  fetchNielitProjectsFromFirebase,
+  fetchAdmissionsFromFirebase,
+  fetchJobApplicationsFromFirebase,
+  fetchRsvpsFromFirebase
 };
