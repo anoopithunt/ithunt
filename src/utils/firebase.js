@@ -1,3 +1,4 @@
+import { submitAdmissionToBackend, submitJobApplicationToBackend, submitNielitProjectToBackend, submitRsvpToBackend } from './apiClient.js';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { getDatabase, ref as rtdbRef, push as rtdbPush, get as rtdbGet } from 'firebase/database';
@@ -120,6 +121,7 @@ export async function saveNielitProjectRecord(data) {
   if (rtdb) {
     try {
       rtdbPush(rtdbRef(rtdb, 'nielit_projects'), payload);
+      submitNielitProjectToBackend(payload).catch(() => {});
       rtdbPush(rtdbRef(rtdb, 'users'), userPayload);
       console.log('✓ NIELIT Project & Student User pushed to Firebase Realtime DB');
     } catch (e) {
@@ -201,6 +203,7 @@ export async function saveAdmissionRecord(data) {
   if (rtdb) {
     try {
       rtdbPush(rtdbRef(rtdb, 'admissions'), payload);
+      submitAdmissionToBackend(payload).catch(() => {});
       rtdbPush(rtdbRef(rtdb, 'users'), userPayload);
       console.log('✓ Admission record & Student User pushed to Firebase Realtime DB');
     } catch (e) {
@@ -261,6 +264,7 @@ export async function saveJobApplicationRecord(data) {
   if (rtdb) {
     try {
       rtdbPush(rtdbRef(rtdb, 'job_applications'), payload);
+      submitJobApplicationToBackend(payload).catch(() => {});
       console.log('✓ Job Application record pushed to Firebase Realtime DB');
     } catch (e) {
       console.warn('Realtime DB push notice:', e.message);
@@ -309,6 +313,7 @@ export async function saveRsvpRecord(data) {
   if (rtdb) {
     try {
       rtdbPush(rtdbRef(rtdb, 'event_rsvps'), { ...payload, timestamp: Date.now() });
+      submitRsvpToBackend(payload).catch(() => {});
       console.log('✓ Event RSVP record pushed to Firebase Realtime DB');
     } catch (e) {
       console.warn('Realtime DB push warning:', e.message);
