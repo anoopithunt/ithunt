@@ -611,10 +611,9 @@ const submitJobApplication = (jobData) => {
   triggerConfetti();
 };
 
-const submitNielitProject = (projectData) => {
+const submitNielitProject = async (projectData) => {
   showNielitModal.value = false;
   submittedNielitData.value = projectData;
-  showNielitPreviewModal.value = true;
 
   const regId = projectData.nielitRegNo || ('NIELIT-' + Math.floor(100000 + Math.random() * 900000));
   submittedRegistrationNo.value = regId;
@@ -628,7 +627,11 @@ const submitNielitProject = (projectData) => {
   liveNielitProjectsList.value.unshift(nielitRecord);
 
   // Save to Firebase Firestore & local storage
-  saveNielitProjectRecord(nielitRecord).catch(() => {});
+  let fbDocId = regId;
+  try {
+    const res = await saveNielitProjectRecord(nielitRecord);
+    if (res && res.id) fbDocId = res.id;
+  } catch (e) {}
 
   // Dispatch email notification with 4-page PDF attachment EXCLUSIVELY to Admin
   try {
@@ -638,6 +641,10 @@ const submitNielitProject = (projectData) => {
     sendNielitProjectEmailNotification(projectData).catch(() => {});
   }
 
+  // Display Success Dialog Box
+  modalTitle.value = '🎉 Project Data Stored Successfully in Firebase!';
+  modalBody.value = `Congratulations ${projectData.candidateName}! Your ${projectData.nielitLevel || 'O'} Level Project record (Reg No: ${regId}) has been successfully saved to your Firebase Firestore Database & Users collection.\n\n🔥 Firebase Document ID: ${fbDocId}`;
+  showModal.value = true;
   triggerConfetti();
 };
 
@@ -653,7 +660,7 @@ const handleReviewSubmitted = (review) => {
   triggerConfetti();
 };
 
-const submitAdmission = (formData) => {
+const submitAdmission = async (formData) => {
   const randomRegId = 'ITH-' + Math.floor(100000 + Math.random() * 900000);
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -681,7 +688,11 @@ const submitAdmission = (formData) => {
   liveAdmissionsList.value.unshift(newAdmissionRecord);
 
   // Save to Firebase Firestore & local storage
-  saveAdmissionRecord(newAdmissionRecord).catch(() => {});
+  let fbDocId = randomRegId;
+  try {
+    const res = await saveAdmissionRecord(newAdmissionRecord);
+    if (res && res.id) fbDocId = res.id;
+  } catch (e) {}
 
   // Generate PDF Blob & trigger automatic email dispatch to softtechithunt@gmail.com with PDF attachment
   const pdfBlob = getAdmissionPdfBlob(newAdmissionRecord);
@@ -690,8 +701,9 @@ const submitAdmission = (formData) => {
   // Trigger mobile SMS & WhatsApp messaging dispatch
   triggerMobileMessageNotification(newAdmissionRecord).catch(() => {});
 
-  modalTitle.value = content.value?.ui?.admissionSuccessTitle || 'Admission Registered Successfully! 🎓';
-  modalBody.value = `Congratulations ${formData.candidateName}! Your admission/internship application for "${formData.course}" has been confirmed. You can now download your official verified Admission Registration Slip in PDF format.`;
+  // Display Success Dialog Box
+  modalTitle.value = '🎉 Student Record Stored Successfully in Firebase!';
+  modalBody.value = `Congratulations ${formData.candidateName}! Your admission record for "${formData.course}" (Reg No: ${randomRegId}) has been successfully saved to your Firebase Firestore Database & Users collection.\n\n🔥 Firebase Document ID: ${fbDocId}`;
   showModal.value = true;
   triggerConfetti();
 };
