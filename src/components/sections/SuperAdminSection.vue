@@ -802,7 +802,7 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { sendStudentAdmissionEmail, sendFeeReceiptJpgEmail } from '../../utils/emailNotifier.js';
 import { generateFeeReceiptJpgBlob } from '../../utils/jpgReceiptGenerator.js';
-import { deleteUserFromBackend, updateNielitProjectInBackend, deleteProject } from '../../utils/apiClient.js';
+import { deleteAdmissionFromBackend, deleteUserFromBackend, updateNielitProjectInBackend, deleteProject } from '../../utils/apiClient.js';
 
 const props = defineProps({
   content: {
@@ -1157,7 +1157,8 @@ const cycleAdmissionStatus = (adm) => {
 
 const deleteAdmission = async (adm) => {
   const idToDelete = adm.registrationNo || adm.id;
-  if (!confirm(`Are you sure you want to remove admission record for ${adm.candidateName} (${idToDelete})?`)) {
+  const candidateName = adm.candidateName || adm.name || 'Candidate';
+  if (!confirm(`Are you sure you want to remove admission record for ${candidateName} (${idToDelete})?`)) {
     return;
   }
 
@@ -1179,7 +1180,7 @@ const deleteAdmission = async (adm) => {
 
   // 4. Delete from REST API backend
   try {
-    await deleteUserFromBackend(idToDelete);
+    await deleteAdmissionFromBackend(adm);
     emailActionMsg.value = `✓ Candidate record ${idToDelete} removed successfully from Database & API.`;
   } catch (e) {
     console.warn('Delete warning:', e.message);

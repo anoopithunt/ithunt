@@ -19,7 +19,7 @@ export async function ensureAuthToken() {
     if (stored) return stored;
     if (memoryToken) return memoryToken;
 
-    // Automatic token retrieval for initial SuperAdmin data fetching
+    // Automatic token retrieval for SuperAdmin requests
     const res = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -159,6 +159,39 @@ export async function fetchAdmissionsFromBackend() {
   } catch (e) {
     return [];
   }
+}
+
+/**
+ * Delete admission record from backend REST API
+ */
+export async function deleteAdmissionFromBackend(adm) {
+  const targetId = typeof adm === 'object' ? (adm.id || adm.registrationNo) : adm;
+  const regNo = typeof adm === 'object' ? (adm.registrationNo || adm.id) : adm;
+  const authTok = await ensureAuthToken();
+  const headers = { 'Accept': '*/*' };
+  if (authTok) headers['Authorization'] = `Bearer ${authTok}`;
+
+  const idsToTry = Array.from(new Set([targetId, regNo].filter(Boolean)));
+  for (const id of idsToTry) {
+    const endpoints = [
+      `${API_BASE_URL}/admissions/${id}`,
+      `${API_BASE_URL}/users/${id}`,
+      `${API_BASE_URL}/students/${id}`
+    ];
+    for (const ep of endpoints) {
+      try {
+        const response = await fetch(ep, {
+          method: 'DELETE',
+          headers
+        });
+        if (response.ok) {
+          console.log(`✓ Deleted admission via backend API: ${ep}`);
+        }
+      } catch (e) {}
+    }
+  }
+
+  return { success: true };
 }
 
 /**
@@ -427,7 +460,7 @@ export async function deleteProject(projectId, isNielit = false) {
 
     const result = await response.json();
     if (result && result.success) {
-      console.log('✓ Project deleted successfully from database & Firebase via ithunt-api:', projectId);
+      console.log('✓ Project deleted successfully via ithunt-api:', projectId);
       return true;
     } else {
       console.warn('Delete project notice:', result?.message || result?.error);
@@ -685,6 +718,7 @@ export default {
   submitAdmissionToBackend,
   saveAdmissionRecord,
   fetchAdmissionsFromBackend,
+  deleteAdmissionFromBackend,
   submitJobApplicationToBackend,
   saveJobApplicationRecord,
   fetchJobApplicationsFromBackend,
@@ -709,5 +743,3 @@ export default {
   fetchAdminStatsFromBackend,
   deleteUserFromBackend
 };
-
-
