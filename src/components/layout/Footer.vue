@@ -6,18 +6,18 @@
         <div class="brand-logo" style="margin-bottom: 1rem;">
           <img :src="content.brand?.logoImage" :alt="(content.brand?.name || 'IT HUNT') + ' Logo'" class="brand-logo-img" @error="onImgError">
           <div>
-            <div class="brand-title" style="color: #ffffff;">IT <span class="text-gradient">{{ content.brand?.nameHighlight }}</span></div>
-            <div class="brand-tagline" style="color: #ffffff; opacity: 0.85;">{{ content.brand?.tagline }}</div>
+            <div class="brand-title">IT <span class="text-gradient">{{ content.brand?.nameHighlight }}</span></div>
+            <div class="brand-tagline">{{ content.brand?.tagline }}</div>
           </div>
         </div>
-        <p style="font-size: 0.875rem; line-height: 1.7; color: #ffffff;">
+        <p style="font-size: 0.875rem; line-height: 1.7; color: var(--text-muted);">
           {{ content.footer?.aboutText }}
         </p>
         <div style="margin-top: 1.15rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <a href="#" @click.prevent="$emit('set-tab', 'reviews')" class="skill-tag" style="background: rgba(250, 204, 21, 0.15); color: var(--color-ai-yellow); border-color: rgba(250, 204, 21, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.9rem; font-weight: 800; font-size: 0.825rem; border-radius: var(--radius-full);">
             {{ content.footerSections?.reviewRatingBadge || '⭐ Student Reviews & Ratings (4.9 / 5.0) →' }}
           </a>
-          <a href="#" @click.prevent="$emit('set-tab', 'careers')" class="skill-tag" style="background: rgba(249, 115, 22, 0.15); color: #fb923c; border-color: rgba(249, 115, 22, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.9rem; font-weight: 800; font-size: 0.825rem; border-radius: var(--radius-full);">
+          <a href="#" @click.prevent="$emit('set-tab', 'careers')" class="skill-tag" style="background: rgba(249, 115, 22, 0.15); color: var(--color-ai-orange); border-color: rgba(249, 115, 22, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.9rem; font-weight: 800; font-size: 0.825rem; border-radius: var(--radius-full);">
             💼 We Are Hiring (Teachers & Devs) →
           </a>
           <a href="#" @click.prevent="$emit('set-tab', 'login')" class="skill-tag" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.9rem; font-weight: 800; font-size: 0.825rem; border-radius: var(--radius-full);">
@@ -55,15 +55,15 @@
       <!-- Contact & Location -->
       <div class="footer-col">
         <h4>{{ content.footerSections?.contactTitle || 'Contact & Location' }}</h4>
-        <p style="font-size: 0.875rem; margin-bottom: 0.4rem; color: #ffffff;">📍 {{ content.contact?.location }}</p>
-        <p style="font-size: 0.875rem; margin-bottom: 0.4rem; color: #ffffff;">📞 {{ content.contact?.phone }}</p>
-        <p style="font-size: 0.875rem; margin-bottom: 1rem; color: #ffffff;">✉️ {{ content.contact?.email }}</p>
+        <p style="font-size: 0.875rem; margin-bottom: 0.4rem; color: var(--text-muted);">📍 {{ content.contact?.location }}</p>
+        <p style="font-size: 0.875rem; margin-bottom: 0.4rem; color: var(--text-muted);">📞 {{ content.contact?.phone }}</p>
+        <p style="font-size: 0.875rem; margin-bottom: 1rem; color: var(--text-muted);">✉️ {{ content.contact?.email }}</p>
       </div>
     </div>
 
     <!-- Footer Bottom Bar -->
     <div class="container footer-bottom">
-      <div style="color: #ffffff;">{{ content.footer?.copyrightText }}</div>
+      <div style="color: var(--text-muted);">{{ content.footer?.copyrightText }}</div>
       <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
         <a href="#" @click.prevent="$emit('set-tab', 'careers')">💼 Careers</a>
         <a href="#" @click.prevent="$emit('set-tab', 'reviews')">{{ content.ui?.reviewsAndRatings || '⭐ Reviews & Ratings' }}</a>

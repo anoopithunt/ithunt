@@ -3,32 +3,9 @@
     <!-- Top Scroll Progress Indicator -->
     <div class="scroll-progress-bar" :style="{ width: scrollProgress + '%' }" aria-hidden="true"></div>
 
-    <!-- Floating Ambient Aurora Glow Mesh -->
-    <div class="ambient-glow-container" aria-hidden="true">
-      <div class="ambient-orb ambient-orb-1"></div>
-      <div class="ambient-orb ambient-orb-2"></div>
-      <div class="ambient-orb ambient-orb-3"></div>
-    </div>
+    <!-- Subtle Clean Background Accent Layer -->
+    <div class="subtle-bg-gradient" aria-hidden="true"></div>
 
-    <!-- Cosmic Twinkling Starfield Background Layer -->
-    <div class="starfield-wrapper" aria-hidden="true">
-      <div class="stars-layer stars-small"></div>
-      <div class="stars-layer stars-medium"></div>
-      <div class="stars-layer stars-large"></div>
-      <div class="shooting-star shooting-star-1"></div>
-      <div class="shooting-star shooting-star-2"></div>
-      <div class="shooting-star shooting-star-3"></div>
-    </div>
-
-    <!-- Celebratory Floating Confetti System -->
-    <div class="confetti-container" v-if="showConfetti" aria-hidden="true">
-      <div 
-        v-for="item in confettiPieces" 
-        :key="item.id" 
-        class="confetti-piece" 
-        :style="item.style"
-      ></div>
-    </div>
 
     <!-- Navbar Component -->
     <Navbar 
