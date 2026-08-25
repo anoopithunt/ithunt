@@ -802,7 +802,7 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { sendStudentAdmissionEmail, sendFeeReceiptJpgEmail } from '../../utils/emailNotifier.js';
 import { generateFeeReceiptJpgBlob } from '../../utils/jpgReceiptGenerator.js';
-import { deleteAdmissionFromBackend, deleteUserFromBackend, updateNielitProjectInBackend, deleteProject } from '../../utils/apiClient.js';
+import { API, deleteAdmissionFromBackend, deleteUserFromBackend, updateNielitProjectInBackend, deleteProject } from '../../utils/apiClient.js';
 
 const props = defineProps({
   content: {
@@ -1107,39 +1107,46 @@ const handleSaveEditedProject = async () => {
 };
 
 const deleteNielitProject = async (p) => {
-  const targetId = p.registrationNo || p.nielitRegNo || p.id;
-  if (!confirm(`Are you sure you want to delete NIELIT project form for ${p.candidateName || 'Candidate'} (${targetId})?`)) {
+  const targetId = typeof p === 'object' ? (p.registrationNo || p.nielitRegNo || p.id) : p;
+  const candidateName = typeof p === 'object' ? (p.candidateName || p.studentName || 'Candidate') : 'Candidate';
+  if (!confirm(`Are you sure you want to delete NIELIT project form for ${candidateName} (${targetId})?`)) {
     return;
   }
 
   // 1. Blacklist IDs in localStorage
-  if (p.registrationNo) addDeletedId('ithunt_deleted_nielit_ids', p.registrationNo);
-  if (p.nielitRegNo) addDeletedId('ithunt_deleted_nielit_ids', p.nielitRegNo);
-  if (p.id) addDeletedId('ithunt_deleted_nielit_ids', p.id);
+  if (typeof p === 'object') {
+    if (p.registrationNo) addDeletedId('ithunt_deleted_nielit_ids', p.registrationNo);
+    if (p.nielitRegNo) addDeletedId('ithunt_deleted_nielit_ids', p.nielitRegNo);
+    if (p.id) addDeletedId('ithunt_deleted_nielit_ids', p.id);
+  }
   if (targetId) addDeletedId('ithunt_deleted_nielit_ids', targetId);
 
   // 2. Immediately remove from local list
   nielitProjectsList.value = nielitProjectsList.value.filter(item => 
-    item.registrationNo !== p.registrationNo && 
-    item.nielitRegNo !== p.nielitRegNo && 
-    item.id !== p.id &&
     item.registrationNo !== targetId &&
     item.nielitRegNo !== targetId &&
     item.id !== targetId
   );
 
   // 3. Emit delete to parent App.vue
-  emit('delete-nielit-project', p);
+  emit('delete-nielit-project', typeof p === 'object' ? p : { id: targetId, registrationNo: targetId });
 
-  // 4. Delete from REST API backend
+  // 4. Delete from REST API backend via API helper
   try {
-    await deleteProject(targetId, true);
+    await API.deleteNielitProject(targetId);
     emailActionMsg.value = `✓ NIELIT project form (${targetId}) removed successfully from Database & API.`;
   } catch (err) {
-    console.warn('Delete project warning:', err.message);
+    try {
+      await API.deleteProject(targetId);
+    } catch (e) {
+      console.warn('Delete project warning:', err.message);
+    }
   }
   setTimeout(() => { emailActionMsg.value = ''; }, 4000);
 };
+
+// Universal alias
+const handleDeleteProject = (projectId) => deleteNielitProject(projectId);
 
 const cycleNielitStatus = (p) => {
   if (!p.status || p.status === 'Submitted') p.status = 'Under Review';
@@ -1156,37 +1163,44 @@ const cycleAdmissionStatus = (adm) => {
 };
 
 const deleteAdmission = async (adm) => {
-  const idToDelete = adm.registrationNo || adm.id;
-  const candidateName = adm.candidateName || adm.name || 'Candidate';
+  const idToDelete = typeof adm === 'object' ? (adm.registrationNo || adm.id) : adm;
+  const candidateName = typeof adm === 'object' ? (adm.candidateName || adm.name || 'Candidate') : 'Candidate';
   if (!confirm(`Are you sure you want to remove admission record for ${candidateName} (${idToDelete})?`)) {
     return;
   }
 
   // 1. Blacklist IDs in localStorage
-  if (adm.registrationNo) addDeletedId('ithunt_deleted_admission_ids', adm.registrationNo);
-  if (adm.id) addDeletedId('ithunt_deleted_admission_ids', adm.id);
+  if (typeof adm === 'object') {
+    if (adm.registrationNo) addDeletedId('ithunt_deleted_admission_ids', adm.registrationNo);
+    if (adm.id) addDeletedId('ithunt_deleted_admission_ids', adm.id);
+  }
   if (idToDelete) addDeletedId('ithunt_deleted_admission_ids', idToDelete);
 
   // 2. Immediately remove from local list
   admissionsList.value = admissionsList.value.filter(a => 
-    a.registrationNo !== adm.registrationNo && 
-    a.id !== adm.id &&
-    a.registrationNo !== idToDelete &&
+    a.registrationNo !== idToDelete && 
     a.id !== idToDelete
   );
 
   // 3. Emit delete to parent App.vue
-  emit('delete-admission', adm);
+  emit('delete-admission', typeof adm === 'object' ? adm : { id: idToDelete, registrationNo: idToDelete });
 
-  // 4. Delete from REST API backend
+  // 4. Delete from REST API backend via API helper
   try {
-    await deleteAdmissionFromBackend(adm);
+    await API.deleteAdmission(idToDelete);
     emailActionMsg.value = `✓ Candidate record ${idToDelete} removed successfully from Database & API.`;
   } catch (e) {
-    console.warn('Delete warning:', e.message);
+    try {
+      await deleteAdmissionFromBackend(adm);
+    } catch (err) {
+      console.warn('Delete admission warning:', e.message);
+    }
   }
   setTimeout(() => { emailActionMsg.value = ''; }, 4000);
 };
+
+// Universal alias
+const handleDeleteAdmission = (admissionId) => deleteAdmission(admissionId);
 
 const cycleJobStatus = (job) => {
   if (job.status === 'Reviewing Profile') job.status = 'Shortlisted for Interview';

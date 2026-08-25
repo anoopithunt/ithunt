@@ -138,9 +138,10 @@
         </div>
 
         <div class="modal-actions" style="margin-top: 1.5rem;">
-          <button type="button" class="btn-secondary" @click="$emit('close')">Cancel</button>
-          <button type="submit" class="btn-primary">
-            <span>Submit NIELIT Project Form 🚀</span>
+          <button type="button" class="btn-secondary" :disabled="isSubmitting" @click="$emit('close')">Cancel</button>
+          <button type="submit" class="btn-primary" :disabled="isSubmitting">
+            <span v-if="isSubmitting">Submitting NIELIT Form... ⏳</span>
+            <span v-else>Submit NIELIT Project Form 🚀</span>
           </button>
         </div>
       </form>
@@ -150,6 +151,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import { API } from '@/utils/apiClient';
 
 const props = defineProps({
   initialData: {
@@ -160,10 +162,15 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'submit-nielit-project']);
 
+const isSubmitting = ref(false);
+
 const form = ref({
-  candidateName: props.initialData.candidateName || 'Praveen Kumar Soni',
-  nielitRegNo: props.initialData.nielitRegNo || '1536056',
-  nielitLevel: props.initialData.nielitLevel || 'A',
+  studentName: props.initialData.studentName || props.initialData.candidateName || 'Praveen Kumar Soni',
+  candidateName: props.initialData.candidateName || props.initialData.studentName || 'Praveen Kumar Soni',
+  regNo: props.initialData.regNo || props.initialData.nielitRegNo || '1536056',
+  nielitRegNo: props.initialData.nielitRegNo || props.initialData.regNo || '1536056',
+  nielitLevel: props.initialData.nielitLevel || 'O',
+  level: props.initialData.level || 'O Level',
   fatherName: props.initialData.fatherName || 'Kedar Mal Soni',
   email: props.initialData.email || 'praveensoni11@gmail.com',
   mobile: props.initialData.mobile || '7740854811',
@@ -173,22 +180,43 @@ const form = ref({
   pin: props.initialData.pin || '333502',
 
   projectTitle: props.initialData.projectTitle || 'Network Monitoring and Management',
-  guideName: props.initialData.guideName || 'Sushil Kumar',
-  guideQualification: props.initialData.guideQualification || 'MCA',
-  guideDesignation: props.initialData.guideDesignation || 'Sr. Laravel Developer',
+  guideName: props.initialData.guideName || 'Mr. Lakshman Singh Chauhan',
+  guideQualification: props.initialData.guideQualification || 'MCA (Computer Science)',
+  guideDesignation: props.initialData.guideDesignation || 'Director & Founder, IT HUNT',
   guidePlace: props.initialData.guidePlace || 'Prayagraj',
-  guideAddress: props.initialData.guideAddress || 'Prayagraj Uttar Pradesh',
+  guideAddress: props.initialData.guideAddress || 'Holagarh, Prayagraj, UP',
   projectDate: props.initialData.projectDate || new Date().toLocaleDateString('en-GB'),
+  githubRepo: props.initialData.githubRepo || '',
 
   amount: props.initialData.amount || '1000',
   paymentDate: props.initialData.paymentDate || new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
   utrNumber: props.initialData.utrNumber || 'CHD550W1FMSF1B',
   accountHolderName: props.initialData.accountHolderName || 'Praveen Kumar Soni',
-  paymentRemark: props.initialData.paymentRemark || 'Paid'
+  paymentRemark: props.initialData.paymentRemark || 'Paid Online'
 });
 
-const handleSubmit = () => {
-  emit('submit-nielit-project', { ...form.value });
+const handleSubmit = async () => {
+  try {
+    isSubmitting.value = true;
+    const payload = {
+      ...form.value,
+      studentName: form.value.candidateName || form.value.studentName,
+      candidateName: form.value.candidateName || form.value.studentName,
+      regNo: form.value.nielitRegNo || form.value.regNo,
+      registrationNo: form.value.nielitRegNo || form.value.regNo,
+      nielitRegNo: form.value.nielitRegNo || form.value.regNo,
+      level: form.value.nielitLevel ? `${form.value.nielitLevel} Level` : 'O Level',
+      status: 'Submitted'
+    };
+
+    await API.submitNielitProject(payload);
+    emit('submit-nielit-project', payload);
+  } catch (err) {
+    console.warn('API submission note:', err.message);
+    emit('submit-nielit-project', { ...form.value });
+  } finally {
+    isSubmitting.value = false;
+  }
 };
 </script>
 
