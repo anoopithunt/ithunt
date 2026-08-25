@@ -243,41 +243,6 @@
         </div>
       </div>
     </div>
-
-    <!-- 3. CAREERS SECTION -->
-    <div style="background: rgba(15, 23, 42, 0.6); padding: 4rem 0; border-top: 1px solid var(--border-cyber);">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-tag">{{ content.careersSection?.tagline }}</span>
-          <h2 class="section-title">{{ content.careersSection?.titlePrefix }}<span class="text-gradient">{{ content.careersSection?.titleGradient }}</span></h2>
-          <p class="section-subtitle">{{ content.careersSection?.description }}</p>
-
-          <div style="margin-top: 1.25rem;">
-            <span class="exp-badge-required">
-              {{ content.careersSection?.mandatoryPolicyNotice }}
-            </span>
-          </div>
-        </div>
-
-        <div class="careers-grid">
-          <div class="career-card" v-for="job in content.careersSection?.jobOpenings" :key="job.id">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.85rem;">
-              <span class="skill-tag" style="background: rgba(249, 115, 22, 0.15); color: var(--color-ai-yellow); border-color: rgba(249, 115, 22, 0.3);">{{ job.type }}</span>
-              <span class="exp-badge-required" style="font-size: 0.725rem; padding: 0.2rem 0.5rem;">{{ content.ui?.minExpRequiredBadge || 'Min 4+ Yrs Exp' }}</span>
-            </div>
-
-            <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; margin-bottom: 0.4rem;">{{ job.title }}</h3>
-            <div style="color: var(--color-ai-cyan); font-size: 0.825rem; font-weight: 700; margin-bottom: 0.85rem; font-family: var(--font-mono);">📍 {{ job.location }} | Salary: {{ job.salary }}</div>
-
-            <p style="color: var(--text-muted); font-size: 0.875rem; line-height: 1.6; margin-bottom: 1.15rem;">{{ job.description }}</p>
-
-            <button class="btn-primary" style="width: 100%; justify-content: center; margin-top: auto;" @click="$emit('open-job-modal', job)">
-              <span>{{ content.ui?.applyJobBtnPrefix || 'Apply for' }} {{ job.shortTitle }}</span> 💼
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
