@@ -1,6 +1,6 @@
 import { submitAdmissionToBackend, submitJobApplicationToBackend, submitNielitProjectToBackend, submitRsvpToBackend } from './apiClient.js';
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, getDocs, doc, setDoc, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { getDatabase, ref as rtdbRef, push as rtdbPush, get as rtdbGet } from 'firebase/database';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 import { getAnalytics, isSupported } from 'firebase/analytics';
@@ -213,27 +213,41 @@ export async function saveAdmissionRecord(data) {
 
   // Cloud Firestore Write
   if (db) {
+    let savedId = payload.registrationNo;
+    try {
+      if (payload.registrationNo) {
+        await setDoc(doc(db, 'admissions', payload.registrationNo), {
+          ...payload,
+          timestamp: serverTimestamp ? serverTimestamp() : nowIso
+        }, { merge: true });
+        savedId = payload.registrationNo;
+      } else {
+        const docRef = await addDoc(collection(db, 'admissions'), {
+          ...payload,
+          timestamp: serverTimestamp ? serverTimestamp() : nowIso
+        });
+        savedId = docRef.id;
+      }
+      console.log('✓ Admission record successfully written to Firebase Firestore ID:', savedId);
+    } catch (err) {
+      console.error('❌ Could not save Admission to Firebase Firestore:', err.message, err.code);
+      if (err.code === 'permission-denied') {
+        console.warn('⚠️ FIRESTORE PERMISSION DENIED: Please update your Firestore Security Rules in Firebase Console (console.firebase.google.com -> ithunt-3a42d -> Firestore Database -> Rules) to: allow read, write: if true;');
+      }
+      return { success: false, localOnly: true, error: err.message, code: err.code };
+    }
+
     try {
       await addDoc(collection(db, 'users'), {
         ...userPayload,
         timestamp: serverTimestamp ? serverTimestamp() : nowIso
       });
-      console.log('✓ Enrolled Student record saved to Firestore "users" collection');
+      console.log('✓ Enrolled Student user record saved to Firestore "users" collection');
     } catch (e) {
       console.warn('Could not save to users collection:', e.message);
     }
 
-    try {
-      const docRef = await addDoc(collection(db, 'admissions'), {
-        ...payload,
-        timestamp: serverTimestamp ? serverTimestamp() : nowIso
-      });
-      console.log('✓ Admission record saved to Firestore "admissions" collection ID:', docRef.id);
-      return { success: true, id: docRef.id };
-    } catch (err) {
-      console.error('❌ Could not save Admission to Firebase Firestore:', err);
-      return { success: true, localOnly: true, error: err.message };
-    }
+    return { success: true, id: savedId, firestore: true };
   }
   return { success: true, localOnly: true };
 }
