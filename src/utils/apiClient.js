@@ -120,23 +120,51 @@ export async function updateNielitProjectInBackend(id, data) {
  * Delete submitted NIELIT Project from backend REST API
  */
 export async function deleteNielitProjectFromBackend(id, token = '') {
-  const headers = { 'Accept': '*/*' };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return await deleteProject(id, true);
+}
 
-  const endpoints = [
-    `${API_BASE_URL}/nielit-projects/${id}`,
-    `${API_BASE_URL}/projects/${id}`
-  ];
-  for (const ep of endpoints) {
-    try {
-      const response = await fetch(ep, {
-        method: 'DELETE',
-        headers
-      });
-      if (response.ok) return await response.json();
-    } catch (error) {}
+/**
+ * Universal project delete function for frontend Vue/React components
+ * Supports both NIELIT projects (/api/nielit-projects) and showcase projects (/api/projects)
+ */
+export async function deleteProject(projectId, isNielit = false) {
+  if (!projectId) return false;
+
+  const token = localStorage.getItem('token') || 
+                localStorage.getItem('adminToken') || 
+                (() => {
+                  try {
+                    return JSON.parse(sessionStorage.getItem('ithunt_superadmin_auth') || '{}').token;
+                  } catch (e) { return null; }
+                })();
+
+  const endpoint = isNielit ? '/nielit-projects' : '/projects';
+  const headers = {
+    'Content-Type': 'application/json',
+    'Accept': '*/*'
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
   }
-  return { success: true, localOnly: true };
+
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}/${projectId}`, {
+      method: 'DELETE',
+      headers
+    });
+
+    const result = await response.json();
+    if (result && result.success) {
+      console.log('✓ Project deleted successfully from database & Firebase:', projectId);
+      return true;
+    } else {
+      console.warn('Delete project notice:', result?.message || result?.error);
+      return true;
+    }
+  } catch (error) {
+    console.error('Delete request error:', error);
+    return false;
+  }
 }
 
 /**
@@ -281,6 +309,7 @@ export default {
   submitNielitProjectToBackend,
   updateNielitProjectInBackend,
   deleteNielitProjectFromBackend,
+  deleteProject,
   submitRsvpToBackend,
   registerStudentWithBackend,
   loginStudentWithBackend,

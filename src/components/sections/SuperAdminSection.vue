@@ -803,7 +803,7 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { sendStudentAdmissionEmail, sendFeeReceiptJpgEmail } from '../../utils/emailNotifier.js';
 import { generateFeeReceiptJpgBlob } from '../../utils/jpgReceiptGenerator.js';
 import { deleteAdmissionFromFirebase, updateNielitProjectInFirebase, deleteNielitProjectFromFirebase } from '../../utils/firebase.js';
-import { deleteUserFromBackend, updateNielitProjectInBackend, deleteNielitProjectFromBackend } from '../../utils/apiClient.js';
+import { deleteUserFromBackend, updateNielitProjectInBackend, deleteNielitProjectFromBackend, deleteProject } from '../../utils/apiClient.js';
 
 const props = defineProps({
   content: {
