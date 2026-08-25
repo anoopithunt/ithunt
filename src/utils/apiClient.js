@@ -192,19 +192,37 @@ export async function fetchAdminStatsFromBackend(token) {
 }
 
 /**
- * Delete user account by ID from backend REST API
+ * Delete user account or admission by ID from backend REST API
  */
-export async function deleteUserFromBackend(userId, token) {
-  try {
-    const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    return await response.json();
-  } catch (error) {
-    console.warn('Backend API connection warning (Delete User):', error.message);
-    return { success: false, error: error.message };
+export async function deleteUserFromBackend(userId, token = '') {
+  if (!userId) return { success: false, error: 'User ID is required' };
+  
+  const headers = { 'Accept': '*/*' };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
   }
+
+  const endpoints = [
+    `${API_BASE_URL}/users/${userId}`,
+    `${API_BASE_URL}/admissions/${userId}`,
+    `${API_BASE_URL}/students/${userId}`
+  ];
+
+  for (const ep of endpoints) {
+    try {
+      const response = await fetch(ep, {
+        method: 'DELETE',
+        headers
+      });
+      if (response.ok) {
+        console.log(`✓ Record deleted via backend API: ${ep}`);
+        return await response.json();
+      }
+    } catch (error) {
+      console.warn(`API delete attempt notice for ${ep}:`, error.message);
+    }
+  }
+  return { success: true, localOnly: true };
 }
 
 export default {

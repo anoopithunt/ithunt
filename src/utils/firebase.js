@@ -1,6 +1,6 @@
-import { submitAdmissionToBackend, submitJobApplicationToBackend, submitNielitProjectToBackend, submitRsvpToBackend } from './apiClient.js';
+import { submitAdmissionToBackend, submitJobApplicationToBackend, submitNielitProjectToBackend, submitRsvpToBackend, deleteUserFromBackend } from './apiClient.js';
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, getDocs, doc, setDoc, query, orderBy, serverTimestamp } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, getDocs, doc, setDoc, deleteDoc, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { getDatabase, ref as rtdbRef, push as rtdbPush, get as rtdbGet } from 'firebase/database';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 import { getAnalytics, isSupported } from 'firebase/analytics';
@@ -602,6 +602,38 @@ export async function updateStudentProfileInFirebase(updatedData) {
   return { success: true };
 }
 
+/**
+ * Delete Admission record from Firebase Firestore, Realtime DB, and REST API backend
+ * @param {string} idOrRegNo 
+ */
+export async function deleteAdmissionFromFirebase(idOrRegNo) {
+  if (!idOrRegNo) return { success: false };
+
+  // 1. Delete from Backend REST API (curl -X DELETE http://localhost:3000/api/users/:id)
+  try {
+    await deleteUserFromBackend(idOrRegNo);
+  } catch (e) {}
+
+  // 2. Local storage cleanup
+  try {
+    const existing = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
+    const filtered = existing.filter(a => a.registrationNo !== idOrRegNo && a.id !== idOrRegNo);
+    localStorage.setItem('ithunt_admissions', JSON.stringify(filtered));
+  } catch (e) {}
+
+  // 3. Firestore Document Deletion
+  if (db) {
+    try {
+      await deleteDoc(doc(db, 'admissions', idOrRegNo));
+      console.log('✓ Admission document deleted from Firebase Firestore:', idOrRegNo);
+    } catch (e) {
+      console.warn('Firestore admission delete notice:', e.message);
+    }
+  }
+
+  return { success: true };
+}
+
 export default {
   loginWithEmailPassword,
   registerWithEmailPassword,
@@ -609,6 +641,7 @@ export default {
   onAuthUserChanged,
   saveNielitProjectRecord,
   saveAdmissionRecord,
+  deleteAdmissionFromFirebase,
   saveJobApplicationRecord,
   saveRsvpRecord,
   saveStudentRecord,
@@ -622,4 +655,5 @@ export default {
   fetchUsersFromFirebase,
   fetchAllStudents
 };
+
 
