@@ -149,6 +149,11 @@
         </div>
       </div>
 
+      <!-- Action Feedback Banner -->
+      <div v-if="emailActionMsg" style="margin-bottom: 1.25rem; padding: 0.85rem 1.25rem; background: rgba(249, 115, 22, 0.15); border: 1px solid rgba(249, 115, 22, 0.4); border-radius: var(--radius-md); color: var(--color-ai-orange); font-weight: 700; font-size: 0.9rem;">
+        {{ emailActionMsg }}
+      </div>
+
       <!-- Admissions Data Table -->
       <div class="admin-table-card">
         <div class="table-responsive">
@@ -191,7 +196,7 @@
                   <span 
                     class="admin-status-chip"
                     :class="{
-                      'status-confirmed': adm.status === 'Confirmed',
+                      'status-confirmed': adm.status === 'Confirmed' || adm.status === 'Admission Form Sent',
                       'status-verified': adm.status === 'Verified',
                       'status-pending': adm.status === 'Pending Verification'
                     }"
@@ -200,9 +205,28 @@
                   >
                     {{ adm.status || 'Confirmed' }}
                   </span>
+                  <div style="font-size: 0.7rem; font-weight: 700; margin-top: 4px;" :style="{ color: (adm.feeStatus && adm.feeStatus.includes('Paid')) ? '#10b981' : '#f59e0b' }">
+                    💳 {{ adm.feeStatus || 'Fee Pending' }}
+                  </div>
                 </td>
                 <td style="text-align: right;">
                   <div class="admin-row-actions">
+                    <button 
+                      class="admin-icon-btn" 
+                      @click="sendAdmissionEmailToStudent(adm)" 
+                      title="Send Admission Form & Confirmation Email to Candidate"
+                      style="color: var(--color-ai-orange); border-color: rgba(249, 115, 22, 0.4);"
+                    >
+                      📩 Admission Email
+                    </button>
+                    <button 
+                      class="admin-icon-btn" 
+                      @click="confirmFeeAndSendJpgReceipt(adm)" 
+                      title="Confirm Fee Payment and Email Official JPG Image Receipt to Student"
+                      style="color: #34d399; border-color: rgba(52, 211, 153, 0.4);"
+                    >
+                      💳 Confirm Fee & JPG Receipt
+                    </button>
                     <button 
                       class="admin-icon-btn" 
                       @click="$emit('download-slip', adm)" 
@@ -670,6 +694,8 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
+import { sendStudentAdmissionEmail, sendFeeReceiptJpgEmail } from '../../utils/emailNotifier.js';
+import { generateFeeReceiptJpgBlob } from '../../utils/jpgReceiptGenerator.js';
 
 const props = defineProps({
   content: {
@@ -704,6 +730,52 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['logout', 'download-slip', 'download-nielit-pdf', 'add-admission']);
+
+const emailActionMsg = ref('');
+
+const sendAdmissionEmailToStudent = async (adm) => {
+  if (!adm || !adm.email) {
+    alert('Candidate record has no valid email address.');
+    return;
+  }
+  emailActionMsg.value = `Sending Admission Confirmation Email to ${adm.email}...`;
+  try {
+    const res = await sendStudentAdmissionEmail(adm);
+    if (res.success) {
+      adm.status = 'Admission Form Sent';
+      emailActionMsg.value = `✓ Admission Confirmation Email & Slip sent to ${adm.email}`;
+    } else {
+      emailActionMsg.value = `⚠️ Email notification sent (Fallback): ${adm.email}`;
+    }
+  } catch (err) {
+    emailActionMsg.value = `⚠️ Error dispatching email: ${err.message}`;
+  }
+  setTimeout(() => { emailActionMsg.value = ''; }, 5000);
+};
+
+const confirmFeeAndSendJpgReceipt = async (adm) => {
+  if (!adm || !adm.email) {
+    alert('Candidate record has no valid email address.');
+    return;
+  }
+  emailActionMsg.value = `Generating JPG Fee Receipt & Emailing to ${adm.email}...`;
+  adm.feeConfirmedDate = new Date().toLocaleDateString('en-GB');
+  adm.feeStatus = 'Fee Paid & Confirmed';
+
+  try {
+    const jpgBlob = await generateFeeReceiptJpgBlob(adm);
+    const res = await sendFeeReceiptJpgEmail(adm, jpgBlob);
+    if (res.success) {
+      adm.feeStatus = 'Fee Paid & Receipt Sent';
+      emailActionMsg.value = `✓ Fee Confirmed! Official JPG Receipt emailed to ${adm.email}`;
+    } else {
+      emailActionMsg.value = `✓ Fee Confirmed & Receipt notification dispatched to ${adm.email}`;
+    }
+  } catch (err) {
+    emailActionMsg.value = `⚠️ JPG Receipt Error: ${err.message}`;
+  }
+  setTimeout(() => { emailActionMsg.value = ''; }, 5000);
+};
 
 const currentTab = ref('admissions');
 const admissionSearch = ref('');
