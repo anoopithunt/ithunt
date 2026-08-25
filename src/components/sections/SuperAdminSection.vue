@@ -802,8 +802,7 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { sendStudentAdmissionEmail, sendFeeReceiptJpgEmail } from '../../utils/emailNotifier.js';
 import { generateFeeReceiptJpgBlob } from '../../utils/jpgReceiptGenerator.js';
-import { deleteAdmissionFromFirebase, updateNielitProjectInFirebase, deleteNielitProjectFromFirebase } from '../../utils/firebase.js';
-import { deleteUserFromBackend, updateNielitProjectInBackend, deleteNielitProjectFromBackend, deleteProject } from '../../utils/apiClient.js';
+import { deleteUserFromBackend, updateNielitProjectInBackend, deleteProject } from '../../utils/apiClient.js';
 
 const props = defineProps({
   content: {
@@ -1083,9 +1082,8 @@ const handleSaveEditedProject = async () => {
   // 2. Emit to parent App.vue
   emit('update-nielit-project', updatedData);
 
-  // 3. Persist to Firebase & REST API
+  // 3. Persist to REST API backend
   try {
-    await updateNielitProjectInFirebase(targetId, updatedData);
     await updateNielitProjectInBackend(targetId, updatedData);
     emailActionMsg.value = `✓ NIELIT project form for ${updatedData.candidateName} updated successfully in Database & API.`;
   } catch (err) {
@@ -1121,10 +1119,9 @@ const deleteNielitProject = async (p) => {
   // 3. Emit delete to parent App.vue
   emit('delete-nielit-project', p);
 
-  // 4. Delete from Firebase & REST API backend
+  // 4. Delete from REST API backend
   try {
-    await deleteNielitProjectFromFirebase(targetId);
-    await deleteNielitProjectFromBackend(targetId);
+    await deleteProject(targetId, true);
     emailActionMsg.value = `✓ NIELIT project form (${targetId}) removed successfully from Database & API.`;
   } catch (err) {
     console.warn('Delete project warning:', err.message);
@@ -1137,7 +1134,6 @@ const cycleNielitStatus = (p) => {
   else if (p.status === 'Under Review') p.status = 'Verified & Approved';
   else p.status = 'Submitted';
   const targetId = p.registrationNo || p.nielitRegNo;
-  updateNielitProjectInFirebase(targetId, { status: p.status }).catch(() => {});
   updateNielitProjectInBackend(targetId, { status: p.status }).catch(() => {});
 };
 
@@ -1169,10 +1165,9 @@ const deleteAdmission = async (adm) => {
   // 3. Emit delete to parent App.vue
   emit('delete-admission', adm);
 
-  // 4. Delete from Firebase & REST API backend
+  // 4. Delete from REST API backend
   try {
     await deleteUserFromBackend(idToDelete);
-    await deleteAdmissionFromFirebase(idToDelete);
     emailActionMsg.value = `✓ Candidate record ${idToDelete} removed successfully from Database & API.`;
   } catch (e) {
     console.warn('Delete warning:', e.message);
