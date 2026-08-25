@@ -1,25 +1,23 @@
 /* ==========================================================================
-   IT HUNT - Centralized Color Palette & Theme System (Solar Orange & Gold Theme)
+   IT HUNT - Clean, Authentic & User-Friendly Theme System
    ==========================================================================
-   Vibrant, high-energy Orange & Yellow/Gold theme with warm glowing gradients,
-   glassmorphism, and sleek modern dark/light contrast.
+   Sleek Slate & Warm Brand Orange palette with refined contrast, gentle
+   surfaces, and clear visual hierarchy for both Light & Dark modes.
    ========================================================================== */
 
-/* Fonts preloaded asynchronously in index.html for maximum LCP speed */
-
 :root {
-  /* Solar Dark Theme - Dark Mode (Default) */
-  --bg-cyber-dark: #0c0906;
-  --bg-card-glass: rgba(26, 19, 13, 0.82);
-  --bg-card-hover: rgba(38, 27, 17, 0.92);
-  --bg-nav-glass: rgba(18, 13, 8, 0.85);
-  --bg-input-cyber: rgba(22, 16, 10, 0.9);
+  /* Dark Theme - Default Sleek Deep Slate */
+  --bg-cyber-dark: #0a0e17;
+  --bg-card-glass: rgba(18, 24, 38, 0.85);
+  --bg-card-hover: rgba(26, 35, 54, 0.95);
+  --bg-nav-glass: rgba(10, 14, 23, 0.88);
+  --bg-input-cyber: rgba(15, 21, 33, 0.95);
 
-  /* Primary Solar Brand Tokens */
+  /* Primary Brand Tokens */
   --color-ai-orange: #f97316;
   --color-ai-orange-hover: #ea580c;
-  --color-ai-yellow: #facc15;
-  --color-ai-yellow-hover: #eab308;
+  --color-ai-yellow: #f59e0b;
+  --color-ai-yellow-hover: #d97706;
   --color-ai-gold: #f59e0b;
   --color-ai-amber: #fbbf24;
   --color-ai-coral: #ff6b4a;
@@ -29,34 +27,34 @@
   /* Backward Compatibility Aliases */
   --color-ai-violet: #f97316;
   --color-ai-violet-hover: #ea580c;
-  --color-ai-cyan: #facc15;
-  --color-ai-cyan-hover: #eab308;
+  --color-ai-cyan: #f59e0b;
+  --color-ai-cyan-hover: #d97706;
 
-  /* Neon Glow Effects (Orange & Yellow) */
-  --glow-orange: rgba(249, 115, 22, 0.45);
-  --glow-yellow: rgba(250, 204, 21, 0.45);
-  --glow-gold: rgba(245, 158, 11, 0.4);
-  --glow-violet: rgba(249, 115, 22, 0.4);
-  --glow-cyan: rgba(250, 204, 21, 0.4);
-  --glow-emerald: rgba(16, 185, 129, 0.35);
-  --glow-pink: rgba(244, 63, 94, 0.35);
+  /* Subtle Soft Glows */
+  --glow-orange: rgba(249, 115, 22, 0.2);
+  --glow-yellow: rgba(245, 158, 11, 0.2);
+  --glow-gold: rgba(245, 158, 11, 0.18);
+  --glow-violet: rgba(249, 115, 22, 0.2);
+  --glow-cyan: rgba(245, 158, 11, 0.2);
+  --glow-emerald: rgba(16, 185, 129, 0.2);
+  --glow-pink: rgba(244, 63, 94, 0.2);
 
-  /* High-Energy Solar Gradients */
-  --gradient-ai-hero: linear-gradient(135deg, #ff6b00 0%, #f97316 40%, #facc15 100%);
-  --gradient-ai-secondary: linear-gradient(135deg, #f59e0b 0%, #facc15 100%);
-  --gradient-ai-gold: linear-gradient(135deg, #fde047 0%, #f59e0b 50%, #d97706 100%);
-  --gradient-ai-btn: linear-gradient(135deg, #ea580c 0%, #f59e0b 100%);
-  --gradient-card-border: linear-gradient(135deg, rgba(249, 115, 22, 0.5), rgba(250, 204, 21, 0.3));
+  /* Gradients */
+  --gradient-ai-hero: linear-gradient(135deg, #f97316 0%, #fbbf24 100%);
+  --gradient-ai-secondary: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+  --gradient-ai-gold: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+  --gradient-ai-btn: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+  --gradient-card-border: linear-gradient(135deg, rgba(249, 115, 22, 0.25), rgba(245, 158, 11, 0.15));
 
-  /* Cyber & Solar Borders */
+  /* Clean Borders */
   --border-cyber: rgba(255, 255, 255, 0.08);
-  --border-cyber-glow: rgba(249, 115, 22, 0.45);
-  --border-cyan-glow: rgba(250, 204, 21, 0.45);
+  --border-cyber-glow: rgba(249, 115, 22, 0.35);
+  --border-cyan-glow: rgba(245, 158, 11, 0.35);
 
-  /* Typography Colors */
-  --text-main: #fffaf5;
-  --text-muted: #d6c7b2;
-  --text-dim: #9a8873;
+  /* High-Contrast Crisp Typography */
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
 
   /* Fonts */
   --font-heading: 'Outfit', sans-serif;
@@ -64,30 +62,31 @@
   --font-mono: 'Fira Code', monospace;
 
   /* Shadows & Radius */
-  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 12px 35px -5px rgba(0, 0, 0, 0.7), 0 0 30px rgba(249, 115, 22, 0.22);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.4), 0 0 20px rgba(249, 115, 22, 0.08);
   --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 24px;
-  --radius-xl: 32px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
   --radius-full: 9999px;
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Light Theme Variables - Warm Solar Cream & Orange */
+/* Light Theme Variables - Clean Soft White & Slate */
 body.light-theme {
-  --bg-cyber-dark: #fffbf5;
-  --bg-card-glass: rgba(255, 255, 255, 0.92);
-  --bg-card-hover: rgba(255, 255, 255, 0.99);
-  --bg-nav-glass: rgba(255, 251, 245, 0.9);
+  --bg-cyber-dark: #f8fafc;
+  --bg-card-glass: rgba(255, 255, 255, 0.95);
+  --bg-card-hover: #ffffff;
+  --bg-nav-glass: rgba(248, 250, 252, 0.9);
   --bg-input-cyber: #ffffff;
 
-  --border-cyber: rgba(234, 88, 12, 0.12);
-  --border-cyber-glow: rgba(249, 115, 22, 0.35);
+  --border-cyber: rgba(15, 23, 42, 0.08);
+  --border-cyber-glow: rgba(249, 115, 22, 0.3);
 
-  --text-main: #27170a;
-  --text-muted: #6b4d32;
-  --text-dim: #9c7b5b;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-dim: #64748b;
 
-  --shadow-lg: 0 10px 30px -5px rgba(249, 115, 22, 0.08), 0 0 20px rgba(250, 204, 21, 0.12);
+  --shadow-lg: 0 10px 30px -5px rgba(15, 23, 42, 0.06), 0 2px 10px rgba(249, 115, 22, 0.05);
 }
+
