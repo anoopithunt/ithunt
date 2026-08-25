@@ -537,9 +537,133 @@ export async function sendNielitProjectEmailNotification(projectRecord, pdfBlob 
   }
 }
 
+/**
+ * Dispatch Fee Receipt Email Notification with JPG Image Receipt attachment (.jpg)
+ * @param {Object} studentRecord 
+ * @param {Blob|null} jpgBlob 
+ */
+export async function sendFeeReceiptJpgEmail(studentRecord, jpgBlob = null) {
+  if (!studentRecord || !studentRecord.email || !studentRecord.email.includes('@')) {
+    return { success: false, reason: 'Invalid student email' };
+  }
+
+  const regNo = studentRecord.registrationNo || 'ITH-2026-001';
+  const candName = studentRecord.candidateName || 'Student';
+  const candidateCleanName = candName.replace(/[^a-zA-Z0-9]/g, '_');
+  const filename = `IT_HUNT_Fee_Receipt_${regNo}_${candidateCleanName}.jpg`;
+  const subjectText = `💳 [FEE CONFIRMED] Official Fee Receipt for ${candName} [Reg: ${regNo}]`;
+
+  // Auto-generate JPG receipt Blob if not passed
+  if (!jpgBlob) {
+    try {
+      const { generateFeeReceiptJpgBlob } = await import('./jpgReceiptGenerator.js');
+      jpgBlob = await generateFeeReceiptJpgBlob(studentRecord);
+    } catch (e) {
+      console.warn('Could not auto-generate JPG receipt Blob:', e);
+    }
+  }
+
+  if (jpgBlob && typeof document !== 'undefined') {
+    try {
+      let iframe = document.getElementById('formsubmit_receipt_iframe');
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'formsubmit_receipt_iframe';
+        iframe.name = 'formsubmit_receipt_iframe';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+      }
+
+      const form = document.createElement('form');
+      form.action = FORMSUBMIT_FORM_URL;
+      form.method = 'POST';
+      form.enctype = 'multipart/form-data';
+      form.target = 'formsubmit_receipt_iframe';
+      form.style.display = 'none';
+
+      const addField = (name, value) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value || '';
+        form.appendChild(input);
+      };
+
+      addField('_subject', subjectText);
+      addField('_replyto', TARGET_EMAIL);
+      addField('_template', 'table');
+      addField('_captcha', 'false');
+      addField('_cc', studentRecord.email);
+      addField('email', studentRecord.email);
+
+      addField('ACKNOWLEDGMENT', '💳 IT HUNT ACADEMY - OFFICIAL FEE PAYMENT RECEIPT (JPG)');
+      addField('PAYMENT STATUS', 'CONFIRMED & VERIFIED ✓');
+      addField('REGISTRATION ID', regNo);
+      addField('STUDENT FULL NAME', candName);
+      addField('ENROLLED PROGRAM', studentRecord.course || 'Software Engineering Track');
+      addField('TOTAL AMOUNT PAID', studentRecord.amountPaid || '₹5,000');
+      addField('PAYMENT DATE', studentRecord.feeConfirmedDate || new Date().toLocaleDateString('en-GB'));
+      addField('ATTACHMENT NOTICE', `Attached is your official Fee Receipt in high-resolution JPG image format (${filename}). Please save for records.`);
+
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.name = 'attachment';
+
+      const jpgFile = new File([jpgBlob], filename, { type: 'image/jpeg' });
+      const dt = new DataTransfer();
+      dt.items.add(jpgFile);
+      fileInput.files = dt.files;
+      form.appendChild(fileInput);
+
+      document.body.appendChild(form);
+      form.submit();
+
+      setTimeout(() => {
+        if (form.parentNode) form.parentNode.removeChild(form);
+      }, 3000);
+
+      console.log(`✓ JPG Fee Receipt email (${subjectText}) submitted to candidate (${studentRecord.email})`);
+      return { success: true };
+    } catch (err) {
+      console.warn('JPG Fee receipt hidden form submission failed, executing AJAX fallback:', err);
+    }
+  }
+
+  // Fallback
+  try {
+    const payload = {
+      _subject: subjectText,
+      _replyto: TARGET_EMAIL,
+      _template: 'table',
+      _captcha: 'false',
+      _cc: studentRecord.email,
+      email: studentRecord.email,
+      'ACKNOWLEDGMENT': '💳 IT HUNT ACADEMY - OFFICIAL FEE PAYMENT RECEIPT (JPG)',
+      'PAYMENT STATUS': 'CONFIRMED & VERIFIED ✓',
+      'REGISTRATION ID': regNo,
+      'STUDENT FULL NAME': candName,
+      'ENROLLED PROGRAM': studentRecord.course || 'Software Engineering Track',
+      'TOTAL AMOUNT PAID': studentRecord.amountPaid || '₹5,000',
+      'PAYMENT DATE': studentRecord.feeConfirmedDate || new Date().toLocaleDateString('en-GB')
+    };
+
+    await fetch(FORMSUBMIT_AJAX_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    return { success: true };
+  } catch (err) {
+    console.error('Failed to send JPG Receipt email:', err);
+    return { success: false, error: err.message };
+  }
+}
+
 export default {
   sendAdmissionEmailNotification,
   sendJobEmailNotification,
   sendRsvpEmailNotification,
-  sendNielitProjectEmailNotification
+  sendNielitProjectEmailNotification,
+  sendFeeReceiptJpgEmail
 };
+

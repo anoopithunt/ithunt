@@ -119,8 +119,19 @@
           @logout="handleAdminLogout"
           @download-slip="downloadCustomAdmissionSlip"
           @download-nielit-pdf="downloadNielitProjectPdfDoc"
-          @add-admission="handleDirectAdmission"
           @set-tab="setTab" 
+        />
+
+        <!-- 11. Dedicated Student Portal View -->
+        <StudentPortalSection 
+          v-else-if="activeTab === 'student-portal'" 
+          key="student-portal"
+          :content="content" 
+          :studentUser="studentUser"
+          @student-login="handleStudentLogin"
+          @student-signup="handleStudentSignup"
+          @update-student-profile="handleUpdateStudentProfile"
+          @student-logout="handleStudentLogout"
         />
       </Transition>
     </main>
@@ -357,6 +368,7 @@ import CareersSection from './components/sections/CareersSection.vue';
 import AdmissionSection from './components/sections/AdmissionSection.vue';
 import LoginSection from './components/sections/LoginSection.vue';
 import SuperAdminSection from './components/sections/SuperAdminSection.vue';
+import StudentPortalSection from './components/sections/StudentPortalSection.vue';
 
 import CourseDetailModal from './components/modals/CourseDetailModal.vue';
 import EventDetailModal from './components/modals/EventDetailModal.vue';
@@ -382,6 +394,83 @@ const adminUser = ref({
   email: 'admin@ithunt.com',
   avatar: 'img/ithunt.webp'
 });
+
+// Student Session & Auth State
+const studentUser = ref(null);
+try {
+  const savedStudent = localStorage.getItem('ithunt_student_user');
+  if (savedStudent) studentUser.value = JSON.parse(savedStudent);
+} catch (e) {}
+
+const handleStudentLogin = ({ email, password }, callback) => {
+  const found = liveAdmissionsList.value.find(s => s.email && s.email.toLowerCase() === email.toLowerCase());
+  if (found) {
+    studentUser.value = { ...found };
+    localStorage.setItem('ithunt_student_user', JSON.stringify(studentUser.value));
+    if (callback) callback(null);
+  } else {
+    const storedStudents = JSON.parse(localStorage.getItem('ithunt_registered_students') || '[]');
+    const localFound = storedStudents.find(s => s.email && s.email.toLowerCase() === email.toLowerCase());
+    if (localFound) {
+      studentUser.value = { ...localFound };
+      localStorage.setItem('ithunt_student_user', JSON.stringify(studentUser.value));
+      if (callback) callback(null);
+    } else {
+      if (callback) callback('No student account found with this email address. Please Sign Up first.');
+    }
+  }
+};
+
+const handleStudentSignup = (signupData, callback) => {
+  const regNo = `ITH-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+  const newStudent = {
+    registrationNo: regNo,
+    candidateName: signupData.candidateName,
+    email: signupData.email,
+    mobile: signupData.mobile,
+    course: signupData.course,
+    fatherName: 'Not Specified',
+    motherName: 'Not Specified',
+    gender: 'Male',
+    dob: new Date().toISOString().split('T')[0],
+    district: 'Prayagraj',
+    address: 'Holagarh, Prayagraj',
+    date: new Date().toLocaleDateString('en-GB'),
+    time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+    status: 'Active Registered Student',
+    feeStatus: 'Pending Verification'
+  };
+
+  studentUser.value = newStudent;
+  localStorage.setItem('ithunt_student_user', JSON.stringify(newStudent));
+
+  const storedStudents = JSON.parse(localStorage.getItem('ithunt_registered_students') || '[]');
+  storedStudents.push(newStudent);
+  localStorage.setItem('ithunt_registered_students', JSON.stringify(storedStudents));
+
+  liveAdmissionsList.value.unshift(newStudent);
+  saveAdmissionRecord(newStudent);
+
+  if (callback) callback(null);
+};
+
+const handleUpdateStudentProfile = (updatedData) => {
+  if (!studentUser.value) return;
+  const merged = { ...studentUser.value, ...updatedData };
+  studentUser.value = merged;
+  localStorage.setItem('ithunt_student_user', JSON.stringify(merged));
+
+  const idx = liveAdmissionsList.value.findIndex(s => s.registrationNo === merged.registrationNo || s.email === merged.email);
+  if (idx !== -1) {
+    liveAdmissionsList.value[idx] = { ...liveAdmissionsList.value[idx], ...updatedData };
+    saveAdmissionRecord(liveAdmissionsList.value[idx]);
+  }
+};
+
+const handleStudentLogout = () => {
+  studentUser.value = null;
+  localStorage.removeItem('ithunt_student_user');
+};
 
 // Live registries synced dynamically
 const liveAdmissionsList = ref([]);

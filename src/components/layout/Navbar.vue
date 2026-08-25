@@ -41,6 +41,16 @@
           <span>{{ content.navbar?.applyCtaText || 'Apply NIELIT Project' }}</span> {{ content.navbar?.applyCtaIcon || '✨' }}
         </button>
 
+        <!-- Student Portal Button -->
+        <button 
+          class="theme-toggle-btn" 
+          style="width: auto; padding: 0.45rem 0.85rem; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 700; color: var(--color-ai-orange); border-color: rgba(249, 115, 22, 0.4);"
+          @click="$emit('set-tab', 'student-portal')"
+          title="Student Login & Profile Portal"
+        >
+          <span>🎓 Student Portal</span>
+        </button>
+
         <!-- SuperAdmin / Login Portal Button -->
         <button 
           v-if="isAdminLoggedIn"
@@ -82,6 +92,15 @@
         @click="$emit('set-tab', item.id); isMobileNavOpen = false;"
       >
         {{ item.icon }} {{ item.label }}
+      </button>
+
+      <button 
+        class="nav-item-btn" 
+        :class="{ active: activeTab === 'student-portal' }" 
+        @click="$emit('set-tab', 'student-portal'); isMobileNavOpen = false;"
+        style="color: var(--color-ai-orange); font-weight: 800;"
+      >
+        🎓 Student Portal & Profile
       </button>
 
       <button 
