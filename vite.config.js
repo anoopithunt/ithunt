@@ -51,7 +51,7 @@ export default defineConfig(({ command }) => {
     server: {
       port: 5500,
       host: true,
-      strictPort: true
+      strictPort: false
     },
     build: {
       outDir: 'dist',

@@ -4,9 +4,9 @@
   "type": "module",
   "description": "IT HUNT - Software Solutions & Tech Academy Web Portal (Vue 3 + Vite)",
   "scripts": {
-    "dev": "vite --port 5500 --host",
+    "dev": "vite --host",
     "build": "vite build",
-    "preview": "vite preview --port 5500",
+    "preview": "vite preview",
     "test": "node -e \"console.log('✓ All tests passed!')\""
   },
   "dependencies": {
