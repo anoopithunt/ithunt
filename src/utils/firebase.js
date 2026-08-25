@@ -211,19 +211,28 @@ export async function deleteNielitProjectFromFirebase(idOrRegNo) {
 
   const id = idOrRegNo;
 
-  // 1. Sync with backend REST API
+  // 1. Record in deleted IDs blacklist
+  try {
+    const deleted = JSON.parse(localStorage.getItem('ithunt_deleted_nielit_ids') || '[]');
+    if (!deleted.includes(id)) {
+      deleted.push(id);
+      localStorage.setItem('ithunt_deleted_nielit_ids', JSON.stringify(deleted));
+    }
+  } catch (e) {}
+
+  // 2. Sync with backend REST API
   try {
     await deleteNielitProjectFromBackend(id);
   } catch (e) {}
 
-  // 2. Local storage cleanup
+  // 3. Local storage cleanup
   try {
     const existing = JSON.parse(localStorage.getItem('ithunt_nielit_projects') || '[]');
     const filtered = existing.filter(p => p.registrationNo !== id && p.nielitRegNo !== id && p.id !== id);
     localStorage.setItem('ithunt_nielit_projects', JSON.stringify(filtered));
   } catch (e) {}
 
-  // 3. Firestore Document Deletion
+  // 4. Firestore Document Deletion
   if (db) {
     try {
       await deleteDoc(doc(db, 'nielit_projects', id));
@@ -426,36 +435,46 @@ export async function saveRsvpRecord(data) {
  * Fetch all stored NIELIT Projects from Firebase Firestore or local storage
  */
 export async function fetchNielitProjectsFromFirebase() {
+  const deletedIds = new Set(JSON.parse(localStorage.getItem('ithunt_deleted_nielit_ids') || '[]'));
+  let list = [];
   if (db) {
     try {
       const q = query(collection(db, 'nielit_projects'), orderBy('createdAt', 'desc'));
       const snap = await getDocs(q);
-      return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      list = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (e) {
       console.warn('Fetching from Firestore failed, reading local storage:', e.message);
     }
   }
-  try {
-    return JSON.parse(localStorage.getItem('ithunt_nielit_projects') || '[]');
-  } catch (e) { return []; }
+  if (!list.length) {
+    try {
+      list = JSON.parse(localStorage.getItem('ithunt_nielit_projects') || '[]');
+    } catch (e) { list = []; }
+  }
+  return list.filter(p => !deletedIds.has(p.id) && !deletedIds.has(p.registrationNo) && !deletedIds.has(p.nielitRegNo));
 }
 
 /**
  * Fetch all stored Admissions from Firebase Firestore or local storage
  */
 export async function fetchAdmissionsFromFirebase() {
+  const deletedIds = new Set(JSON.parse(localStorage.getItem('ithunt_deleted_admission_ids') || '[]'));
+  let list = [];
   if (db) {
     try {
       const q = query(collection(db, 'admissions'), orderBy('createdAt', 'desc'));
       const snap = await getDocs(q);
-      return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      list = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (e) {
       console.warn('Fetching from Firestore failed, reading local storage:', e.message);
     }
   }
-  try {
-    return JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
-  } catch (e) { return []; }
+  if (!list.length) {
+    try {
+      list = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
+    } catch (e) { list = []; }
+  }
+  return list.filter(a => !deletedIds.has(a.id) && !deletedIds.has(a.registrationNo));
 }
 
 /**
@@ -684,19 +703,28 @@ export async function updateStudentProfileInFirebase(updatedData) {
 export async function deleteAdmissionFromFirebase(idOrRegNo) {
   if (!idOrRegNo) return { success: false };
 
-  // 1. Delete from Backend REST API (curl -X DELETE http://localhost:3000/api/users/:id)
+  // 1. Record in deleted IDs blacklist
+  try {
+    const deleted = JSON.parse(localStorage.getItem('ithunt_deleted_admission_ids') || '[]');
+    if (!deleted.includes(idOrRegNo)) {
+      deleted.push(idOrRegNo);
+      localStorage.setItem('ithunt_deleted_admission_ids', JSON.stringify(deleted));
+    }
+  } catch (e) {}
+
+  // 2. Delete from Backend REST API (curl -X DELETE http://localhost:3000/api/users/:id)
   try {
     await deleteUserFromBackend(idOrRegNo);
   } catch (e) {}
 
-  // 2. Local storage cleanup
+  // 3. Local storage cleanup
   try {
     const existing = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
     const filtered = existing.filter(a => a.registrationNo !== idOrRegNo && a.id !== idOrRegNo);
     localStorage.setItem('ithunt_admissions', JSON.stringify(filtered));
   } catch (e) {}
 
-  // 3. Firestore Document Deletion
+  // 4. Firestore Document Deletion
   if (db) {
     try {
       await deleteDoc(doc(db, 'admissions', idOrRegNo));

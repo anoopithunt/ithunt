@@ -924,28 +924,67 @@ const reviewsList = ref([
   ...(props.content.reviewsSection?.reviewsList || [])
 ]);
 
+const getDeletedIds = (key) => {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(key) || '[]'));
+  } catch (e) {
+    return new Set();
+  }
+};
+
+const addDeletedId = (key, id) => {
+  if (!id) return;
+  try {
+    const existing = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!existing.includes(id)) {
+      existing.push(id);
+      localStorage.setItem(key, JSON.stringify(existing));
+    }
+  } catch (e) {}
+};
+
 watch(() => props.allAdmissions, (val) => {
-  const samples = props.content.superAdminData?.sampleAdmissions || props.content.sampleAdmissions || [];
-  const existingIds = new Set((val || []).map(a => a.registrationNo));
-  admissionsList.value = [...(val || []), ...samples.filter(s => !existingIds.has(s.registrationNo))];
+  const deletedIds = getDeletedIds('ithunt_deleted_admission_ids');
+  const samples = (props.content.superAdminData?.sampleAdmissions || props.content.sampleAdmissions || []).filter(s => {
+    const sId = s.registrationNo || s.id;
+    return !deletedIds.has(sId);
+  });
+  const validProps = (val || []).filter(a => {
+    const aId = a.registrationNo || a.id;
+    return !deletedIds.has(aId);
+  });
+  const existingIds = new Set(validProps.map(a => a.registrationNo || a.id));
+  admissionsList.value = [...validProps, ...samples.filter(s => !existingIds.has(s.registrationNo || s.id))];
 }, { immediate: true, deep: true });
 
 watch(() => props.allJobApplications, (val) => {
-  const samples = props.content.superAdminData?.sampleJobApplications || props.content.sampleJobApplications || [];
-  const existingIds = new Set((val || []).map(j => j.id));
-  jobApplicationsList.value = [...(val || []), ...samples.filter(s => !existingIds.has(s.id))];
+  const deletedIds = getDeletedIds('ithunt_deleted_job_ids');
+  const samples = (props.content.superAdminData?.sampleJobApplications || props.content.sampleJobApplications || []).filter(s => !deletedIds.has(s.id));
+  const validProps = (val || []).filter(j => !deletedIds.has(j.id));
+  const existingIds = new Set(validProps.map(j => j.id));
+  jobApplicationsList.value = [...validProps, ...samples.filter(s => !existingIds.has(s.id))];
 }, { immediate: true, deep: true });
 
 watch(() => props.allRsvps, (val) => {
-  const samples = props.content.superAdminData?.sampleRsvps || props.content.sampleRsvps || [];
-  const existingIds = new Set((val || []).map(r => r.id));
-  rsvpsList.value = [...(val || []), ...samples.filter(s => !existingIds.has(s.id))];
+  const deletedIds = getDeletedIds('ithunt_deleted_rsvp_ids');
+  const samples = (props.content.superAdminData?.sampleRsvps || props.content.sampleRsvps || []).filter(s => !deletedIds.has(s.id));
+  const validProps = (val || []).filter(r => !deletedIds.has(r.id));
+  const existingIds = new Set(validProps.map(r => r.id));
+  rsvpsList.value = [...validProps, ...samples.filter(s => !existingIds.has(s.id))];
 }, { immediate: true, deep: true });
 
 watch(() => props.allNielitProjects, (val) => {
-  const samples = props.content.sampleNielitProjects || [];
-  const existingIds = new Set((val || []).map(n => n.registrationNo || n.nielitRegNo));
-  nielitProjectsList.value = [...(val || []), ...samples.filter(s => !existingIds.has(s.registrationNo || s.nielitRegNo))];
+  const deletedIds = getDeletedIds('ithunt_deleted_nielit_ids');
+  const samples = (props.content.sampleNielitProjects || []).filter(s => {
+    const sId = s.registrationNo || s.nielitRegNo || s.id;
+    return !deletedIds.has(sId);
+  });
+  const validProps = (val || []).filter(p => {
+    const pId = p.registrationNo || p.nielitRegNo || p.id;
+    return !deletedIds.has(pId);
+  });
+  const existingIds = new Set(validProps.map(n => n.registrationNo || n.nielitRegNo || n.id));
+  nielitProjectsList.value = [...validProps, ...samples.filter(s => !existingIds.has(s.registrationNo || s.nielitRegNo || s.id))];
 }, { immediate: true, deep: true });
 
 const filteredAdmissions = computed(() => {
@@ -1059,21 +1098,38 @@ const handleSaveEditedProject = async () => {
 
 const deleteNielitProject = async (p) => {
   const targetId = p.registrationNo || p.nielitRegNo || p.id;
-  if (confirm(`Are you sure you want to delete NIELIT project form for ${p.candidateName} (${targetId})?`)) {
-    nielitProjectsList.value = nielitProjectsList.value.filter(item => 
-      item.registrationNo !== p.registrationNo && item.nielitRegNo !== p.nielitRegNo && item.id !== p.id
-    );
-    emit('delete-nielit-project', p);
-
-    try {
-      await deleteNielitProjectFromFirebase(targetId);
-      await deleteNielitProjectFromBackend(targetId);
-      emailActionMsg.value = `✓ NIELIT project form (${targetId}) removed successfully from Database & API.`;
-    } catch (err) {
-      console.warn('Delete project warning:', err.message);
-    }
-    setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+  if (!confirm(`Are you sure you want to delete NIELIT project form for ${p.candidateName || 'Candidate'} (${targetId})?`)) {
+    return;
   }
+
+  // 1. Blacklist IDs in localStorage
+  if (p.registrationNo) addDeletedId('ithunt_deleted_nielit_ids', p.registrationNo);
+  if (p.nielitRegNo) addDeletedId('ithunt_deleted_nielit_ids', p.nielitRegNo);
+  if (p.id) addDeletedId('ithunt_deleted_nielit_ids', p.id);
+  if (targetId) addDeletedId('ithunt_deleted_nielit_ids', targetId);
+
+  // 2. Immediately remove from local list
+  nielitProjectsList.value = nielitProjectsList.value.filter(item => 
+    item.registrationNo !== p.registrationNo && 
+    item.nielitRegNo !== p.nielitRegNo && 
+    item.id !== p.id &&
+    item.registrationNo !== targetId &&
+    item.nielitRegNo !== targetId &&
+    item.id !== targetId
+  );
+
+  // 3. Emit delete to parent App.vue
+  emit('delete-nielit-project', p);
+
+  // 4. Delete from Firebase & REST API backend
+  try {
+    await deleteNielitProjectFromFirebase(targetId);
+    await deleteNielitProjectFromBackend(targetId);
+    emailActionMsg.value = `✓ NIELIT project form (${targetId}) removed successfully from Database & API.`;
+  } catch (err) {
+    console.warn('Delete project warning:', err.message);
+  }
+  setTimeout(() => { emailActionMsg.value = ''; }, 4000);
 };
 
 const cycleNielitStatus = (p) => {
@@ -1092,22 +1148,36 @@ const cycleAdmissionStatus = (adm) => {
 };
 
 const deleteAdmission = async (adm) => {
-  if (confirm(`Are you sure you want to remove admission record for ${adm.candidateName} (${adm.registrationNo})?`)) {
-    const idToDelete = adm.registrationNo || adm.id;
-    admissionsList.value = admissionsList.value.filter(a => a.registrationNo !== adm.registrationNo && a.id !== adm.id);
-    emit('delete-admission', adm);
-
-    try {
-      // 1. Delete from Backend REST API: curl -X DELETE http://localhost:3000/api/users/:id
-      await deleteUserFromBackend(idToDelete);
-      // 2. Delete from Firebase Firestore & Realtime DB
-      await deleteAdmissionFromFirebase(idToDelete);
-      emailActionMsg.value = `✓ Candidate record ${idToDelete} removed successfully from Database & API.`;
-    } catch (e) {
-      console.warn('Delete warning:', e.message);
-    }
-    setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+  const idToDelete = adm.registrationNo || adm.id;
+  if (!confirm(`Are you sure you want to remove admission record for ${adm.candidateName} (${idToDelete})?`)) {
+    return;
   }
+
+  // 1. Blacklist IDs in localStorage
+  if (adm.registrationNo) addDeletedId('ithunt_deleted_admission_ids', adm.registrationNo);
+  if (adm.id) addDeletedId('ithunt_deleted_admission_ids', adm.id);
+  if (idToDelete) addDeletedId('ithunt_deleted_admission_ids', idToDelete);
+
+  // 2. Immediately remove from local list
+  admissionsList.value = admissionsList.value.filter(a => 
+    a.registrationNo !== adm.registrationNo && 
+    a.id !== adm.id &&
+    a.registrationNo !== idToDelete &&
+    a.id !== idToDelete
+  );
+
+  // 3. Emit delete to parent App.vue
+  emit('delete-admission', adm);
+
+  // 4. Delete from Firebase & REST API backend
+  try {
+    await deleteUserFromBackend(idToDelete);
+    await deleteAdmissionFromFirebase(idToDelete);
+    emailActionMsg.value = `✓ Candidate record ${idToDelete} removed successfully from Database & API.`;
+  } catch (e) {
+    console.warn('Delete warning:', e.message);
+  }
+  setTimeout(() => { emailActionMsg.value = ''; }, 4000);
 };
 
 const cycleJobStatus = (job) => {
