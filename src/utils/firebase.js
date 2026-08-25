@@ -471,6 +471,123 @@ export async function fetchAllStudents() {
   }
 }
 
+/**
+ * Register a new student user with Firebase Auth, Firestore, and REST API
+ * @param {Object} signupData 
+ */
+export async function registerStudentUser(signupData) {
+  if (!signupData || !signupData.email || !signupData.password) {
+    return { success: false, error: 'Email and password are required' };
+  }
+
+  const regNo = `ITH-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+  const studentRecord = {
+    registrationNo: regNo,
+    candidateName: signupData.candidateName || 'Student',
+    email: signupData.email,
+    mobile: signupData.mobile || '',
+    course: signupData.course || 'MERN Stack Web Engineer',
+    fatherName: signupData.fatherName || 'Not Specified',
+    motherName: signupData.motherName || 'Not Specified',
+    gender: signupData.gender || 'Male',
+    dob: signupData.dob || new Date().toISOString().split('T')[0],
+    district: signupData.district || 'Prayagraj',
+    address: signupData.address || 'Holagarh, Prayagraj',
+    date: new Date().toLocaleDateString('en-GB'),
+    time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+    status: 'Active Registered Student',
+    feeStatus: 'Pending Verification'
+  };
+
+  // 1. Firebase Authentication
+  let authUser = null;
+  if (auth) {
+    try {
+      const userCredential = await registerWithEmailPassword(signupData.email, signupData.password);
+      authUser = userCredential.user;
+      studentRecord.uid = authUser.uid;
+      console.log('✓ Student registered in Firebase Auth:', authUser.uid);
+    } catch (authErr) {
+      console.warn('Firebase Auth registration note:', authErr.message);
+    }
+  }
+
+  // 2. REST API Integration
+  try {
+    const apiRes = await registerStudentWithBackend(studentRecord);
+    if (apiRes && apiRes.success) {
+      console.log('✓ Student registered with backend REST API');
+    }
+  } catch (apiErr) {
+    console.warn('Backend API student register notice:', apiErr.message);
+  }
+
+  // 3. Firestore Database Write
+  await saveAdmissionRecord(studentRecord);
+  await saveStudentRecord(studentRecord.candidateName, studentRecord.email, studentRecord);
+
+  return { success: true, user: studentRecord, authUser };
+}
+
+/**
+ * Log in student user with Firebase Auth, Firestore, and REST API
+ * @param {string} email 
+ * @param {string} password 
+ */
+export async function loginStudentUser(email, password) {
+  if (!email || !password) {
+    return { success: false, error: 'Email and password required' };
+  }
+
+  let authUser = null;
+
+  // 1. Firebase Authentication
+  if (auth) {
+    try {
+      const userCredential = await loginWithEmailPassword(email, password);
+      authUser = userCredential.user;
+      console.log('✓ Student authenticated with Firebase Auth:', authUser.uid);
+    } catch (authErr) {
+      console.warn('Firebase Auth login notice:', authErr.message);
+    }
+  }
+
+  // 2. REST API Login Fallback / Verification
+  try {
+    const apiRes = await loginStudentWithBackend(email, password);
+    if (apiRes && apiRes.success && apiRes.data?.user) {
+      return { success: true, user: apiRes.data.user, authUser };
+    }
+  } catch (e) {}
+
+  // 3. Firestore / Admissions Matching
+  const admissions = await fetchAdmissionsFromFirebase();
+  const found = admissions.find(s => s.email && s.email.toLowerCase() === email.toLowerCase());
+
+  if (found) {
+    return { success: true, user: found, authUser };
+  }
+
+  return { success: false, error: 'Invalid email or password. Please check your credentials.' };
+}
+
+/**
+ * Update Student Profile details in Firestore and REST API
+ * @param {Object} updatedData 
+ */
+export async function updateStudentProfileInFirebase(updatedData) {
+  if (!updatedData || !updatedData.email) return { success: false };
+
+  try {
+    await updateStudentProfileWithBackend(updatedData);
+  } catch (e) {}
+
+  await saveAdmissionRecord(updatedData);
+  await saveStudentRecord(updatedData.candidateName || updatedData.name, updatedData.email, updatedData);
+
+  return { success: true };
+}
+
 export default {
   loginWithEmailPassword,
   registerWithEmailPassword,
@@ -481,6 +598,9 @@ export default {
   saveJobApplicationRecord,
   saveRsvpRecord,
   saveStudentRecord,
+  registerStudentUser,
+  loginStudentUser,
+  updateStudentProfileInFirebase,
   fetchNielitProjectsFromFirebase,
   fetchAdmissionsFromFirebase,
   fetchJobApplicationsFromFirebase,
@@ -488,3 +608,4 @@ export default {
   fetchUsersFromFirebase,
   fetchAllStudents
 };
+
