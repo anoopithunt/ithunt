@@ -121,6 +121,8 @@
           @download-nielit-pdf="downloadNielitProjectPdfDoc"
           @add-admission="handleDirectAdmission"
           @delete-admission="handleDeleteAdmission"
+          @update-nielit-project="handleUpdateNielitProject"
+          @delete-nielit-project="handleDeleteNielitProject"
           @set-tab="setTab" 
         />
 
@@ -806,6 +808,36 @@ const handleDeleteAdmission = (adm) => {
     const existing = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
     const filtered = existing.filter(a => a.registrationNo !== idToDelete && a.id !== idToDelete);
     localStorage.setItem('ithunt_admissions', JSON.stringify(filtered));
+  } catch (e) {}
+};
+
+const handleUpdateNielitProject = (updatedProject) => {
+  const targetId = updatedProject.registrationNo || updatedProject.nielitRegNo;
+  const idx = liveNielitProjectsList.value.findIndex(p => p.registrationNo === targetId || p.nielitRegNo === targetId);
+  if (idx !== -1) {
+    liveNielitProjectsList.value[idx] = { ...liveNielitProjectsList.value[idx], ...updatedProject };
+  }
+  try {
+    const existing = JSON.parse(localStorage.getItem('ithunt_nielit_projects') || '[]');
+    const eIdx = existing.findIndex(p => p.registrationNo === targetId || p.nielitRegNo === targetId);
+    if (eIdx !== -1) {
+      existing[eIdx] = { ...existing[eIdx], ...updatedProject };
+      localStorage.setItem('ithunt_nielit_projects', JSON.stringify(existing));
+    }
+  } catch (e) {}
+};
+
+const handleDeleteNielitProject = (project) => {
+  const targetId = project.registrationNo || project.nielitRegNo || project.id;
+  liveNielitProjectsList.value = liveNielitProjectsList.value.filter(p => 
+    p.registrationNo !== targetId && p.nielitRegNo !== targetId && p.id !== targetId
+  );
+  try {
+    const existing = JSON.parse(localStorage.getItem('ithunt_nielit_projects') || '[]');
+    const filtered = existing.filter(p => 
+      p.registrationNo !== targetId && p.nielitRegNo !== targetId && p.id !== targetId
+    );
+    localStorage.setItem('ithunt_nielit_projects', JSON.stringify(filtered));
   } catch (e) {}
 };
 
