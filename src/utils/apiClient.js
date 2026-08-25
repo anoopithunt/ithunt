@@ -6,17 +6,24 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000
  * Submit online admission registration to backend REST API
  */
 export async function submitAdmissionToBackend(data) {
-  try {
-    const response = await fetch(`${API_BASE_URL}/admissions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    return await response.json();
-  } catch (error) {
-    console.warn('Backend API connection warning (Admission):', error.message);
-    return { success: false, error: error.message };
+  const endpoints = [
+    `${API_BASE_URL}/admissions`,
+    `${API_BASE_URL}/admission`,
+    `${API_BASE_URL}/admin/admissions`
+  ];
+  for (const ep of endpoints) {
+    try {
+      const response = await fetch(ep, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (error) {}
   }
+  return { success: false, error: 'Backend REST API endpoint not responding' };
 }
 
 /**
