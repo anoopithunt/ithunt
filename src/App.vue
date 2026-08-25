@@ -357,8 +357,19 @@ import CONTENT_DATA from './data/contentData.js';
 import { generateAdmissionPdf, generatePrivacyPolicyPdf, generateTermsConditionsPdf, getAdmissionPdfBlob } from './utils/pdfGenerator.js';
 import { generateNielitProjectPdf, getNielitProjectPdfBlob } from './utils/nielitPdfGenerator.js';
 import { sendAdmissionEmailNotification, sendJobEmailNotification, sendRsvpEmailNotification, sendNielitProjectEmailNotification } from './utils/emailNotifier.js';
-import { triggerMobileMessageNotification } from './utils/smsNotifier.js';
-import { saveNielitProjectRecord, saveAdmissionRecord, saveJobApplicationRecord, saveRsvpRecord, fetchAdmissionsFromFirebase, fetchJobApplicationsFromFirebase, fetchRsvpsFromFirebase, fetchNielitProjectsFromFirebase, registerStudentUser, loginStudentUser, updateStudentProfileInFirebase } from './utils/firebase.js';
+import { 
+  saveNielitProjectRecord, 
+  saveAdmissionRecord, 
+  saveJobApplicationRecord, 
+  saveRsvpRecord, 
+  fetchAdmissionsFromBackend, 
+  fetchJobApplicationsFromBackend, 
+  fetchRsvpsFromBackend, 
+  fetchNielitProjectsFromBackend, 
+  registerStudentUser, 
+  loginStudentUser, 
+  updateStudentProfile 
+} from './utils/apiClient.js';
 
 import Navbar from './components/layout/Navbar.vue';
 import Footer from './components/layout/Footer.vue';
@@ -448,7 +459,7 @@ const handleUpdateStudentProfile = async (updatedData) => {
     liveAdmissionsList.value[idx] = { ...liveAdmissionsList.value[idx], ...updatedData };
   }
 
-  await updateStudentProfileInFirebase(merged);
+  await updateStudentProfile(merged);
 };
 
 const handleStudentLogout = () => {
@@ -1001,21 +1012,21 @@ onMounted(() => {
     }
   }
 
-  // Load persisted records from Firebase / LocalStorage
+  // Load persisted records from ithunt-api Backend / LocalStorage
   const loadInitialData = async () => {
     try {
       const [admissions, jobs, rsvps, nielitProjects] = await Promise.all([
-        fetchAdmissionsFromFirebase(),
-        fetchJobApplicationsFromFirebase(),
-        fetchRsvpsFromFirebase(),
-        fetchNielitProjectsFromFirebase()
+        fetchAdmissionsFromBackend(),
+        fetchJobApplicationsFromBackend(),
+        fetchRsvpsFromBackend(),
+        fetchNielitProjectsFromBackend()
       ]);
       if (admissions && admissions.length) liveAdmissionsList.value = admissions;
       if (jobs && jobs.length) liveJobApplicationsList.value = jobs;
       if (rsvps && rsvps.length) liveRsvpsList.value = rsvps;
       if (nielitProjects && nielitProjects.length) liveNielitProjectsList.value = nielitProjects;
     } catch (e) {
-      console.warn('Error loading records from Firebase:', e);
+      console.warn('Notice loading initial records from REST API:', e);
     }
   };
   loadInitialData();

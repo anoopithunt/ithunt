@@ -116,7 +116,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import { loginWithEmailPassword } from '../../utils/firebase.js';
+import { loginUserWithBackend } from '../../utils/apiClient.js';
 
 const props = defineProps({
   content: {
@@ -141,16 +141,22 @@ const handleLogin = async () => {
   const inputUser = username.value.trim();
   const inputPass = password.value.trim();
 
-  // 1. Try Live Firebase Email/Password Authentication
+  // 1. Authenticate with backend REST API: POST /api/auth/login
   try {
-    const userCredential = await loginWithEmailPassword(inputUser, inputPass);
-    if (userCredential && userCredential.user) {
-      const authUser = userCredential.user;
+    const apiRes = await loginUserWithBackend(inputUser, inputPass);
+    if (apiRes && apiRes.success) {
+      const user = apiRes.data?.user || apiRes.data || {};
+      const token = apiRes.data?.token || '';
+      if (token) {
+        localStorage.setItem('token', token);
+        localStorage.setItem('adminToken', token);
+      }
+
       const adminUser = {
-        uid: authUser.uid,
-        name: authUser.displayName || 'Authenticated Administrator',
-        role: 'Director & Chief Administrator',
-        email: authUser.email,
+        name: user.name || 'Mr. Lakshman Singh Chauhan',
+        role: user.role === 'superadmin' ? 'Director & Chief Administrator' : (user.role || 'Administrator'),
+        email: user.email || inputUser,
+        token: token,
         avatar: props.content.director?.image || 'img/ithunt.webp',
         loginTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
       };
@@ -165,8 +171,8 @@ const handleLogin = async () => {
       emit('login-success', adminUser);
       return;
     }
-  } catch (firebaseErr) {
-    console.info('Firebase Authentication notice:', firebaseErr.message);
+  } catch (apiErr) {
+    console.info('Backend API auth notice:', apiErr.message);
   }
 
   // 2. Fallback check for default SuperAdmin portal credentials
