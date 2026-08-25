@@ -359,6 +359,14 @@
                   <div class="admin-row-actions">
                     <button 
                       class="admin-icon-btn" 
+                      @click="openEditNielitModal(p)" 
+                      title="Edit Submitted Project Form Details"
+                      style="color: var(--color-ai-cyan); border-color: rgba(56, 189, 248, 0.4);"
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button 
+                      class="admin-icon-btn" 
                       @click="$emit('download-nielit-pdf', p)" 
                       title="Download Official 4-Page NIELIT Project PDF Document"
                       style="color: var(--color-ai-yellow);"
@@ -698,6 +706,95 @@
         </div>
       </div>
     </div>
+
+    <!-- Edit Submitted NIELIT Project Modal -->
+    <div class="modal-overlay" v-if="showEditNielitModal" @click.self="showEditNielitModal = false">
+      <div class="modal-card" style="max-width: 780px;">
+        <div class="modal-header">
+          <div class="modal-title"><span>✏️</span> Edit Submitted Project Form Details</div>
+          <button class="modal-close-btn" @click="showEditNielitModal = false">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 1.5rem;">
+          <form @submit.prevent="handleSaveEditedProject">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Candidate Name <span class="req">*</span></label>
+                <input type="text" v-model="editNielitForm.candidateName" required class="form-control" placeholder="Full name">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Father's Name <span class="req">*</span></label>
+                <input type="text" v-model="editNielitForm.fatherName" required class="form-control" placeholder="Father name">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Mobile Number <span class="req">*</span></label>
+                <input type="tel" v-model="editNielitForm.mobile" required class="form-control" placeholder="10-digit mobile">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email Address <span class="req">*</span></label>
+                <input type="email" v-model="editNielitForm.email" required class="form-control" placeholder="email@example.com">
+              </div>
+              <div class="form-group">
+                <label class="form-label">NIELIT Reg / Roll No <span class="req">*</span></label>
+                <input type="text" v-model="editNielitForm.nielitRegNo" required class="form-control" placeholder="e.g. 1548234">
+              </div>
+              <div class="form-group">
+                <label class="form-label">NIELIT Level <span class="req">*</span></label>
+                <select v-model="editNielitForm.nielitLevel" class="form-control" required>
+                  <option value="O">'O' Level</option>
+                  <option value="A">'A' Level</option>
+                  <option value="B">'B' Level</option>
+                  <option value="C">'C' Level</option>
+                </select>
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Project Title <span class="req">*</span></label>
+                <input type="text" v-model="editNielitForm.projectTitle" required class="form-control" placeholder="Complete project title">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Guide Name <span class="req">*</span></label>
+                <input type="text" v-model="editNielitForm.guideName" required class="form-control" placeholder="Project guide name">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Guide Qualification <span class="req">*</span></label>
+                <input type="text" v-model="editNielitForm.guideQualification" required class="form-control" placeholder="e.g. MCA, M.Tech">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Guide Designation <span class="req">*</span></label>
+                <input type="text" v-model="editNielitForm.guideDesignation" required class="form-control" placeholder="e.g. Director & Founder, IT HUNT">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Fee Amount (₹) <span class="req">*</span></label>
+                <input type="text" v-model="editNielitForm.amount" required class="form-control" placeholder="1000">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Transaction / UTR Number <span class="req">*</span></label>
+                <input type="text" v-model="editNielitForm.utrNumber" required class="form-control" placeholder="e.g. UTR123456789">
+              </div>
+              <div class="form-group">
+                <label class="form-label">District / City</label>
+                <input type="text" v-model="editNielitForm.district" class="form-control" placeholder="Prayagraj">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Submission / Verification Status</label>
+                <select v-model="editNielitForm.status" class="form-control">
+                  <option value="Submitted">Submitted</option>
+                  <option value="Under Review">Under Review</option>
+                  <option value="Verified & Approved">Verified & Approved</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: flex-end;">
+              <button type="button" class="btn-secondary" @click="showEditNielitModal = false">
+                Cancel
+              </button>
+              <button type="submit" class="btn-primary">
+                <span>Save & Update Project Form 💾</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -705,8 +802,8 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { sendStudentAdmissionEmail, sendFeeReceiptJpgEmail } from '../../utils/emailNotifier.js';
 import { generateFeeReceiptJpgBlob } from '../../utils/jpgReceiptGenerator.js';
-import { deleteAdmissionFromFirebase } from '../../utils/firebase.js';
-import { deleteUserFromBackend } from '../../utils/apiClient.js';
+import { deleteAdmissionFromFirebase, updateNielitProjectInFirebase, deleteNielitProjectFromFirebase } from '../../utils/firebase.js';
+import { deleteUserFromBackend, updateNielitProjectInBackend, deleteNielitProjectFromBackend } from '../../utils/apiClient.js';
 
 const props = defineProps({
   content: {
@@ -740,7 +837,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['logout', 'download-slip', 'download-nielit-pdf', 'add-admission', 'delete-admission']);
+const emit = defineEmits(['logout', 'download-slip', 'download-nielit-pdf', 'add-admission', 'delete-admission', 'update-nielit-project', 'delete-nielit-project']);
 
 const emailActionMsg = ref('');
 
@@ -888,18 +985,104 @@ const filteredNielitProjects = computed(() => {
   });
 });
 
+const showEditNielitModal = ref(false);
+const editNielitForm = ref({
+  registrationNo: '',
+  nielitRegNo: '',
+  candidateName: '',
+  fatherName: '',
+  mobile: '',
+  email: '',
+  nielitLevel: 'O',
+  projectTitle: '',
+  guideName: 'Mr. Lakshman Singh Chauhan',
+  guideQualification: 'MCA (Computer Science)',
+  guideDesignation: 'Director & Founder, IT HUNT',
+  amount: '1000',
+  utrNumber: '',
+  district: 'Prayagraj',
+  state: 'Uttar Pradesh',
+  status: 'Submitted'
+});
+
+const openEditNielitModal = (p) => {
+  editNielitForm.value = {
+    registrationNo: p.registrationNo || p.nielitRegNo || '',
+    nielitRegNo: p.nielitRegNo || p.registrationNo || '',
+    candidateName: p.candidateName || '',
+    fatherName: p.fatherName || '',
+    mobile: p.mobile || '',
+    email: p.email || '',
+    nielitLevel: p.nielitLevel || 'O',
+    projectTitle: p.projectTitle || '',
+    guideName: p.guideName || 'Mr. Lakshman Singh Chauhan',
+    guideQualification: p.guideQualification || 'MCA (Computer Science)',
+    guideDesignation: p.guideDesignation || 'Director & Founder, IT HUNT',
+    amount: p.amount || '1000',
+    utrNumber: p.utrNumber || '',
+    district: p.district || 'Prayagraj',
+    state: p.state || 'Uttar Pradesh',
+    status: p.status || 'Submitted',
+    paymentDate: p.paymentDate || new Date().toISOString().split('T')[0],
+    paymentRemark: p.paymentRemark || 'Paid Online'
+  };
+  showEditNielitModal.value = true;
+};
+
+const handleSaveEditedProject = async () => {
+  const updatedData = { ...editNielitForm.value };
+  const targetId = updatedData.registrationNo || updatedData.nielitRegNo;
+
+  // 1. Update local reactive state
+  const idx = nielitProjectsList.value.findIndex(p => 
+    p.registrationNo === targetId || p.nielitRegNo === targetId
+  );
+  if (idx !== -1) {
+    nielitProjectsList.value[idx] = { ...nielitProjectsList.value[idx], ...updatedData };
+  }
+
+  // 2. Emit to parent App.vue
+  emit('update-nielit-project', updatedData);
+
+  // 3. Persist to Firebase & REST API
+  try {
+    await updateNielitProjectInFirebase(targetId, updatedData);
+    await updateNielitProjectInBackend(targetId, updatedData);
+    emailActionMsg.value = `✓ NIELIT project form for ${updatedData.candidateName} updated successfully in Database & API.`;
+  } catch (err) {
+    console.warn('Update project error:', err.message);
+  }
+
+  showEditNielitModal.value = false;
+  setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+};
+
+const deleteNielitProject = async (p) => {
+  const targetId = p.registrationNo || p.nielitRegNo || p.id;
+  if (confirm(`Are you sure you want to delete NIELIT project form for ${p.candidateName} (${targetId})?`)) {
+    nielitProjectsList.value = nielitProjectsList.value.filter(item => 
+      item.registrationNo !== p.registrationNo && item.nielitRegNo !== p.nielitRegNo && item.id !== p.id
+    );
+    emit('delete-nielit-project', p);
+
+    try {
+      await deleteNielitProjectFromFirebase(targetId);
+      await deleteNielitProjectFromBackend(targetId);
+      emailActionMsg.value = `✓ NIELIT project form (${targetId}) removed successfully from Database & API.`;
+    } catch (err) {
+      console.warn('Delete project warning:', err.message);
+    }
+    setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+  }
+};
+
 const cycleNielitStatus = (p) => {
   if (!p.status || p.status === 'Submitted') p.status = 'Under Review';
   else if (p.status === 'Under Review') p.status = 'Verified & Approved';
   else p.status = 'Submitted';
-};
-
-const deleteNielitProject = (p) => {
-  if (confirm(`Remove NIELIT project submission for ${p.candidateName} (${p.nielitRegNo || p.registrationNo})?`)) {
-    nielitProjectsList.value = nielitProjectsList.value.filter(item => 
-      item.registrationNo !== p.registrationNo && item.nielitRegNo !== p.nielitRegNo
-    );
-  }
+  const targetId = p.registrationNo || p.nielitRegNo;
+  updateNielitProjectInFirebase(targetId, { status: p.status }).catch(() => {});
+  updateNielitProjectInBackend(targetId, { status: p.status }).catch(() => {});
 };
 
 const cycleAdmissionStatus = (adm) => {

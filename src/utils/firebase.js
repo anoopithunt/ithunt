@@ -1,4 +1,4 @@
-import { submitAdmissionToBackend, submitJobApplicationToBackend, submitNielitProjectToBackend, submitRsvpToBackend, deleteUserFromBackend } from './apiClient.js';
+import { submitAdmissionToBackend, submitJobApplicationToBackend, submitNielitProjectToBackend, updateNielitProjectInBackend, deleteNielitProjectFromBackend, submitRsvpToBackend, deleteUserFromBackend } from './apiClient.js';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore, collection, addDoc, getDocs, doc, setDoc, deleteDoc, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { getDatabase, ref as rtdbRef, push as rtdbPush, get as rtdbGet } from 'firebase/database';
@@ -159,6 +159,81 @@ export async function saveNielitProjectRecord(data) {
     }
   }
   return { success: true, localOnly: true };
+}
+
+/**
+ * Update NIELIT Project submission record in Firestore, Realtime DB, and REST API
+ * @param {string} idOrRegNo
+ * @param {Object} updatedData
+ */
+export async function updateNielitProjectInFirebase(idOrRegNo, updatedData) {
+  if (!idOrRegNo || !updatedData) return { success: false };
+
+  const id = idOrRegNo;
+
+  // 1. Sync with backend REST API
+  try {
+    await updateNielitProjectInBackend(id, updatedData);
+  } catch (e) {}
+
+  // 2. Local storage update
+  try {
+    const existing = JSON.parse(localStorage.getItem('ithunt_nielit_projects') || '[]');
+    const idx = existing.findIndex(p => p.registrationNo === id || p.nielitRegNo === id || p.id === id);
+    if (idx !== -1) {
+      existing[idx] = { ...existing[idx], ...updatedData };
+      localStorage.setItem('ithunt_nielit_projects', JSON.stringify(existing));
+    }
+  } catch (e) {}
+
+  // 3. Firestore Document Update
+  if (db) {
+    try {
+      await setDoc(doc(db, 'nielit_projects', id), {
+        ...updatedData,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+      console.log('✓ NIELIT Project updated in Firebase Firestore:', id);
+    } catch (e) {
+      console.warn('Firestore update warning:', e.message);
+    }
+  }
+
+  return { success: true };
+}
+
+/**
+ * Delete NIELIT Project submission record from Firestore, Realtime DB, and REST API
+ * @param {string} idOrRegNo
+ */
+export async function deleteNielitProjectFromFirebase(idOrRegNo) {
+  if (!idOrRegNo) return { success: false };
+
+  const id = idOrRegNo;
+
+  // 1. Sync with backend REST API
+  try {
+    await deleteNielitProjectFromBackend(id);
+  } catch (e) {}
+
+  // 2. Local storage cleanup
+  try {
+    const existing = JSON.parse(localStorage.getItem('ithunt_nielit_projects') || '[]');
+    const filtered = existing.filter(p => p.registrationNo !== id && p.nielitRegNo !== id && p.id !== id);
+    localStorage.setItem('ithunt_nielit_projects', JSON.stringify(filtered));
+  } catch (e) {}
+
+  // 3. Firestore Document Deletion
+  if (db) {
+    try {
+      await deleteDoc(doc(db, 'nielit_projects', id));
+      console.log('✓ NIELIT Project document deleted from Firebase Firestore:', id);
+    } catch (e) {
+      console.warn('Firestore delete warning:', e.message);
+    }
+  }
+
+  return { success: true };
 }
 
 /**
@@ -640,6 +715,8 @@ export default {
   logoutUser,
   onAuthUserChanged,
   saveNielitProjectRecord,
+  updateNielitProjectInFirebase,
+  deleteNielitProjectFromFirebase,
   saveAdmissionRecord,
   deleteAdmissionFromFirebase,
   saveJobApplicationRecord,

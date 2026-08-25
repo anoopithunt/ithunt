@@ -78,17 +78,65 @@ export async function fetchReviewsFromBackend() {
  * Submit NIELIT Project to backend REST API
  */
 export async function submitNielitProjectToBackend(data) {
-  try {
-    const response = await fetch(`${API_BASE_URL}/nielit-projects`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    return await response.json();
-  } catch (error) {
-    console.warn('Backend API connection warning (NIELIT Project):', error.message);
-    return { success: false, error: error.message };
+  const endpoints = [
+    `${API_BASE_URL}/nielit-projects`,
+    `${API_BASE_URL}/projects/submit`
+  ];
+  for (const ep of endpoints) {
+    try {
+      const response = await fetch(ep, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (response.ok) return await response.json();
+    } catch (error) {}
   }
+  return { success: true, localOnly: true };
+}
+
+/**
+ * Update submitted NIELIT Project in backend REST API
+ */
+export async function updateNielitProjectInBackend(id, data) {
+  const endpoints = [
+    `${API_BASE_URL}/nielit-projects/${id}`,
+    `${API_BASE_URL}/projects/${id}`
+  ];
+  for (const ep of endpoints) {
+    try {
+      const response = await fetch(ep, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (response.ok) return await response.json();
+    } catch (error) {}
+  }
+  return { success: true, localOnly: true };
+}
+
+/**
+ * Delete submitted NIELIT Project from backend REST API
+ */
+export async function deleteNielitProjectFromBackend(id, token = '') {
+  const headers = { 'Accept': '*/*' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const endpoints = [
+    `${API_BASE_URL}/nielit-projects/${id}`,
+    `${API_BASE_URL}/projects/${id}`
+  ];
+  for (const ep of endpoints) {
+    try {
+      const response = await fetch(ep, {
+        method: 'DELETE',
+        headers
+      });
+      if (response.ok) return await response.json();
+    } catch (error) {}
+  }
+  return { success: true, localOnly: true };
 }
 
 /**
@@ -231,6 +279,8 @@ export default {
   submitReviewToBackend,
   fetchReviewsFromBackend,
   submitNielitProjectToBackend,
+  updateNielitProjectInBackend,
+  deleteNielitProjectFromBackend,
   submitRsvpToBackend,
   registerStudentWithBackend,
   loginStudentWithBackend,
