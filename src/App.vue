@@ -119,6 +119,7 @@
           @logout="handleAdminLogout"
           @download-slip="downloadCustomAdmissionSlip"
           @download-nielit-pdf="downloadNielitProjectPdfDoc"
+          @add-admission="handleDirectAdmission"
           @set-tab="setTab" 
         />
 
@@ -769,9 +770,24 @@ const handleAdminLogout = () => {
   activeTab.value = 'home';
 };
 
-const handleDirectAdmission = (newAdm) => {
+const handleDirectAdmission = async (newAdm) => {
   lastSubmittedAdmission.value = newAdm;
-  // Trigger dual email notification for Admin & Student as well as mobile notifications
+  
+  // 1. Immediately update local state to show in admissions list
+  const existingIdx = liveAdmissionsList.value.findIndex(a => a.registrationNo === newAdm.registrationNo);
+  if (existingIdx === -1) {
+    liveAdmissionsList.value.unshift(newAdm);
+  }
+
+  // 2. Persist directly to Firebase Firestore, Realtime DB & REST API backend
+  try {
+    await saveAdmissionRecord(newAdm);
+    console.log('✓ Admin direct admission saved to Firebase Firestore & Users collection:', newAdm.registrationNo);
+  } catch (err) {
+    console.warn('Firebase save warning (Direct Admission):', err.message);
+  }
+
+  // 3. Trigger dual email notification for Admin & Student as well as mobile notifications
   try {
     const pdfBlob = getAdmissionPdfBlob(newAdm);
     sendAdmissionEmailNotification(newAdm, pdfBlob).catch(() => {});
