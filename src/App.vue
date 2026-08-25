@@ -803,10 +803,28 @@ const handleDirectAdmission = async (newAdm) => {
 
 const handleDeleteAdmission = (adm) => {
   const idToDelete = adm.registrationNo || adm.id;
-  liveAdmissionsList.value = liveAdmissionsList.value.filter(a => a.registrationNo !== idToDelete && a.id !== idToDelete);
+  try {
+    const deleted = JSON.parse(localStorage.getItem('ithunt_deleted_admission_ids') || '[]');
+    if (adm.registrationNo && !deleted.includes(adm.registrationNo)) deleted.push(adm.registrationNo);
+    if (adm.id && !deleted.includes(adm.id)) deleted.push(adm.id);
+    if (idToDelete && !deleted.includes(idToDelete)) deleted.push(idToDelete);
+    localStorage.setItem('ithunt_deleted_admission_ids', JSON.stringify(deleted));
+  } catch (e) {}
+
+  liveAdmissionsList.value = liveAdmissionsList.value.filter(a => 
+    a.registrationNo !== idToDelete && 
+    a.id !== idToDelete &&
+    a.registrationNo !== adm.registrationNo && 
+    a.id !== adm.id
+  );
   try {
     const existing = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
-    const filtered = existing.filter(a => a.registrationNo !== idToDelete && a.id !== idToDelete);
+    const filtered = existing.filter(a => 
+      a.registrationNo !== idToDelete && 
+      a.id !== idToDelete &&
+      a.registrationNo !== adm.registrationNo && 
+      a.id !== adm.id
+    );
     localStorage.setItem('ithunt_admissions', JSON.stringify(filtered));
   } catch (e) {}
 };
@@ -829,13 +847,32 @@ const handleUpdateNielitProject = (updatedProject) => {
 
 const handleDeleteNielitProject = (project) => {
   const targetId = project.registrationNo || project.nielitRegNo || project.id;
+  try {
+    const deleted = JSON.parse(localStorage.getItem('ithunt_deleted_nielit_ids') || '[]');
+    if (project.registrationNo && !deleted.includes(project.registrationNo)) deleted.push(project.registrationNo);
+    if (project.nielitRegNo && !deleted.includes(project.nielitRegNo)) deleted.push(project.nielitRegNo);
+    if (project.id && !deleted.includes(project.id)) deleted.push(project.id);
+    if (targetId && !deleted.includes(targetId)) deleted.push(targetId);
+    localStorage.setItem('ithunt_deleted_nielit_ids', JSON.stringify(deleted));
+  } catch (e) {}
+
   liveNielitProjectsList.value = liveNielitProjectsList.value.filter(p => 
-    p.registrationNo !== targetId && p.nielitRegNo !== targetId && p.id !== targetId
+    p.registrationNo !== targetId && 
+    p.nielitRegNo !== targetId && 
+    p.id !== targetId &&
+    p.registrationNo !== project.registrationNo && 
+    p.nielitRegNo !== project.nielitRegNo && 
+    p.id !== project.id
   );
   try {
     const existing = JSON.parse(localStorage.getItem('ithunt_nielit_projects') || '[]');
     const filtered = existing.filter(p => 
-      p.registrationNo !== targetId && p.nielitRegNo !== targetId && p.id !== targetId
+      p.registrationNo !== targetId && 
+      p.nielitRegNo !== targetId && 
+      p.id !== targetId &&
+      p.registrationNo !== project.registrationNo && 
+      p.nielitRegNo !== project.nielitRegNo && 
+      p.id !== project.id
     );
     localStorage.setItem('ithunt_nielit_projects', JSON.stringify(filtered));
   } catch (e) {}
