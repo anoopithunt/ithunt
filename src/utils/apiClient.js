@@ -102,6 +102,57 @@ export async function submitRsvpToBackend(data) {
 }
 
 /**
+ * Register a new student user via backend REST API
+ */
+export async function registerStudentWithBackend(studentData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/students/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(studentData)
+    });
+    return await response.json();
+  } catch (error) {
+    console.warn('Backend API connection warning (Student Register):', error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Authenticate student user via backend REST API
+ */
+export async function loginStudentWithBackend(email, password) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/students/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    return await response.json();
+  } catch (error) {
+    console.warn('Backend API connection warning (Student Login):', error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Update student profile via backend REST API
+ */
+export async function updateStudentProfileWithBackend(studentData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/students/profile`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(studentData)
+    });
+    return await response.json();
+  } catch (error) {
+    console.warn('Backend API connection warning (Student Update):', error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
  * Authenticate user with backend REST API
  */
 export async function loginUserWithBackend(email, password) {
@@ -156,7 +207,11 @@ export default {
   fetchReviewsFromBackend,
   submitNielitProjectToBackend,
   submitRsvpToBackend,
+  registerStudentWithBackend,
+  loginStudentWithBackend,
+  updateStudentProfileWithBackend,
   loginUserWithBackend,
   fetchAdminStatsFromBackend,
   deleteUserFromBackend
 };
+

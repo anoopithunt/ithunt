@@ -354,7 +354,7 @@ import { generateAdmissionPdf, generatePrivacyPolicyPdf, generateTermsConditions
 import { generateNielitProjectPdf, getNielitProjectPdfBlob } from './utils/nielitPdfGenerator.js';
 import { sendAdmissionEmailNotification, sendJobEmailNotification, sendRsvpEmailNotification, sendNielitProjectEmailNotification } from './utils/emailNotifier.js';
 import { triggerMobileMessageNotification } from './utils/smsNotifier.js';
-import { saveNielitProjectRecord, saveAdmissionRecord, saveJobApplicationRecord, saveRsvpRecord, fetchAdmissionsFromFirebase, fetchJobApplicationsFromFirebase, fetchRsvpsFromFirebase, fetchNielitProjectsFromFirebase } from './utils/firebase.js';
+import { saveNielitProjectRecord, saveAdmissionRecord, saveJobApplicationRecord, saveRsvpRecord, fetchAdmissionsFromFirebase, fetchJobApplicationsFromFirebase, fetchRsvpsFromFirebase, fetchNielitProjectsFromFirebase, registerStudentUser, loginStudentUser, updateStudentProfileInFirebase } from './utils/firebase.js';
 
 import Navbar from './components/layout/Navbar.vue';
 import Footer from './components/layout/Footer.vue';
@@ -402,59 +402,38 @@ try {
   if (savedStudent) studentUser.value = JSON.parse(savedStudent);
 } catch (e) {}
 
-const handleStudentLogin = ({ email, password }, callback) => {
-  const found = liveAdmissionsList.value.find(s => s.email && s.email.toLowerCase() === email.toLowerCase());
-  if (found) {
-    studentUser.value = { ...found };
-    localStorage.setItem('ithunt_student_user', JSON.stringify(studentUser.value));
-    if (callback) callback(null);
-  } else {
-    const storedStudents = JSON.parse(localStorage.getItem('ithunt_registered_students') || '[]');
-    const localFound = storedStudents.find(s => s.email && s.email.toLowerCase() === email.toLowerCase());
-    if (localFound) {
-      studentUser.value = { ...localFound };
+const handleStudentLogin = async ({ email, password }, callback) => {
+  try {
+    const res = await loginStudentUser(email, password);
+    if (res.success && res.user) {
+      studentUser.value = { ...res.user };
       localStorage.setItem('ithunt_student_user', JSON.stringify(studentUser.value));
       if (callback) callback(null);
     } else {
-      if (callback) callback('No student account found with this email address. Please Sign Up first.');
+      if (callback) callback(res.error || 'Invalid email or password. Please check your credentials.');
     }
+  } catch (err) {
+    if (callback) callback(err.message || 'Authentication error.');
   }
 };
 
-const handleStudentSignup = (signupData, callback) => {
-  const regNo = `ITH-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
-  const newStudent = {
-    registrationNo: regNo,
-    candidateName: signupData.candidateName,
-    email: signupData.email,
-    mobile: signupData.mobile,
-    course: signupData.course,
-    fatherName: 'Not Specified',
-    motherName: 'Not Specified',
-    gender: 'Male',
-    dob: new Date().toISOString().split('T')[0],
-    district: 'Prayagraj',
-    address: 'Holagarh, Prayagraj',
-    date: new Date().toLocaleDateString('en-GB'),
-    time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-    status: 'Active Registered Student',
-    feeStatus: 'Pending Verification'
-  };
-
-  studentUser.value = newStudent;
-  localStorage.setItem('ithunt_student_user', JSON.stringify(newStudent));
-
-  const storedStudents = JSON.parse(localStorage.getItem('ithunt_registered_students') || '[]');
-  storedStudents.push(newStudent);
-  localStorage.setItem('ithunt_registered_students', JSON.stringify(storedStudents));
-
-  liveAdmissionsList.value.unshift(newStudent);
-  saveAdmissionRecord(newStudent);
-
-  if (callback) callback(null);
+const handleStudentSignup = async (signupData, callback) => {
+  try {
+    const res = await registerStudentUser(signupData);
+    if (res.success && res.user) {
+      studentUser.value = { ...res.user };
+      localStorage.setItem('ithunt_student_user', JSON.stringify(studentUser.value));
+      liveAdmissionsList.value.unshift(studentUser.value);
+      if (callback) callback(null);
+    } else {
+      if (callback) callback(res.error || 'Registration failed. Please try again.');
+    }
+  } catch (err) {
+    if (callback) callback(err.message || 'Registration error.');
+  }
 };
 
-const handleUpdateStudentProfile = (updatedData) => {
+const handleUpdateStudentProfile = async (updatedData) => {
   if (!studentUser.value) return;
   const merged = { ...studentUser.value, ...updatedData };
   studentUser.value = merged;
@@ -463,8 +442,9 @@ const handleUpdateStudentProfile = (updatedData) => {
   const idx = liveAdmissionsList.value.findIndex(s => s.registrationNo === merged.registrationNo || s.email === merged.email);
   if (idx !== -1) {
     liveAdmissionsList.value[idx] = { ...liveAdmissionsList.value[idx], ...updatedData };
-    saveAdmissionRecord(liveAdmissionsList.value[idx]);
   }
+
+  await updateStudentProfileInFirebase(merged);
 };
 
 const handleStudentLogout = () => {
