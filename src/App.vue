@@ -120,6 +120,7 @@
           @download-slip="downloadCustomAdmissionSlip"
           @download-nielit-pdf="downloadNielitProjectPdfDoc"
           @add-admission="handleDirectAdmission"
+          @delete-admission="handleDeleteAdmission"
           @set-tab="setTab" 
         />
 
@@ -796,6 +797,16 @@ const handleDirectAdmission = async (newAdm) => {
   }
   triggerMobileMessageNotification(newAdm).catch(() => {});
   triggerConfetti();
+};
+
+const handleDeleteAdmission = (adm) => {
+  const idToDelete = adm.registrationNo || adm.id;
+  liveAdmissionsList.value = liveAdmissionsList.value.filter(a => a.registrationNo !== idToDelete && a.id !== idToDelete);
+  try {
+    const existing = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
+    const filtered = existing.filter(a => a.registrationNo !== idToDelete && a.id !== idToDelete);
+    localStorage.setItem('ithunt_admissions', JSON.stringify(filtered));
+  } catch (e) {}
 };
 
 const downloadCustomAdmissionSlip = (adm) => {

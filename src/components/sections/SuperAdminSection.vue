@@ -705,6 +705,8 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { sendStudentAdmissionEmail, sendFeeReceiptJpgEmail } from '../../utils/emailNotifier.js';
 import { generateFeeReceiptJpgBlob } from '../../utils/jpgReceiptGenerator.js';
+import { deleteAdmissionFromFirebase } from '../../utils/firebase.js';
+import { deleteUserFromBackend } from '../../utils/apiClient.js';
 
 const props = defineProps({
   content: {
@@ -738,7 +740,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['logout', 'download-slip', 'download-nielit-pdf', 'add-admission']);
+const emit = defineEmits(['logout', 'download-slip', 'download-nielit-pdf', 'add-admission', 'delete-admission']);
 
 const emailActionMsg = ref('');
 
@@ -906,9 +908,22 @@ const cycleAdmissionStatus = (adm) => {
   else adm.status = 'Confirmed';
 };
 
-const deleteAdmission = (adm) => {
+const deleteAdmission = async (adm) => {
   if (confirm(`Are you sure you want to remove admission record for ${adm.candidateName} (${adm.registrationNo})?`)) {
-    admissionsList.value = admissionsList.value.filter(a => a.registrationNo !== adm.registrationNo);
+    const idToDelete = adm.registrationNo || adm.id;
+    admissionsList.value = admissionsList.value.filter(a => a.registrationNo !== adm.registrationNo && a.id !== adm.id);
+    emit('delete-admission', adm);
+
+    try {
+      // 1. Delete from Backend REST API: curl -X DELETE http://localhost:3000/api/users/:id
+      await deleteUserFromBackend(idToDelete);
+      // 2. Delete from Firebase Firestore & Realtime DB
+      await deleteAdmissionFromFirebase(idToDelete);
+      emailActionMsg.value = `✓ Candidate record ${idToDelete} removed successfully from Database & API.`;
+    } catch (e) {
+      console.warn('Delete warning:', e.message);
+    }
+    setTimeout(() => { emailActionMsg.value = ''; }, 4000);
   }
 };
 
