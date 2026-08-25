@@ -146,6 +146,15 @@
             <option value="Verified">Verified</option>
             <option value="Pending Verification">Pending</option>
           </select>
+
+          <!-- Enroll New Candidate Button -->
+          <button 
+            class="btn-primary" 
+            style="padding: 0.5rem 1rem; font-size: 0.825rem; font-weight: 700; white-space: nowrap; border-radius: var(--radius-sm);"
+            @click="openQuickAdmissionModal"
+          >
+            <span>➕ Enroll Candidate</span>
+          </button>
         </div>
       </div>
 

@@ -131,140 +131,7 @@ const CONTENT_DATA = {
     ]
   },
   "sampleAdmissions": [
-    {
-      "registrationNo": "ITH-982410",
-      "date": "18 Aug 2026",
-      "time": "11:30 AM",
-      "candidateName": "Rahul Sharma",
-      "fatherName": "Suresh Sharma",
-      "motherName": "Sunita Sharma",
-      "dob": "2002-05-14",
-      "gender": "Male",
-      "course": "Web Development (MERN Stack & Cloud Architecture)",
-      "mobile": "9876543210",
-      "email": "rahul.sharma@example.com",
-      "district": "PRAYAGRAJ",
-      "address": "24/B Civil Lines, Near High Court",
-      "status": "Confirmed"
-    },
-    {
-      "registrationNo": "ITH-761234",
-      "date": "17 Aug 2026",
-      "time": "04:15 PM",
-      "candidateName": "Priya Srivastava",
-      "fatherName": "Vikas Srivastava",
-      "motherName": "Anita Srivastava",
-      "dob": "2003-09-22",
-      "gender": "Female",
-      "course": "iOS Native App Development (Swift & SwiftUI)",
-      "mobile": "9123456789",
-      "email": "priya.srivastava@example.com",
-      "district": "PRAYAGRAJ",
-      "address": "Plot 42, Teliyarganj, Prayagraj",
-      "status": "Confirmed"
-    },
-    {
-      "registrationNo": "ITH-542190",
-      "date": "16 Aug 2026",
-      "time": "02:00 PM",
-      "candidateName": "Amitabh Verma",
-      "fatherName": "Dinesh Verma",
-      "motherName": "Kiran Verma",
-      "dob": "2001-11-08",
-      "gender": "Male",
-      "course": "Android App Engineering (Kotlin & Jetpack Compose)",
-      "mobile": "9834512789",
-      "email": "amitabh.verma@example.com",
-      "district": "PRATAPGARH",
-      "address": "Near Railway Station, Pratapgarh",
-      "status": "Verified"
-    },
-    {
-      "registrationNo": "ITH-432890",
-      "date": "15 Aug 2026",
-      "time": "10:45 AM",
-      "candidateName": "Ananya Gupta",
-      "fatherName": "Rajesh Gupta",
-      "motherName": "Meena Gupta",
-      "dob": "2004-01-30",
-      "gender": "Female",
-      "course": "Python Programming, Generative AI & Data Analytics",
-      "mobile": "9988776655",
-      "email": "ananya.gupta@example.com",
-      "district": "PRAYAGRAJ",
-      "address": "Dahiyawa Holagarh, Prayagraj",
-      "status": "Pending Verification"
-    },
-    {
-      "registrationNo": "ITH-312987",
-      "date": "14 Aug 2026",
-      "time": "03:20 PM",
-      "candidateName": "Mohd. Farhan",
-      "fatherName": "Abdul Rashid",
-      "motherName": "Fatima Begum",
-      "dob": "2002-07-19",
-      "gender": "Male",
-      "course": "Full-Funnel Digital Marketing & Growth Hacking",
-      "mobile": "9765432109",
-      "email": "farhan.mohd@example.com",
-      "district": "KAUSHAMBI",
-      "address": "Main Bazaar, Sirathu, Kaushambi",
-      "status": "Confirmed"
-    }
-  ],
-  "sampleNielitProjects": [
-    {
-      "registrationNo": "NIELIT-1536056",
-      "nielitRegNo": "1536056",
-      "nielitLevel": "A",
-      "candidateName": "Praveen Kumar Soni",
-      "fatherName": "Kedar Mal Soni",
-      "email": "praveensoni11@gmail.com",
-      "mobile": "7740854811",
-      "address": "Buhana Jhunjhunu",
-      "district": "Jhunjhunu",
-      "state": "Rajasthan",
-      "pin": "333502",
-      "projectTitle": "Network Monitoring and Management",
-      "guideName": "Sushil Kumar",
-      "guideQualification": "MCA",
-      "guideDesignation": "Sr. Laravel Developer",
-      "guidePlace": "Prayagraj",
-      "guideAddress": "Prayagraj Uttar Pradesh",
-      "projectDate": "18/07/2026",
-      "amount": "1000",
-      "paymentDate": "25-Mar-2026",
-      "utrNumber": "CHD550W1FMSF1B",
-      "accountHolderName": "Praveen Kumar Soni",
-      "paymentRemark": "Paid",
-      "status": "Verified & Approved"
-    },
-    {
-      "registrationNo": "NIELIT-1492011",
-      "nielitRegNo": "1492011",
-      "nielitLevel": "O",
-      "candidateName": "Shubham Tiwari",
-      "fatherName": "Ramesh Chandra Tiwari",
-      "email": "shubham.tiwari@example.com",
-      "mobile": "9839123456",
-      "address": "Civil Lines, Prayagraj",
-      "district": "Prayagraj",
-      "state": "Uttar Pradesh",
-      "pin": "211001",
-      "projectTitle": "E-Commerce Billing & Inventory System",
-      "guideName": "Lakshman Singh Chauhan",
-      "guideQualification": "MCA",
-      "guideDesignation": "Director & Tech Architect",
-      "guidePlace": "Prayagraj",
-      "guideAddress": "IT HUNT Academy, Holagarh Prayagraj",
-      "projectDate": "12/08/2026",
-      "amount": "1000",
-      "paymentDate": "12-Aug-2026",
-      "utrNumber": "UPI/623910/ITHUNT",
-      "accountHolderName": "Shubham Tiwari",
-      "paymentRemark": "Paid",
-      "status": "Submitted"
-    }
+
   ],
   "sampleJobApplications": [
     {
@@ -815,381 +682,381 @@ const CONTENT_DATA = {
 
   // Careers & Hiring Section
   careersSection: {
-  "tagline": "JOIN OUR ELITE ACADEMIC & ENGINEERING TEAM",
-  "titlePrefix": "Careers: ",
-  "titleGradient": "Teachers & Developers Wanted",
-  "description": "IT HUNT is expanding! We are hiring passionate technical educators, senior developers, and academic mentors to lead our production software studio and technology training academy in Prayagraj.",
-  "mandatoryPolicyNotice": "⚠️ MANDATORY REQUIREMENT: Minimum 4+ Years Experience Required for Senior & Lead Roles",
-  "filterCategories": [
-    {
-      "id": "all",
-      "label": "🌟 All Vacancies",
-      "icon": "🌟"
-    },
-    {
-      "id": "teaching",
-      "label": "🎓 Teaching & Faculty (Mentors)",
-      "icon": "🎓"
-    },
-    {
-      "id": "developer",
-      "label": "💻 Software Developers (Web & Mobile)",
-      "icon": "💻"
-    },
-    {
-      "id": "operations",
-      "label": "⚙️ Lab & Academic Operations",
-      "icon": "⚙️"
-    }
-  ],
-  "benefits": [
-    {
-      "icon": "💰",
-      "title": "Top-Tier Compensation",
-      "desc": "Industry-competitive salaries with performance bonuses and annual appraisal reviews."
-    },
-    {
-      "icon": "💻",
-      "title": "High-Tech Studio Labs",
-      "desc": "Dedicated Apple Mac / PC workstations with fiber internet and licensed dev tools."
-    },
-    {
-      "icon": "🚀",
-      "title": "Live Client Exposure",
-      "desc": "Work on actual enterprise client projects alongside training aspiring engineers."
-    },
-    {
-      "icon": "🌴",
-      "title": "Academic Work-Life Balance",
-      "desc": "Structured working hours, festival holidays, and a supportive collaborative culture."
-    }
-  ],
-  "jobOpenings": [
-    {
-      "id": 1,
-      "category": "teaching",
-      "categoryBadge": "🎓 Teaching Faculty",
-      "shortTitle": "MERN Lead Trainer",
-      "title": "Senior MERN Stack Developer & Technical Trainer",
-      "type": "Full-Time / Part-Time",
-      "experience": "Min 4+ Years Experience",
-      "location": "Prayagraj Campus / Hybrid",
-      "salary": "₹6.5L - ₹10.0L P.A.",
-      "description": "Lead our flagship MERN Stack internship track, mentor students through live web applications, conduct sprint code reviews, and teach modern React/Node architecture.",
-      "teachingPoints": [
-        "Deliver interactive daily lectures and hands-on live coding sessions on React 19, Node.js, Express, and MongoDB.",
-        "Mentor internship batches in building production-grade SaaS web apps and microservices.",
-        "Conduct GitHub Pull Request code reviews and teach clean coding practices and JWT authentication.",
-        "Evaluate student capstone projects and guide candidates through technical interview preparation."
-      ],
-      "skills": [
-        "React.js",
-        "Node.js",
-        "Express.js",
-        "MongoDB",
-        "Redux Toolkit",
-        "TypeScript",
-        "Docker",
-        "REST APIs",
-        "Git"
-      ]
-    },
-    {
-      "id": 2,
-      "category": "teaching",
-      "categoryBadge": "🎓 Teaching Faculty",
-      "shortTitle": "Python & AI Faculty",
-      "title": "Senior Python, Generative AI & Machine Learning Faculty",
-      "type": "Full-Time",
-      "experience": "Min 4+ Years Experience",
-      "location": "Prayagraj Campus / Hybrid",
-      "salary": "₹7.5L - ₹12.0L P.A.",
-      "description": "Train students and engineering interns in Python programming, FastAPI backends, Machine Learning models, and modern Generative AI / LLM workflows.",
-      "teachingPoints": [
-        "Teach Core & Advanced Python, Object-Oriented Programming, NumPy, Pandas, and data modeling.",
-        "Deliver curriculum on Prompt Engineering, LangChain, RAG pipelines, and OpenAI/HuggingFace API integrations.",
-        "Guide students in deploying AI models on cloud endpoints using FastAPI and Docker.",
-        "Mentor aspiring AI engineers in building real-world AI chatbot and automation projects."
-      ],
-      "skills": [
-        "Python 3.12+",
-        "FastAPI",
-        "PyTorch / Scikit-Learn",
-        "LangChain",
-        "OpenAI APIs",
-        "PostgreSQL",
-        "Docker",
-        "RAG"
-      ]
-    },
-    {
-      "id": 3,
-      "category": "teaching",
-      "categoryBadge": "🎓 Teaching Faculty",
-      "shortTitle": "iOS Tech Mentor",
-      "title": "Senior iOS Mobile Application Instructor & Swift Mentor",
-      "type": "Full-Time / Part-Time",
-      "experience": "Min 4+ Years Experience",
-      "location": "Prayagraj Campus / Remote",
-      "salary": "₹7.0L - ₹11.0L P.A.",
-      "description": "Guide interns through native iOS app development, Swift 5+, modern SwiftUI framework, Xcode debugging, and Apple App Store submission processes.",
-      "teachingPoints": [
-        "Teach Swift programming, SwiftUI declarative UI architecture, StateObject, and Combine.",
-        "Mentor students on local database integration using CoreData, SwiftData, and REST API consumption.",
-        "Instruct on Apple Human Interface Guidelines, TestFlight beta distribution, and App Store publishing.",
-        "Review student mobile app code and facilitate portfolio development."
-      ],
-      "skills": [
-        "Swift 5+",
-        "SwiftUI",
-        "UIKit",
-        "Xcode",
-        "CoreData / SwiftData",
-        "Combine",
-        "App Store Connect",
-        "REST APIs"
-      ]
-    },
-    {
-      "id": 4,
-      "category": "teaching",
-      "categoryBadge": "🎓 Teaching Faculty",
-      "shortTitle": "Android Instructor",
-      "title": "Senior Android Developer & Native Kotlin Educator",
-      "type": "Full-Time",
-      "experience": "Min 4+ Years Experience",
-      "location": "Prayagraj Campus / Hybrid",
-      "salary": "₹6.5L - ₹9.5L P.A.",
-      "description": "Instruct and mentor Android development interns on Kotlin, Jetpack Compose, clean MVVM architecture, Room DB, and Google Play Store deployment.",
-      "teachingPoints": [
-        "Deliver hands-on instruction in Kotlin syntax, Coroutines, StateFlow, and Jetpack Compose UI.",
-        "Teach clean MVVM architectural patterns, Dependency Injection (Hilt), and Room SQLite persistence.",
-        "Guide students through Firebase Auth, Google Maps SDK, and Push Notification integration.",
-        "Assist interns in publishing production apps to the Google Play Store."
-      ],
-      "skills": [
-        "Kotlin",
-        "Jetpack Compose",
-        "MVVM",
-        "Coroutines",
-        "Room Database",
-        "Retrofit",
-        "Hilt / Koin",
-        "Google Play"
-      ]
-    },
-    {
-      "id": 5,
-      "category": "teaching",
-      "categoryBadge": "🎓 Teaching Faculty",
-      "shortTitle": "NIELIT Faculty",
-      "title": "NIELIT O & A Level Computer Science Faculty",
-      "type": "Full-Time",
-      "experience": "Min 3+ Years Experience",
-      "location": "Prayagraj Campus",
-      "salary": "₹4.5L - ₹7.0L P.A.",
-      "description": "Teach NIELIT O Level and A Level modules including IT Tools, Web Designing, Python Programming, and Internet of Things (IoT).",
-      "teachingPoints": [
-        "Conduct classroom and lab sessions covering NIELIT official syllabus (M1-R5 to M4-R5).",
-        "Prepare students for online objective exams, theory papers, and practical lab viva.",
-        "Instruct fundamentals of Web Designing (HTML5, CSS3, JavaScript) and Python problem solving.",
-        "Track student progress, conduct periodic mock exams, and facilitate certification success."
-      ],
-      "skills": [
-        "Python",
-        "HTML/CSS/JS",
-        "C Programming",
-        "IoT & Arduino",
-        "DBMS",
-        "Computer Networking",
-        "MS Office"
-      ]
-    },
-    {
-      "id": 6,
-      "category": "teaching",
-      "categoryBadge": "🎓 Teaching Faculty",
-      "shortTitle": "Digital Marketing Mentor",
-      "title": "Senior Digital Marketing Lead & Growth Marketing Mentor",
-      "type": "Full-Time",
-      "experience": "Min 3+ Years Experience",
-      "location": "Prayagraj Campus",
-      "salary": "₹4.8L - ₹7.5L P.A.",
-      "description": "Lead the Digital Marketing internship track, teaching technical SEO, Google Ads PPC campaigns, Meta Ads Manager, and growth hacking strategies.",
-      "teachingPoints": [
-        "Teach On-Page/Off-Page SEO, Keyword Research, Technical Audits, and Google Search Console.",
-        "Mentor students in running live budget Google Search/Display Ads and Meta Ads campaigns.",
-        "Instruct on Google Analytics 4 (GA4), conversion tracking, ROI modeling, and email marketing.",
-        "Guide interns through live client brand marketing campaigns."
-      ],
-      "skills": [
-        "SEO / SEM",
-        "Google Ads (PPC)",
-        "Meta Ads Manager",
-        "Google Analytics 4",
-        "Content Strategy",
-        "Canva / Figma"
-      ]
-    },
-    {
-      "id": 7,
-      "category": "developer",
-      "categoryBadge": "💻 Software Developer",
-      "shortTitle": "Full-Stack Developer",
-      "title": "Senior Full-Stack Web Developer (React.js, Node.js & Cloud)",
-      "type": "Full-Time",
-      "experience": "Min 4+ Years Experience",
-      "location": "Prayagraj Campus / Hybrid",
-      "salary": "₹8.0L - ₹13.0L P.A.",
-      "description": "Architect and build robust enterprise web applications, customer portals, and high-throughput REST/GraphQL microservices for IT HUNT client software ventures.",
-      "teachingPoints": [
-        "Design scalable database schemas with PostgreSQL, MongoDB, and Redis caching layers.",
-        "Develop responsive, accessible frontends using React 19, Next.js, and TypeScript.",
-        "Implement automated CI/CD deployment pipelines on AWS / Docker infrastructure.",
-        "Participate in architecture reviews and mentor junior engineering staff."
-      ],
-      "skills": [
-        "React.js / Next.js",
-        "Node.js",
-        "PostgreSQL / MongoDB",
-        "TypeScript",
-        "Docker",
-        "AWS / Cloud",
-        "GraphQL"
-      ]
-    },
-    {
-      "id": 8,
-      "category": "developer",
-      "categoryBadge": "💻 Software Developer",
-      "shortTitle": "Mobile Apps Lead",
-      "title": "Lead Mobile Applications Developer (iOS & Android)",
-      "type": "Full-Time",
-      "experience": "Min 4+ Years Experience",
-      "location": "Prayagraj Campus / Hybrid",
-      "salary": "₹8.5L - ₹13.5L P.A.",
-      "description": "Lead mobile app development initiatives for enterprise clients across both Apple iOS and Google Android ecosystems.",
-      "teachingPoints": [
-        "Architect high-performance native iOS (SwiftUI) and Android (Jetpack Compose) mobile clients.",
-        "Integrate biometric auth, offline caching, push notifications, and payment gateways.",
-        "Manage end-to-end releases on Apple App Store Connect and Google Play Console.",
-        "Ensure 99.9% crash-free sessions and optimized rendering performance."
-      ],
-      "skills": [
-        "SwiftUI / Swift",
-        "Kotlin / Compose",
-        "Cross-Platform SDKs",
-        "REST APIs",
-        "App Store & Play Store",
-        "Firebase"
-      ]
-    },
-    {
-      "id": 9,
-      "category": "developer",
-      "categoryBadge": "💻 Software Developer",
-      "shortTitle": "Backend & Cloud Engineer",
-      "title": "Senior Backend & Cloud Infrastructure Engineer",
-      "type": "Full-Time",
-      "experience": "Min 4+ Years Experience",
-      "location": "Prayagraj Campus / Remote",
-      "salary": "₹8.0L - ₹12.5L P.A.",
-      "description": "Design and maintain high-concurrency backend services, database clusters, containerized deployments, and robust API gateways.",
-      "teachingPoints": [
-        "Build high-performance microservices in Node.js / Go / FastAPI with asynchronous queues.",
-        "Optimize relational and NoSQL database queries, indexes, and sharding strategies.",
-        "Maintain secure Linux cloud servers, SSL certificates, Nginx reverse proxies, and Docker swarms.",
-        "Enforce security audits, rate limiting, and automated health monitoring."
-      ],
-      "skills": [
-        "Node.js / FastAPI",
-        "PostgreSQL",
-        "MongoDB",
-        "Redis",
-        "Docker & Kubernetes",
-        "Nginx",
-        "Linux Servers",
-        "CI/CD"
-      ]
-    },
-    {
-      "id": 10,
-      "category": "developer",
-      "categoryBadge": "💻 Software Developer",
-      "shortTitle": "UI/UX & Frontend Engineer",
-      "title": "UI/UX Product Designer & Modern Frontend Specialist",
-      "type": "Full-Time",
-      "experience": "Min 3+ Years Experience",
-      "location": "Prayagraj Campus",
-      "salary": "₹5.5L - ₹8.5L P.A.",
-      "description": "Create world-class user interfaces, responsive component libraries, Figma prototypes, and micro-animations for educational platforms and enterprise apps.",
-      "teachingPoints": [
-        "Design intuitive wireframes, mockups, and clickable prototypes in Figma.",
-        "Translate designs into clean, responsive HTML5, modern CSS3, and Vue/React components.",
-        "Ensure strict WCAG accessibility, fluid typography, and delightful micro-interactions.",
-        "Collaborate with developers to ensure 100% pixel-perfect UI fidelity."
-      ],
-      "skills": [
-        "Figma",
-        "CSS3 / CSS Animations",
-        "Vue.js / React",
-        "Tailwind CSS",
-        "Wireframing",
-        "Prototyping",
-        "Design Systems"
-      ]
-    },
-    {
-      "id": 11,
-      "category": "operations",
-      "categoryBadge": "⚙️ Academic Operations",
-      "shortTitle": "Lab Systems Administrator",
-      "title": "Senior Lab Workstation & High-Speed Network Systems Administrator",
-      "type": "Full-Time",
-      "experience": "Min 3+ Years Experience",
-      "location": "Holagarh Prayagraj Campus",
-      "salary": "₹4.0L - ₹6.5L P.A.",
-      "description": "Manage campus computer labs, hardware maintenance, optical fiber network routing, software licenses, and server backups for 100+ workstations.",
-      "teachingPoints": [
-        "Maintain 100+ lab computers (macOS, Windows, Linux) and resolve hardware/OS issues.",
-        "Manage high-speed optical fiber routers, Wi-Fi access points, VLANs, and firewall security.",
-        "Install and license developer tools (VS Code, Xcode, Android Studio, Node.js, Python).",
-        "Maintain daily lab availability and manage automated local backup servers."
-      ],
-      "skills": [
-        "Networking (LAN/VLAN/Routers)",
-        "Hardware Troubleshooting",
-        "Linux & Windows Admin",
-        "Server Maintenance"
-      ]
-    },
-    {
-      "id": 12,
-      "category": "operations",
-      "categoryBadge": "⚙️ Academic Operations",
-      "shortTitle": "Career & Admission Counselor",
-      "title": "Student Academic Counselor & Career Placement Coordinator",
-      "type": "Full-Time",
-      "experience": "Min 2+ Years Experience",
-      "location": "Holagarh Prayagraj Campus",
-      "salary": "₹3.8L - ₹6.0L P.A.",
-      "description": "Counsel prospective students and parents, coordinate batch admissions, and liaise with partner software companies for alumni placement drives.",
-      "teachingPoints": [
-        "Guide students on choosing suitable internship and diploma tracks based on career goals.",
-        "Manage admission inquiries, registration verifications, and onboarding schedules.",
-        "Coordinate with corporate HR partners to schedule campus placement drives and interviews.",
-        "Maintain student satisfaction records, feedback reviews, and alumni networking."
-      ],
-      "skills": [
-        "Student Counseling",
-        "Communication & Sales",
-        "Placement Coordination",
-        "CRM Software",
-        "Academic Operations"
-      ]
-    }
-  ]
-},
+    "tagline": "JOIN OUR ELITE ACADEMIC & ENGINEERING TEAM",
+    "titlePrefix": "Careers: ",
+    "titleGradient": "Teachers & Developers Wanted",
+    "description": "IT HUNT is expanding! We are hiring passionate technical educators, senior developers, and academic mentors to lead our production software studio and technology training academy in Prayagraj.",
+    "mandatoryPolicyNotice": "⚠️ MANDATORY REQUIREMENT: Minimum 4+ Years Experience Required for Senior & Lead Roles",
+    "filterCategories": [
+      {
+        "id": "all",
+        "label": "🌟 All Vacancies",
+        "icon": "🌟"
+      },
+      {
+        "id": "teaching",
+        "label": "🎓 Teaching & Faculty (Mentors)",
+        "icon": "🎓"
+      },
+      {
+        "id": "developer",
+        "label": "💻 Software Developers (Web & Mobile)",
+        "icon": "💻"
+      },
+      {
+        "id": "operations",
+        "label": "⚙️ Lab & Academic Operations",
+        "icon": "⚙️"
+      }
+    ],
+    "benefits": [
+      {
+        "icon": "💰",
+        "title": "Top-Tier Compensation",
+        "desc": "Industry-competitive salaries with performance bonuses and annual appraisal reviews."
+      },
+      {
+        "icon": "💻",
+        "title": "High-Tech Studio Labs",
+        "desc": "Dedicated Apple Mac / PC workstations with fiber internet and licensed dev tools."
+      },
+      {
+        "icon": "🚀",
+        "title": "Live Client Exposure",
+        "desc": "Work on actual enterprise client projects alongside training aspiring engineers."
+      },
+      {
+        "icon": "🌴",
+        "title": "Academic Work-Life Balance",
+        "desc": "Structured working hours, festival holidays, and a supportive collaborative culture."
+      }
+    ],
+    "jobOpenings": [
+      {
+        "id": 1,
+        "category": "teaching",
+        "categoryBadge": "🎓 Teaching Faculty",
+        "shortTitle": "MERN Lead Trainer",
+        "title": "Senior MERN Stack Developer & Technical Trainer",
+        "type": "Full-Time / Part-Time",
+        "experience": "Min 4+ Years Experience",
+        "location": "Prayagraj Campus / Hybrid",
+        "salary": "₹6.5L - ₹10.0L P.A.",
+        "description": "Lead our flagship MERN Stack internship track, mentor students through live web applications, conduct sprint code reviews, and teach modern React/Node architecture.",
+        "teachingPoints": [
+          "Deliver interactive daily lectures and hands-on live coding sessions on React 19, Node.js, Express, and MongoDB.",
+          "Mentor internship batches in building production-grade SaaS web apps and microservices.",
+          "Conduct GitHub Pull Request code reviews and teach clean coding practices and JWT authentication.",
+          "Evaluate student capstone projects and guide candidates through technical interview preparation."
+        ],
+        "skills": [
+          "React.js",
+          "Node.js",
+          "Express.js",
+          "MongoDB",
+          "Redux Toolkit",
+          "TypeScript",
+          "Docker",
+          "REST APIs",
+          "Git"
+        ]
+      },
+      {
+        "id": 2,
+        "category": "teaching",
+        "categoryBadge": "🎓 Teaching Faculty",
+        "shortTitle": "Python & AI Faculty",
+        "title": "Senior Python, Generative AI & Machine Learning Faculty",
+        "type": "Full-Time",
+        "experience": "Min 4+ Years Experience",
+        "location": "Prayagraj Campus / Hybrid",
+        "salary": "₹7.5L - ₹12.0L P.A.",
+        "description": "Train students and engineering interns in Python programming, FastAPI backends, Machine Learning models, and modern Generative AI / LLM workflows.",
+        "teachingPoints": [
+          "Teach Core & Advanced Python, Object-Oriented Programming, NumPy, Pandas, and data modeling.",
+          "Deliver curriculum on Prompt Engineering, LangChain, RAG pipelines, and OpenAI/HuggingFace API integrations.",
+          "Guide students in deploying AI models on cloud endpoints using FastAPI and Docker.",
+          "Mentor aspiring AI engineers in building real-world AI chatbot and automation projects."
+        ],
+        "skills": [
+          "Python 3.12+",
+          "FastAPI",
+          "PyTorch / Scikit-Learn",
+          "LangChain",
+          "OpenAI APIs",
+          "PostgreSQL",
+          "Docker",
+          "RAG"
+        ]
+      },
+      {
+        "id": 3,
+        "category": "teaching",
+        "categoryBadge": "🎓 Teaching Faculty",
+        "shortTitle": "iOS Tech Mentor",
+        "title": "Senior iOS Mobile Application Instructor & Swift Mentor",
+        "type": "Full-Time / Part-Time",
+        "experience": "Min 4+ Years Experience",
+        "location": "Prayagraj Campus / Remote",
+        "salary": "₹7.0L - ₹11.0L P.A.",
+        "description": "Guide interns through native iOS app development, Swift 5+, modern SwiftUI framework, Xcode debugging, and Apple App Store submission processes.",
+        "teachingPoints": [
+          "Teach Swift programming, SwiftUI declarative UI architecture, StateObject, and Combine.",
+          "Mentor students on local database integration using CoreData, SwiftData, and REST API consumption.",
+          "Instruct on Apple Human Interface Guidelines, TestFlight beta distribution, and App Store publishing.",
+          "Review student mobile app code and facilitate portfolio development."
+        ],
+        "skills": [
+          "Swift 5+",
+          "SwiftUI",
+          "UIKit",
+          "Xcode",
+          "CoreData / SwiftData",
+          "Combine",
+          "App Store Connect",
+          "REST APIs"
+        ]
+      },
+      {
+        "id": 4,
+        "category": "teaching",
+        "categoryBadge": "🎓 Teaching Faculty",
+        "shortTitle": "Android Instructor",
+        "title": "Senior Android Developer & Native Kotlin Educator",
+        "type": "Full-Time",
+        "experience": "Min 4+ Years Experience",
+        "location": "Prayagraj Campus / Hybrid",
+        "salary": "₹6.5L - ₹9.5L P.A.",
+        "description": "Instruct and mentor Android development interns on Kotlin, Jetpack Compose, clean MVVM architecture, Room DB, and Google Play Store deployment.",
+        "teachingPoints": [
+          "Deliver hands-on instruction in Kotlin syntax, Coroutines, StateFlow, and Jetpack Compose UI.",
+          "Teach clean MVVM architectural patterns, Dependency Injection (Hilt), and Room SQLite persistence.",
+          "Guide students through Firebase Auth, Google Maps SDK, and Push Notification integration.",
+          "Assist interns in publishing production apps to the Google Play Store."
+        ],
+        "skills": [
+          "Kotlin",
+          "Jetpack Compose",
+          "MVVM",
+          "Coroutines",
+          "Room Database",
+          "Retrofit",
+          "Hilt / Koin",
+          "Google Play"
+        ]
+      },
+      {
+        "id": 5,
+        "category": "teaching",
+        "categoryBadge": "🎓 Teaching Faculty",
+        "shortTitle": "NIELIT Faculty",
+        "title": "NIELIT O & A Level Computer Science Faculty",
+        "type": "Full-Time",
+        "experience": "Min 3+ Years Experience",
+        "location": "Prayagraj Campus",
+        "salary": "₹4.5L - ₹7.0L P.A.",
+        "description": "Teach NIELIT O Level and A Level modules including IT Tools, Web Designing, Python Programming, and Internet of Things (IoT).",
+        "teachingPoints": [
+          "Conduct classroom and lab sessions covering NIELIT official syllabus (M1-R5 to M4-R5).",
+          "Prepare students for online objective exams, theory papers, and practical lab viva.",
+          "Instruct fundamentals of Web Designing (HTML5, CSS3, JavaScript) and Python problem solving.",
+          "Track student progress, conduct periodic mock exams, and facilitate certification success."
+        ],
+        "skills": [
+          "Python",
+          "HTML/CSS/JS",
+          "C Programming",
+          "IoT & Arduino",
+          "DBMS",
+          "Computer Networking",
+          "MS Office"
+        ]
+      },
+      {
+        "id": 6,
+        "category": "teaching",
+        "categoryBadge": "🎓 Teaching Faculty",
+        "shortTitle": "Digital Marketing Mentor",
+        "title": "Senior Digital Marketing Lead & Growth Marketing Mentor",
+        "type": "Full-Time",
+        "experience": "Min 3+ Years Experience",
+        "location": "Prayagraj Campus",
+        "salary": "₹4.8L - ₹7.5L P.A.",
+        "description": "Lead the Digital Marketing internship track, teaching technical SEO, Google Ads PPC campaigns, Meta Ads Manager, and growth hacking strategies.",
+        "teachingPoints": [
+          "Teach On-Page/Off-Page SEO, Keyword Research, Technical Audits, and Google Search Console.",
+          "Mentor students in running live budget Google Search/Display Ads and Meta Ads campaigns.",
+          "Instruct on Google Analytics 4 (GA4), conversion tracking, ROI modeling, and email marketing.",
+          "Guide interns through live client brand marketing campaigns."
+        ],
+        "skills": [
+          "SEO / SEM",
+          "Google Ads (PPC)",
+          "Meta Ads Manager",
+          "Google Analytics 4",
+          "Content Strategy",
+          "Canva / Figma"
+        ]
+      },
+      {
+        "id": 7,
+        "category": "developer",
+        "categoryBadge": "💻 Software Developer",
+        "shortTitle": "Full-Stack Developer",
+        "title": "Senior Full-Stack Web Developer (React.js, Node.js & Cloud)",
+        "type": "Full-Time",
+        "experience": "Min 4+ Years Experience",
+        "location": "Prayagraj Campus / Hybrid",
+        "salary": "₹8.0L - ₹13.0L P.A.",
+        "description": "Architect and build robust enterprise web applications, customer portals, and high-throughput REST/GraphQL microservices for IT HUNT client software ventures.",
+        "teachingPoints": [
+          "Design scalable database schemas with PostgreSQL, MongoDB, and Redis caching layers.",
+          "Develop responsive, accessible frontends using React 19, Next.js, and TypeScript.",
+          "Implement automated CI/CD deployment pipelines on AWS / Docker infrastructure.",
+          "Participate in architecture reviews and mentor junior engineering staff."
+        ],
+        "skills": [
+          "React.js / Next.js",
+          "Node.js",
+          "PostgreSQL / MongoDB",
+          "TypeScript",
+          "Docker",
+          "AWS / Cloud",
+          "GraphQL"
+        ]
+      },
+      {
+        "id": 8,
+        "category": "developer",
+        "categoryBadge": "💻 Software Developer",
+        "shortTitle": "Mobile Apps Lead",
+        "title": "Lead Mobile Applications Developer (iOS & Android)",
+        "type": "Full-Time",
+        "experience": "Min 4+ Years Experience",
+        "location": "Prayagraj Campus / Hybrid",
+        "salary": "₹8.5L - ₹13.5L P.A.",
+        "description": "Lead mobile app development initiatives for enterprise clients across both Apple iOS and Google Android ecosystems.",
+        "teachingPoints": [
+          "Architect high-performance native iOS (SwiftUI) and Android (Jetpack Compose) mobile clients.",
+          "Integrate biometric auth, offline caching, push notifications, and payment gateways.",
+          "Manage end-to-end releases on Apple App Store Connect and Google Play Console.",
+          "Ensure 99.9% crash-free sessions and optimized rendering performance."
+        ],
+        "skills": [
+          "SwiftUI / Swift",
+          "Kotlin / Compose",
+          "Cross-Platform SDKs",
+          "REST APIs",
+          "App Store & Play Store",
+          "Firebase"
+        ]
+      },
+      {
+        "id": 9,
+        "category": "developer",
+        "categoryBadge": "💻 Software Developer",
+        "shortTitle": "Backend & Cloud Engineer",
+        "title": "Senior Backend & Cloud Infrastructure Engineer",
+        "type": "Full-Time",
+        "experience": "Min 4+ Years Experience",
+        "location": "Prayagraj Campus / Remote",
+        "salary": "₹8.0L - ₹12.5L P.A.",
+        "description": "Design and maintain high-concurrency backend services, database clusters, containerized deployments, and robust API gateways.",
+        "teachingPoints": [
+          "Build high-performance microservices in Node.js / Go / FastAPI with asynchronous queues.",
+          "Optimize relational and NoSQL database queries, indexes, and sharding strategies.",
+          "Maintain secure Linux cloud servers, SSL certificates, Nginx reverse proxies, and Docker swarms.",
+          "Enforce security audits, rate limiting, and automated health monitoring."
+        ],
+        "skills": [
+          "Node.js / FastAPI",
+          "PostgreSQL",
+          "MongoDB",
+          "Redis",
+          "Docker & Kubernetes",
+          "Nginx",
+          "Linux Servers",
+          "CI/CD"
+        ]
+      },
+      {
+        "id": 10,
+        "category": "developer",
+        "categoryBadge": "💻 Software Developer",
+        "shortTitle": "UI/UX & Frontend Engineer",
+        "title": "UI/UX Product Designer & Modern Frontend Specialist",
+        "type": "Full-Time",
+        "experience": "Min 3+ Years Experience",
+        "location": "Prayagraj Campus",
+        "salary": "₹5.5L - ₹8.5L P.A.",
+        "description": "Create world-class user interfaces, responsive component libraries, Figma prototypes, and micro-animations for educational platforms and enterprise apps.",
+        "teachingPoints": [
+          "Design intuitive wireframes, mockups, and clickable prototypes in Figma.",
+          "Translate designs into clean, responsive HTML5, modern CSS3, and Vue/React components.",
+          "Ensure strict WCAG accessibility, fluid typography, and delightful micro-interactions.",
+          "Collaborate with developers to ensure 100% pixel-perfect UI fidelity."
+        ],
+        "skills": [
+          "Figma",
+          "CSS3 / CSS Animations",
+          "Vue.js / React",
+          "Tailwind CSS",
+          "Wireframing",
+          "Prototyping",
+          "Design Systems"
+        ]
+      },
+      {
+        "id": 11,
+        "category": "operations",
+        "categoryBadge": "⚙️ Academic Operations",
+        "shortTitle": "Lab Systems Administrator",
+        "title": "Senior Lab Workstation & High-Speed Network Systems Administrator",
+        "type": "Full-Time",
+        "experience": "Min 3+ Years Experience",
+        "location": "Holagarh Prayagraj Campus",
+        "salary": "₹4.0L - ₹6.5L P.A.",
+        "description": "Manage campus computer labs, hardware maintenance, optical fiber network routing, software licenses, and server backups for 100+ workstations.",
+        "teachingPoints": [
+          "Maintain 100+ lab computers (macOS, Windows, Linux) and resolve hardware/OS issues.",
+          "Manage high-speed optical fiber routers, Wi-Fi access points, VLANs, and firewall security.",
+          "Install and license developer tools (VS Code, Xcode, Android Studio, Node.js, Python).",
+          "Maintain daily lab availability and manage automated local backup servers."
+        ],
+        "skills": [
+          "Networking (LAN/VLAN/Routers)",
+          "Hardware Troubleshooting",
+          "Linux & Windows Admin",
+          "Server Maintenance"
+        ]
+      },
+      {
+        "id": 12,
+        "category": "operations",
+        "categoryBadge": "⚙️ Academic Operations",
+        "shortTitle": "Career & Admission Counselor",
+        "title": "Student Academic Counselor & Career Placement Coordinator",
+        "type": "Full-Time",
+        "experience": "Min 2+ Years Experience",
+        "location": "Holagarh Prayagraj Campus",
+        "salary": "₹3.8L - ₹6.0L P.A.",
+        "description": "Counsel prospective students and parents, coordinate batch admissions, and liaise with partner software companies for alumni placement drives.",
+        "teachingPoints": [
+          "Guide students on choosing suitable internship and diploma tracks based on career goals.",
+          "Manage admission inquiries, registration verifications, and onboarding schedules.",
+          "Coordinate with corporate HR partners to schedule campus placement drives and interviews.",
+          "Maintain student satisfaction records, feedback reviews, and alumni networking."
+        ],
+        "skills": [
+          "Student Counseling",
+          "Communication & Sales",
+          "Placement Coordination",
+          "CRM Software",
+          "Academic Operations"
+        ]
+      }
+    ]
+  },
 
   // Alumni Testimonials & Achievements Section
   testimonialsSection: {
