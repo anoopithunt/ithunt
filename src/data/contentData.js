@@ -330,7 +330,6 @@ const CONTENT_DATA = {
   // Header Navigation Items
   navigation: [
     { id: "home", label: "Home", icon: "🏠" },
-    { id: "internships", label: "NIELIT Project", icon: "🚀" },
     { id: "events", label: "Events & Gallery", icon: "🎪" },
     { id: "courses", label: "Courses", icon: "📚" }
   ],
