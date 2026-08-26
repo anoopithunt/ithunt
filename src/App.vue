@@ -117,6 +117,13 @@
           :allRsvps="liveRsvpsList"
           :allNielitProjects="liveNielitProjectsList"
           :allStudents="liveStudentsList"
+          :allInternships="liveInternshipsList"
+          :allFees="liveFeesList"
+          :allCertificates="liveCertificatesList"
+          :allProjects="liveProjectsList"
+          :allContactInquiries="liveContactInquiriesList"
+          :allReviews="liveReviewsList"
+          :allUsers="liveUsersList"
           @logout="handleAdminLogout"
           @download-slip="downloadCustomAdmissionSlip"
           @download-nielit-pdf="downloadNielitProjectPdfDoc"
@@ -369,7 +376,15 @@ import {
   fetchRsvpsFromBackend, 
   fetchNielitProjectsFromBackend, 
   fetchStudentsFromBackend,
+  fetchInternshipsFromBackend,
+  fetchFeesFromBackend,
+  fetchCertificatesFromBackend,
+  fetchProjectsFromBackend,
+  fetchContactInquiriesFromBackend,
+  fetchReviewsFromBackend,
+  fetchUsersFromBackend,
   deleteStudentFromBackend,
+  deleteUserFromBackend,
   registerStudentUser, 
   loginStudentUser, 
   updateStudentProfile 
@@ -492,12 +507,19 @@ const handleStudentLogout = () => {
   localStorage.removeItem('ithunt_student_user');
 };
 
-// Live registries synced 100% dynamically with live database API
+// Live registries synced 100% dynamically with live database API (All Swagger API Collections)
 const liveAdmissionsList = ref([]);
 const liveJobApplicationsList = ref([]);
 const liveRsvpsList = ref([]);
 const liveNielitProjectsList = ref([]);
 const liveStudentsList = ref([]);
+const liveInternshipsList = ref([]);
+const liveFeesList = ref([]);
+const liveCertificatesList = ref([]);
+const liveProjectsList = ref([]);
+const liveContactInquiriesList = ref([]);
+const liveReviewsList = ref([]);
+const liveUsersList = ref([]);
 
 const handleDeleteStudent = async (student) => {
   const idToDelete = student.id || student.userId;
@@ -1041,21 +1063,39 @@ onMounted(() => {
     }
   }
 
-  // Load 100% live database records from ithunt-api REST API
+  // Load 100% live database records across all Swagger API endpoints from ithunt-api REST API
   const loadInitialData = async () => {
     try {
-      const [admissions, jobs, rsvps, nielitProjects, students] = await Promise.all([
+      const [
+        admissions, jobs, rsvps, nielitProjects, students,
+        internships, fees, certificates, projects, contactInquiries, reviews, users
+      ] = await Promise.all([
         fetchAdmissionsFromBackend(),
         fetchJobApplicationsFromBackend(),
         fetchRsvpsFromBackend(),
         fetchNielitProjectsFromBackend(),
-        fetchStudentsFromBackend()
+        fetchStudentsFromBackend(),
+        fetchInternshipsFromBackend(),
+        fetchFeesFromBackend(),
+        fetchCertificatesFromBackend(),
+        fetchProjectsFromBackend(),
+        fetchContactInquiriesFromBackend(),
+        fetchReviewsFromBackend(),
+        fetchUsersFromBackend()
       ]);
+
       liveAdmissionsList.value = admissions || [];
       liveJobApplicationsList.value = jobs || [];
       liveRsvpsList.value = rsvps || [];
       liveNielitProjectsList.value = nielitProjects || [];
       liveStudentsList.value = students || [];
+      liveInternshipsList.value = internships || [];
+      liveFeesList.value = fees || [];
+      liveCertificatesList.value = certificates || [];
+      liveProjectsList.value = projects || [];
+      liveContactInquiriesList.value = contactInquiries || [];
+      liveReviewsList.value = reviews || [];
+      liveUsersList.value = users || [];
     } catch (e) {
       console.warn('Notice loading initial records from REST API:', e);
     }
