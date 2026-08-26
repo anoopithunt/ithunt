@@ -597,6 +597,65 @@ export async function fetchRsvpsFromBackend() {
   } catch (e) {}
 
   return (CONTENT_DATA.sampleRsvps || []).filter(r => !deletedIds.has(r.id));
+/**
+ * Fetch all registered Students from backend REST API (GET /api/students)
+ */
+export async function fetchStudentsFromBackend(filters = {}) {
+  try {
+    const queryObj = {};
+    if (filters.course) queryObj.course = filters.course;
+    if (filters.batch) queryObj.batch = filters.batch;
+    if (filters.status) queryObj.status = filters.status;
+
+    const data = await API.getStudents(queryObj);
+    const rawList = Array.isArray(data?.students) 
+      ? data.students 
+      : (Array.isArray(data) ? data : []);
+
+    if (rawList.length > 0) {
+      return rawList.map(s => ({
+        id: s.id || s.userId || `STU-${Date.now()}`,
+        userId: s.userId || s.id,
+        enrollmentNumber: s.enrollmentNumber || s.registrationNo || `ITH-2026-STU${Math.floor(1000 + Math.random() * 9000)}`,
+        name: s.name || s.fullName || s.candidateName || 'Student',
+        fullName: s.name || s.fullName || s.candidateName || 'Student',
+        candidateName: s.name || s.fullName || s.candidateName || 'Student',
+        email: s.email || '',
+        phone: s.phone || s.mobile || '',
+        mobile: s.phone || s.mobile || '',
+        course: s.course || 'MERN Stack Developer',
+        batch: s.batch || '2026',
+        academicStatus: s.academicStatus || s.status || 'ACTIVE',
+        status: s.academicStatus || s.status || 'ACTIVE',
+        gender: s.gender || 'Male',
+        dob: s.dob || '2004-01-01',
+        address: s.address || 'Holagarh, Prayagraj',
+        guardianName: s.guardianName || '—',
+        guardianPhone: s.guardianPhone || '—',
+        bio: s.bio || '',
+        createdAt: s.createdAt ? new Date(s.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'),
+        createdAtFormatted: s.createdAt ? new Date(s.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Recent'
+      }));
+    }
+  } catch (e) {
+    console.warn('Notice loading students from API:', e.message);
+  }
+
+  return CONTENT_DATA.sampleStudents || [];
+}
+
+/**
+ * Delete student record from backend REST API
+ */
+export async function deleteStudentFromBackend(student) {
+  const targetId = typeof student === 'object' ? (student.id || student.userId || student.enrollmentNumber) : student;
+  try {
+    await API.deleteStudent(targetId);
+    return { success: true };
+  } catch (e) {
+    console.warn('Error deleting student:', e.message);
+    return { success: false, error: e.message };
+  }
 }
 
 /**

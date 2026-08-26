@@ -116,11 +116,13 @@
           :allJobApplications="liveJobApplicationsList"
           :allRsvps="liveRsvpsList"
           :allNielitProjects="liveNielitProjectsList"
+          :allStudents="liveStudentsList"
           @logout="handleAdminLogout"
           @download-slip="downloadCustomAdmissionSlip"
           @download-nielit-pdf="downloadNielitProjectPdfDoc"
           @add-admission="handleDirectAdmission"
           @delete-admission="handleDeleteAdmission"
+          @delete-student="handleDeleteStudent"
           @update-nielit-project="handleUpdateNielitProject"
           @delete-nielit-project="handleDeleteNielitProject"
           @set-tab="setTab" 
@@ -366,6 +368,8 @@ import {
   fetchJobApplicationsFromBackend, 
   fetchRsvpsFromBackend, 
   fetchNielitProjectsFromBackend, 
+  fetchStudentsFromBackend,
+  deleteStudentFromBackend,
   registerStudentUser, 
   loginStudentUser, 
   updateStudentProfile 
@@ -493,6 +497,13 @@ const liveAdmissionsList = ref(content.value.sampleAdmissions || []);
 const liveJobApplicationsList = ref(content.value.sampleJobApplications || []);
 const liveRsvpsList = ref(content.value.sampleRsvps || []);
 const liveNielitProjectsList = ref(content.value.sampleNielitProjects || []);
+const liveStudentsList = ref(content.value.sampleStudents || []);
+
+const handleDeleteStudent = async (student) => {
+  const idToDelete = student.id || student.userId;
+  liveStudentsList.value = liveStudentsList.value.filter(s => s.id !== idToDelete && s.userId !== idToDelete);
+  await deleteStudentFromBackend(student);
+};
 
 // Admission Form State
 const form = ref({
@@ -1033,16 +1044,18 @@ onMounted(() => {
   // Load persisted records from ithunt-api Backend / LocalStorage
   const loadInitialData = async () => {
     try {
-      const [admissions, jobs, rsvps, nielitProjects] = await Promise.all([
+      const [admissions, jobs, rsvps, nielitProjects, students] = await Promise.all([
         fetchAdmissionsFromBackend(),
         fetchJobApplicationsFromBackend(),
         fetchRsvpsFromBackend(),
-        fetchNielitProjectsFromBackend()
+        fetchNielitProjectsFromBackend(),
+        fetchStudentsFromBackend()
       ]);
       if (admissions && admissions.length) liveAdmissionsList.value = admissions;
       if (jobs && jobs.length) liveJobApplicationsList.value = jobs;
       if (rsvps && rsvps.length) liveRsvpsList.value = rsvps;
       if (nielitProjects && nielitProjects.length) liveNielitProjectsList.value = nielitProjects;
+      if (students && students.length) liveStudentsList.value = students;
     } catch (e) {
       console.warn('Notice loading initial records from REST API:', e);
     }

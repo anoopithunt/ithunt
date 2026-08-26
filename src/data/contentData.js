@@ -208,6 +208,46 @@ const CONTENT_DATA = {
       "amountPaid": "₹6,500"
     }
   ],
+  "sampleStudents": [
+    {
+      "id": "fde5fc98-958a-40c6-8644-849171250160",
+      "userId": "43acab99-3f77-4e2b-b403-4f2e24cd8317",
+      "enrollmentNumber": "ITH-2026-STU0002",
+      "name": "Anoop Mishra JI",
+      "fullName": "Anoop Mishra JI",
+      "candidateName": "Anoop Mishra JI",
+      "email": "anoopmishradpitz@gmail.com",
+      "phone": "0909090909",
+      "mobile": "0909090909",
+      "course": "6-Month Software & Cloud Masterclass",
+      "batch": "2026",
+      "academicStatus": "ACTIVE",
+      "status": "ACTIVE",
+      "gender": "Male",
+      "dob": "2002-05-15",
+      "createdAt": "26 Aug 2026",
+      "address": "Holagarh, Prayagraj"
+    },
+    {
+      "id": "eeaf1d60-a1a6-4ca8-9bca-a022018d39c8",
+      "userId": "4fc94297-0e8a-4b65-8287-fa5f00e95220",
+      "enrollmentNumber": "ITH-2026-STU0001",
+      "name": "Anoop Mishra",
+      "fullName": "Anoop Mishra",
+      "candidateName": "Anoop Mishra",
+      "email": "anoopmishrapitz@gmail.com",
+      "phone": "3434343411",
+      "mobile": "3434343411",
+      "course": "Mobile App Engineering (Flutter/iOS)",
+      "batch": "2026",
+      "academicStatus": "ACTIVE",
+      "status": "ACTIVE",
+      "gender": "Male",
+      "dob": "2003-10-20",
+      "createdAt": "26 Aug 2026",
+      "address": "Holagarh, Prayagraj"
+    }
+  ],
   "sampleNielitProjects": [
     {
       "id": "NIELIT-1536056",
