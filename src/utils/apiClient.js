@@ -193,12 +193,6 @@ export async function saveAdmissionRecord(data) {
       status: returnedAdm.status || 'Confirmed'
     };
 
-    try {
-      const existing = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
-      existing.unshift(finalRecord);
-      localStorage.setItem('ithunt_admissions', JSON.stringify(existing));
-    } catch (e) {}
-
     return {
       success: true,
       id: finalRecord.registrationNo,
@@ -217,8 +211,6 @@ export async function saveAdmissionRecord(data) {
  * Fetch all stored Admissions from backend REST API or local storage
  */
 export async function fetchAdmissionsFromBackend() {
-  const deletedIds = new Set(JSON.parse(localStorage.getItem('ithunt_deleted_admission_ids') || '[]'));
-
   try {
     const data = await API.getAdmissions();
     const rawList = Array.isArray(data?.admissions) 
@@ -226,7 +218,7 @@ export async function fetchAdmissionsFromBackend() {
       : (Array.isArray(data) ? data : []);
 
     if (rawList.length > 0) {
-      const normalized = rawList.map(a => ({
+      return rawList.map(a => ({
         id: a.id || a.registrationNumber || `ADM-${Date.now()}`,
         registrationNo: a.registrationNumber || a.registrationNo || a.id || `ITH-${Math.floor(100000 + Math.random() * 900000)}`,
         candidateName: a.fullName || a.candidateName || a.name || 'Candidate',
@@ -244,24 +236,12 @@ export async function fetchAdmissionsFromBackend() {
         feeStatus: a.feeStatus || 'Verified & Paid',
         amountPaid: a.amountPaid || '₹5,000'
       }));
-
-      const filtered = normalized.filter(a => !deletedIds.has(a.id) && !deletedIds.has(a.registrationNo));
-      if (filtered.length > 0) {
-        try { localStorage.setItem('ithunt_admissions_cache', JSON.stringify(filtered)); } catch (e) {}
-        return filtered;
-      }
     }
   } catch (e) {
     console.warn('Notice loading admissions from API:', e.message);
   }
 
-  try {
-    const cached = JSON.parse(localStorage.getItem('ithunt_admissions_cache') || localStorage.getItem('ithunt_admissions') || '[]');
-    const valid = cached.filter(a => !deletedIds.has(a.id) && !deletedIds.has(a.registrationNo));
-    if (valid.length > 0) return valid;
-  } catch (e) {}
-
-  return (CONTENT_DATA.sampleAdmissions || []).filter(a => !deletedIds.has(a.id) && !deletedIds.has(a.registrationNo));
+  return CONTENT_DATA.sampleAdmissions || [];
 }
 
 /**
