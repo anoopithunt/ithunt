@@ -440,15 +440,15 @@ const handleStudentSignup = async (signupData, callback) => {
       localStorage.setItem('ithunt_student_user', JSON.stringify(studentUser.value));
       
       const admRes = await saveAdmissionRecord({
-        fullName: signupData.candidateName || signupData.fullName || signupData.name || 'Rahul Sharma',
-        candidateName: signupData.candidateName || signupData.fullName || signupData.name || 'Rahul Sharma',
-        email: signupData.email || 'rahul.sharma@example.com',
-        phone: signupData.mobile || signupData.phone || '+919876543210',
-        mobile: signupData.mobile || signupData.phone || '+919876543210',
-        course: signupData.course || 'Full Stack MERN Software Engineering',
-        track: signupData.track || signupData.course || 'Web Development',
-        qualification: signupData.qualification || 'Undergraduate',
-        address: signupData.address || 'Prayagraj, UP'
+        fullName: signupData.candidateName || signupData.fullName || signupData.name || '',
+        candidateName: signupData.candidateName || signupData.fullName || signupData.name || '',
+        email: signupData.email || '',
+        phone: signupData.mobile || signupData.phone || '',
+        mobile: signupData.mobile || signupData.phone || '',
+        course: signupData.course || '',
+        track: signupData.track || signupData.course || '',
+        qualification: signupData.qualification || '',
+        address: signupData.address || ''
       });
 
       if (admRes && admRes.success) {
@@ -752,20 +752,20 @@ const submitAdmission = async (formData) => {
     registrationNo: randomRegId,
     date: dateStr,
     time: timeStr,
-    candidateName: formData.candidateName || formData.fullName || 'Rahul Sharma',
-    fullName: formData.fullName || formData.candidateName || 'Rahul Sharma',
-    fatherName: formData.fatherName || '—',
-    motherName: formData.motherName || '—',
-    dob: formData.dob || '2004-01-01',
+    candidateName: formData.candidateName || formData.fullName || '',
+    fullName: formData.fullName || formData.candidateName || '',
+    fatherName: formData.fatherName || '',
+    motherName: formData.motherName || '',
+    dob: formData.dob || '',
     gender: formData.gender || 'Male',
-    course: formData.course || 'Full Stack MERN Software Engineering',
-    track: formData.track || formData.course || 'Web Development',
-    qualification: formData.qualification || 'Undergraduate',
-    mobile: formData.mobile || formData.phone || '+919876543210',
-    phone: formData.phone || formData.mobile || '+919876543210',
-    email: formData.email || 'rahul.sharma@example.com',
+    course: formData.course || '',
+    track: formData.track || formData.course || '',
+    qualification: formData.qualification || '',
+    mobile: formData.mobile || formData.phone || '',
+    phone: formData.phone || formData.mobile || '',
+    email: formData.email || '',
     district: formData.district || 'PRAYAGRAJ',
-    address: formData.address || 'Prayagraj, UP',
+    address: formData.address || '',
     status: 'Confirmed'
   };
 
