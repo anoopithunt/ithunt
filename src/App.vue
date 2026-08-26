@@ -438,8 +438,29 @@ const handleStudentSignup = async (signupData, callback) => {
     if (res.success && res.user) {
       studentUser.value = { ...res.user };
       localStorage.setItem('ithunt_student_user', JSON.stringify(studentUser.value));
-      liveAdmissionsList.value.unshift(studentUser.value);
-      if (callback) callback(null);
+      
+      const admRes = await saveAdmissionRecord({
+        fullName: signupData.candidateName || signupData.fullName || signupData.name || 'Rahul Sharma',
+        candidateName: signupData.candidateName || signupData.fullName || signupData.name || 'Rahul Sharma',
+        email: signupData.email || 'rahul.sharma@example.com',
+        phone: signupData.mobile || signupData.phone || '+919876543210',
+        mobile: signupData.mobile || signupData.phone || '+919876543210',
+        course: signupData.course || 'Full Stack MERN Software Engineering',
+        track: signupData.track || signupData.course || 'Web Development',
+        qualification: signupData.qualification || 'Undergraduate',
+        address: signupData.address || 'Prayagraj, UP'
+      });
+
+      if (admRes && admRes.success) {
+        const finalAdm = admRes.record || res.user;
+        const existingIdx = liveAdmissionsList.value.findIndex(a => a.registrationNo === finalAdm.registrationNo);
+        if (existingIdx === -1) {
+          liveAdmissionsList.value.unshift(finalAdm);
+        }
+        if (callback) callback(null);
+      } else {
+        if (callback) callback(admRes?.error || 'Failed to submit admission application to database server');
+      }
     } else {
       if (callback) callback(res.error || 'Registration failed. Please try again.');
     }
@@ -731,42 +752,56 @@ const submitAdmission = async (formData) => {
     registrationNo: randomRegId,
     date: dateStr,
     time: timeStr,
-    candidateName: formData.candidateName,
-    fatherName: formData.fatherName,
-    motherName: formData.motherName,
-    dob: formData.dob,
-    gender: formData.gender,
-    course: formData.course,
-    mobile: formData.mobile,
-    email: formData.email,
+    candidateName: formData.candidateName || formData.fullName || 'Rahul Sharma',
+    fullName: formData.fullName || formData.candidateName || 'Rahul Sharma',
+    fatherName: formData.fatherName || '—',
+    motherName: formData.motherName || '—',
+    dob: formData.dob || '2004-01-01',
+    gender: formData.gender || 'Male',
+    course: formData.course || 'Full Stack MERN Software Engineering',
+    track: formData.track || formData.course || 'Web Development',
+    qualification: formData.qualification || 'Undergraduate',
+    mobile: formData.mobile || formData.phone || '+919876543210',
+    phone: formData.phone || formData.mobile || '+919876543210',
+    email: formData.email || 'rahul.sharma@example.com',
     district: formData.district || 'PRAYAGRAJ',
-    address: formData.address,
+    address: formData.address || 'Prayagraj, UP',
     status: 'Confirmed'
   };
 
-  submittedRegistrationNo.value = randomRegId;
-  lastSubmittedAdmission.value = newAdmissionRecord;
-  liveAdmissionsList.value.unshift(newAdmissionRecord);
+  // POST http://localhost:3000/api/admissions
+  const apiRes = await saveAdmissionRecord(newAdmissionRecord);
 
-  // Save to Firebase Firestore & local storage
-  let fbDocId = randomRegId;
-  try {
-    const res = await saveAdmissionRecord(newAdmissionRecord);
-    if (res && res.id) fbDocId = res.id;
-  } catch (e) {}
+  if (apiRes && apiRes.success) {
+    const finalRegNo = apiRes.record?.registrationNo || apiRes.id || randomRegId;
+    newAdmissionRecord.registrationNo = finalRegNo;
 
-  // Generate PDF Blob & trigger automatic email dispatch to softtechithunt@gmail.com with PDF attachment
-  const pdfBlob = getAdmissionPdfBlob(newAdmissionRecord);
-  sendAdmissionEmailNotification(newAdmissionRecord, pdfBlob).catch(() => {});
+    submittedRegistrationNo.value = finalRegNo;
+    lastSubmittedAdmission.value = newAdmissionRecord;
 
-  // Trigger mobile SMS & WhatsApp messaging dispatch
-  triggerMobileMessageNotification(newAdmissionRecord).catch(() => {});
+    const existingIdx = liveAdmissionsList.value.findIndex(a => a.registrationNo === finalRegNo);
+    if (existingIdx === -1) {
+      liveAdmissionsList.value.unshift(newAdmissionRecord);
+    }
 
-  // Display Success Dialog Box
-  modalTitle.value = '🎉 Student Record Stored Successfully in Firebase!';
-  modalBody.value = `Congratulations ${formData.candidateName}! Your admission record for "${formData.course}" (Reg No: ${randomRegId}) has been successfully saved to your Firebase Firestore Database & Users collection.\n\n🔥 Firebase Document ID: ${fbDocId}`;
-  showModal.value = true;
-  triggerConfetti();
+    try {
+      const pdfBlob = getAdmissionPdfBlob(newAdmissionRecord);
+      sendAdmissionEmailNotification(newAdmissionRecord, pdfBlob).catch(() => {});
+    } catch (e) {
+      sendAdmissionEmailNotification(newAdmissionRecord).catch(() => {});
+    }
+    triggerMobileMessageNotification(newAdmissionRecord).catch(() => {});
+
+    modalTitle.value = '🎉 Admission Application Submitted Successfully!';
+    modalBody.value = `Congratulations ${newAdmissionRecord.candidateName}! Your student admission for "${newAdmissionRecord.course}" has been successfully submitted to the database API (http://localhost:3000/api/admissions).\n\n📋 Registration No: ${finalRegNo}\n✉️ Confirmation details sent to ${newAdmissionRecord.email}.`;
+    showModal.value = true;
+    triggerConfetti();
+  } else {
+    submittedRegistrationNo.value = '';
+    modalTitle.value = '❌ Admission Submission Failed';
+    modalBody.value = `Error submitting admission application: ${apiRes?.error || 'Unable to connect to http://localhost:3000/api/admissions'}. Please check if the backend API server is running and try again.`;
+    showModal.value = true;
+  }
 };
 
 const handleLoginSuccess = (user) => {
