@@ -1141,9 +1141,13 @@ const admissionsList = ref([]);
 const jobApplicationsList = ref([]);
 const rsvpsList = ref([]);
 const nielitProjectsList = ref([]);
-const reviewsList = ref([
-  ...(props.content.reviewsSection?.reviewsList || [])
-]);
+const internshipsList = ref([]);
+const feesList = ref([]);
+const certificatesList = ref([]);
+const projectsList = ref([]);
+const contactInquiriesList = ref([]);
+const reviewsList = ref([]);
+const usersList = ref([]);
 
 const getDeletedIds = (key) => {
   try {
