@@ -492,12 +492,12 @@ const handleStudentLogout = () => {
   localStorage.removeItem('ithunt_student_user');
 };
 
-// Live registries synced dynamically with database & sample fallback records
-const liveAdmissionsList = ref(content.value.sampleAdmissions || []);
-const liveJobApplicationsList = ref(content.value.sampleJobApplications || []);
-const liveRsvpsList = ref(content.value.sampleRsvps || []);
-const liveNielitProjectsList = ref(content.value.sampleNielitProjects || []);
-const liveStudentsList = ref(content.value.sampleStudents || []);
+// Live registries synced 100% dynamically with live database API
+const liveAdmissionsList = ref([]);
+const liveJobApplicationsList = ref([]);
+const liveRsvpsList = ref([]);
+const liveNielitProjectsList = ref([]);
+const liveStudentsList = ref([]);
 
 const handleDeleteStudent = async (student) => {
   const idToDelete = student.id || student.userId;
@@ -1041,7 +1041,7 @@ onMounted(() => {
     }
   }
 
-  // Load persisted records from ithunt-api Backend / LocalStorage
+  // Load 100% live database records from ithunt-api REST API
   const loadInitialData = async () => {
     try {
       const [admissions, jobs, rsvps, nielitProjects, students] = await Promise.all([
@@ -1051,11 +1051,11 @@ onMounted(() => {
         fetchNielitProjectsFromBackend(),
         fetchStudentsFromBackend()
       ]);
-      if (admissions && admissions.length) liveAdmissionsList.value = admissions;
-      if (jobs && jobs.length) liveJobApplicationsList.value = jobs;
-      if (rsvps && rsvps.length) liveRsvpsList.value = rsvps;
-      if (nielitProjects && nielitProjects.length) liveNielitProjectsList.value = nielitProjects;
-      if (students && students.length) liveStudentsList.value = students;
+      liveAdmissionsList.value = admissions || [];
+      liveJobApplicationsList.value = jobs || [];
+      liveRsvpsList.value = rsvps || [];
+      liveNielitProjectsList.value = nielitProjects || [];
+      liveStudentsList.value = students || [];
     } catch (e) {
       console.warn('Notice loading initial records from REST API:', e);
     }
