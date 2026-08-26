@@ -10,6 +10,8 @@
     "test": "node -e \"console.log('✓ All tests passed!')\""
   },
   "dependencies": {
+    "firebase": "^12.18.0",
+    "firebase-admin": "^14.3.0",
     "jspdf": "^4.2.1",
     "vue": "^3.4.21"
   },
