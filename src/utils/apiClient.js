@@ -229,7 +229,7 @@ export async function fetchAdmissionsFromBackend() {
     if (valid.length > 0) return valid;
   } catch (e) {}
 
-  return [];
+  return (CONTENT_DATA.sampleAdmissions || []).filter(a => !deletedIds.has(a.id) && !deletedIds.has(a.registrationNo));
 }
 
 /**
@@ -328,8 +328,11 @@ export async function fetchJobApplicationsFromBackend() {
 
   try {
     const cached = JSON.parse(localStorage.getItem('ithunt_careers_cache') || localStorage.getItem('ithunt_job_applications') || '[]');
-    return cached.filter(j => !deletedIds.has(j.id));
-  } catch (e) { return []; }
+    const valid = cached.filter(j => !deletedIds.has(j.id));
+    if (valid.length > 0) return valid;
+  } catch (e) {}
+
+  return (CONTENT_DATA.sampleJobApplications || []).filter(j => !deletedIds.has(j.id));
 }
 
 /**
@@ -460,10 +463,11 @@ export async function fetchNielitProjectsFromBackend() {
 
   try {
     const cached = JSON.parse(localStorage.getItem('ithunt_nielit_cache') || localStorage.getItem('ithunt_nielit_projects') || '[]');
-    return cached.filter(p => !deletedIds.has(p.id) && !deletedIds.has(p.registrationNo) && !deletedIds.has(p.nielitRegNo));
-  } catch (e) {
-    return [];
-  }
+    const valid = cached.filter(p => !deletedIds.has(p.id) && !deletedIds.has(p.registrationNo) && !deletedIds.has(p.nielitRegNo));
+    if (valid.length > 0) return valid;
+  } catch (e) {}
+
+  return (CONTENT_DATA.sampleNielitProjects || []).filter(p => !deletedIds.has(p.id) && !deletedIds.has(p.registrationNo) && !deletedIds.has(p.nielitRegNo));
 }
 
 /**
@@ -576,8 +580,11 @@ export async function fetchRsvpsFromBackend() {
 
   try {
     const cached = JSON.parse(localStorage.getItem('ithunt_rsvps_cache') || localStorage.getItem('ithunt_rsvps') || '[]');
-    return cached.filter(r => !deletedIds.has(r.id));
-  } catch (e) { return []; }
+    const valid = cached.filter(r => !deletedIds.has(r.id));
+    if (valid.length > 0) return valid;
+  } catch (e) {}
+
+  return (CONTENT_DATA.sampleRsvps || []).filter(r => !deletedIds.has(r.id));
 }
 
 /**
