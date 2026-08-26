@@ -467,11 +467,11 @@ const handleStudentLogout = () => {
   localStorage.removeItem('ithunt_student_user');
 };
 
-// Live registries synced dynamically
-const liveAdmissionsList = ref([]);
-const liveJobApplicationsList = ref([]);
-const liveRsvpsList = ref([]);
-const liveNielitProjectsList = ref([]);
+// Live registries synced dynamically with database & sample fallback records
+const liveAdmissionsList = ref(content.value.sampleAdmissions || []);
+const liveJobApplicationsList = ref(content.value.sampleJobApplications || []);
+const liveRsvpsList = ref(content.value.sampleRsvps || []);
+const liveNielitProjectsList = ref(content.value.sampleNielitProjects || []);
 
 // Admission Form State
 const form = ref({
