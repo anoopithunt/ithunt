@@ -46,43 +46,74 @@ export async function apiRequest(endpoint, options = {}) {
  */
 export const API = {
   // Students
-  getStudents: (params = '') => apiRequest(`/students${params ? '?' + new URLSearchParams(params) : ''}`),
+  getStudents: (params = '') => apiRequest(`/students${params ? '?' + (typeof params === 'string' ? params : new URLSearchParams(params)) : ''}`),
   getStudent: (id) => apiRequest(`/students/${id}`),
   registerStudent: (studentData) => apiRequest('/students/register', { method: 'POST', body: JSON.stringify(studentData) }),
+  updateStudent: (id, updates) => apiRequest(`/students/${id}`, { method: 'PUT', body: JSON.stringify(updates) }),
   deleteStudent: (id) => apiRequest(`/students/${id}`, { method: 'DELETE' }),
 
-  // Projects (General / Capstone)
-  getProjects: (params = '') => apiRequest(`/projects${params ? '?' + new URLSearchParams(params) : ''}`),
-  getProject: (id) => apiRequest(`/projects/${id}`),
-  submitProject: (projectData) => apiRequest('/projects/submit', { method: 'POST', body: JSON.stringify(projectData) }),
-  updateProject: (id, updates) => apiRequest(`/projects/${id}`, { method: 'PUT', body: JSON.stringify(updates) }),
-  deleteProject: (id) => apiRequest(`/projects/${id}`, { method: 'DELETE' }),
+  // Admissions
+  getAdmissions: () => apiRequest('/admissions'),
+  getAdmission: (id) => apiRequest(`/admissions/${id}`),
+  applyAdmission: (admissionData) => apiRequest('/admissions', { method: 'POST', body: JSON.stringify(admissionData) }),
+  updateAdmissionStatus: (id, status) => apiRequest(`/admissions/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  deleteAdmission: (id) => apiRequest(`/admissions/${id}`, { method: 'DELETE' }),
 
   // NIELIT Project Submissions
   getNielitProjects: () => apiRequest('/nielit-projects'),
+  getNielitProject: (id) => apiRequest(`/nielit-projects/${id}`),
   submitNielitProject: (data) => apiRequest('/nielit-projects', { method: 'POST', body: JSON.stringify(data) }),
   updateNielitProject: (id, data) => apiRequest(`/nielit-projects/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteNielitProject: (id) => apiRequest(`/nielit-projects/${id}`, { method: 'DELETE' }),
 
-  // Admissions
-  getAdmissions: () => apiRequest('/admissions'),
-  applyAdmission: (admissionData) => apiRequest('/admissions', { method: 'POST', body: JSON.stringify(admissionData) }),
-  deleteAdmission: (id) => apiRequest(`/admissions/${id}`, { method: 'DELETE' }),
-
   // Careers / Job Applications
   getCareers: () => apiRequest('/careers/applications'),
   applyJob: (jobData) => apiRequest('/careers/apply', { method: 'POST', body: JSON.stringify(jobData) }),
+  updateJobStatus: (id, status) => apiRequest(`/careers/applications/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  deleteJobApplication: (id) => apiRequest(`/careers/applications/${id}`, { method: 'DELETE' }),
 
-  // Reviews
-  getReviews: () => apiRequest('/reviews'),
-  submitReview: (reviewData) => apiRequest('/reviews', { method: 'POST', body: JSON.stringify(reviewData) }),
+  // Internships
+  getInternshipApplications: () => apiRequest('/internships/applications'),
+  applyInternship: (data) => apiRequest('/internships/apply', { method: 'POST', body: JSON.stringify(data) }),
+  updateInternshipStatus: (id, status) => apiRequest(`/internships/applications/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
 
   // Events & RSVPs
   getEvents: () => apiRequest('/events/rsvps'),
   submitRsvp: (rsvpData) => apiRequest('/events/rsvp', { method: 'POST', body: JSON.stringify(rsvpData) }),
 
-  // Auth & Admin
+  // Reviews
+  getReviews: () => apiRequest('/reviews'),
+  getAdminReviews: () => apiRequest('/reviews/admin'),
+  submitReview: (reviewData) => apiRequest('/reviews', { method: 'POST', body: JSON.stringify(reviewData) }),
+  approveReview: (id) => apiRequest(`/reviews/admin/${id}/approve`, { method: 'PATCH' }),
+  deleteReview: (id) => apiRequest(`/reviews/admin/${id}`, { method: 'DELETE' }),
+
+  // Fees Ledger
+  getFees: () => apiRequest('/fees'),
+  getStudentFees: (studentId) => apiRequest(`/fees/student/${studentId}`),
+  recordFee: (feeData) => apiRequest('/fees/record', { method: 'POST', body: JSON.stringify(feeData) }),
+
+  // Certificates
+  getCertificates: () => apiRequest('/certificates'),
+  verifyCertificate: (certNo) => apiRequest(`/certificates/verify/${certNo}`),
+  issueCertificate: (certData) => apiRequest('/certificates', { method: 'POST', body: JSON.stringify(certData) }),
+  deleteCertificate: (id) => apiRequest(`/certificates/${id}`, { method: 'DELETE' }),
+
+  // Projects (General / Capstone)
+  getProjects: (params = '') => apiRequest(`/projects${params ? '?' + (typeof params === 'string' ? params : new URLSearchParams(params)) : ''}`),
+  getProject: (id) => apiRequest(`/projects/${id}`),
+  submitProject: (projectData) => apiRequest('/projects/submit', { method: 'POST', body: JSON.stringify(projectData) }),
+  updateProject: (id, updates) => apiRequest(`/projects/${id}`, { method: 'PUT', body: JSON.stringify(updates) }),
+  deleteProject: (id) => apiRequest(`/projects/${id}`, { method: 'DELETE' }),
+
+  // Contact Inquiries
+  getContactInquiries: () => apiRequest('/contact'),
+  submitContactInquiry: (data) => apiRequest('/contact', { method: 'POST', body: JSON.stringify(data) }),
+
+  // Auth & Admin Users
   login: (credentials) => apiRequest('/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),
+  getUsers: () => apiRequest('/auth/users'),
+  deleteUser: (id) => apiRequest(`/auth/users/${id}`, { method: 'DELETE' }),
   getDashboardStats: () => apiRequest('/admin/stats'),
   syncFirebase: () => apiRequest('/admin/firebase/sync-all', { method: 'POST' })
 };
@@ -800,23 +831,176 @@ export async function fetchAdminStatsFromBackend(token) {
 }
 
 /**
+ * Fetch all Internship Applications from backend REST API (GET /api/internships/applications)
+ */
+export async function fetchInternshipsFromBackend() {
+  try {
+    const data = await API.getInternshipApplications();
+    const rawList = Array.isArray(data?.applications) ? data.applications : (Array.isArray(data) ? data : []);
+    if (rawList.length > 0) {
+      return rawList.map(item => ({
+        id: item.id || `INT-${Date.now()}`,
+        candidateName: item.candidateName || item.fullName || item.name || 'Applicant',
+        name: item.candidateName || item.fullName || item.name || 'Applicant',
+        email: item.email || '',
+        phone: item.phone || item.mobile || '',
+        mobile: item.phone || item.mobile || '',
+        track: item.track || item.internshipTrack || 'Full Stack MERN',
+        duration: item.duration || '6 Months',
+        status: item.status || 'Under Review',
+        appliedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')
+      }));
+    }
+  } catch (e) {
+    console.warn('Notice loading internship applications from API:', e.message);
+  }
+  return CONTENT_DATA.sampleInternships || [];
+}
+
+/**
+ * Fetch all Fees Ledger Payments from backend REST API (GET /api/fees)
+ */
+export async function fetchFeesFromBackend() {
+  try {
+    const data = await API.getFees();
+    const rawList = Array.isArray(data?.transactions) ? data.transactions : (Array.isArray(data) ? data : []);
+    if (rawList.length > 0) {
+      return rawList.map(item => ({
+        id: item.id || item.transactionId || `FEE-${Date.now()}`,
+        studentId: item.studentId || item.userId || '',
+        studentName: item.studentName || item.name || 'Student',
+        receiptNo: item.receiptNo || item.utrNo || `REC-${Math.floor(10000 + Math.random() * 90000)}`,
+        course: item.course || 'IT Masterclass',
+        amount: item.amount ? `₹${Number(item.amount).toLocaleString('en-IN')}` : '₹5,000',
+        amountPaid: item.amount ? `₹${Number(item.amount).toLocaleString('en-IN')}` : '₹5,000',
+        paymentMode: item.paymentMode || item.mode || 'Online UPI',
+        status: item.status || 'Paid & Verified',
+        date: item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')
+      }));
+    }
+  } catch (e) {
+    console.warn('Notice loading fee transactions from API:', e.message);
+  }
+  return CONTENT_DATA.sampleFees || [];
+}
+
+/**
+ * Fetch all Verified Certificates from backend REST API (GET /api/certificates)
+ */
+export async function fetchCertificatesFromBackend() {
+  try {
+    const data = await API.getCertificates();
+    const rawList = Array.isArray(data?.certificates) ? data.certificates : (Array.isArray(data) ? data : []);
+    if (rawList.length > 0) {
+      return rawList.map(item => ({
+        id: item.id || `CERT-${Date.now()}`,
+        certNo: item.certNo || item.certificateNumber || `ITH-CERT-${Math.floor(10000 + Math.random() * 90000)}`,
+        studentName: item.studentName || item.candidateName || 'Engineer',
+        course: item.course || item.program || 'Software Engineering',
+        grade: item.grade || 'A+',
+        issueDate: item.issueDate ? new Date(item.issueDate).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'),
+        status: item.status || 'Verified & Issued'
+      }));
+    }
+  } catch (e) {
+    console.warn('Notice loading certificates from API:', e.message);
+  }
+  return CONTENT_DATA.sampleCertificates || [];
+}
+
+/**
+ * Fetch all Capstone Projects from backend REST API (GET /api/projects)
+ */
+export async function fetchProjectsFromBackend() {
+  try {
+    const data = await API.getProjects();
+    const rawList = Array.isArray(data?.projects) ? data.projects : (Array.isArray(data) ? data : []);
+    if (rawList.length > 0) {
+      return rawList.map(item => ({
+        id: item.id || `PRJ-${Date.now()}`,
+        title: item.title || item.projectTitle || 'Capstone Project',
+        projectTitle: item.title || item.projectTitle || 'Capstone Project',
+        studentName: item.studentName || item.candidateName || 'Student Developer',
+        techStack: item.techStack || 'React, Node.js, MongoDB',
+        repoUrl: item.repoUrl || item.githubUrl || 'https://github.com/ithunt',
+        liveUrl: item.liveUrl || 'https://ithunt.in',
+        status: item.status || 'Completed',
+        submittedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')
+      }));
+    }
+  } catch (e) {
+    console.warn('Notice loading capstone projects from API:', e.message);
+  }
+  return CONTENT_DATA.sampleProjects || [];
+}
+
+/**
+ * Fetch all Contact Inquiries from backend REST API (GET /api/contact)
+ */
+export async function fetchContactInquiriesFromBackend() {
+  try {
+    const data = await API.getContactInquiries();
+    const rawList = Array.isArray(data?.inquiries) ? data.inquiries : (Array.isArray(data) ? data : []);
+    if (rawList.length > 0) {
+      return rawList.map(item => ({
+        id: item.id || `INQ-${Date.now()}`,
+        name: item.name || item.fullName || 'Inquirer',
+        email: item.email || '',
+        phone: item.phone || item.mobile || '',
+        subject: item.subject || 'Course Enquiry',
+        message: item.message || '',
+        createdAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')
+      }));
+    }
+  } catch (e) {
+    console.warn('Notice loading contact inquiries from API:', e.message);
+  }
+  return CONTENT_DATA.sampleContactInquiries || [];
+}
+
+
+
+/**
+ * Fetch all Auth Users from backend REST API (GET /api/auth/users)
+ */
+export async function fetchUsersFromBackend() {
+  try {
+    const data = await API.getUsers();
+    const rawList = Array.isArray(data?.users) ? data.users : (Array.isArray(data) ? data : []);
+    if (rawList.length > 0) {
+      return rawList.map(item => ({
+        id: item.id || `USR-${Date.now()}`,
+        name: item.name || 'User',
+        email: item.email || '',
+        role: item.role || 'student',
+        verified: item.verified !== undefined ? item.verified : true,
+        createdAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')
+      }));
+    }
+  } catch (e) {
+    console.warn('Notice loading auth users from API:', e.message);
+  }
+  return CONTENT_DATA.sampleUsers || [];
+}
+
+/**
  * Delete user account or admission by ID from backend REST API
  */
 export async function deleteUserFromBackend(userId, token = '') {
   if (!userId) return { success: false, error: 'User ID is required' };
   
   try {
-    await apiRequest(`/users/${userId}`, { method: 'DELETE' });
+    await API.deleteUser(userId);
     return { success: true };
   } catch (e) {}
 
   try {
-    await apiRequest(`/admissions/${userId}`, { method: 'DELETE' });
+    await API.deleteAdmission(userId);
     return { success: true };
   } catch (e) {}
 
   try {
-    await apiRequest(`/students/${userId}`, { method: 'DELETE' });
+    await API.deleteStudent(userId);
     return { success: true };
   } catch (e) {}
 

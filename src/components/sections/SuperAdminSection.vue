@@ -1122,12 +1122,17 @@ const quickForm = ref({
 
 const defaultTabs = [
   { id: 'students', label: '🎓 Students Directory', icon: '🎓' },
-  { id: 'admissions', label: '📝 Candidate Admissions', icon: '📝' },
-  { id: 'nielit', label: '📜 NIELIT Projects', icon: '📜' },
+  { id: 'admissions', label: '📝 Admissions Registry', icon: '📝' },
+  { id: 'nielit', label: '📜 NIELIT Submissions', icon: '📜' },
   { id: 'internships', label: '🚀 Internship Tracks', icon: '🚀' },
-  { id: 'events', label: '🎪 Event RSVPs & Passes', icon: '🎪' },
+  { id: 'events', label: '🎪 Event VIP Passes', icon: '🎪' },
   { id: 'careers', label: '💼 Faculty & Dev Jobs', icon: '💼' },
   { id: 'reviews', label: '⭐ Student Reviews', icon: '⭐' },
+  { id: 'fees', label: '💳 Fees Ledger', icon: '💳' },
+  { id: 'certificates', label: '🏅 Certificates', icon: '🏅' },
+  { id: 'projects', label: '💻 Capstone Projects', icon: '💻' },
+  { id: 'contact', label: '📬 Enquiries', icon: '📬' },
+  { id: 'users', label: '👥 User Accounts', icon: '👥' },
   { id: 'settings', label: '⚙️ System Config', icon: '⚙️' }
 ];
 
@@ -1195,6 +1200,34 @@ watch(() => props.allRsvps, (val) => {
 
 watch(() => props.allNielitProjects, (val) => {
   nielitProjectsList.value = val || [];
+}, { immediate: true, deep: true });
+
+watch(() => props.allInternships, (val) => {
+  internshipsList.value = val || [];
+}, { immediate: true, deep: true });
+
+watch(() => props.allFees, (val) => {
+  feesList.value = val || [];
+}, { immediate: true, deep: true });
+
+watch(() => props.allCertificates, (val) => {
+  certificatesList.value = val || [];
+}, { immediate: true, deep: true });
+
+watch(() => props.allProjects, (val) => {
+  projectsList.value = val || [];
+}, { immediate: true, deep: true });
+
+watch(() => props.allContactInquiries, (val) => {
+  contactInquiriesList.value = val || [];
+}, { immediate: true, deep: true });
+
+watch(() => props.allReviews, (val) => {
+  reviewsList.value = val || [];
+}, { immediate: true, deep: true });
+
+watch(() => props.allUsers, (val) => {
+  usersList.value = val || [];
 }, { immediate: true, deep: true });
 
 const filteredAdmissions = computed(() => {

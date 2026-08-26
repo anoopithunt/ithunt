@@ -51,7 +51,13 @@ export default defineConfig(({ command }) => {
     server: {
       port: 5500,
       host: true,
-      strictPort: false
+      strictPort: false,
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3000',
+          changeOrigin: true
+        }
+      }
     },
     build: {
       outDir: 'dist',
