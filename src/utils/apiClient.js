@@ -597,6 +597,8 @@ export async function fetchRsvpsFromBackend() {
   } catch (e) {}
 
   return (CONTENT_DATA.sampleRsvps || []).filter(r => !deletedIds.has(r.id));
+}
+
 /**
  * Fetch all registered Students from backend REST API (GET /api/students)
  */

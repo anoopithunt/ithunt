@@ -955,6 +955,10 @@
               </button>
             </div>
           </form>
+        </div>
+      </div>
+    </div>
+
     <!-- Student Profile Detail Modal -->
     <div class="modal-overlay" v-if="showStudentDetailModal && selectedStudentDetail" @click.self="showStudentDetailModal = false">
       <div class="modal-card" style="max-width: 640px;">
