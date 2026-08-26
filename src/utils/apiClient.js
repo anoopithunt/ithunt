@@ -86,10 +86,16 @@ export async function deleteFromFirebaseCloud(collectionName, docId) {
  * Standard Core API Request Handler with automatic Auth header attachment & response unwrapping
  */
 export async function apiRequest(endpoint, options = {}) {
-  const token = localStorage.getItem('token') || 
-                localStorage.getItem('authToken') || 
-                localStorage.getItem('adminToken') || 
-                await ensureAuthToken();
+  let token = localStorage.getItem('token') || 
+              localStorage.getItem('authToken') || 
+              localStorage.getItem('adminToken') || 
+              (() => {
+                try {
+                  return JSON.parse(sessionStorage.getItem('ithunt_superadmin_auth') || '{}').token;
+                } catch (e) { return null; }
+              })();
+
+  if (!token && memoryToken) token = memoryToken;
 
   const headers = {
     'Content-Type': 'application/json',
@@ -102,17 +108,22 @@ export async function apiRequest(endpoint, options = {}) {
     ? endpoint 
     : `${API_BASE_URL}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
 
-  const response = await fetch(url, {
-    ...options,
-    headers
-  });
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers
+    });
 
-  const data = await response.json().catch(() => ({ success: response.ok }));
-  if (!response.ok && !data.success) {
-    throw new Error(data.message || 'API request failed');
+    const data = await response.json().catch(() => ({ success: response.ok }));
+    if (!response.ok && !data.success) {
+      return { success: false, error: data.message || 'API request failed' };
+    }
+
+    return data.data !== undefined ? data.data : data;
+  } catch (err) {
+    console.warn(`Notice loading ${endpoint} from REST API:`, err.message);
+    return { success: false, error: err.message };
   }
-
-  return data.data !== undefined ? data.data : data;
 }
 
 /**
@@ -208,15 +219,15 @@ export async function ensureAuthToken() {
     if (stored) return stored;
     if (memoryToken) return memoryToken;
 
-    // Automatic token retrieval for SuperAdmin requests
     const res = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: 'admin@ithunt.com', password: 'admin@ithunt2026' })
-    });
-    if (res.ok) {
-      const json = await res.json();
-      if (json.success && json.data?.token) {
+    }).catch(() => null);
+
+    if (res && res.ok) {
+      const json = await res.json().catch(() => null);
+      if (json && json.success && json.data?.token) {
         memoryToken = json.data.token;
         localStorage.setItem('token', memoryToken);
         localStorage.setItem('authToken', memoryToken);
@@ -1106,22 +1117,40 @@ export async function fetchContactInquiriesFromBackend() {
  * Fetch all Auth Users from backend REST API (GET /api/auth/users)
  */
 export async function fetchUsersFromBackend() {
+  let list = [];
+
   try {
     const data = await API.getUsers();
     const rawList = Array.isArray(data?.users) ? data.users : (Array.isArray(data) ? data : []);
     if (rawList.length > 0) {
-      return rawList.map(item => ({
-        id: item.id || `USR-${Date.now()}`,
-        name: item.name || 'User',
-        email: item.email || '',
-        role: item.role || 'student',
-        verified: item.verified !== undefined ? item.verified : true,
-        createdAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')
-      }));
+      list = rawList;
     }
   } catch (e) {
     console.warn('Notice loading auth users from API:', e.message);
   }
+
+  // Fetch/merge live user accounts directly from Firebase Cloud Firestore
+  try {
+    const fbRecords = await fetchFromFirebaseCloud('users');
+    if (fbRecords.length > 0) {
+      const map = new Map();
+      list.forEach(u => map.set(u.id || u.email, u));
+      fbRecords.forEach(u => map.set(u.id || u.email, { ...map.get(u.id || u.email), ...u }));
+      list = Array.from(map.values());
+    }
+  } catch (e) {}
+
+  if (list.length > 0) {
+    return list.map(item => ({
+      id: item.id || `USR-${Date.now()}`,
+      name: item.name || 'User',
+      email: item.email || '',
+      role: item.role || 'student',
+      verified: item.verified !== undefined ? item.verified : true,
+      createdAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')
+    }));
+  }
+
   return [];
 }
 
