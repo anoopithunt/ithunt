@@ -476,7 +476,7 @@ export async function fetchJobApplicationsFromBackend() {
     if (valid.length > 0) return valid;
   } catch (e) {}
 
-  return (CONTENT_DATA.sampleJobApplications || []).filter(j => !deletedIds.has(j.id));
+  return [];
 }
 
 /**
@@ -611,7 +611,7 @@ export async function fetchNielitProjectsFromBackend() {
     if (valid.length > 0) return valid;
   } catch (e) {}
 
-  return (CONTENT_DATA.sampleNielitProjects || []).filter(p => !deletedIds.has(p.id) && !deletedIds.has(p.registrationNo) && !deletedIds.has(p.nielitRegNo));
+  return [];
 }
 
 /**
@@ -728,7 +728,7 @@ export async function fetchRsvpsFromBackend() {
     if (valid.length > 0) return valid;
   } catch (e) {}
 
-  return (CONTENT_DATA.sampleRsvps || []).filter(r => !deletedIds.has(r.id));
+  return [];
 }
 
 /**
@@ -996,7 +996,7 @@ export async function fetchInternshipsFromBackend() {
   } catch (e) {
     console.warn('Notice loading internship applications from API:', e.message);
   }
-  return CONTENT_DATA.sampleInternships || [];
+  return [];
 }
 
 /**
@@ -1023,7 +1023,7 @@ export async function fetchFeesFromBackend() {
   } catch (e) {
     console.warn('Notice loading fee transactions from API:', e.message);
   }
-  return CONTENT_DATA.sampleFees || [];
+  return [];
 }
 
 /**
@@ -1047,7 +1047,7 @@ export async function fetchCertificatesFromBackend() {
   } catch (e) {
     console.warn('Notice loading certificates from API:', e.message);
   }
-  return CONTENT_DATA.sampleCertificates || [];
+  return [];
 }
 
 /**
@@ -1073,7 +1073,7 @@ export async function fetchProjectsFromBackend() {
   } catch (e) {
     console.warn('Notice loading capstone projects from API:', e.message);
   }
-  return CONTENT_DATA.sampleProjects || [];
+  return [];
 }
 
 /**
@@ -1097,7 +1097,7 @@ export async function fetchContactInquiriesFromBackend() {
   } catch (e) {
     console.warn('Notice loading contact inquiries from API:', e.message);
   }
-  return CONTENT_DATA.sampleContactInquiries || [];
+  return [];
 }
 
 
@@ -1122,7 +1122,7 @@ export async function fetchUsersFromBackend() {
   } catch (e) {
     console.warn('Notice loading auth users from API:', e.message);
   }
-  return CONTENT_DATA.sampleUsers || [];
+  return [];
 }
 
 /**
