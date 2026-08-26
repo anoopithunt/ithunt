@@ -1156,11 +1156,7 @@ const addDeletedId = (key, id) => {
 };
 
 watch(() => props.allStudents, (val) => {
-  if (val && val.length > 0) {
-    studentsList.value = val;
-  } else {
-    studentsList.value = props.content.sampleStudents || [];
-  }
+  studentsList.value = val || [];
 }, { immediate: true, deep: true });
 
 const filteredStudents = computed(() => {
@@ -1182,59 +1178,19 @@ const filteredStudents = computed(() => {
 });
 
 watch(() => props.allAdmissions, (val) => {
-  const deletedIds = getDeletedIds('ithunt_deleted_admission_ids');
-  const validProps = (val || []).filter(a => {
-    const aId = a.registrationNo || a.id;
-    return !deletedIds.has(aId);
-  });
-  if (validProps.length > 0) {
-    admissionsList.value = validProps;
-  } else {
-    const samples = (props.content.superAdminData?.sampleAdmissions || props.content.sampleAdmissions || []).filter(s => {
-      const sId = s.registrationNo || s.id;
-      return !deletedIds.has(sId);
-    });
-    admissionsList.value = samples;
-  }
+  admissionsList.value = val || [];
 }, { immediate: true, deep: true });
 
 watch(() => props.allJobApplications, (val) => {
-  const deletedIds = getDeletedIds('ithunt_deleted_job_ids');
-  const validProps = (val || []).filter(j => !deletedIds.has(j.id));
-  if (validProps.length > 0) {
-    jobApplicationsList.value = validProps;
-  } else {
-    const samples = (props.content.superAdminData?.sampleJobApplications || props.content.sampleJobApplications || []).filter(s => !deletedIds.has(s.id));
-    jobApplicationsList.value = samples;
-  }
+  jobApplicationsList.value = val || [];
 }, { immediate: true, deep: true });
 
 watch(() => props.allRsvps, (val) => {
-  const deletedIds = getDeletedIds('ithunt_deleted_rsvp_ids');
-  const validProps = (val || []).filter(r => !deletedIds.has(r.id));
-  if (validProps.length > 0) {
-    rsvpsList.value = validProps;
-  } else {
-    const samples = (props.content.superAdminData?.sampleRsvps || props.content.sampleRsvps || []).filter(s => !deletedIds.has(s.id));
-    rsvpsList.value = samples;
-  }
+  rsvpsList.value = val || [];
 }, { immediate: true, deep: true });
 
 watch(() => props.allNielitProjects, (val) => {
-  const deletedIds = getDeletedIds('ithunt_deleted_nielit_ids');
-  const validProps = (val || []).filter(p => {
-    const pId = p.registrationNo || p.nielitRegNo || p.id;
-    return !deletedIds.has(pId);
-  });
-  if (validProps.length > 0) {
-    nielitProjectsList.value = validProps;
-  } else {
-    const samples = (props.content.sampleNielitProjects || []).filter(s => {
-      const sId = s.registrationNo || s.nielitRegNo || s.id;
-      return !deletedIds.has(sId);
-    });
-    nielitProjectsList.value = samples;
-  }
+  nielitProjectsList.value = val || [];
 }, { immediate: true, deep: true });
 
 const filteredAdmissions = computed(() => {
