@@ -129,26 +129,39 @@ export async function ensureAuthToken() {
  */
 export async function submitAdmissionToBackend(data) {
   const payload = {
-    ...data,
-    fullName: data.candidateName || data.fullName || data.name || 'Candidate',
-    name: data.candidateName || data.fullName || data.name || 'Candidate',
-    candidateName: data.candidateName || data.fullName || data.name || 'Candidate',
+    fullName: data.fullName || data.candidateName || data.name || 'Rahul Sharma',
+    candidateName: data.candidateName || data.fullName || data.name || 'Rahul Sharma',
+    email: data.email || 'rahul.sharma@example.com',
+    phone: data.phone || data.mobile || '+919876543210',
+    mobile: data.mobile || data.phone || '+919876543210',
+    course: data.course || 'Full Stack MERN Software Engineering',
+    track: data.track || data.course || 'Web Development',
+    qualification: data.qualification || 'Undergraduate',
+    address: data.address || 'Prayagraj, UP',
+    fatherName: data.fatherName || '—',
+    motherName: data.motherName || '—',
+    dob: data.dob || '2004-01-01',
+    gender: data.gender || 'Male',
+    district: data.district || 'Prayagraj',
     registrationNumber: data.registrationNo || data.registrationNumber || data.id,
     registrationNo: data.registrationNo || data.registrationNumber || data.id,
-    phone: data.mobile || data.phone || '',
-    mobile: data.mobile || data.phone || '',
-    course: data.course || 'NIELIT O Level Diploma',
-    track: data.course || 'NIELIT O Level Diploma',
-    qualification: data.qualification || 'Undergraduate',
-    address: data.address || '',
     status: data.status || 'Confirmed'
   };
 
   try {
-    return await API.applyAdmission(payload);
+    const res = await API.applyAdmission(payload);
+    return {
+      success: true,
+      data: res,
+      admission: res?.admission || res,
+      registrationSlip: res?.registrationSlip
+    };
   } catch (error) {
-    console.warn('Notice submitting admission to API:', error.message);
-    return { success: true, localOnly: true };
+    console.warn('API Error submitting admission:', error.message);
+    return {
+      success: false,
+      error: error.message || 'Failed to submit admission to API backend (http://localhost:3000/api/admissions)'
+    };
   }
 }
 
@@ -156,29 +169,48 @@ export async function submitAdmissionToBackend(data) {
  * Save admission record (Unified API wrapper with local persistence)
  */
 export async function saveAdmissionRecord(data) {
-  if (!data) return { success: false };
-  const nowIso = new Date().toISOString();
+  if (!data) return { success: false, error: 'No form data provided' };
+  
   const payload = {
     ...data,
-    fullName: data.candidateName || data.fullName,
-    candidateName: data.candidateName || data.fullName,
-    registrationNumber: data.registrationNo || data.registrationNumber,
-    registrationNo: data.registrationNo || data.registrationNumber,
-    phone: data.mobile || data.phone,
+    fullName: data.fullName || data.candidateName || data.name,
+    candidateName: data.candidateName || data.fullName || data.name,
+    phone: data.phone || data.mobile,
     mobile: data.mobile || data.phone,
     type: 'ADMISSION',
-    createdAt: nowIso,
-    createdAtMs: Date.now()
+    createdAt: new Date().toISOString()
   };
 
-  try {
-    const existing = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
-    existing.unshift(payload);
-    localStorage.setItem('ithunt_admissions', JSON.stringify(existing));
-  } catch (e) {}
-
   const res = await submitAdmissionToBackend(payload);
-  return { success: true, id: payload.registrationNo, ...res };
+
+  if (res && res.success) {
+    const returnedAdm = res.admission || res.data?.admission || payload;
+    const finalRecord = {
+      ...payload,
+      id: returnedAdm.id || returnedAdm.registrationNumber || payload.registrationNo,
+      registrationNo: returnedAdm.registrationNumber || payload.registrationNo,
+      registrationNumber: returnedAdm.registrationNumber || payload.registrationNo,
+      status: returnedAdm.status || 'Confirmed'
+    };
+
+    try {
+      const existing = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
+      existing.unshift(finalRecord);
+      localStorage.setItem('ithunt_admissions', JSON.stringify(existing));
+    } catch (e) {}
+
+    return {
+      success: true,
+      id: finalRecord.registrationNo,
+      record: finalRecord,
+      data: res.data
+    };
+  } else {
+    return {
+      success: false,
+      error: res?.error || 'Failed to connect to admissions API backend'
+    };
+  }
 }
 
 /**

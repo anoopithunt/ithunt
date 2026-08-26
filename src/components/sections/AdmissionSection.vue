@@ -76,8 +76,9 @@
           </div>
 
           <div style="margin-top: 1.75rem;">
-            <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
-              <span>{{ content.admissionSection?.fields?.submitBtn || 'Submit Registration 🚀' }}</span>
+            <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;" :disabled="isSubmitting">
+              <span v-if="isSubmitting">Submitting to API... ⏳</span>
+              <span v-else>{{ content.admissionSection?.fields?.submitBtn || 'Submit Registration 🚀' }}</span>
             </button>
           </div>
         </form>
@@ -181,6 +182,7 @@
 </template>
 
 <script setup>
+import { ref } from 'vue';
 import { sendWhatsAppNotification, sendDeviceSmsNotification } from '../../utils/smsNotifier.js';
 
 const props = defineProps({
@@ -204,8 +206,17 @@ const props = defineProps({
 
 const emit = defineEmits(['submit-admission', 'download-pdf']);
 
-const handleSubmit = () => {
-  emit('submit-admission', props.form);
+const isSubmitting = ref(false);
+
+const handleSubmit = async () => {
+  try {
+    isSubmitting.value = true;
+    await emit('submit-admission', props.form);
+  } finally {
+    setTimeout(() => {
+      isSubmitting.value = false;
+    }, 600);
+  }
 };
 
 const onImgError = (event) => {
