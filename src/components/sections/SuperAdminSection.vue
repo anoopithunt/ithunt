@@ -37,12 +37,22 @@
 
     <!-- 2. HIGH-LEVEL EXECUTIVE METRIC STATS -->
     <div class="superadmin-stats-grid anim-stagger-2">
-      <!-- Total Admissions -->
+      <!-- Database Students List -->
       <div class="admin-stat-card">
         <div class="admin-stat-icon-box primary-glow">🎓</div>
         <div class="admin-stat-content">
+          <div class="admin-stat-val text-gradient">{{ studentsList.length }}</div>
+          <div class="admin-stat-lbl">Database Students</div>
+          <div class="admin-stat-trend">⚡ GET /api/students</div>
+        </div>
+      </div>
+
+      <!-- Total Admissions -->
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon-box primary-glow">📝</div>
+        <div class="admin-stat-content">
           <div class="admin-stat-val text-gradient">{{ admissionsList.length }}</div>
-          <div class="admin-stat-lbl">Registered Admissions</div>
+          <div class="admin-stat-lbl">Admissions Registry</div>
           <div class="admin-stat-trend">🟢 Active Batch 2026-27</div>
         </div>
       </div>
@@ -109,7 +119,8 @@
       >
         <span>{{ tab.icon }}</span>
         <span>{{ tab.label }}</span>
-        <span class="tab-badge-counter" v-if="tab.id === 'admissions'">{{ admissionsList.length }}</span>
+        <span class="tab-badge-counter" v-if="tab.id === 'students'">{{ studentsList.length }}</span>
+        <span class="tab-badge-counter" v-else-if="tab.id === 'admissions'">{{ admissionsList.length }}</span>
         <span class="tab-badge-counter" v-else-if="tab.id === 'nielit'">{{ nielitProjectsList.length }}</span>
         <span class="tab-badge-counter" v-else-if="tab.id === 'careers'">{{ jobApplicationsList.length }}</span>
         <span class="tab-badge-counter" v-else-if="tab.id === 'events'">{{ rsvpsList.length }}</span>
@@ -117,6 +128,158 @@
     </div>
 
     <!-- 4. TAB PANELS -->
+
+    <!-- TAB 0: STUDENTS DIRECTORY / STUDENT LIST -->
+    <div v-if="currentTab === 'students'" class="admin-tab-panel anim-stagger-3">
+      <div class="panel-header-controls">
+        <div>
+          <h3 class="panel-title">🎓 Students Directory & Master Academic List</h3>
+          <p class="panel-subtitle">
+            Live database students API (`GET http://localhost:3000/api/students`) | Total Registered: <strong style="color: var(--color-ai-orange);">{{ studentsList.length }}</strong>
+          </p>
+        </div>
+
+        <div class="panel-filter-group">
+          <!-- Search Bar -->
+          <div class="events-search-box" style="margin: 0; min-width: 280px;">
+            <span class="events-search-icon">🔍</span>
+            <input 
+              type="text" 
+              v-model="studentSearch" 
+              class="events-search-input" 
+              placeholder="Search by Name, Reg No, Email, Phone..."
+            >
+            <button v-if="studentSearch" class="events-search-clear" @click="studentSearch = ''">✕</button>
+          </div>
+
+          <!-- Course Filter -->
+          <select v-model="studentCourseFilter" class="form-control admin-select-filter">
+            <option value="all">All Courses</option>
+            <option value="6-Month Software & Cloud Masterclass">6-Month Software & Cloud Masterclass</option>
+            <option value="Mobile App Engineering (Flutter/iOS)">Mobile App Engineering (Flutter/iOS)</option>
+            <option value="3-Month MERN Stack Web Engineer">3-Month MERN Stack Web Engineer</option>
+            <option value="NIELIT O/A Level Diploma">NIELIT O/A Level Diploma</option>
+          </select>
+
+          <!-- Batch Filter -->
+          <select v-model="studentBatchFilter" class="form-control admin-select-filter" style="min-width: 120px;">
+            <option value="all">All Batches</option>
+            <option value="2026">Batch 2026</option>
+            <option value="2025">Batch 2025</option>
+          </select>
+
+          <!-- Status Filter -->
+          <select v-model="studentStatusFilter" class="form-control admin-select-filter" style="min-width: 130px;">
+            <option value="all">All Statuses</option>
+            <option value="ACTIVE">ACTIVE ✓</option>
+            <option value="GRADUATED">GRADUATED 🎓</option>
+            <option value="INACTIVE">INACTIVE ⏸️</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Students Data Table Card -->
+      <div class="admin-table-card">
+        <div class="table-responsive-container">
+          <table class="admin-data-table">
+            <thead>
+              <tr>
+                <th>Enrollment No</th>
+                <th>Student Particulars</th>
+                <th>Contact Mobile</th>
+                <th>Enrolled Course & Batch</th>
+                <th>Academic Status</th>
+                <th>Registered Date</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="stu in filteredStudents" :key="stu.id || stu.enrollmentNumber">
+                <!-- Enrollment No -->
+                <td>
+                  <span class="reg-no-code" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); font-weight: 700;">
+                    {{ stu.enrollmentNumber || 'ITH-2026-STU001' }}
+                  </span>
+                </td>
+
+                <!-- Student Particulars -->
+                <td>
+                  <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="width: 38px; height: 38px; border-radius: 50%; background: var(--gradient-ai-btn); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #fff; font-size: 1rem; flex-shrink: 0;">
+                      {{ (stu.name || stu.fullName || 'S').charAt(0).toUpperCase() }}
+                    </div>
+                    <div>
+                      <div style="font-weight: 700; color: var(--text-main);">{{ stu.name || stu.fullName || stu.candidateName }}</div>
+                      <div style="font-size: 0.78rem; color: var(--text-muted);">{{ stu.email }}</div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Mobile -->
+                <td style="font-family: var(--font-mono); font-size: 0.875rem;">
+                  {{ stu.phone || stu.mobile || '—' }}
+                </td>
+
+                <!-- Course & Batch -->
+                <td>
+                  <div style="font-weight: 600; font-size: 0.88rem; color: var(--text-main);">{{ stu.course }}</div>
+                  <span style="font-size: 0.72rem; padding: 0.15rem 0.5rem; border-radius: 12px; background: rgba(255,255,255,0.06); color: var(--text-muted); font-family: var(--font-mono);">
+                    Batch: {{ stu.batch || '2026' }}
+                  </span>
+                </td>
+
+                <!-- Academic Status -->
+                <td>
+                  <span 
+                    class="status-pill"
+                    :style="{
+                      background: (stu.academicStatus === 'ACTIVE' || stu.status === 'ACTIVE') ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                      color: (stu.academicStatus === 'ACTIVE' || stu.status === 'ACTIVE') ? '#10b981' : '#ef4444',
+                      borderColor: (stu.academicStatus === 'ACTIVE' || stu.status === 'ACTIVE') ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'
+                    }"
+                  >
+                    ● {{ stu.academicStatus || stu.status || 'ACTIVE' }}
+                  </span>
+                </td>
+
+                <!-- Date -->
+                <td style="font-size: 0.82rem; color: var(--text-muted);">
+                  {{ stu.createdAtFormatted || stu.createdAt }}
+                </td>
+
+                <!-- Actions -->
+                <td style="text-align: right;">
+                  <div style="display: flex; justify-content: flex-end; gap: 0.4rem;">
+                    <button 
+                      class="admin-icon-btn" 
+                      title="View Student Profile"
+                      @click="selectedStudentDetail = stu; showStudentDetailModal = true;"
+                    >
+                      👁️ View
+                    </button>
+                    <button 
+                      class="admin-icon-btn" 
+                      style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3);"
+                      title="Delete Student"
+                      @click="$emit('delete-student', stu)"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Empty state -->
+              <tr v-if="filteredStudents.length === 0">
+                <td colspan="7" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                  🎓 No student records found matching your filter criteria.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
     <!-- TAB 1: ADMISSIONS & STUDENT REGISTRY -->
     <div v-if="currentTab === 'admissions'" class="admin-tab-panel anim-stagger-3">
@@ -792,6 +955,43 @@
               </button>
             </div>
           </form>
+    <!-- Student Profile Detail Modal -->
+    <div class="modal-overlay" v-if="showStudentDetailModal && selectedStudentDetail" @click.self="showStudentDetailModal = false">
+      <div class="modal-card" style="max-width: 640px;">
+        <div class="modal-header">
+          <div class="modal-title"><span>🎓</span> Student Profile & Master Academic Record</div>
+          <button class="modal-close-btn" @click="showStudentDetailModal = false">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 1.75rem;">
+          <div style="display: flex; align-items: center; gap: 1.25rem; margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border-cyber);">
+            <div style="width: 58px; height: 58px; border-radius: 50%; background: var(--gradient-ai-btn); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #fff; font-weight: 800; flex-shrink: 0;">
+              🎓
+            </div>
+            <div>
+              <h3 style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; margin-bottom: 0.2rem; color: var(--text-main);">
+                {{ selectedStudentDetail.name || selectedStudentDetail.fullName || selectedStudentDetail.candidateName }}
+              </h3>
+              <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--color-ai-orange);">
+                Enrollment ID: {{ selectedStudentDetail.enrollmentNumber }}
+              </div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.88rem; line-height: 1.6;">
+            <div><strong style="color: var(--text-muted);">Database Record ID:</strong> <div style="font-family: var(--font-mono); font-size: 0.78rem; color: #38bdf8; word-break: break-all;">{{ selectedStudentDetail.id }}</div></div>
+            <div><strong style="color: var(--text-muted);">User Account ID:</strong> <div style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-muted); word-break: break-all;">{{ selectedStudentDetail.userId || selectedStudentDetail.id }}</div></div>
+            <div><strong style="color: var(--text-muted);">Email Address:</strong> <div style="color: var(--text-main); font-weight: 600;">{{ selectedStudentDetail.email }}</div></div>
+            <div><strong style="color: var(--text-muted);">Contact Phone:</strong> <div style="color: var(--text-main); font-family: var(--font-mono);">{{ selectedStudentDetail.phone || selectedStudentDetail.mobile }}</div></div>
+            <div><strong style="color: var(--text-muted);">Enrolled Program:</strong> <div style="color: var(--text-main); font-weight: 700;">{{ selectedStudentDetail.course }}</div></div>
+            <div><strong style="color: var(--text-muted);">Batch Cohort:</strong> <div><span style="padding: 0.15rem 0.5rem; border-radius: 12px; background: rgba(255,255,255,0.08); font-family: var(--font-mono); font-size: 0.75rem;">Batch {{ selectedStudentDetail.batch || '2026' }}</span></div></div>
+            <div><strong style="color: var(--text-muted);">Academic Status:</strong> <div><span class="status-pill" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border-color: rgba(16, 185, 129, 0.3);">● {{ selectedStudentDetail.academicStatus || 'ACTIVE' }}</span></div></div>
+            <div><strong style="color: var(--text-muted);">Gender / DOB:</strong> <div style="color: var(--text-main);">{{ selectedStudentDetail.gender }} | {{ selectedStudentDetail.dob || '—' }}</div></div>
+            <div style="grid-column: span 2;"><strong style="color: var(--text-muted);">Residential Address:</strong> <div style="color: var(--text-main);">{{ selectedStudentDetail.address || 'Holagarh, Prayagraj, UP' }}</div></div>
+            <div><strong style="color: var(--text-muted);">Account Created:</strong> <div style="color: var(--text-dim); font-size: 0.8rem;">{{ selectedStudentDetail.createdAt }}</div></div>
+          </div>
+        </div>
+        <div class="modal-footer" style="padding: 1rem 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button class="btn-secondary" @click="showStudentDetailModal = false">Close Profile</button>
         </div>
       </div>
     </div>
@@ -833,10 +1033,14 @@ const props = defineProps({
   allNielitProjects: {
     type: Array,
     default: () => []
+  },
+  allStudents: {
+    type: Array,
+    default: () => []
   }
 });
 
-const emit = defineEmits(['logout', 'download-slip', 'download-nielit-pdf', 'add-admission', 'delete-admission', 'update-nielit-project', 'delete-nielit-project']);
+const emit = defineEmits(['logout', 'download-slip', 'download-nielit-pdf', 'add-admission', 'delete-admission', 'update-nielit-project', 'delete-nielit-project', 'delete-student']);
 
 const emailActionMsg = ref('');
 
@@ -884,7 +1088,15 @@ const confirmFeeAndSendJpgReceipt = async (adm) => {
   setTimeout(() => { emailActionMsg.value = ''; }, 5000);
 };
 
-const currentTab = ref('admissions');
+const currentTab = ref('students');
+const studentSearch = ref('');
+const studentCourseFilter = ref('all');
+const studentBatchFilter = ref('all');
+const studentStatusFilter = ref('all');
+const studentsList = ref([]);
+const selectedStudentDetail = ref(null);
+const showStudentDetailModal = ref(false);
+
 const admissionSearch = ref('');
 const admissionStatusFilter = ref('all');
 const nielitSearch = ref('');
@@ -905,7 +1117,8 @@ const quickForm = ref({
 });
 
 const defaultTabs = [
-  { id: 'admissions', label: '🎓 Student Admissions', icon: '🎓' },
+  { id: 'students', label: '🎓 Students Directory', icon: '🎓' },
+  { id: 'admissions', label: '📝 Candidate Admissions', icon: '📝' },
   { id: 'nielit', label: '📜 NIELIT Projects', icon: '📜' },
   { id: 'internships', label: '🚀 Internship Tracks', icon: '🚀' },
   { id: 'events', label: '🎪 Event RSVPs & Passes', icon: '🎪' },
@@ -941,6 +1154,32 @@ const addDeletedId = (key, id) => {
     }
   } catch (e) {}
 };
+
+watch(() => props.allStudents, (val) => {
+  if (val && val.length > 0) {
+    studentsList.value = val;
+  } else {
+    studentsList.value = props.content.sampleStudents || [];
+  }
+}, { immediate: true, deep: true });
+
+const filteredStudents = computed(() => {
+  return studentsList.value.filter(stu => {
+    const search = studentSearch.value.toLowerCase().trim();
+    const matchesSearch = !search || 
+      (stu.name && stu.name.toLowerCase().includes(search)) ||
+      (stu.enrollmentNumber && stu.enrollmentNumber.toLowerCase().includes(search)) ||
+      (stu.email && stu.email.toLowerCase().includes(search)) ||
+      (stu.phone && stu.phone.includes(search)) ||
+      (stu.course && stu.course.toLowerCase().includes(search));
+
+    const matchesCourse = studentCourseFilter.value === 'all' || stu.course === studentCourseFilter.value;
+    const matchesBatch = studentBatchFilter.value === 'all' || stu.batch === studentBatchFilter.value;
+    const matchesStatus = studentStatusFilter.value === 'all' || stu.academicStatus === studentStatusFilter.value || stu.status === studentStatusFilter.value;
+
+    return matchesSearch && matchesCourse && matchesBatch && matchesStatus;
+  });
+});
 
 watch(() => props.allAdmissions, (val) => {
   const deletedIds = getDeletedIds('ithunt_deleted_admission_ids');
