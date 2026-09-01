@@ -180,9 +180,9 @@ const form = ref({
   pin: props.initialData.pin || '230129',
 
   projectTitle: props.initialData.projectTitle || 'Network Monitoring and Management',
-  guideName: props.initialData.guideName || 'Mr. Lakshman Singh Chauhan',
+  guideName: props.initialData.guideName || 'Mr. Sushil Kumar',
   guideQualification: props.initialData.guideQualification || 'MCA (Computer Science)',
-  guideDesignation: props.initialData.guideDesignation || 'Director & Founder, IT HUNT',
+  guideDesignation: props.initialData.guideDesignation || 'Laraval/NodeJS Developer',
   guidePlace: props.initialData.guidePlace || 'Prayagraj',
   guideAddress: props.initialData.guideAddress || 'Holagarh, Prayagraj, UP',
   projectDate: props.initialData.projectDate || new Date().toLocaleDateString('en-GB'),
@@ -192,7 +192,7 @@ const form = ref({
   paymentDate: props.initialData.paymentDate || new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
   utrNumber: props.initialData.utrNumber || 'CHD550W1FMSF1B',
   accountHolderName: props.initialData.accountHolderName || 'Anup Kumar',
-  paymentRemark: props.initialData.paymentRemark || 'Paid Online'
+  paymentRemark: props.initialData.paymentRemark || 'Paid'
 });
 
 const handleSubmit = async () => {

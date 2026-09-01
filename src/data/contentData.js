@@ -230,7 +230,7 @@ const CONTENT_DATA = {
       "feePaid": "₹1,000",
       "utrNo": "CHD550W1FMSF1B",
       "accountHolderName": "Anup Kumar",
-      "paymentRemark": "Paid Online"
+      "paymentRemark": "Paid"
     },
     {
       "id": "NIELIT-1642890",
