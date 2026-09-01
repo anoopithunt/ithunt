@@ -1006,7 +1006,7 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { sendStudentAdmissionEmail, sendFeeReceiptJpgEmail } from '../../utils/emailNotifier.js';
 import { generateFeeReceiptJpgBlob } from '../../utils/jpgReceiptGenerator.js';
-import { API, deleteAdmissionFromBackend, deleteUserFromBackend, updateNielitProjectInBackend, deleteProject } from '../../utils/apiClient.js';
+import { API, deleteAdmissionFromBackend, deleteUserFromBackend, updateNielitProjectInBackend, deleteNielitProjectFromBackend, deleteProject } from '../../utils/apiClient.js';
 
 const props = defineProps({
   content: {
@@ -1367,10 +1367,10 @@ const deleteNielitProject = async (p) => {
   // 3. Emit delete to parent App.vue
   emit('delete-nielit-project', typeof p === 'object' ? p : { id: targetId, registrationNo: targetId });
 
-  // 4. Delete from REST API backend via API helper
+  // 4. Delete from Firebase Cloud & REST API backend
   try {
-    await API.deleteNielitProject(targetId);
-    emailActionMsg.value = `✓ NIELIT project form (${targetId}) removed successfully from Database & API.`;
+    await deleteNielitProjectFromBackend(targetId);
+    emailActionMsg.value = `✓ NIELIT project form (${targetId}) removed successfully from Firebase Database & API.`;
   } catch (err) {
     try {
       await API.deleteProject(targetId);

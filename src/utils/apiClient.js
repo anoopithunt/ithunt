@@ -16,13 +16,18 @@ let memoryToken = null;
  * Ensures 100% data persistence on production (e.g. Vercel) even when local node server is unreachable.
  */
 export async function saveToFirebaseCloud(collectionName, docId, data) {
-  if (!collectionName || !docId || !data) return;
+  if (!collectionName || !docId || !data) return { success: false };
   const cleanId = String(docId).replace(/\//g, '_');
+  let saved = false;
+
+  // Clean data to strip any undefined values that cause Firestore setDoc to throw
+  const cleanData = JSON.parse(JSON.stringify(data));
 
   try {
     if (db) {
-      await setDoc(doc(db, collectionName, cleanId), data, { merge: true });
+      await setDoc(doc(db, collectionName, cleanId), cleanData, { merge: true });
       console.log(`✓ Record saved to Firebase Cloud Firestore collection "${collectionName}" ID: ${cleanId}`);
+      saved = true;
     }
   } catch (e) {
     console.warn(`Firestore save notice (${collectionName}/${cleanId}):`, e.message);
@@ -30,12 +35,15 @@ export async function saveToFirebaseCloud(collectionName, docId, data) {
 
   try {
     if (rtdb) {
-      await dbSet(dbRef(rtdb, `${collectionName}/${cleanId}`), data);
+      await dbSet(dbRef(rtdb, `${collectionName}/${cleanId}`), cleanData);
       console.log(`✓ Record synced to Firebase Realtime DB "${collectionName}" ID: ${cleanId}`);
+      saved = true;
     }
   } catch (e) {
     console.warn(`Realtime DB save notice (${collectionName}/${cleanId}):`, e.message);
   }
+
+  return { success: saved, id: cleanId };
 }
 
 export async function fetchFromFirebaseCloud(collectionName) {
@@ -432,60 +440,88 @@ export async function submitJobApplicationToBackend(data) {
 
 export async function saveJobApplicationRecord(data) {
   if (!data) return { success: false };
+  const docId = data.id || `JOB-${Date.now()}`;
   const payload = {
     ...data,
-    id: data.id || `JOB-${Date.now()}`,
+    id: docId,
     type: 'JOB_APPLICATION',
-    createdAt: new Date().toISOString()
+    createdAt: data.createdAt || new Date().toISOString()
   };
+
+  // 1. Direct save to Firebase Cloud (Firestore & Realtime DB)
+  await saveToFirebaseCloud('job_applications', docId, payload);
+
+  // 2. Local storage cache
   try {
     const existing = JSON.parse(localStorage.getItem('ithunt_job_applications') || '[]');
-    existing.unshift(payload);
-    localStorage.setItem('ithunt_job_applications', JSON.stringify(existing));
+    const filtered = existing.filter(j => j.id !== docId);
+    filtered.unshift(payload);
+    localStorage.setItem('ithunt_job_applications', JSON.stringify(filtered));
   } catch (e) {}
-  return await submitJobApplicationToBackend(payload);
+
+  // 3. REST API backend sync
+  const apiRes = await submitJobApplicationToBackend(payload);
+  return { success: true, id: docId, record: payload, ...apiRes };
 }
 
 export async function fetchJobApplicationsFromBackend() {
   const deletedIds = new Set(JSON.parse(localStorage.getItem('ithunt_deleted_job_ids') || '[]'));
+  let list = [];
 
+  // 1. Try REST API
   try {
     const data = await API.getCareers();
     const rawList = Array.isArray(data?.applications) 
       ? data.applications 
       : (Array.isArray(data) ? data : []);
-
-    if (rawList.length > 0) {
-      const normalized = rawList.map(j => ({
-        id: j.id || `JOB-${Date.now()}`,
-        name: j.name || j.fullName || 'Applicant',
-        fullName: j.name || j.fullName || 'Applicant',
-        position: j.position || j.role || 'Full Stack Instructor',
-        role: j.position || j.role || 'Full Stack Instructor',
-        phone: j.phone || j.mobile || '',
-        mobile: j.phone || j.mobile || '',
-        email: j.email || '',
-        experience: j.experience || 'Entry Level / Fresher',
-        resumeLink: j.resumeLink || j.resume || '',
-        status: j.status === 'PENDING_REVIEW' ? 'Pending Review' : (j.status || 'Pending Review'),
-        date: j.createdAt ? new Date(j.createdAt).toLocaleDateString('en-GB') : (j.date || new Date().toLocaleDateString('en-GB'))
-      }));
-
-      const filtered = normalized.filter(j => !deletedIds.has(j.id));
-      if (filtered.length > 0) {
-        try { localStorage.setItem('ithunt_careers_cache', JSON.stringify(filtered)); } catch (e) {}
-        return filtered;
-      }
-    }
+    if (rawList.length > 0) list = rawList;
   } catch (e) {
     console.warn('Notice loading job applications from API:', e.message);
   }
 
+  // 2. Fetch & merge from Firebase Cloud
   try {
-    const cached = JSON.parse(localStorage.getItem('ithunt_careers_cache') || localStorage.getItem('ithunt_job_applications') || '[]');
-    const valid = cached.filter(j => !deletedIds.has(j.id));
-    if (valid.length > 0) return valid;
-  } catch (e) {}
+    const fbRecords = await fetchFromFirebaseCloud('job_applications');
+    if (fbRecords.length > 0) {
+      const map = new Map();
+      list.forEach(j => map.set(j.id, j));
+      fbRecords.forEach(j => {
+        if (j.id) map.set(j.id, { ...map.get(j.id), ...j });
+      });
+      list = Array.from(map.values());
+    }
+  } catch (e) {
+    console.warn('Notice loading job applications from Firebase Cloud:', e.message);
+  }
+
+  // 3. Fallback to localStorage cache
+  if (list.length === 0) {
+    try {
+      const cached = JSON.parse(localStorage.getItem('ithunt_careers_cache') || localStorage.getItem('ithunt_job_applications') || '[]');
+      if (Array.isArray(cached) && cached.length > 0) list = cached;
+    } catch (e) {}
+  }
+
+  if (list.length > 0) {
+    const normalized = list.map(j => ({
+      id: j.id || `JOB-${Date.now()}`,
+      name: j.name || j.fullName || 'Applicant',
+      fullName: j.name || j.fullName || 'Applicant',
+      position: j.position || j.role || 'Full Stack Instructor',
+      role: j.position || j.role || 'Full Stack Instructor',
+      phone: j.phone || j.mobile || '',
+      mobile: j.phone || j.mobile || '',
+      email: j.email || '',
+      experience: j.experience || 'Entry Level / Fresher',
+      resumeLink: j.resumeLink || j.resume || '',
+      status: j.status === 'PENDING_REVIEW' ? 'Pending Review' : (j.status || 'Pending Review'),
+      date: j.date || (j.createdAt ? new Date(j.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'))
+    }));
+
+    const filtered = normalized.filter(j => !deletedIds.has(j.id));
+    try { localStorage.setItem('ithunt_careers_cache', JSON.stringify(filtered)); } catch (e) {}
+    return filtered;
+  }
 
   return [];
 }
@@ -494,43 +530,81 @@ export async function fetchJobApplicationsFromBackend() {
  * Submit student review to backend REST API
  */
 export async function submitReviewToBackend(data) {
+  const docId = data.id || `REV-${Date.now()}`;
   const payload = {
     ...data,
+    id: docId,
     name: data.name || data.fullName || 'Verified Student',
     role: data.role || data.course || 'Alumni / Student',
     course: data.course || 'Full Stack Development',
     rating: Number(data.rating) || 5,
     reviewText: data.review || data.reviewText || data.feedback || 'Excellent training at IT HUNT!',
-    avatar: data.avatar || 'img/ithunt.webp'
+    avatar: data.avatar || 'img/ithunt.webp',
+    createdAt: data.createdAt || new Date().toISOString()
   };
+
+  // 1. Direct save to Firebase Cloud
+  await saveToFirebaseCloud('reviews', docId, payload);
+
+  // 2. Local storage cache
+  try {
+    const existing = JSON.parse(localStorage.getItem('ithunt_reviews') || '[]');
+    existing.unshift(payload);
+    localStorage.setItem('ithunt_reviews', JSON.stringify(existing));
+  } catch (e) {}
 
   try {
     return await API.submitReview(payload);
   } catch (error) {
     console.warn('Backend API connection warning (Review):', error.message);
-    return { success: false, error: error.message };
+    return { success: true, localOnly: true, record: payload };
   }
 }
 
 /**
- * Fetch verified public student reviews from backend REST API
+ * Fetch verified public student reviews from backend REST API & Firebase Cloud
  */
 export async function fetchReviewsFromBackend() {
+  let list = [];
+
   try {
     const data = await API.getReviews();
     const rawList = Array.isArray(data?.reviews) ? data.reviews : (Array.isArray(data) ? data : []);
-    if (rawList.length > 0) {
-      return rawList.map(r => ({
-        ...r,
-        name: r.name || 'Verified Student',
-        course: r.role || r.course || 'IT Track',
-        rating: Number(r.rating) || 5,
-        review: r.reviewText || r.review || ''
-      }));
-    }
+    if (rawList.length > 0) list = rawList;
   } catch (error) {
     console.warn('Backend API connection warning (Fetch Reviews):', error.message);
   }
+
+  try {
+    const fbRecords = await fetchFromFirebaseCloud('reviews');
+    if (fbRecords.length > 0) {
+      const map = new Map();
+      list.forEach(r => map.set(r.id || r.name, r));
+      fbRecords.forEach(r => {
+        const k = r.id || r.name;
+        map.set(k, { ...map.get(k), ...r });
+      });
+      list = Array.from(map.values());
+    }
+  } catch (e) {}
+
+  if (list.length === 0) {
+    try {
+      const cached = JSON.parse(localStorage.getItem('ithunt_reviews') || '[]');
+      if (Array.isArray(cached) && cached.length > 0) list = cached;
+    } catch (e) {}
+  }
+
+  if (list.length > 0) {
+    return list.map(r => ({
+      ...r,
+      name: r.name || 'Verified Student',
+      course: r.role || r.course || 'IT Track',
+      rating: Number(r.rating) || 5,
+      review: r.reviewText || r.review || ''
+    }));
+  }
+
   return [];
 }
 
@@ -563,87 +637,160 @@ export async function submitNielitProjectToBackend(data) {
 
 export async function saveNielitProjectRecord(data) {
   if (!data) return { success: false };
+  const docId = String(data.id || data.registrationNo || data.nielitRegNo || data.regNo || `NIELIT-${Date.now()}`);
   const payload = {
     ...data,
+    id: docId,
+    nielitRegNo: data.nielitRegNo || data.registrationNo || data.regNo || docId,
+    registrationNo: data.registrationNo || data.nielitRegNo || data.regNo || docId,
+    candidateName: data.candidateName || data.studentName || data.name || 'Candidate',
+    studentName: data.studentName || data.candidateName || data.name || 'Candidate',
     type: 'NIELIT_PROJECT',
-    createdAt: new Date().toISOString()
+    createdAt: data.createdAt || new Date().toISOString()
   };
+
+  // 1. Direct save to Firebase Cloud (Firestore & Realtime DB)
+  await saveToFirebaseCloud('nielit_projects', docId, payload);
+
+  // 2. Local storage cache
   try {
     const existing = JSON.parse(localStorage.getItem('ithunt_nielit_projects') || '[]');
-    existing.unshift(payload);
-    localStorage.setItem('ithunt_nielit_projects', JSON.stringify(existing));
+    const filtered = existing.filter(p => p.id !== docId && p.registrationNo !== docId && p.nielitRegNo !== docId);
+    filtered.unshift(payload);
+    localStorage.setItem('ithunt_nielit_projects', JSON.stringify(filtered));
   } catch (e) {}
-  return await submitNielitProjectToBackend(payload);
+
+  // 3. REST API backend sync
+  const apiRes = await submitNielitProjectToBackend(payload);
+  return { success: true, id: docId, data: payload, record: payload, ...apiRes };
 }
 
 /**
- * Fetch all stored NIELIT Projects from backend REST API or local storage
+ * Fetch all stored NIELIT Projects from backend REST API, Firebase Cloud, or local storage
  */
 export async function fetchNielitProjectsFromBackend() {
   const deletedIds = new Set(JSON.parse(localStorage.getItem('ithunt_deleted_nielit_ids') || '[]'));
+  let list = [];
 
+  // 1. Try REST API
   try {
     const data = await API.getNielitProjects();
     const rawList = Array.isArray(data?.projects) 
       ? data.projects 
       : (Array.isArray(data) ? data : []);
-
-    if (rawList.length > 0) {
-      const normalized = rawList.map(p => ({
-        id: p.id || p.regNo || p.registrationNo || p.nielitRegNo || `NIELIT-${Date.now()}`,
-        registrationNo: p.regNo || p.registrationNo || p.nielitRegNo || p.id,
-        nielitRegNo: p.nielitRegNo || p.regNo || p.registrationNo || p.id,
-        candidateName: p.studentName || p.candidateName || p.fullName || p.name || 'Candidate',
-        fatherName: p.fatherName || '—',
-        motherName: p.motherName || '—',
-        mobile: p.mobile || p.phone || '',
-        level: p.level || 'O Level (IT)',
-        projectTitle: p.projectTitle || p.title || 'MERN Stack Web Development',
-        guideName: p.guideName || 'Lakshman Singh Chauhan',
-        status: p.status || 'Submitted',
-        date: p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-GB') : (p.date || new Date().toLocaleDateString('en-GB')),
-        feePaid: p.feePaid || '₹100',
-        utrNo: p.utrNo || 'UPI/Verified'
-      }));
-
-      const filtered = normalized.filter(p => !deletedIds.has(p.id) && !deletedIds.has(p.registrationNo) && !deletedIds.has(p.nielitRegNo));
-      if (filtered.length > 0) {
-        try { localStorage.setItem('ithunt_nielit_cache', JSON.stringify(filtered)); } catch (e) {}
-        return filtered;
-      }
-    }
+    if (rawList.length > 0) list = rawList;
   } catch (e) {
     console.warn('Notice loading nielit projects from API:', e.message);
   }
 
+  // 2. Fetch & merge from Firebase Cloud (Firestore & Realtime DB)
   try {
-    const cached = JSON.parse(localStorage.getItem('ithunt_nielit_cache') || localStorage.getItem('ithunt_nielit_projects') || '[]');
-    const valid = cached.filter(p => !deletedIds.has(p.id) && !deletedIds.has(p.registrationNo) && !deletedIds.has(p.nielitRegNo));
-    if (valid.length > 0) return valid;
-  } catch (e) {}
+    const fbRecords = await fetchFromFirebaseCloud('nielit_projects');
+    if (fbRecords.length > 0) {
+      const map = new Map();
+      list.forEach(p => map.set(p.id || p.regNo || p.registrationNo || p.nielitRegNo, p));
+      fbRecords.forEach(p => {
+        const k = p.id || p.regNo || p.registrationNo || p.nielitRegNo;
+        map.set(k, { ...map.get(k), ...p });
+      });
+      list = Array.from(map.values());
+    }
+  } catch (e) {
+    console.warn('Notice loading nielit projects from Firebase Cloud:', e.message);
+  }
+
+  // 3. Fallback to localStorage cache or default sample data
+  if (list.length === 0) {
+    try {
+      const cached = JSON.parse(localStorage.getItem('ithunt_nielit_cache') || localStorage.getItem('ithunt_nielit_projects') || '[]');
+      if (Array.isArray(cached) && cached.length > 0) {
+        list = cached;
+      } else if (CONTENT_DATA?.sampleNielitProjects && CONTENT_DATA.sampleNielitProjects.length > 0) {
+        list = [...CONTENT_DATA.sampleNielitProjects];
+      }
+    } catch (e) {}
+  }
+
+  if (list.length > 0) {
+    const normalized = list.map(p => ({
+      ...p,
+      id: p.id || p.regNo || p.registrationNo || p.nielitRegNo || `NIELIT-${Date.now()}`,
+      registrationNo: p.regNo || p.registrationNo || p.nielitRegNo || p.id,
+      nielitRegNo: p.nielitRegNo || p.regNo || p.registrationNo || p.id,
+      candidateName: p.studentName || p.candidateName || p.fullName || p.name || 'Candidate',
+      studentName: p.studentName || p.candidateName || p.fullName || p.name || 'Candidate',
+      fatherName: p.fatherName || '—',
+      motherName: p.motherName || '—',
+      mobile: p.mobile || p.phone || '',
+      level: p.level || p.nielitLevel || 'O Level',
+      projectTitle: p.projectTitle || p.title || 'MERN Stack Web Development',
+      guideName: p.guideName || 'Mr. Sushil Kumar',
+      guideQualification: p.guideQualification || 'MCA (Computer Science)',
+      guideDesignation: p.guideDesignation || 'Laraval/NodeJS Developer',
+      status: p.status || 'Submitted',
+      date: p.date || (p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')),
+      feePaid: p.feePaid || p.amount || '₹1,000',
+      utrNo: p.utrNo || p.utrNumber || 'UPI/Verified',
+      accountHolderName: p.accountHolderName || p.candidateName || '',
+      paymentRemark: p.paymentRemark || 'Paid'
+    }));
+
+    const filtered = normalized.filter(p => !deletedIds.has(p.id) && !deletedIds.has(p.registrationNo) && !deletedIds.has(p.nielitRegNo));
+    try { localStorage.setItem('ithunt_nielit_cache', JSON.stringify(filtered)); } catch (e) {}
+    return filtered;
+  }
 
   return [];
 }
 
 /**
- * Update submitted NIELIT Project in backend REST API
+ * Update submitted NIELIT Project in backend REST API & Firebase Cloud
  */
 export async function updateNielitProjectInBackend(id, data) {
+  if (!id) return { success: false };
+  const cleanId = String(id).replace(/\//g, '_');
+
+  // 1. Update in Firebase Cloud
+  await saveToFirebaseCloud('nielit_projects', cleanId, data);
+
+  // 2. Update local storage
   try {
-    return await API.updateNielitProject(id, data);
+    const existing = JSON.parse(localStorage.getItem('ithunt_nielit_projects') || '[]');
+    const idx = existing.findIndex(p => p.id === cleanId || p.registrationNo === cleanId || p.nielitRegNo === cleanId);
+    if (idx !== -1) {
+      existing[idx] = { ...existing[idx], ...data };
+      localStorage.setItem('ithunt_nielit_projects', JSON.stringify(existing));
+    }
+  } catch (e) {}
+
+  try {
+    return await API.updateNielitProject(cleanId, data);
   } catch (error) {
     try {
-      return await API.updateProject(id, data);
+      return await API.updateProject(cleanId, data);
     } catch (e) {}
   }
   return { success: true, localOnly: true };
 }
 
 /**
- * Delete submitted NIELIT Project from backend REST API
+ * Delete submitted NIELIT Project from backend REST API & Firebase Cloud
  */
 export async function deleteNielitProjectFromBackend(id, token = '') {
-  return await deleteProject(id, true);
+  if (!id) return false;
+  const cleanId = String(id).replace(/\//g, '_');
+
+  // 1. Delete from Firebase Cloud
+  await deleteFromFirebaseCloud('nielit_projects', cleanId);
+
+  // 2. Mark in deleted IDs local cache
+  try {
+    const deletedIds = JSON.parse(localStorage.getItem('ithunt_deleted_nielit_ids') || '[]');
+    deletedIds.push(cleanId);
+    localStorage.setItem('ithunt_deleted_nielit_ids', JSON.stringify(deletedIds));
+  } catch (e) {}
+
+  return await deleteProject(cleanId, true);
 }
 
 /**
@@ -692,52 +839,80 @@ export async function submitRsvpToBackend(data) {
 
 export async function saveRsvpRecord(data) {
   if (!data) return { success: false };
+  const docId = data.id || `RSVP-${Date.now()}`;
   const payload = {
     ...data,
-    id: data.id || `RSVP-${Date.now()}`,
+    id: docId,
     type: 'EVENT_RSVP',
-    createdAt: new Date().toISOString()
+    createdAt: data.createdAt || new Date().toISOString()
   };
+
+  // 1. Direct save to Firebase Cloud (Firestore & Realtime DB)
+  await saveToFirebaseCloud('event_rsvps', docId, payload);
+
+  // 2. Local storage cache
   try {
     const existing = JSON.parse(localStorage.getItem('ithunt_rsvps') || '[]');
-    existing.unshift(payload);
-    localStorage.setItem('ithunt_rsvps', JSON.stringify(existing));
+    const filtered = existing.filter(r => r.id !== docId);
+    filtered.unshift(payload);
+    localStorage.setItem('ithunt_rsvps', JSON.stringify(filtered));
   } catch (e) {}
-  return await submitRsvpToBackend(payload);
+
+  // 3. REST API backend sync
+  const apiRes = await submitRsvpToBackend(payload);
+  return { success: true, id: docId, record: payload, ...apiRes };
 }
 
 export async function fetchRsvpsFromBackend() {
   const deletedIds = new Set(JSON.parse(localStorage.getItem('ithunt_deleted_rsvp_ids') || '[]'));
+  let list = [];
 
+  // 1. Try REST API
   try {
     const data = await API.getEvents();
     const rawList = Array.isArray(data?.rsvps)
       ? data.rsvps
       : (Array.isArray(data?.events) ? data.events : (Array.isArray(data) ? data : []));
-
-    if (rawList.length > 0) {
-      const normalized = rawList.map(r => ({
-        id: r.id || `RSVP-${Date.now()}`,
-        name: r.candidateName || r.name || r.fullName || 'Attendee',
-        email: r.email || '',
-        mobile: r.phone || r.mobile || '',
-        eventTitle: r.eventName || r.eventTitle || r.title || 'IT HUNT Tech Summit 2026',
-        status: r.status || 'Confirmed',
-        date: r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-GB') : (r.date || new Date().toLocaleDateString('en-GB'))
-      }));
-      const filtered = normalized.filter(r => !deletedIds.has(r.id));
-      if (filtered.length > 0) {
-        try { localStorage.setItem('ithunt_rsvps_cache', JSON.stringify(filtered)); } catch (e) {}
-        return filtered;
-      }
-    }
+    if (rawList.length > 0) list = rawList;
   } catch (e) {}
 
+  // 2. Fetch & merge from Firebase Cloud
   try {
-    const cached = JSON.parse(localStorage.getItem('ithunt_rsvps_cache') || localStorage.getItem('ithunt_rsvps') || '[]');
-    const valid = cached.filter(r => !deletedIds.has(r.id));
-    if (valid.length > 0) return valid;
-  } catch (e) {}
+    const fbRecords = await fetchFromFirebaseCloud('event_rsvps');
+    if (fbRecords.length > 0) {
+      const map = new Map();
+      list.forEach(r => map.set(r.id, r));
+      fbRecords.forEach(r => {
+        if (r.id) map.set(r.id, { ...map.get(r.id), ...r });
+      });
+      list = Array.from(map.values());
+    }
+  } catch (e) {
+    console.warn('Notice loading RSVPs from Firebase Cloud:', e.message);
+  }
+
+  // 3. Fallback to localStorage cache
+  if (list.length === 0) {
+    try {
+      const cached = JSON.parse(localStorage.getItem('ithunt_rsvps_cache') || localStorage.getItem('ithunt_rsvps') || '[]');
+      if (Array.isArray(cached) && cached.length > 0) list = cached;
+    } catch (e) {}
+  }
+
+  if (list.length > 0) {
+    const normalized = list.map(r => ({
+      id: r.id || `RSVP-${Date.now()}`,
+      name: r.candidateName || r.name || r.fullName || 'Attendee',
+      email: r.email || '',
+      mobile: r.phone || r.mobile || '',
+      eventTitle: r.eventName || r.eventTitle || r.title || 'IT HUNT Tech Summit 2026',
+      status: r.status || 'Confirmed',
+      date: r.date || (r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'))
+    }));
+    const filtered = normalized.filter(r => !deletedIds.has(r.id));
+    try { localStorage.setItem('ithunt_rsvps_cache', JSON.stringify(filtered)); } catch (e) {}
+    return filtered;
+  }
 
   return [];
 }
