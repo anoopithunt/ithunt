@@ -421,7 +421,7 @@ export async function sendNielitProjectEmailNotification(projectRecord, pdfBlob 
   if (!projectRecord) return { success: false };
 
   const candName = projectRecord.candidateName || 'Candidate';
-  const regNo = projectRecord.nielitRegNo || '1536056';
+  const regNo = projectRecord.nielitRegNo || '1110423';
   const level = projectRecord.nielitLevel || 'A';
   const projectTitle = projectRecord.projectTitle || 'Network Monitoring and Management';
   const subjectText = `📜 [NIELIT PROJECT SUBMISSION] ${candName} [Reg: ${regNo}] (${level} Level)`;
