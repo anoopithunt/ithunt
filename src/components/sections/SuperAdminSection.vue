@@ -1074,7 +1074,7 @@ const openEditNielitModal = (p) => {
     state: p.state || 'Uttar Pradesh',
     status: p.status || 'Submitted',
     paymentDate: p.paymentDate || new Date().toISOString().split('T')[0],
-    paymentRemark: p.paymentRemark || 'Paid Online'
+    paymentRemark: p.paymentRemark || 'Paid'
   };
   showEditNielitModal.value = true;
 };
