@@ -6,23 +6,24 @@
    ========================================================================== */
 
 :root {
-  /* Dark Theme - Default Sleek Deep Slate */
-  --bg-cyber-dark: #0a0e17;
-  --bg-card-glass: rgba(18, 24, 38, 0.85);
-  --bg-card-hover: rgba(26, 35, 54, 0.95);
-  --bg-nav-glass: rgba(10, 14, 23, 0.88);
-  --bg-input-cyber: rgba(15, 21, 33, 0.95);
+  /* Dark Theme - Modern Deep Midnight Slate */
+  --bg-cyber-dark: #070a12;
+  --bg-card-glass: rgba(15, 23, 42, 0.75);
+  --bg-card-hover: rgba(22, 33, 58, 0.85);
+  --bg-nav-glass: rgba(7, 10, 18, 0.82);
+  --bg-input-cyber: rgba(13, 19, 33, 0.9);
 
   /* Primary Brand Tokens */
   --color-ai-orange: #f97316;
   --color-ai-orange-hover: #ea580c;
   --color-ai-yellow: #f59e0b;
   --color-ai-yellow-hover: #d97706;
-  --color-ai-gold: #f59e0b;
-  --color-ai-amber: #fbbf24;
+  --color-ai-gold: #fbbf24;
+  --color-ai-amber: #f59e0b;
   --color-ai-coral: #ff6b4a;
   --color-ai-emerald: #10b981;
   --color-ai-pink: #f43f5e;
+  --color-ai-indigo: #6366f1;
 
   /* Backward Compatibility Aliases */
   --color-ai-violet: #f97316;
@@ -30,26 +31,28 @@
   --color-ai-cyan: #f59e0b;
   --color-ai-cyan-hover: #d97706;
 
-  /* Subtle Soft Glows */
-  --glow-orange: rgba(249, 115, 22, 0.2);
-  --glow-yellow: rgba(245, 158, 11, 0.2);
-  --glow-gold: rgba(245, 158, 11, 0.18);
-  --glow-violet: rgba(249, 115, 22, 0.2);
-  --glow-cyan: rgba(245, 158, 11, 0.2);
-  --glow-emerald: rgba(16, 185, 129, 0.2);
-  --glow-pink: rgba(244, 63, 94, 0.2);
+  /* Vibrant & Subtle Soft Glows */
+  --glow-orange: rgba(249, 115, 22, 0.28);
+  --glow-yellow: rgba(245, 158, 11, 0.28);
+  --glow-gold: rgba(251, 191, 36, 0.25);
+  --glow-violet: rgba(249, 115, 22, 0.28);
+  --glow-cyan: rgba(245, 158, 11, 0.28);
+  --glow-emerald: rgba(16, 185, 129, 0.28);
+  --glow-pink: rgba(244, 63, 94, 0.28);
 
   /* Gradients */
-  --gradient-ai-hero: linear-gradient(135deg, #f97316 0%, #fbbf24 100%);
+  --gradient-ai-hero: linear-gradient(135deg, #f97316 0%, #fbbf24 50%, #f59e0b 100%);
   --gradient-ai-secondary: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
   --gradient-ai-gold: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
-  --gradient-ai-btn: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
-  --gradient-card-border: linear-gradient(135deg, rgba(249, 115, 22, 0.25), rgba(245, 158, 11, 0.15));
+  --gradient-ai-btn: linear-gradient(135deg, #ea580c 0%, #f97316 50%, #fbbf24 100%);
+  --gradient-card-border: linear-gradient(135deg, rgba(249, 115, 22, 0.35), rgba(245, 158, 11, 0.2), rgba(255, 255, 255, 0.05));
+  --gradient-glass-shine: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 100%);
 
-  /* Clean Borders */
+  /* Clean Borders & Glass */
   --border-cyber: rgba(255, 255, 255, 0.08);
-  --border-cyber-glow: rgba(249, 115, 22, 0.35);
-  --border-cyan-glow: rgba(245, 158, 11, 0.35);
+  --border-cyber-glow: rgba(249, 115, 22, 0.45);
+  --border-cyan-glow: rgba(245, 158, 11, 0.45);
+  --glass-blur: blur(16px);
 
   /* High-Contrast Crisp Typography */
   --text-main: #f8fafc;
@@ -63,30 +66,38 @@
 
   /* Shadows & Radius */
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.4), 0 0 20px rgba(249, 115, 22, 0.08);
+  --shadow-md: 0 6px 20px -2px rgba(0, 0, 0, 0.4), 0 0 15px rgba(249, 115, 22, 0.05);
+  --shadow-lg: 0 14px 40px -6px rgba(0, 0, 0, 0.5), 0 0 25px rgba(249, 115, 22, 0.12);
+  --shadow-card-hover: 0 22px 50px -10px rgba(0, 0, 0, 0.7), 0 0 30px rgba(249, 115, 22, 0.25);
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 20px;
   --radius-xl: 28px;
   --radius-full: 9999px;
+  
+  /* Smooth Physics Transitions */
   --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-spring: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Light Theme Variables - Clean Soft White & Slate */
+/* Light Theme Variables - Crisp Clean Canvas with Warm Amber Touches */
 body.light-theme {
   --bg-cyber-dark: #f8fafc;
-  --bg-card-glass: rgba(255, 255, 255, 0.95);
+  --bg-card-glass: rgba(255, 255, 255, 0.85);
   --bg-card-hover: #ffffff;
-  --bg-nav-glass: rgba(248, 250, 252, 0.9);
+  --bg-nav-glass: rgba(248, 250, 252, 0.88);
   --bg-input-cyber: #ffffff;
 
   --border-cyber: rgba(15, 23, 42, 0.08);
-  --border-cyber-glow: rgba(249, 115, 22, 0.3);
+  --border-cyber-glow: rgba(249, 115, 22, 0.35);
 
   --text-main: #0f172a;
   --text-muted: #475569;
   --text-dim: #64748b;
 
-  --shadow-lg: 0 10px 30px -5px rgba(15, 23, 42, 0.06), 0 2px 10px rgba(249, 115, 22, 0.05);
+  --shadow-md: 0 4px 16px -2px rgba(15, 23, 42, 0.06), 0 2px 8px rgba(249, 115, 22, 0.04);
+  --shadow-lg: 0 12px 35px -6px rgba(15, 23, 42, 0.08), 0 4px 14px rgba(249, 115, 22, 0.06);
+  --shadow-card-hover: 0 20px 40px -8px rgba(15, 23, 42, 0.12), 0 6px 20px rgba(249, 115, 22, 0.1);
 }
 

@@ -135,7 +135,7 @@ const renderPage1 = () => {
   
   const d = props.projectData || {};
   const candName = (d.candidateName || 'Candidate Name').toUpperCase();
-  const regNo = d.nielitRegNo || '1536056';
+  const regNo = d.nielitRegNo || '1110423';
   const level = d.nielitLevel || 'A';
   const projectTitle = d.projectTitle || 'Network Monitoring and Management';
   const guideName = d.guideName || 'Sushil Kumar';
@@ -234,14 +234,14 @@ const renderPage2 = () => {
   const d = props.projectData || {};
   const candName = (d.candidateName || 'Candidate Name').toUpperCase();
   const fatherName = d.fatherName || 'Father Name';
-  const regNo = d.nielitRegNo || '1536056';
+  const regNo = d.nielitRegNo || '1110423';
   const level = d.nielitLevel || 'A';
-  const address = d.address || 'Buhana Jhunjhunu';
-  const district = d.district || 'Jhunjhunu';
-  const state = d.state || 'Rajasthan';
-  const pin = d.pin || '333502';
-  const mobile = d.mobile || '7740854811';
-  const email = (d.email || 'praveensoni11@gmail.com').toUpperCase();
+  const address = d.address || 'Kunda Pratapgarh ';
+  const district = d.district || 'Kunda';
+  const state = d.state || 'Uttar Pradesh';
+  const pin = d.pin || '230129';
+  const mobile = d.mobile || '9795771806';
+  const email = (d.email || 'anupcodemaya@gmail.com').toUpperCase();
 
   ctx.fillStyle = '#000000';
 
@@ -324,7 +324,7 @@ const renderPage3 = () => {
 
   const d = props.projectData || {};
   const candName = (d.candidateName || 'Candidate Name').toUpperCase();
-  const regNo = d.nielitRegNo || '1536056';
+  const regNo = d.nielitRegNo || '1110423';
   const level = d.nielitLevel || 'A';
   const projectTitle = d.projectTitle || 'Network Monitoring and Management';
   const guideName = d.guideName || 'Sushil Kumar';
@@ -429,7 +429,7 @@ const renderPage4 = () => {
 
   const d = props.projectData || {};
   const candName = (d.candidateName || 'Candidate Name').toUpperCase();
-  const regNo = d.nielitRegNo || '1536056';
+  const regNo = d.nielitRegNo || '1110423';
   const level = d.nielitLevel || 'A';
   const amount = d.amount || '1000';
   const paymentDate = formatNielitDate(d.paymentDate || '25-Mar-2026');

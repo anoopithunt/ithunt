@@ -25,7 +25,7 @@ export function formatNielitDate(dateInput) {
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       return `${String(d.getDate()).padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear()}`;
     }
-  } catch (e) {}
+  } catch (e) { }
   return str || '25-Mar-2026';
 }
 
@@ -51,7 +51,7 @@ export function createNielitProjectPdfDoc(data) {
 
     const candName = (data.candidateName || 'Candidate Name').toUpperCase();
     const fatherName = data.fatherName || 'Father Name';
-    const regNo = data.nielitRegNo || '1536056';
+    const regNo = data.nielitRegNo || '1110423';
     const level = data.nielitLevel || 'A';
     const projectTitle = data.projectTitle || 'Network Monitoring and Management';
     const guideName = data.guideName || 'Sushil Kumar';
@@ -61,16 +61,16 @@ export function createNielitProjectPdfDoc(data) {
     const guideAddress = data.guideAddress || 'Prayagraj Uttar Pradesh';
     const projectDate = formatNielitDate(data.projectDate || '18/07/2026');
 
-    const residentialAddress = data.address || 'Buhana Jhunjhunu';
-    const district = data.district || 'Jhunjhunu';
-    const state = data.state || 'Rajasthan';
-    const pin = data.pin || '333502';
-    const mobile = data.mobile || '7740854811';
-    const email = (data.email || 'praveensoni11@gmail.com').toUpperCase();
+    const residentialAddress = data.address || 'Kunda Pratapgarh ';
+    const district = data.district || 'Kunda';
+    const state = data.state || 'Uttar Pradesh';
+    const pin = data.pin || '230129';
+    const mobile = data.mobile || '9795771806';
+    const email = (data.email || 'anupcodemaya@gmail.com').toUpperCase();
 
     const paymentDate = formatNielitDate(data.paymentDate || '25-Mar-2026');
     const utrNumber = data.utrNumber || 'CHD550W1FMSF1B';
-    const accountHolderName = data.accountHolderName || data.candidateName || 'Praveen Kumar Soni';
+    const accountHolderName = data.accountHolderName || data.candidateName || 'Anup Kumar';
     const amount = data.amount || '1000';
     const remark = data.paymentRemark || 'Paid';
 
@@ -98,7 +98,7 @@ export function createNielitProjectPdfDoc(data) {
     curY += 15;
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(11);
-    
+
     const p1Lines = doc.splitTextToSize(
       `This is to certify that the Project / Dissertation entitled "${projectTitle}" a bonafide work done by Mr. / Ms. ${candName} (NIELIT Registration No: ${regNo}) in partial fulfilment of ${level} Level / B Level / C Level examination and has been carried out under my direct supervision and guidance. This report or a similar report on the topic has not been submitted for any other examination and does not form a part of any other course undergone by the candidate.`,
       contentWidth
@@ -157,7 +157,7 @@ export function createNielitProjectPdfDoc(data) {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
     doc.text('PERFORMA OF COVERING LETTER TO THE PROJECT REPORT', pageWidth / 2, curY, { align: 'center' });
-    
+
     // Underline header
     const titleWidth = doc.getTextWidth('PERFORMA OF COVERING LETTER TO THE PROJECT REPORT');
     doc.setLineWidth(0.4);
@@ -293,7 +293,7 @@ export function createNielitProjectPdfDoc(data) {
     curY += 6;
     doc.text('(or)', margin, curY);
     curY += 6;
-    
+
     doc.setFont('helvetica', 'bold');
     doc.text(`Name of the Guide/Supervisor: ${guideName}`, margin, curY);
     curY += 6;
@@ -322,7 +322,7 @@ export function createNielitProjectPdfDoc(data) {
     let cellX = tableX;
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9.5);
-    
+
     doc.text('Payment Date', cellX + 3, curY + 5.5);
     cellX += colWidthsP3[0];
     doc.line(cellX, curY, cellX, curY + (rowH * 2));
@@ -403,7 +403,7 @@ export function createNielitProjectPdfDoc(data) {
     doc.setFontSize(9);
 
     const headers = [
-      'S. No.', 'Regn. No.', 'Name of Cand.', 'Level', 
+      'S. No.', 'Regn. No.', 'Name of Cand.', 'Level',
       'Amount', 'Transaction Date', 'Transaction No/UTR', 'Payment Sender Name', 'Remark'
     ];
 

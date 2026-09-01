@@ -16,12 +16,12 @@
           <div class="form-grid-2">
             <div class="form-field">
               <label class="form-label">Candidate Name <span class="req">*</span></label>
-              <input type="text" v-model="form.candidateName" required class="form-control" placeholder="e.g. Praveen Kumar Soni" />
+              <input type="text" v-model="form.candidateName" required class="form-control" placeholder="e.g. Anup Kumar" />
             </div>
 
             <div class="form-field">
               <label class="form-label">NIELIT Registration No <span class="req">*</span></label>
-              <input type="text" v-model="form.nielitRegNo" required class="form-control" placeholder="e.g. 1536056" />
+              <input type="text" v-model="form.nielitRegNo" required class="form-control" placeholder="e.g. 1110423" />
             </div>
 
             <div class="form-field">
@@ -36,39 +36,39 @@
 
             <div class="form-field">
               <label class="form-label">Father's Name <span class="req">*</span></label>
-              <input type="text" v-model="form.fatherName" required class="form-control" placeholder="e.g. Kedar Mal Soni" />
+              <input type="text" v-model="form.fatherName" required class="form-control" placeholder="e.g. Shiv Shanker Mishra" />
             </div>
 
             <div class="form-field">
               <label class="form-label">Email Address <span class="req">*</span></label>
-              <input type="email" v-model="form.email" required class="form-control" placeholder="praveensoni11@gmail.com" />
+              <input type="email" v-model="form.email" required class="form-control" placeholder="anupcodemaya@gmail.com" />
             </div>
 
             <div class="form-field">
               <label class="form-label">Mobile Number <span class="req">*</span></label>
-              <input type="tel" v-model="form.mobile" required class="form-control" placeholder="7740854811" />
+              <input type="tel" v-model="form.mobile" required class="form-control" placeholder="9795771806" />
             </div>
           </div>
 
           <div class="form-field" style="margin-top: 0.75rem;">
             <label class="form-label">Residential Address <span class="req">*</span></label>
-            <input type="text" v-model="form.address" required class="form-control" placeholder="Buhana Jhunjhunu" />
+            <input type="text" v-model="form.address" required class="form-control" placeholder="Kunda Pratapgarh " />
           </div>
 
           <div class="form-grid-3" style="margin-top: 0.75rem;">
             <div class="form-field">
               <label class="form-label">District <span class="req">*</span></label>
-              <input type="text" v-model="form.district" required class="form-control" placeholder="Jhunjhunu" />
+              <input type="text" v-model="form.district" required class="form-control" placeholder="Pratapgarh" />
             </div>
 
             <div class="form-field">
               <label class="form-label">State <span class="req">*</span></label>
-              <input type="text" v-model="form.state" required class="form-control" placeholder="Rajasthan" />
+              <input type="text" v-model="form.state" required class="form-control" placeholder="Uttar Pradesh" />
             </div>
 
             <div class="form-field">
               <label class="form-label">Pin Code <span class="req">*</span></label>
-              <input type="text" v-model="form.pin" required class="form-control" placeholder="333502" />
+              <input type="text" v-model="form.pin" required class="form-control" placeholder="230129" />
             </div>
           </div>
         </div>
@@ -127,7 +127,7 @@
           <div class="form-grid-2" style="margin-top: 0.75rem;">
             <div class="form-field">
               <label class="form-label">Account Holder / Sender Name <span class="req">*</span></label>
-              <input type="text" v-model="form.accountHolderName" required class="form-control" placeholder="Praveen Kumar Soni" />
+              <input type="text" v-model="form.accountHolderName" required class="form-control" placeholder="Anup Kumar" />
             </div>
 
             <div class="form-field">
@@ -165,24 +165,24 @@ const emit = defineEmits(['close', 'submit-nielit-project']);
 const isSubmitting = ref(false);
 
 const form = ref({
-  studentName: props.initialData.studentName || props.initialData.candidateName || 'Praveen Kumar Soni',
-  candidateName: props.initialData.candidateName || props.initialData.studentName || 'Praveen Kumar Soni',
-  regNo: props.initialData.regNo || props.initialData.nielitRegNo || '1536056',
-  nielitRegNo: props.initialData.nielitRegNo || props.initialData.regNo || '1536056',
+  studentName: props.initialData.studentName || props.initialData.candidateName || 'Anup Kumar',
+  candidateName: props.initialData.candidateName || props.initialData.studentName || 'Anup Kumar',
+  regNo: props.initialData.regNo || props.initialData.nielitRegNo || '1110423',
+  nielitRegNo: props.initialData.nielitRegNo || props.initialData.regNo || '1110423',
   nielitLevel: props.initialData.nielitLevel || 'O',
   level: props.initialData.level || 'O Level',
-  fatherName: props.initialData.fatherName || 'Kedar Mal Soni',
-  email: props.initialData.email || 'praveensoni11@gmail.com',
-  mobile: props.initialData.mobile || '7740854811',
-  address: props.initialData.address || 'Buhana Jhunjhunu',
-  district: props.initialData.district || 'Jhunjhunu',
-  state: props.initialData.state || 'Rajasthan',
-  pin: props.initialData.pin || '333502',
+  fatherName: props.initialData.fatherName || 'Shiv Shanker Mishra',
+  email: props.initialData.email || 'anupcodemaya@gmail.com',
+  mobile: props.initialData.mobile || '9795771806',
+  address: props.initialData.address || 'Kunda Pratapgarh ',
+  district: props.initialData.district || 'Kunda',
+  state: props.initialData.state || 'Uttar Pradesh',
+  pin: props.initialData.pin || '230129',
 
   projectTitle: props.initialData.projectTitle || 'Network Monitoring and Management',
-  guideName: props.initialData.guideName || 'Mr. Lakshman Singh Chauhan',
+  guideName: props.initialData.guideName || 'Mr. Sushil Kumar',
   guideQualification: props.initialData.guideQualification || 'MCA (Computer Science)',
-  guideDesignation: props.initialData.guideDesignation || 'Director & Founder, IT HUNT',
+  guideDesignation: props.initialData.guideDesignation || 'Laraval/NodeJS Developer',
   guidePlace: props.initialData.guidePlace || 'Prayagraj',
   guideAddress: props.initialData.guideAddress || 'Holagarh, Prayagraj, UP',
   projectDate: props.initialData.projectDate || new Date().toLocaleDateString('en-GB'),
@@ -191,8 +191,8 @@ const form = ref({
   amount: props.initialData.amount || '1000',
   paymentDate: props.initialData.paymentDate || new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
   utrNumber: props.initialData.utrNumber || 'CHD550W1FMSF1B',
-  accountHolderName: props.initialData.accountHolderName || 'Praveen Kumar Soni',
-  paymentRemark: props.initialData.paymentRemark || 'Paid Online'
+  accountHolderName: props.initialData.accountHolderName || 'Anup Kumar',
+  paymentRemark: props.initialData.paymentRemark || 'Paid'
 });
 
 const handleSubmit = async () => {
