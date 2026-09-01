@@ -5506,13 +5506,14 @@ body.light-theme .exp-badge-required {
 html, body {
   overflow-x: hidden;
   width: 100%;
+  -webkit-text-size-adjust: 100%;
 }
 
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
-img, svg {
+img, svg, video, canvas {
   max-width: 100%;
   height: auto;
 }
@@ -5529,7 +5530,24 @@ input, select, textarea, button {
   }
 }
 
-/* 2. Tablet & Medium Screen Optimizations (769px - 1024px) */
+/* 2. Large Tablet & Laptop Optimizations (901px - 1100px) */
+@media (max-width: 1100px) {
+  .nav-links {
+    gap: 0.2rem;
+  }
+
+  .nav-item-btn {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.825rem;
+  }
+
+  .cta-btn-header {
+    padding: 0.45rem 0.95rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* 3. Tablet & Medium Screen Optimizations (769px - 1024px) */
 @media (max-width: 1024px) {
   .hero-grid {
     grid-template-columns: 1fr !important;
@@ -5538,12 +5556,18 @@ input, select, textarea, button {
   }
 
   .hero-content {
-    max-width: 650px;
+    max-width: 680px;
     margin: 0 auto;
   }
 
   .hero-cta-group {
     justify-content: center;
+  }
+
+  .hero-media-wrapper {
+    max-width: 620px;
+    margin: 0 auto;
+    width: 100%;
   }
 
   .stats-grid {
@@ -5571,16 +5595,53 @@ input, select, textarea, button {
   .admin-grid-2col {
     grid-template-columns: 1fr !important;
   }
-}
 
-/* 3. Small Tablet & Large Mobile (601px - 768px) */
-@media (max-width: 768px) {
-  .section-title {
-    font-size: 2rem !important;
+  .director-spotlight-card {
+    grid-template-columns: 1fr;
+    text-align: center;
+    justify-items: center;
   }
 
-  .hero-title {
-    font-size: 2.4rem !important;
+  .director-img {
+    margin: 0 auto;
+  }
+}
+
+/* 4. Small Tablet & Mobile Switch (769px - 900px) */
+@media (max-width: 900px) {
+  .nav-links,
+  .cta-btn-header {
+    display: none !important;
+  }
+
+  .mobile-toggle-btn {
+    display: flex !important;
+  }
+
+  .internship-banner,
+  .rating-summary-card {
+    grid-template-columns: 1fr !important;
+  }
+
+  .internship-tracks-grid,
+  .alumni-cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem;
+  }
+
+  .alumni-stats-ribbon {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem;
+  }
+
+  .roadmap-grid,
+  .internship-features-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 2rem;
   }
 
   .admin-control-bar {
@@ -5593,6 +5654,19 @@ input, select, textarea, button {
   .admin-quick-actions {
     width: 100%;
     justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
+
+/* 5. Mobile Landscape & Standard Phones (601px - 768px) */
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 2rem !important;
+  }
+
+  .hero-title {
+    font-size: 2.3rem !important;
+    line-height: 1.25;
   }
 
   .superadmin-stats-grid {
@@ -5602,11 +5676,6 @@ input, select, textarea, button {
 
   .careers-benefits-ribbon {
     grid-template-columns: 1fr 1fr !important;
-  }
-
-  .footer-grid {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 2rem;
   }
 
   .footer-bottom {
@@ -5619,16 +5688,50 @@ input, select, textarea, button {
   .footer-bottom > div:last-child {
     justify-content: center;
   }
+
+  .pdf-two-col-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+
+  .pdf-reg-highlight-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .internship-filter-capsule,
+  .events-category-nav,
+  .admin-nav-tabs {
+    display: flex !important;
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0.35rem;
+  }
+
+  .internship-filter-capsule::-webkit-scrollbar,
+  .events-category-nav::-webkit-scrollbar,
+  .admin-nav-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-capsule-btn,
+  .event-cat-btn,
+  .admin-nav-tab-btn {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
 }
 
-/* 4. Standard Mobile Screens (481px - 600px) */
+/* 6. Standard Smartphone Portrait (481px - 600px) */
 @media (max-width: 600px) {
   .container {
     padding: 0 1.15rem !important;
   }
 
   .hero-title {
-    font-size: 2.1rem !important;
+    font-size: 2rem !important;
   }
 
   .hero-subtitle {
@@ -5638,6 +5741,7 @@ input, select, textarea, button {
   .hero-cta-group {
     flex-direction: column;
     width: 100%;
+    gap: 0.75rem;
   }
 
   .hero-cta-group .btn-primary,
@@ -5655,11 +5759,15 @@ input, select, textarea, button {
     padding: 1rem 0.85rem !important;
   }
 
-  .form-grid {
+  .form-grid,
+  .form-grid-2,
+  .form-grid-3 {
     grid-template-columns: 1fr !important;
+    gap: 0.75rem;
   }
 
-  .modal-card {
+  .modal-card,
+  .nielit-modal-card {
     width: 95vw !important;
     max-width: 95vw !important;
     padding: 1.5rem 1.15rem !important;
@@ -5678,11 +5786,11 @@ input, select, textarea, button {
   }
 
   .review-highlight-title {
-    font-size: 1.7rem !important;
+    font-size: 1.6rem !important;
   }
 
   .star-glow-btn {
-    font-size: 2.2rem !important;
+    font-size: 2.1rem !important;
   }
 
   .careers-benefits-ribbon {
@@ -5693,21 +5801,37 @@ input, select, textarea, button {
     grid-template-columns: 1fr !important;
     gap: 2rem;
   }
+
+  .hero-floating-badge {
+    position: static !important;
+    margin: 1.25rem auto 0 !important;
+    display: inline-flex !important;
+    max-width: 90%;
+  }
+
+  .code-terminal-card {
+    font-size: 0.8rem;
+    overflow-x: auto;
+  }
 }
 
-/* 5. Extra-Small Mobile Screens (320px - 480px) */
+/* 7. Extra-Small Mobile Devices (320px - 480px) */
 @media (max-width: 480px) {
   .container {
     padding: 0 0.85rem !important;
   }
 
+  .navbar-container {
+    height: 64px !important;
+  }
+
   .brand-logo {
-    gap: 0.5rem;
+    gap: 0.45rem;
   }
 
   .brand-logo-img {
-    width: 38px;
-    height: 38px;
+    width: 36px !important;
+    height: 36px !important;
   }
 
   .brand-title {
@@ -5727,12 +5851,12 @@ input, select, textarea, button {
   }
 
   .hero-title {
-    font-size: 1.85rem !important;
+    font-size: 1.75rem !important;
     line-height: 1.2;
   }
 
   .section-title {
-    font-size: 1.65rem !important;
+    font-size: 1.55rem !important;
   }
 
   .section-tag {
@@ -5748,25 +5872,39 @@ input, select, textarea, button {
     padding: 0.75rem 0.5rem !important;
   }
 
+  .stat-number {
+    font-size: 1.65rem !important;
+  }
+
   .stat-label {
-    font-size: 0.72rem !important;
+    font-size: 0.7rem !important;
+  }
+
+  .track-glass-stats {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem !important;
+  }
+
+  .track-stat-cell {
+    padding: 0.5rem !important;
+    text-align: center;
   }
 
   .login-card {
-    padding: 1.75rem 1.15rem !important;
+    padding: 1.5rem 1rem !important;
     border-radius: var(--radius-lg) !important;
   }
 
   .login-title {
-    font-size: 1.65rem !important;
+    font-size: 1.5rem !important;
   }
 
   .review-highlight-card {
-    padding: 1.5rem 1rem !important;
+    padding: 1.5rem 0.85rem !important;
   }
 
   .review-highlight-title {
-    font-size: 1.45rem !important;
+    font-size: 1.35rem !important;
   }
 
   .review-floating-pill {
@@ -5775,64 +5913,59 @@ input, select, textarea, button {
   }
 
   .star-glow-btn {
-    font-size: 1.85rem !important;
+    font-size: 1.75rem !important;
     padding: 0 0.05rem !important;
   }
 
   .star-count-indicator {
-    font-size: 0.9rem !important;
+    font-size: 0.85rem !important;
   }
 
   .rating-interactive-card {
-    padding: 1rem 0.85rem !important;
+    padding: 1rem 0.75rem !important;
   }
 
   .cat-chip-glow-btn {
     font-size: 0.75rem !important;
-    padding: 0.4rem 0.75rem !important;
+    padding: 0.4rem 0.65rem !important;
   }
 
   .review-submit-mega-btn {
-    padding: 0.95rem 1.25rem !important;
-    font-size: 0.95rem !important;
+    padding: 0.85rem 1.15rem !important;
+    font-size: 0.9rem !important;
   }
 
   .admin-control-bar {
-    padding: 1.15rem 0.85rem !important;
+    padding: 1rem 0.75rem !important;
     border-radius: var(--radius-lg) !important;
   }
 
   .admin-user-name {
-    font-size: 1.15rem !important;
+    font-size: 1.05rem !important;
   }
 
   .superadmin-stats-grid {
     grid-template-columns: 1fr 1fr !important;
-    gap: 0.6rem !important;
+    gap: 0.5rem !important;
   }
 
   .admin-stat-card {
-    padding: 0.85rem 0.65rem !important;
-    gap: 0.6rem !important;
+    padding: 0.75rem 0.5rem !important;
+    gap: 0.5rem !important;
   }
 
   .admin-stat-icon-box {
-    width: 36px !important;
-    height: 36px !important;
-    font-size: 1.15rem !important;
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 1rem !important;
   }
 
   .admin-stat-val {
-    font-size: 1.15rem !important;
+    font-size: 1.05rem !important;
   }
 
   .admin-stat-lbl {
-    font-size: 0.72rem !important;
-  }
-
-  .admin-nav-tab-btn {
-    padding: 0.6rem 0.9rem !important;
-    font-size: 0.78rem !important;
+    font-size: 0.68rem !important;
   }
 
   .events-search-box {
@@ -5843,7 +5976,7 @@ input, select, textarea, button {
   .reviews-filter-bar {
     flex-direction: column;
     align-items: stretch;
-    gap: 1rem;
+    gap: 0.85rem;
   }
 
   .reviews-filter-bar > div {
@@ -5852,34 +5985,44 @@ input, select, textarea, button {
   }
 
   .receipt-preview-card {
-    padding: 1.25rem 0.85rem !important;
-    font-size: 0.82rem;
+    padding: 1.15rem 0.75rem !important;
+    font-size: 0.8rem;
   }
 
   .receipt-title {
-    font-size: 1.15rem !important;
+    font-size: 1.05rem !important;
+  }
+
+  .floating-back-to-top {
+    bottom: 1.25rem !important;
+    right: 1.25rem !important;
+    width: 42px !important;
+    height: 42px !important;
+    font-size: 1.1rem !important;
   }
 }
 
-/* ==========================================================================
-   6. Universal Responsive System & Fluid Viewport Enhancements
-   ========================================================================== */
+/* 8. Ultra-Compact Mobile Screens (< 360px) */
+@media (max-width: 360px) {
+  .superadmin-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
 
-/* Prevent iOS input zoom on mobile focus */
-@media (max-width: 768px) {
-  input[type="text"],
-  input[type="email"],
-  input[type="tel"],
-  input[type="password"],
-  input[type="number"],
-  input[type="date"],
-  select,
-  textarea {
-    font-size: 16px !important;
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .brand-title {
+    font-size: 0.95rem !important;
+  }
+
+  .brand-logo-img {
+    width: 32px !important;
+    height: 32px !important;
   }
 }
 
-/* Fluid Responsive Table Scroll Wrappers */
+/* 9. Universal Responsive Table & Document Scroll Wrappers */
 .table-responsive,
 .admin-table-wrap {
   width: 100%;
@@ -5891,16 +6034,15 @@ input, select, textarea, button {
 
 .table-responsive table,
 .admin-table-wrap table {
-  min-width: 650px;
+  min-width: 600px;
   width: 100%;
   border-collapse: collapse;
 }
 
-/* Universal Touch Target Enhancements */
+/* 10. Universal Mobile Touch Targets & Accessibility */
 @media (max-width: 640px) {
   .btn-primary,
   .btn-secondary,
-  .admin-nav-tab-btn,
   .modal-close-btn,
   .star-glow-btn {
     min-height: 44px;
@@ -5909,40 +6051,12 @@ input, select, textarea, button {
     justify-content: center;
   }
 
-  /* Responsive Grid Adjustments */
-  .form-grid-2,
-  .form-grid-3 {
-    grid-template-columns: 1fr !important;
-  }
-
-  .superadmin-stats-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 0.75rem !important;
-  }
-
-  /* Canvas and PDF Document Responsiveness */
   canvas,
   iframe,
   embed,
   object {
     max-width: 100% !important;
     height: auto !important;
-  }
-}
-
-@media (max-width: 380px) {
-  .superadmin-stats-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  .admin-nav-tabs {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .admin-nav-tab-btn {
-    width: 100%;
-    text-align: center;
   }
 }
 
@@ -6008,4 +6122,5 @@ input, select, textarea, button {
   opacity: 0;
   transform: translateY(-10px) scale(0.995);
 }
+
 
