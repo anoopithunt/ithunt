@@ -3,6 +3,23 @@
     <!-- Top Scroll Progress Indicator -->
     <div class="scroll-progress-bar" :style="{ width: scrollProgress + '%' }" aria-hidden="true"></div>
 
+    <!-- Cosmic Twinkling Starfield Layer -->
+    <div class="starfield-wrapper" aria-hidden="true">
+      <div class="stars-layer stars-small"></div>
+      <div class="stars-layer stars-medium"></div>
+      <div class="stars-layer stars-large"></div>
+      <div class="shooting-star shooting-star-1"></div>
+      <div class="shooting-star shooting-star-2"></div>
+      <div class="shooting-star shooting-star-3"></div>
+    </div>
+
+    <!-- Floating Ambient Glow Orbs Layer -->
+    <div class="ambient-glow-container" aria-hidden="true">
+      <div class="ambient-orb ambient-orb-1"></div>
+      <div class="ambient-orb ambient-orb-2"></div>
+      <div class="ambient-orb ambient-orb-3"></div>
+    </div>
+
     <!-- Subtle Clean Background Accent Layer -->
     <div class="subtle-bg-gradient" aria-hidden="true"></div>
 
@@ -357,6 +374,17 @@
       @open-privacy-policy="openPrivacyPolicyPdf"
       @open-terms-conditions="openTermsConditionsPdf"
     />
+
+    <!-- Floating Back to Top Action Button -->
+    <button 
+      class="floating-back-to-top" 
+      :class="{ visible: showBackToTop }" 
+      @click="scrollToTop" 
+      title="Scroll to Top"
+      aria-label="Back to Top"
+    >
+      <span>↑</span>
+    </button>
   </div>
 </template>
 
@@ -417,6 +445,7 @@ const content = ref(CONTENT_DATA);
 const activeTab = ref('home');
 const isDarkMode = ref(true);
 const scrollProgress = ref(0);
+const showBackToTop = ref(false);
 const showConfetti = ref(false);
 const confettiPieces = ref([]);
 
@@ -570,12 +599,17 @@ const modalTitle = ref('');
 const modalBody = ref('');
 const submittedRegistrationNo = ref('');
 
-// Scroll Progress Tracker
+// Scroll Progress Tracker & Floating Action Controller
 const handleScroll = () => {
   const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
   if (totalHeight > 0) {
     scrollProgress.value = Math.min(100, Math.max(0, (window.scrollY / totalHeight) * 100));
   }
+  showBackToTop.value = window.scrollY > 320;
+};
+
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 // Trigger Celebratory Confetti Burst
