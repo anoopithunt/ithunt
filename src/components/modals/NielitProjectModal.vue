@@ -151,7 +151,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import { API } from '@/utils/apiClient';
+import { API, saveNielitProjectRecord } from '@/utils/apiClient';
 
 const props = defineProps({
   initialData: {
@@ -169,8 +169,8 @@ const form = ref({
   candidateName: props.initialData.candidateName || props.initialData.studentName || 'Anup Kumar',
   regNo: props.initialData.regNo || props.initialData.nielitRegNo || '1110423',
   nielitRegNo: props.initialData.nielitRegNo || props.initialData.regNo || '1110423',
-  nielitLevel: props.initialData.nielitLevel || 'O',
-  level: props.initialData.level || 'O Level',
+  nielitLevel: props.initialData.nielitLevel || 'A',
+  level: props.initialData.level || 'A Level',
   fatherName: props.initialData.fatherName || 'Shiv Shanker Mishra',
   email: props.initialData.email || 'anupcodemaya@gmail.com',
   mobile: props.initialData.mobile || '9795771806',
@@ -198,18 +198,23 @@ const form = ref({
 const handleSubmit = async () => {
   try {
     isSubmitting.value = true;
+    const regId = form.value.nielitRegNo || form.value.regNo || '1110423';
     const payload = {
       ...form.value,
-      studentName: form.value.candidateName || form.value.studentName,
-      candidateName: form.value.candidateName || form.value.studentName,
-      regNo: form.value.nielitRegNo || form.value.regNo,
-      registrationNo: form.value.nielitRegNo || form.value.regNo,
-      nielitRegNo: form.value.nielitRegNo || form.value.regNo,
+      id: regId,
+      studentName: form.value.candidateName || form.value.studentName || 'Anup Kumar',
+      candidateName: form.value.candidateName || form.value.studentName || 'Anup Kumar',
+      regNo: regId,
+      registrationNo: regId,
+      nielitRegNo: regId,
       level: form.value.nielitLevel ? `${form.value.nielitLevel} Level` : 'O Level',
-      status: 'Submitted'
+      status: 'Submitted',
+      feePaid: `₹${form.value.amount || '1,000'}`,
+      utrNo: form.value.utrNumber || 'CHD550W1FMSF1B'
     };
 
-    await API.submitNielitProject(payload);
+    // Save directly to Firebase Firestore Cloud Database
+    await saveNielitProjectRecord(payload);
     emit('submit-nielit-project', payload);
   } catch (err) {
     console.warn('API submission note:', err.message);
