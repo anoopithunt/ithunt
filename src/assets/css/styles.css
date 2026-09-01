@@ -15,6 +15,31 @@ html {
   width: 100%;
 }
 
+/* Custom Modern Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-cyber-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #f97316 0%, #f59e0b 100%);
+  border-radius: 9999px;
+  border: 2px solid var(--bg-cyber-dark);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ea580c 0%, #d97706 100%);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #f97316 var(--bg-cyber-dark);
+}
+
 body {
   font-family: var(--font-body);
   background-color: var(--bg-cyber-dark);
@@ -23,7 +48,7 @@ body {
   overflow-x: hidden;
   min-height: 100vh;
   width: 100%;
-  transition: background-color 0.25s ease, color 0.25s ease;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -5920,3 +5945,67 @@ input, select, textarea, button {
     text-align: center;
   }
 }
+
+/* ==========================================================================
+   FLOATING ACTION UTILITIES & SMOOTH BACK-TO-TOP BUTTON
+   ========================================================================== */
+
+.floating-back-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background: var(--bg-card-glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-cyber-glow);
+  color: var(--color-ai-orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  cursor: pointer;
+  z-index: 999;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 20px rgba(249, 115, 22, 0.25);
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px) scale(0.85);
+}
+
+.floating-back-to-top.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.floating-back-to-top:hover {
+  transform: translateY(-4px) scale(1.1);
+  background: var(--gradient-ai-btn);
+  color: #ffffff;
+  border-color: #facc15;
+  box-shadow: 0 12px 30px rgba(249, 115, 22, 0.6), 0 0 30px rgba(250, 204, 21, 0.5);
+}
+
+.floating-back-to-top:active {
+  transform: translateY(1px) scale(0.95);
+}
+
+/* View Morph Transition Optimization */
+.view-morph-enter-active,
+.view-morph-leave-active {
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.view-morph-enter-from {
+  opacity: 0;
+  transform: translateY(14px) scale(0.995);
+}
+
+.view-morph-leave-to {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.995);
+}
+
