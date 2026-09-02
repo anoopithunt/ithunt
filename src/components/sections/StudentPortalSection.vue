@@ -14,51 +14,51 @@
     <!-- LOGGED IN VIEW: Student Dashboard & Profile Editor -->
     <div v-if="studentUser" class="student-dashboard-wrap anim-stagger-1" style="max-width: 960px; margin: 0 auto;">
       <!-- Dashboard Welcome Banner -->
-      <div style="background: var(--bg-card-glass); border: 1px solid var(--border-cyber); padding: 1.75rem; border-radius: var(--radius-lg); margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-        <div style="display: flex; align-items: center; gap: 1.25rem;">
-          <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--gradient-ai-btn); display: flex; align-items: center; justify-content: center; font-size: 1.75rem; color: #fff; font-weight: 800;">
+      <div class="student-welcome-banner">
+        <div class="student-welcome-user">
+          <div class="student-avatar-badge">
             🎓
           </div>
           <div>
-            <h2 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; margin-bottom: 0.2rem;">
+            <h2 class="student-welcome-name">
               Welcome back, {{ studentUser.candidateName }}!
             </h2>
-            <div style="font-size: 0.875rem; color: var(--text-muted); font-family: var(--font-mono);">
+            <div class="student-welcome-meta">
               Reg ID: <strong style="color: var(--color-ai-orange);">{{ studentUser.registrationNo || 'ITH-2026-001' }}</strong> | Email: {{ studentUser.email }}
             </div>
           </div>
         </div>
 
-        <button class="btn-secondary" @click="handleLogout" style="padding: 0.5rem 1.2rem; font-size: 0.875rem;">
+        <button class="btn-secondary student-logout-btn" @click="handleLogout">
           <span>🚪 Logout</span>
         </button>
       </div>
 
       <!-- Quick Status Badges -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem;">
-        <div style="background: var(--bg-card-glass); border: 1px solid var(--border-cyber); padding: 1.25rem; border-radius: var(--radius-md); text-align: center;">
-          <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Program Enrolled</div>
-          <div style="font-weight: 800; font-size: 1.1rem; color: var(--text-main); margin-top: 0.4rem;">{{ studentUser.course || 'MERN Stack Developer' }}</div>
+      <div class="student-status-grid">
+        <div class="student-status-card">
+          <div class="student-status-lbl">Program Enrolled</div>
+          <div class="student-status-val">{{ studentUser.course || 'MERN Stack Developer' }}</div>
         </div>
 
-        <div style="background: var(--bg-card-glass); border: 1px solid var(--border-cyber); padding: 1.25rem; border-radius: var(--radius-md); text-align: center;">
-          <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Admission Status</div>
-          <div style="font-weight: 800; font-size: 1.1rem; color: #10b981; margin-top: 0.4rem;">
+        <div class="student-status-card">
+          <div class="student-status-lbl">Admission Status</div>
+          <div class="student-status-val" style="color: #10b981;">
             {{ studentUser.status || 'Active & Confirmed ✓' }}
           </div>
         </div>
 
-        <div style="background: var(--bg-card-glass); border: 1px solid var(--border-cyber); padding: 1.25rem; border-radius: var(--radius-md); text-align: center;">
-          <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Fee Payment Status</div>
-          <div style="font-weight: 800; font-size: 1.1rem; margin-top: 0.4rem;" :style="{ color: (studentUser.feeStatus && studentUser.feeStatus.includes('Paid')) ? '#10b981' : '#f59e0b' }">
+        <div class="student-status-card">
+          <div class="student-status-lbl">Fee Payment Status</div>
+          <div class="student-status-val" :style="{ color: (studentUser.feeStatus && studentUser.feeStatus.includes('Paid')) ? '#10b981' : '#f59e0b' }">
             {{ studentUser.feeStatus || 'Pending Verification' }}
           </div>
         </div>
       </div>
 
       <!-- EDIT & UPDATE STUDENT PROFILE FORM -->
-      <div style="background: var(--bg-card-glass); border: 1px solid var(--border-cyber); padding: 2rem; border-radius: var(--radius-lg);">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.75rem; border-bottom: 1px solid var(--border-cyber); padding-bottom: 1rem;">
+      <div class="student-profile-card">
+        <div class="student-profile-header">
           <h3 style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800;">
             ✏️ Edit & Update Your Student Profile Details
           </h3>
@@ -66,7 +66,7 @@
         </div>
 
         <form @submit.prevent="saveProfileUpdates" class="admission-form">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+          <div class="student-profile-form-grid">
             <div class="form-group">
               <label class="form-label">Full Candidate Name <span class="req">*</span></label>
               <input type="text" v-model="editForm.candidateName" required class="form-control">
