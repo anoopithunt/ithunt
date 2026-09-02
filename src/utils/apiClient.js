@@ -1,7 +1,7 @@
 import { CONTENT_DATA } from '../data/contentData.js';
 import { db, rtdb } from './firebaseConfig.js';
-import { collection, doc, setDoc, getDocs, deleteDoc } from 'firebase/firestore';
-import { ref as dbRef, set as dbSet, get as dbGet, remove as dbRemove } from 'firebase/database';
+import { collection, doc, setDoc, getDocs, deleteDoc, onSnapshot } from 'firebase/firestore';
+import { ref as dbRef, set as dbSet, get as dbGet, remove as dbRemove, onValue } from 'firebase/database';
 
 const API_BASE_URL = (
   import.meta.env.VITE_API_URL || 
@@ -10,6 +10,194 @@ const API_BASE_URL = (
 ).replace(/\/+$/, '');
 
 let memoryToken = null;
+
+// ==============================================================================
+// Normalization Helpers for Clean Data Models Across UI
+// ==============================================================================
+export const normalizeAdmission = (a) => ({
+  id: a.id || a.registrationNumber || a.registrationNo || `ADM-${Date.now()}`,
+  registrationNo: a.registrationNumber || a.registrationNo || a.id || `ITH-${Math.floor(100000 + Math.random() * 900000)}`,
+  candidateName: a.fullName || a.candidateName || a.name || 'Candidate',
+  fullName: a.fullName || a.candidateName || a.name || 'Candidate',
+  fatherName: a.fatherName || '—',
+  motherName: a.motherName || '—',
+  mobile: a.phone || a.mobile || '',
+  phone: a.phone || a.mobile || '',
+  email: a.email || '',
+  course: a.course || a.track || "NIELIT 'A' Level Diploma",
+  track: a.course || a.track || "NIELIT 'A' Level Diploma",
+  district: a.district || a.city || 'Prayagraj',
+  gender: a.gender || 'Male',
+  dob: a.dob || '2004-01-01',
+  date: a.createdAt ? new Date(a.createdAt).toLocaleDateString('en-GB') : (a.date || new Date().toLocaleDateString('en-GB')),
+  time: a.createdAt ? new Date(a.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : (a.time || '10:00 AM'),
+  status: (a.status === 'PROVISIONALLY ADMITTED' || !a.status) ? 'Confirmed' : a.status,
+  feeStatus: a.feeStatus || 'Verified & Paid',
+  amountPaid: a.amountPaid || '₹5,000'
+});
+
+export const normalizeStudent = (s) => ({
+  id: s.id || s.userId || `STU-${Date.now()}`,
+  userId: s.userId || s.id,
+  enrollmentNumber: s.enrollmentNumber || s.registrationNo || `ITH-2026-STU${Math.floor(1000 + Math.random() * 9000)}`,
+  name: s.name || s.fullName || s.candidateName || 'Student',
+  fullName: s.name || s.fullName || s.candidateName || 'Student',
+  candidateName: s.name || s.fullName || s.candidateName || 'Student',
+  email: s.email || '',
+  phone: s.phone || s.mobile || '',
+  mobile: s.phone || s.mobile || '',
+  course: s.course || 'MERN Stack Developer',
+  batch: s.batch || '2026',
+  academicStatus: s.academicStatus || s.status || 'ACTIVE',
+  status: s.academicStatus || s.status || 'ACTIVE',
+  gender: s.gender || 'Male',
+  dob: s.dob || '2004-01-01',
+  address: s.address || 'Holagarh, Prayagraj',
+  guardianName: s.guardianName || '—',
+  guardianPhone: s.guardianPhone || '—',
+  bio: s.bio || '',
+  createdAt: s.createdAt ? new Date(s.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'),
+  createdAtFormatted: s.createdAt ? new Date(s.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Recent'
+});
+
+export const normalizeNielitProject = (p) => ({
+  id: p.id || p.regNo || p.registrationNo || p.nielitRegNo || `NIELIT-${Date.now()}`,
+  registrationNo: p.regNo || p.registrationNo || p.nielitRegNo || p.id,
+  nielitRegNo: p.nielitRegNo || p.regNo || p.registrationNo || p.id,
+  candidateName: p.studentName || p.candidateName || p.fullName || p.name || 'Candidate',
+  studentName: p.studentName || p.candidateName || p.fullName || p.name || 'Candidate',
+  fatherName: p.fatherName || '—',
+  motherName: p.motherName || '—',
+  mobile: p.mobile || p.phone || '',
+  level: p.level || p.nielitLevel || 'O Level',
+  projectTitle: p.projectTitle || p.title || 'MERN Stack Web Development',
+  guideName: p.guideName || 'Mr. Sushil Kumar',
+  guideQualification: p.guideQualification || 'MCA (Computer Science)',
+  guideDesignation: p.guideDesignation || 'Laravel/NodeJS Developer',
+  status: p.status || 'Submitted',
+  date: p.date || (p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')),
+  feePaid: p.feePaid || p.amount || '₹1,000',
+  utrNo: p.utrNo || p.utrNumber || 'UPI/Verified',
+  accountHolderName: p.accountHolderName || p.candidateName || '',
+  paymentRemark: p.paymentRemark || 'Paid'
+});
+
+export const normalizeJobApplication = (j) => ({
+  id: j.id || `JOB-${Date.now()}`,
+  name: j.name || j.fullName || 'Applicant',
+  fullName: j.name || j.fullName || 'Applicant',
+  position: j.position || j.role || j.jobTitle || 'Faculty Instructor',
+  role: j.position || j.role || j.jobTitle || 'Faculty Instructor',
+  phone: j.phone || j.mobile || '',
+  mobile: j.phone || j.mobile || '',
+  email: j.email || '',
+  experience: j.experience || 'Entry Level / Fresher',
+  resumeLink: j.resumeLink || j.resume || j.portfolioUrl || '',
+  portfolio: j.portfolioUrl || j.portfolio || j.resumeLink || '',
+  status: j.status === 'PENDING_REVIEW' ? 'Pending Review' : (j.status || 'Pending Review'),
+  date: j.date || (j.createdAt ? new Date(j.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'))
+});
+
+export const normalizeRsvp = (r) => ({
+  id: r.id || `RSVP-${Date.now()}`,
+  name: r.candidateName || r.name || r.fullName || 'Attendee',
+  candidateName: r.candidateName || r.name || r.fullName || 'Attendee',
+  email: r.email || '',
+  phone: r.phone || r.mobile || '',
+  mobile: r.phone || r.mobile || '',
+  eventTitle: r.eventName || r.eventTitle || r.title || 'IT HUNT Tech Summit 2026',
+  college: r.college || '',
+  status: r.status || 'Confirmed',
+  date: r.date || (r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'))
+});
+
+export const normalizeReview = (r) => ({
+  id: r.id || `REV-${Date.now()}`,
+  name: r.name || r.fullName || 'Verified Student',
+  role: r.role || r.course || 'Alumni / Student',
+  course: r.role || r.course || 'IT Track',
+  rating: Number(r.rating) || 5,
+  comment: r.reviewText || r.review || r.comment || '',
+  review: r.reviewText || r.review || r.comment || '',
+  reviewText: r.reviewText || r.review || r.comment || '',
+  category: r.category || '💻 Labs & Workstations',
+  avatar: r.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=60',
+  date: r.date || (r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')),
+  verified: r.verified !== undefined ? r.verified : true
+});
+
+export const normalizeInternship = (i) => ({
+  id: i.id || `INT-${Date.now()}`,
+  candidateName: i.candidateName || i.fullName || i.name || 'Applicant',
+  name: i.candidateName || i.fullName || i.name || 'Applicant',
+  email: i.email || '',
+  phone: i.phone || i.mobile || '',
+  mobile: i.phone || i.mobile || '',
+  track: i.track || i.internshipTrack || 'Full Stack MERN',
+  duration: i.duration || '6 Months',
+  status: i.status || 'Active Internship',
+  appliedAt: i.appliedAt || (i.createdAt ? new Date(i.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'))
+});
+
+export const normalizeFee = (f) => ({
+  id: f.id || f.transactionId || `FEE-${Date.now()}`,
+  studentId: f.studentId || f.userId || '',
+  studentName: f.studentName || f.name || 'Student',
+  receiptNo: f.receiptNumber || f.receiptNo || f.utrNo || `REC-${Math.floor(10000 + Math.random() * 90000)}`,
+  receiptNumber: f.receiptNumber || f.receiptNo || '',
+  course: f.courseName || f.course || 'IT Masterclass',
+  amount: f.amount ? (String(f.amount).startsWith('₹') ? f.amount : `₹${Number(f.amount).toLocaleString('en-IN')}`) : '₹5,000',
+  amountPaid: f.amountPaid || (f.amount ? (String(f.amount).startsWith('₹') ? f.amount : `₹${Number(f.amount).toLocaleString('en-IN')}`) : '₹5,000'),
+  paymentMode: f.paymentMode || f.mode || 'Online UPI',
+  status: f.status === 'PAID' ? 'Verified & Paid' : (f.status || 'Paid & Verified'),
+  date: f.paymentDate ? new Date(f.paymentDate).toLocaleDateString('en-GB') : (f.createdAt ? new Date(f.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'))
+});
+
+export const normalizeCertificate = (c) => ({
+  id: c.id || `CERT-${Date.now()}`,
+  certNo: c.certificateNumber || c.certNo || `ITH-CERT-${Math.floor(10000 + Math.random() * 90000)}`,
+  certificateNumber: c.certificateNumber || c.certNo || '',
+  studentName: c.studentName || c.candidateName || 'Engineer',
+  course: c.courseName || c.course || c.program || 'Software Engineering',
+  grade: c.grade || 'A+',
+  issueDate: c.issueDate ? (String(c.issueDate).includes('/') ? c.issueDate : new Date(c.issueDate).toLocaleDateString('en-GB')) : new Date().toLocaleDateString('en-GB'),
+  status: c.status === 'VERIFIED_ACTIVE' ? 'Verified & Active' : (c.status || 'Verified & Issued')
+});
+
+export const normalizeProject = (p) => ({
+  id: p.id || `PRJ-${Date.now()}`,
+  title: p.title || p.projectTitle || 'Capstone Project',
+  projectTitle: p.title || p.projectTitle || 'Capstone Project',
+  studentName: p.authorName || p.studentName || p.candidateName || 'Student Developer',
+  techStack: Array.isArray(p.techStack) ? p.techStack.join(', ') : (p.techStack || 'React, Node.js, MongoDB'),
+  repoUrl: p.githubUrl || p.repoUrl || 'https://github.com/ithunt',
+  liveUrl: p.liveUrl || 'https://ithunt.in',
+  status: p.status === 'APPROVED' ? 'Completed & Approved' : (p.status || 'Completed & Deployed'),
+  submittedAt: p.submittedAt || (p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'))
+});
+
+export const normalizeContactInquiry = (c) => ({
+  id: c.id || `INQ-${Date.now()}`,
+  name: c.name || c.fullName || 'Inquirer',
+  fullName: c.name || c.fullName || 'Inquirer',
+  email: c.email || '',
+  phone: c.phone || c.mobile || '',
+  mobile: c.phone || c.mobile || '',
+  subject: c.subject || 'Course Enquiry',
+  message: c.message || '',
+  createdAt: c.createdAt ? (String(c.createdAt).includes('/') ? c.createdAt : new Date(c.createdAt).toLocaleDateString('en-GB')) : new Date().toLocaleDateString('en-GB')
+});
+
+export const normalizeUser = (u) => ({
+  id: u.id || `USR-${Date.now()}`,
+  name: u.name || 'User',
+  email: u.email || '',
+  role: u.role || 'student',
+  phone: u.phone || '',
+  course: u.course || '',
+  verified: u.verified !== undefined ? u.verified : true,
+  createdAt: u.createdAt ? (String(u.createdAt).includes('/') ? u.createdAt : new Date(u.createdAt).toLocaleDateString('en-GB')) : new Date().toLocaleDateString('en-GB')
+});
 
 /**
  * Direct Firebase Cloud Database Sync Helpers (Project: ithunt-3a42d)
@@ -91,6 +279,59 @@ export async function deleteFromFirebaseCloud(collectionName, docId) {
 }
 
 /**
+ * Setup Real-time Firebase Firestore Live Listeners
+ * Watches all live database collections and immediately invokes callbacks whenever data is added, changed, or removed.
+ */
+export function setupRealtimeFirebaseListeners(callbacks = {}) {
+  const unsubscribes = [];
+
+  const listenerMap = [
+    { name: 'admissions', callback: callbacks.onAdmissions, normalizer: normalizeAdmission },
+    { name: 'students', callback: callbacks.onStudents, normalizer: normalizeStudent },
+    { name: 'nielit_projects', callback: callbacks.onNielitProjects, normalizer: normalizeNielitProject },
+    { name: 'job_applications', callback: callbacks.onJobApplications, normalizer: normalizeJobApplication },
+    { name: 'event_rsvps', callback: callbacks.onRsvps, normalizer: normalizeRsvp },
+    { name: 'reviews', callback: callbacks.onReviews, normalizer: normalizeReview },
+    { name: 'internships', callback: callbacks.onInternships, normalizer: normalizeInternship },
+    { name: 'fees', callback: callbacks.onFees, normalizer: normalizeFee },
+    { name: 'certificates', callback: callbacks.onCertificates, normalizer: normalizeCertificate },
+    { name: 'projects', callback: callbacks.onProjects, normalizer: normalizeProject },
+    { name: 'contact', callback: callbacks.onContactInquiries, normalizer: normalizeContactInquiry },
+    { name: 'users', callback: callbacks.onUsers, normalizer: normalizeUser }
+  ];
+
+  if (db) {
+    listenerMap.forEach(({ name, callback, normalizer }) => {
+      if (typeof callback === 'function') {
+        try {
+          const unsub = onSnapshot(collection(db, name), (snapshot) => {
+            if (!snapshot.empty) {
+              const records = [];
+              snapshot.forEach(docSnap => {
+                records.push({ id: docSnap.id, ...docSnap.data() });
+              });
+              const normalized = normalizer ? records.map(normalizer) : records;
+              callback(normalized);
+            }
+          }, (err) => {
+            console.warn(`Realtime Firestore listener notice (${name}):`, err.message);
+          });
+          unsubscribes.push(unsub);
+        } catch (e) {
+          console.warn(`Could not attach Firestore listener for ${name}:`, e.message);
+        }
+      }
+    });
+  }
+
+  return () => {
+    unsubscribes.forEach(unsub => {
+      try { unsub(); } catch (e) {}
+    });
+  };
+}
+
+/**
  * Standard Core API Request Handler with automatic Auth header attachment & response unwrapping
  */
 export async function apiRequest(endpoint, options = {}) {
@@ -104,6 +345,10 @@ export async function apiRequest(endpoint, options = {}) {
               })();
 
   if (!token && memoryToken) token = memoryToken;
+
+  if (!token && !endpoint.includes('/auth/login')) {
+    token = await ensureAuthToken();
+  }
 
   const headers = {
     'Content-Type': 'application/json',
@@ -371,28 +616,17 @@ export async function fetchAdmissionsFromBackend() {
     }
   } catch (e) {}
 
-  if (list.length > 0) {
-    return list.map(a => ({
-      id: a.id || a.registrationNumber || `ADM-${Date.now()}`,
-      registrationNo: a.registrationNumber || a.registrationNo || a.id || `ITH-${Math.floor(100000 + Math.random() * 900000)}`,
-      candidateName: a.fullName || a.candidateName || a.name || 'Candidate',
-      fatherName: a.fatherName || '—',
-      motherName: a.motherName || '—',
-      mobile: a.phone || a.mobile || '',
-      email: a.email || '',
-      course: a.course || a.track || 'NIELIT O Level Diploma',
-      district: a.district || a.city || 'Prayagraj',
-      gender: a.gender || 'Male',
-      dob: a.dob || '2004-01-01',
-      date: a.createdAt ? new Date(a.createdAt).toLocaleDateString('en-GB') : (a.date || new Date().toLocaleDateString('en-GB')),
-      time: a.createdAt ? new Date(a.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : (a.time || '10:00 AM'),
-      status: (a.status === 'PROVISIONALLY ADMITTED' || !a.status) ? 'Confirmed' : a.status,
-      feeStatus: a.feeStatus || 'Verified & Paid',
-      amountPaid: a.amountPaid || '₹5,000'
-    }));
+  // 3. Fallback to localStorage cache
+  if (list.length === 0) {
+    try {
+      const cached = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
+      if (Array.isArray(cached) && cached.length > 0) {
+        list = cached;
+      }
+    } catch (e) {}
   }
 
-  return [];
+  return list.map(normalizeAdmission);
 }
 
 /**
@@ -498,32 +732,16 @@ export async function fetchJobApplicationsFromBackend() {
   if (list.length === 0) {
     try {
       const cached = JSON.parse(localStorage.getItem('ithunt_careers_cache') || localStorage.getItem('ithunt_job_applications') || '[]');
-      if (Array.isArray(cached) && cached.length > 0) list = cached;
+      if (Array.isArray(cached) && cached.length > 0) {
+        list = cached;
+      }
     } catch (e) {}
   }
 
-  if (list.length > 0) {
-    const normalized = list.map(j => ({
-      id: j.id || `JOB-${Date.now()}`,
-      name: j.name || j.fullName || 'Applicant',
-      fullName: j.name || j.fullName || 'Applicant',
-      position: j.position || j.role || 'Full Stack Instructor',
-      role: j.position || j.role || 'Full Stack Instructor',
-      phone: j.phone || j.mobile || '',
-      mobile: j.phone || j.mobile || '',
-      email: j.email || '',
-      experience: j.experience || 'Entry Level / Fresher',
-      resumeLink: j.resumeLink || j.resume || '',
-      status: j.status === 'PENDING_REVIEW' ? 'Pending Review' : (j.status || 'Pending Review'),
-      date: j.date || (j.createdAt ? new Date(j.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'))
-    }));
-
-    const filtered = normalized.filter(j => !deletedIds.has(j.id));
-    try { localStorage.setItem('ithunt_careers_cache', JSON.stringify(filtered)); } catch (e) {}
-    return filtered;
-  }
-
-  return [];
+  const normalized = list.map(normalizeJobApplication);
+  const filtered = normalized.filter(j => !deletedIds.has(j.id));
+  try { localStorage.setItem('ithunt_careers_cache', JSON.stringify(filtered)); } catch (e) {}
+  return filtered;
 }
 
 /**
@@ -561,6 +779,8 @@ export async function submitReviewToBackend(data) {
   }
 }
 
+export const saveReviewRecord = submitReviewToBackend;
+
 /**
  * Fetch verified public student reviews from backend REST API & Firebase Cloud
  */
@@ -591,21 +811,13 @@ export async function fetchReviewsFromBackend() {
   if (list.length === 0) {
     try {
       const cached = JSON.parse(localStorage.getItem('ithunt_reviews') || '[]');
-      if (Array.isArray(cached) && cached.length > 0) list = cached;
+      if (Array.isArray(cached) && cached.length > 0) {
+        list = cached;
+      }
     } catch (e) {}
   }
 
-  if (list.length > 0) {
-    return list.map(r => ({
-      ...r,
-      name: r.name || 'Verified Student',
-      course: r.role || r.course || 'IT Track',
-      rating: Number(r.rating) || 5,
-      review: r.reviewText || r.review || ''
-    }));
-  }
-
-  return [];
+  return list.map(normalizeReview);
 }
 
 /**
@@ -699,48 +911,20 @@ export async function fetchNielitProjectsFromBackend() {
     console.warn('Notice loading nielit projects from Firebase Cloud:', e.message);
   }
 
-  // 3. Fallback to localStorage cache or default sample data
+  // 3. Fallback to localStorage cache
   if (list.length === 0) {
     try {
       const cached = JSON.parse(localStorage.getItem('ithunt_nielit_cache') || localStorage.getItem('ithunt_nielit_projects') || '[]');
       if (Array.isArray(cached) && cached.length > 0) {
         list = cached;
-      } else if (CONTENT_DATA?.sampleNielitProjects && CONTENT_DATA.sampleNielitProjects.length > 0) {
-        list = [...CONTENT_DATA.sampleNielitProjects];
       }
     } catch (e) {}
   }
 
-  if (list.length > 0) {
-    const normalized = list.map(p => ({
-      ...p,
-      id: p.id || p.regNo || p.registrationNo || p.nielitRegNo || `NIELIT-${Date.now()}`,
-      registrationNo: p.regNo || p.registrationNo || p.nielitRegNo || p.id,
-      nielitRegNo: p.nielitRegNo || p.regNo || p.registrationNo || p.id,
-      candidateName: p.studentName || p.candidateName || p.fullName || p.name || 'Candidate',
-      studentName: p.studentName || p.candidateName || p.fullName || p.name || 'Candidate',
-      fatherName: p.fatherName || '—',
-      motherName: p.motherName || '—',
-      mobile: p.mobile || p.phone || '',
-      level: p.level || p.nielitLevel || 'O Level',
-      projectTitle: p.projectTitle || p.title || 'MERN Stack Web Development',
-      guideName: p.guideName || 'Mr. Sushil Kumar',
-      guideQualification: p.guideQualification || 'MCA (Computer Science)',
-      guideDesignation: p.guideDesignation || 'Laraval/NodeJS Developer',
-      status: p.status || 'Submitted',
-      date: p.date || (p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')),
-      feePaid: p.feePaid || p.amount || '₹1,000',
-      utrNo: p.utrNo || p.utrNumber || 'UPI/Verified',
-      accountHolderName: p.accountHolderName || p.candidateName || '',
-      paymentRemark: p.paymentRemark || 'Paid'
-    }));
-
-    const filtered = normalized.filter(p => !deletedIds.has(p.id) && !deletedIds.has(p.registrationNo) && !deletedIds.has(p.nielitRegNo));
-    try { localStorage.setItem('ithunt_nielit_cache', JSON.stringify(filtered)); } catch (e) {}
-    return filtered;
-  }
-
-  return [];
+  const normalized = list.map(normalizeNielitProject);
+  const filtered = normalized.filter(p => !deletedIds.has(p.id) && !deletedIds.has(p.registrationNo) && !deletedIds.has(p.nielitRegNo));
+  try { localStorage.setItem('ithunt_nielit_cache', JSON.stringify(filtered)); } catch (e) {}
+  return filtered;
 }
 
 /**
@@ -895,26 +1079,16 @@ export async function fetchRsvpsFromBackend() {
   if (list.length === 0) {
     try {
       const cached = JSON.parse(localStorage.getItem('ithunt_rsvps_cache') || localStorage.getItem('ithunt_rsvps') || '[]');
-      if (Array.isArray(cached) && cached.length > 0) list = cached;
+      if (Array.isArray(cached) && cached.length > 0) {
+        list = cached;
+      }
     } catch (e) {}
   }
 
-  if (list.length > 0) {
-    const normalized = list.map(r => ({
-      id: r.id || `RSVP-${Date.now()}`,
-      name: r.candidateName || r.name || r.fullName || 'Attendee',
-      email: r.email || '',
-      mobile: r.phone || r.mobile || '',
-      eventTitle: r.eventName || r.eventTitle || r.title || 'IT HUNT Tech Summit 2026',
-      status: r.status || 'Confirmed',
-      date: r.date || (r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'))
-    }));
-    const filtered = normalized.filter(r => !deletedIds.has(r.id));
-    try { localStorage.setItem('ithunt_rsvps_cache', JSON.stringify(filtered)); } catch (e) {}
-    return filtered;
-  }
-
-  return [];
+  const normalized = list.map(normalizeRsvp);
+  const filtered = normalized.filter(r => !deletedIds.has(r.id));
+  try { localStorage.setItem('ithunt_rsvps_cache', JSON.stringify(filtered)); } catch (e) {}
+  return filtered;
 }
 
 /**
@@ -952,33 +1126,17 @@ export async function fetchStudentsFromBackend(filters = {}) {
     }
   } catch (e) {}
 
-  if (list.length > 0) {
-    return list.map(s => ({
-      id: s.id || s.userId || `STU-${Date.now()}`,
-      userId: s.userId || s.id,
-      enrollmentNumber: s.enrollmentNumber || s.registrationNo || `ITH-2026-STU${Math.floor(1000 + Math.random() * 9000)}`,
-      name: s.name || s.fullName || s.candidateName || 'Student',
-      fullName: s.name || s.fullName || s.candidateName || 'Student',
-      candidateName: s.name || s.fullName || s.candidateName || 'Student',
-      email: s.email || '',
-      phone: s.phone || s.mobile || '',
-      mobile: s.phone || s.mobile || '',
-      course: s.course || 'MERN Stack Developer',
-      batch: s.batch || '2026',
-      academicStatus: s.academicStatus || s.status || 'ACTIVE',
-      status: s.academicStatus || s.status || 'ACTIVE',
-      gender: s.gender || 'Male',
-      dob: s.dob || '2004-01-01',
-      address: s.address || 'Holagarh, Prayagraj',
-      guardianName: s.guardianName || '—',
-      guardianPhone: s.guardianPhone || '—',
-      bio: s.bio || '',
-      createdAt: s.createdAt ? new Date(s.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'),
-      createdAtFormatted: s.createdAt ? new Date(s.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Recent'
-    }));
+  // Fallback to localStorage
+  if (list.length === 0) {
+    try {
+      const cached = JSON.parse(localStorage.getItem('ithunt_students') || '[]');
+      if (Array.isArray(cached) && cached.length > 0) {
+        list = cached;
+      }
+    } catch (e) {}
   }
 
-  return [];
+  return list.map(normalizeStudent);
 }
 
 /**
@@ -1162,131 +1320,181 @@ export async function fetchAdminStatsFromBackend(token) {
  * Fetch all Internship Applications from backend REST API (GET /api/internships/applications)
  */
 export async function fetchInternshipsFromBackend() {
+  let list = [];
+
   try {
     const data = await API.getInternshipApplications();
     const rawList = Array.isArray(data?.applications) ? data.applications : (Array.isArray(data) ? data : []);
-    if (rawList.length > 0) {
-      return rawList.map(item => ({
-        id: item.id || `INT-${Date.now()}`,
-        candidateName: item.candidateName || item.fullName || item.name || 'Applicant',
-        name: item.candidateName || item.fullName || item.name || 'Applicant',
-        email: item.email || '',
-        phone: item.phone || item.mobile || '',
-        mobile: item.phone || item.mobile || '',
-        track: item.track || item.internshipTrack || 'Full Stack MERN',
-        duration: item.duration || '6 Months',
-        status: item.status || 'Under Review',
-        appliedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')
-      }));
-    }
+    if (rawList.length > 0) list = rawList;
   } catch (e) {
     console.warn('Notice loading internship applications from API:', e.message);
   }
-  return [];
+
+  try {
+    const fbRecords = await fetchFromFirebaseCloud('internships');
+    if (fbRecords.length > 0) {
+      const map = new Map();
+      list.forEach(i => map.set(i.id || i.candidateName, i));
+      fbRecords.forEach(i => map.set(i.id || i.candidateName, { ...map.get(i.id || i.candidateName), ...i }));
+      list = Array.from(map.values());
+    }
+  } catch (e) {}
+
+  if (list.length === 0) {
+    try {
+      const cached = JSON.parse(localStorage.getItem('ithunt_internships') || '[]');
+      if (Array.isArray(cached) && cached.length > 0) {
+        list = cached;
+      }
+    } catch (e) {}
+  }
+
+  return list.map(normalizeInternship);
 }
 
 /**
  * Fetch all Fees Ledger Payments from backend REST API (GET /api/fees)
  */
 export async function fetchFeesFromBackend() {
+  let list = [];
+
   try {
     const data = await API.getFees();
     const rawList = Array.isArray(data?.transactions) ? data.transactions : (Array.isArray(data) ? data : []);
-    if (rawList.length > 0) {
-      return rawList.map(item => ({
-        id: item.id || item.transactionId || `FEE-${Date.now()}`,
-        studentId: item.studentId || item.userId || '',
-        studentName: item.studentName || item.name || 'Student',
-        receiptNo: item.receiptNo || item.utrNo || `REC-${Math.floor(10000 + Math.random() * 90000)}`,
-        course: item.course || 'IT Masterclass',
-        amount: item.amount ? `₹${Number(item.amount).toLocaleString('en-IN')}` : '₹5,000',
-        amountPaid: item.amount ? `₹${Number(item.amount).toLocaleString('en-IN')}` : '₹5,000',
-        paymentMode: item.paymentMode || item.mode || 'Online UPI',
-        status: item.status || 'Paid & Verified',
-        date: item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')
-      }));
-    }
+    if (rawList.length > 0) list = rawList;
   } catch (e) {
     console.warn('Notice loading fee transactions from API:', e.message);
   }
-  return [];
+
+  try {
+    const fbRecords = await fetchFromFirebaseCloud('fees');
+    if (fbRecords.length > 0) {
+      const map = new Map();
+      list.forEach(f => map.set(f.id || f.receiptNo || f.receiptNumber, f));
+      fbRecords.forEach(f => map.set(f.id || f.receiptNo || f.receiptNumber, { ...map.get(f.id || f.receiptNo || f.receiptNumber), ...f }));
+      list = Array.from(map.values());
+    }
+  } catch (e) {}
+
+  if (list.length === 0) {
+    try {
+      const cached = JSON.parse(localStorage.getItem('ithunt_fees') || '[]');
+      if (Array.isArray(cached) && cached.length > 0) {
+        list = cached;
+      }
+    } catch (e) {}
+  }
+
+  return list.map(normalizeFee);
 }
 
 /**
  * Fetch all Verified Certificates from backend REST API (GET /api/certificates)
  */
 export async function fetchCertificatesFromBackend() {
+  let list = [];
+
   try {
     const data = await API.getCertificates();
     const rawList = Array.isArray(data?.certificates) ? data.certificates : (Array.isArray(data) ? data : []);
-    if (rawList.length > 0) {
-      return rawList.map(item => ({
-        id: item.id || `CERT-${Date.now()}`,
-        certNo: item.certNo || item.certificateNumber || `ITH-CERT-${Math.floor(10000 + Math.random() * 90000)}`,
-        studentName: item.studentName || item.candidateName || 'Engineer',
-        course: item.course || item.program || 'Software Engineering',
-        grade: item.grade || 'A+',
-        issueDate: item.issueDate ? new Date(item.issueDate).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'),
-        status: item.status || 'Verified & Issued'
-      }));
-    }
+    if (rawList.length > 0) list = rawList;
   } catch (e) {
     console.warn('Notice loading certificates from API:', e.message);
   }
-  return [];
+
+  try {
+    const fbRecords = await fetchFromFirebaseCloud('certificates');
+    if (fbRecords.length > 0) {
+      const map = new Map();
+      list.forEach(c => map.set(c.id || c.certNo || c.certificateNumber, c));
+      fbRecords.forEach(c => map.set(c.id || c.certNo || c.certificateNumber, { ...map.get(c.id || c.certNo || c.certificateNumber), ...c }));
+      list = Array.from(map.values());
+    }
+  } catch (e) {}
+
+  if (list.length === 0) {
+    try {
+      const cached = JSON.parse(localStorage.getItem('ithunt_certificates') || '[]');
+      if (Array.isArray(cached) && cached.length > 0) {
+        list = cached;
+      }
+    } catch (e) {}
+  }
+
+  return list.map(normalizeCertificate);
 }
 
 /**
  * Fetch all Capstone Projects from backend REST API (GET /api/projects)
  */
 export async function fetchProjectsFromBackend() {
+  let list = [];
+
   try {
     const data = await API.getProjects();
     const rawList = Array.isArray(data?.projects) ? data.projects : (Array.isArray(data) ? data : []);
-    if (rawList.length > 0) {
-      return rawList.map(item => ({
-        id: item.id || `PRJ-${Date.now()}`,
-        title: item.title || item.projectTitle || 'Capstone Project',
-        projectTitle: item.title || item.projectTitle || 'Capstone Project',
-        studentName: item.studentName || item.candidateName || 'Student Developer',
-        techStack: item.techStack || 'React, Node.js, MongoDB',
-        repoUrl: item.repoUrl || item.githubUrl || 'https://github.com/ithunt',
-        liveUrl: item.liveUrl || 'https://ithunt.in',
-        status: item.status || 'Completed',
-        submittedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')
-      }));
-    }
+    if (rawList.length > 0) list = rawList;
   } catch (e) {
     console.warn('Notice loading capstone projects from API:', e.message);
   }
-  return [];
+
+  try {
+    const fbRecords = await fetchFromFirebaseCloud('projects');
+    if (fbRecords.length > 0) {
+      const map = new Map();
+      list.forEach(p => map.set(p.id || p.title, p));
+      fbRecords.forEach(p => map.set(p.id || p.title, { ...map.get(p.id || p.title), ...p }));
+      list = Array.from(map.values());
+    }
+  } catch (e) {}
+
+  if (list.length === 0) {
+    try {
+      const cached = JSON.parse(localStorage.getItem('ithunt_projects') || '[]');
+      if (Array.isArray(cached) && cached.length > 0) {
+        list = cached;
+      }
+    } catch (e) {}
+  }
+
+  return list.map(normalizeProject);
 }
 
 /**
  * Fetch all Contact Inquiries from backend REST API (GET /api/contact)
  */
 export async function fetchContactInquiriesFromBackend() {
+  let list = [];
+
   try {
     const data = await API.getContactInquiries();
-    const rawList = Array.isArray(data?.inquiries) ? data.inquiries : (Array.isArray(data) ? data : []);
-    if (rawList.length > 0) {
-      return rawList.map(item => ({
-        id: item.id || `INQ-${Date.now()}`,
-        name: item.name || item.fullName || 'Inquirer',
-        email: item.email || '',
-        phone: item.phone || item.mobile || '',
-        subject: item.subject || 'Course Enquiry',
-        message: item.message || '',
-        createdAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')
-      }));
-    }
+    const rawList = Array.isArray(data?.contacts) ? data.contacts : (Array.isArray(data?.inquiries) ? data.inquiries : (Array.isArray(data) ? data : []));
+    if (rawList.length > 0) list = rawList;
   } catch (e) {
     console.warn('Notice loading contact inquiries from API:', e.message);
   }
-  return [];
+
+  try {
+    const fbRecords = await fetchFromFirebaseCloud('contact');
+    if (fbRecords.length > 0) {
+      const map = new Map();
+      list.forEach(c => map.set(c.id || c.email, c));
+      fbRecords.forEach(c => map.set(c.id || c.email, { ...map.get(c.id || c.email), ...c }));
+      list = Array.from(map.values());
+    }
+  } catch (e) {}
+
+  if (list.length === 0) {
+    try {
+      const cached = JSON.parse(localStorage.getItem('ithunt_contact_inquiries') || '[]');
+      if (Array.isArray(cached) && cached.length > 0) {
+        list = cached;
+      }
+    } catch (e) {}
+  }
+
+  return list.map(normalizeContactInquiry);
 }
-
-
 
 /**
  * Fetch all Auth Users from backend REST API (GET /api/auth/users)
@@ -1315,18 +1523,16 @@ export async function fetchUsersFromBackend() {
     }
   } catch (e) {}
 
-  if (list.length > 0) {
-    return list.map(item => ({
-      id: item.id || `USR-${Date.now()}`,
-      name: item.name || 'User',
-      email: item.email || '',
-      role: item.role || 'student',
-      verified: item.verified !== undefined ? item.verified : true,
-      createdAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')
-    }));
+  if (list.length === 0) {
+    try {
+      const cached = JSON.parse(localStorage.getItem('ithunt_users') || '[]');
+      if (Array.isArray(cached) && cached.length > 0) {
+        list = cached;
+      }
+    } catch (e) {}
   }
 
-  return [];
+  return list.map(normalizeUser);
 }
 
 /**

@@ -119,6 +119,7 @@
           v-else-if="activeTab === 'reviews'" 
           key="reviews"
           :content="content" 
+          :allReviews="liveReviewsList"
           @review-submitted="handleReviewSubmitted" 
         />
 
@@ -445,7 +446,9 @@ import {
   deleteAdmissionFromBackend,
   registerStudentUser, 
   loginStudentUser, 
-  updateStudentProfile 
+  updateStudentProfile,
+  setupRealtimeFirebaseListeners,
+  submitReviewToBackend
 } from './utils/apiClient.js';
 import { triggerMobileMessageNotification } from './utils/smsNotifier.js';
 
@@ -581,7 +584,7 @@ const handleStudentLogout = () => {
   localStorage.removeItem('ithunt_student_user');
 };
 
-// Live registries synced 100% dynamically with live database API (All Swagger API Collections)
+// Live registries synced 100% dynamically with live database API & Firebase Cloud
 const liveAdmissionsList = ref([]);
 const liveJobApplicationsList = ref([]);
 const liveRsvpsList = ref([]);
@@ -846,8 +849,16 @@ const downloadNielitProjectPdfDoc = (projectData) => {
   generateNielitProjectPdf(projectData);
 };
 
-const handleReviewSubmitted = (review) => {
+const handleReviewSubmitted = async (review) => {
   submittedRegistrationNo.value = '';
+  const existingIdx = liveReviewsList.value.findIndex(r => r.id === review.id);
+  if (existingIdx === -1) {
+    liveReviewsList.value.unshift(review);
+  }
+  try {
+    await submitReviewToBackend(review);
+  } catch (e) {}
+
   modalTitle.value = content.value?.ui?.reviewSubmitSuccessTitle || 'Review Published Successfully! ⭐';
   modalBody.value = `Thank you ${review.name} for rating IT HUNT ${review.rating} Stars! Your review is now live on our student ratings scorecard.`;
   showModal.value = true;
@@ -1166,7 +1177,7 @@ onMounted(() => {
       liveAdmissionsList.value = admissions || [];
       liveJobApplicationsList.value = jobs || [];
       liveRsvpsList.value = rsvps || [];
-      liveNielitProjectsList.value = (nielitProjects && nielitProjects.length > 0) ? nielitProjects : (content.value.sampleNielitProjects || []);
+      liveNielitProjectsList.value = nielitProjects || [];
       liveStudentsList.value = students || [];
       liveInternshipsList.value = internships || [];
       liveFeesList.value = fees || [];
@@ -1180,6 +1191,26 @@ onMounted(() => {
     }
   };
   loadInitialData();
+
+  // Attach Real-time Firebase Firestore / Realtime DB Live Listeners
+  try {
+    unsubscribeRealtime = setupRealtimeFirebaseListeners({
+      onAdmissions: (data) => { if (data && data.length > 0) liveAdmissionsList.value = data; },
+      onStudents: (data) => { if (data && data.length > 0) liveStudentsList.value = data; },
+      onNielitProjects: (data) => { if (data && data.length > 0) liveNielitProjectsList.value = data; },
+      onJobApplications: (data) => { if (data && data.length > 0) liveJobApplicationsList.value = data; },
+      onRsvps: (data) => { if (data && data.length > 0) liveRsvpsList.value = data; },
+      onReviews: (data) => { if (data && data.length > 0) liveReviewsList.value = data; },
+      onInternships: (data) => { if (data && data.length > 0) liveInternshipsList.value = data; },
+      onFees: (data) => { if (data && data.length > 0) liveFeesList.value = data; },
+      onCertificates: (data) => { if (data && data.length > 0) liveCertificatesList.value = data; },
+      onProjects: (data) => { if (data && data.length > 0) liveProjectsList.value = data; },
+      onContactInquiries: (data) => { if (data && data.length > 0) liveContactInquiriesList.value = data; },
+      onUsers: (data) => { if (data && data.length > 0) liveUsersList.value = data; }
+    });
+  } catch (e) {
+    console.warn('Realtime Firebase listeners initialization notice:', e);
+  }
 
   // Initialize SEO Metadata for active view
   updateSeoMetadata(activeTab.value);
@@ -1210,8 +1241,13 @@ onMounted(() => {
   });
 });
 
+let unsubscribeRealtime = null;
+
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
   if (revealObserver) revealObserver.disconnect();
+  if (unsubscribeRealtime) {
+    try { unsubscribeRealtime(); } catch (e) {}
+  }
 });
 </script>

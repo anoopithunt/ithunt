@@ -124,6 +124,13 @@
         <span class="tab-badge-counter" v-else-if="tab.id === 'nielit'">{{ nielitProjectsList.length }}</span>
         <span class="tab-badge-counter" v-else-if="tab.id === 'careers'">{{ jobApplicationsList.length }}</span>
         <span class="tab-badge-counter" v-else-if="tab.id === 'events'">{{ rsvpsList.length }}</span>
+        <span class="tab-badge-counter" v-else-if="tab.id === 'internships'">{{ internshipsList.length || (content.internshipVenture?.tracks?.length || 5) }}</span>
+        <span class="tab-badge-counter" v-else-if="tab.id === 'reviews'">{{ reviewsList.length }}</span>
+        <span class="tab-badge-counter" v-else-if="tab.id === 'fees'">{{ feesList.length }}</span>
+        <span class="tab-badge-counter" v-else-if="tab.id === 'certificates'">{{ certificatesList.length }}</span>
+        <span class="tab-badge-counter" v-else-if="tab.id === 'projects'">{{ projectsList.length }}</span>
+        <span class="tab-badge-counter" v-else-if="tab.id === 'contact'">{{ contactInquiriesList.length }}</span>
+        <span class="tab-badge-counter" v-else-if="tab.id === 'users'">{{ usersList.length }}</span>
       </button>
     </div>
 
@@ -751,6 +758,241 @@
       </div>
     </div>
 
+    <!-- TAB: FEES LEDGER -->
+    <div v-else-if="currentTab === 'fees'" class="admin-tab-panel anim-stagger-3">
+      <div class="panel-header-controls">
+        <div>
+          <h3 class="panel-title">💳 Student Fees Ledger & Transaction History</h3>
+          <p class="panel-subtitle">Official verified UPI receipts, installment tracking, and payment reconciliations.</p>
+        </div>
+      </div>
+
+      <div class="admin-table-card">
+        <div class="table-responsive">
+          <table class="admin-data-table">
+            <thead>
+              <tr>
+                <th>Receipt No</th>
+                <th>Student Name</th>
+                <th>Program / Course</th>
+                <th>Amount Paid</th>
+                <th>Payment Mode</th>
+                <th>Payment Date</th>
+                <th>Status</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="fee in feesList" :key="fee.id">
+                <td><span class="admin-reg-pill">{{ fee.receiptNo }}</span></td>
+                <td style="font-weight: 800; color: var(--text-main);">{{ fee.studentName }}</td>
+                <td style="color: var(--color-ai-cyan);">{{ fee.course }}</td>
+                <td style="font-weight: 800; color: #10b981; font-family: var(--font-mono);">{{ fee.amount }}</td>
+                <td><span style="font-size: 0.8rem; color: var(--text-muted);">{{ fee.paymentMode }}</span></td>
+                <td style="font-family: var(--font-mono); font-size: 0.8rem;">{{ fee.date }}</td>
+                <td>
+                  <span class="admin-status-chip status-confirmed">{{ fee.status || 'Verified & Paid' }}</span>
+                </td>
+                <td style="text-align: right;">
+                  <button class="btn-primary" @click="confirmFeeAndSendJpgReceipt(fee)" style="padding: 0.35rem 0.75rem; font-size: 0.78rem;">
+                    <span>JPG Slip 🧾</span>
+                  </button>
+                </td>
+              </tr>
+              <tr v-if="feesList.length === 0">
+                <td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-dim);">No fee ledger transactions recorded yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: CERTIFICATES -->
+    <div v-else-if="currentTab === 'certificates'" class="admin-tab-panel anim-stagger-3">
+      <div class="panel-header-controls">
+        <div>
+          <h3 class="panel-title">🏅 Verified Graduate Certificates & Diplomas</h3>
+          <p class="panel-subtitle">Official ISO 9001:2015 accredited course completion credentials and grades.</p>
+        </div>
+      </div>
+
+      <div class="admin-table-card">
+        <div class="table-responsive">
+          <table class="admin-data-table">
+            <thead>
+              <tr>
+                <th>Certificate ID</th>
+                <th>Graduate Name</th>
+                <th>Course / Track</th>
+                <th>Awarded Grade</th>
+                <th>Issue Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="cert in certificatesList" :key="cert.id">
+                <td><span class="admin-reg-pill">{{ cert.certNo }}</span></td>
+                <td style="font-weight: 800; color: var(--text-main);">{{ cert.studentName }}</td>
+                <td style="color: var(--color-ai-cyan);">{{ cert.course }}</td>
+                <td><span class="exp-badge-required" style="font-size: 0.75rem; background: rgba(250, 204, 21, 0.15); color: #facc15; border-color: rgba(250, 204, 21, 0.3);">{{ cert.grade }}</span></td>
+                <td style="font-family: var(--font-mono); font-size: 0.8rem;">{{ cert.issueDate }}</td>
+                <td>
+                  <span class="admin-status-chip status-confirmed">✓ {{ cert.status || 'Verified & Issued' }}</span>
+                </td>
+              </tr>
+              <tr v-if="certificatesList.length === 0">
+                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-dim);">No certificates issued yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: CAPSTONE PROJECTS -->
+    <div v-else-if="currentTab === 'projects'" class="admin-tab-panel anim-stagger-3">
+      <div class="panel-header-controls">
+        <div>
+          <h3 class="panel-title">💻 Capstone Projects & Student Repositories</h3>
+          <p class="panel-subtitle">Production apps built by interns with live cloud hosting and public Git repos.</p>
+        </div>
+      </div>
+
+      <div class="admin-table-card">
+        <div class="table-responsive">
+          <table class="admin-data-table">
+            <thead>
+              <tr>
+                <th>Project Title</th>
+                <th>Developer Name</th>
+                <th>Tech Stack</th>
+                <th>Repository</th>
+                <th>Live Demo</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="prj in projectsList" :key="prj.id">
+                <td>
+                  <div style="font-weight: 800; color: var(--text-main);">{{ prj.title || prj.projectTitle }}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-dim);">ID: {{ prj.id }}</div>
+                </td>
+                <td style="font-weight: 700; color: var(--color-ai-yellow);">{{ prj.studentName }}</td>
+                <td><span style="font-size: 0.8rem; color: var(--color-ai-cyan);">{{ prj.techStack }}</span></td>
+                <td>
+                  <a v-if="prj.repoUrl" :href="prj.repoUrl" target="_blank" rel="noopener noreferrer" style="color: var(--color-ai-cyan); text-decoration: underline; font-size: 0.8rem;">
+                    📦 GitHub Repo
+                  </a>
+                </td>
+                <td>
+                  <a v-if="prj.liveUrl" :href="prj.liveUrl" target="_blank" rel="noopener noreferrer" style="color: #10b981; text-decoration: underline; font-size: 0.8rem; font-weight: 700;">
+                    🚀 Live Demo
+                  </a>
+                </td>
+                <td>
+                  <span class="admin-status-chip status-confirmed">{{ prj.status || 'Completed & Deployed' }}</span>
+                </td>
+              </tr>
+              <tr v-if="projectsList.length === 0">
+                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-dim);">No capstone projects registered yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: ENQUIRIES & CONTACT -->
+    <div v-else-if="currentTab === 'contact'" class="admin-tab-panel anim-stagger-3">
+      <div class="panel-header-controls">
+        <div>
+          <h3 class="panel-title">📬 Inbound Student & Corporate Enquiries</h3>
+          <p class="panel-subtitle">Direct messages and queries submitted through the website contact channels.</p>
+        </div>
+      </div>
+
+      <div class="admin-table-card">
+        <div class="table-responsive">
+          <table class="admin-data-table">
+            <thead>
+              <tr>
+                <th>Inquirer Name</th>
+                <th>Contact Phone</th>
+                <th>Email Address</th>
+                <th>Subject</th>
+                <th>Message Content</th>
+                <th>Received Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="inq in contactInquiriesList" :key="inq.id">
+                <td style="font-weight: 800; color: var(--text-main);">{{ inq.name || inq.fullName }}</td>
+                <td>📞 {{ inq.phone || inq.mobile }}</td>
+                <td style="color: var(--color-ai-cyan);">{{ inq.email }}</td>
+                <td style="font-weight: 700; color: var(--color-ai-yellow);">{{ inq.subject }}</td>
+                <td style="max-width: 320px; font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">{{ inq.message }}</td>
+                <td style="font-family: var(--font-mono); font-size: 0.8rem;">{{ inq.createdAt }}</td>
+              </tr>
+              <tr v-if="contactInquiriesList.length === 0">
+                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-dim);">No inbound enquiries recorded yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: USER ACCOUNTS -->
+    <div v-else-if="currentTab === 'users'" class="admin-tab-panel anim-stagger-3">
+      <div class="panel-header-controls">
+        <div>
+          <h3 class="panel-title">👥 Central Auth User Accounts & Roles</h3>
+          <p class="panel-subtitle">Registered system users, administrator accounts, and verified student credentials.</p>
+        </div>
+      </div>
+
+      <div class="admin-table-card">
+        <div class="table-responsive">
+          <table class="admin-data-table">
+            <thead>
+              <tr>
+                <th>User ID</th>
+                <th>Full Name</th>
+                <th>Email Address</th>
+                <th>System Role</th>
+                <th>Status</th>
+                <th>Registered Date</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="user in usersList" :key="user.id">
+                <td><span class="admin-reg-pill">{{ user.id }}</span></td>
+                <td style="font-weight: 800; color: var(--text-main);">{{ user.name }}</td>
+                <td style="color: var(--color-ai-cyan);">{{ user.email }}</td>
+                <td>
+                  <span class="exp-badge-required" :style="{ background: user.role === 'admin' ? 'rgba(249, 115, 22, 0.2)' : 'rgba(56, 189, 248, 0.15)', color: user.role === 'admin' ? '#f97316' : '#38bdf8' }">
+                    {{ user.role === 'admin' ? '🛡️ SuperAdmin' : '🎓 Student' }}
+                  </span>
+                </td>
+                <td>
+                  <span class="admin-status-chip status-confirmed">✓ {{ user.verified ? 'Verified' : 'Active' }}</span>
+                </td>
+                <td style="font-family: var(--font-mono); font-size: 0.8rem;">{{ user.createdAt }}</td>
+                <td style="text-align: right;">
+                  <button v-if="user.role !== 'admin'" class="admin-icon-btn" @click="handleDeleteUser(user)" style="color: #ef4444;" title="Delete User">🗑️</button>
+                </td>
+              </tr>
+              <tr v-if="usersList.length === 0">
+                <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-dim);">No user accounts recorded yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- TAB 6: SYSTEM CONFIGURATION -->
     <div v-else-if="currentTab === 'settings'" class="admin-tab-panel anim-stagger-3">
       <div class="panel-header-controls">
@@ -1047,6 +1289,34 @@ const props = defineProps({
     default: () => []
   },
   allStudents: {
+    type: Array,
+    default: () => []
+  },
+  allInternships: {
+    type: Array,
+    default: () => []
+  },
+  allFees: {
+    type: Array,
+    default: () => []
+  },
+  allCertificates: {
+    type: Array,
+    default: () => []
+  },
+  allProjects: {
+    type: Array,
+    default: () => []
+  },
+  allContactInquiries: {
+    type: Array,
+    default: () => []
+  },
+  allReviews: {
+    type: Array,
+    default: () => []
+  },
+  allUsers: {
     type: Array,
     default: () => []
   }
@@ -1468,6 +1738,18 @@ const deleteRsvp = (rsvp) => {
 const deleteReview = (rev) => {
   if (confirm(`Delete review from ${rev.name}?`)) {
     reviewsList.value = reviewsList.value.filter(r => r.id !== rev.id);
+  }
+};
+
+const handleDeleteUser = async (user) => {
+  const targetId = user.id || user.email;
+  if (confirm(`Delete user account for ${user.name} (${targetId})?`)) {
+    usersList.value = usersList.value.filter(u => u.id !== user.id && u.email !== user.email);
+    try {
+      await deleteUserFromBackend(targetId);
+      emailActionMsg.value = `✓ User account ${user.name} removed successfully.`;
+      setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+    } catch (e) {}
   }
 };
 

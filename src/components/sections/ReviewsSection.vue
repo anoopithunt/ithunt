@@ -271,12 +271,17 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
+import { saveReviewRecord } from '../../utils/apiClient.js';
 
 const props = defineProps({
   content: {
     type: Object,
     required: true
+  },
+  allReviews: {
+    type: Array,
+    default: () => []
   }
 });
 
@@ -310,7 +315,13 @@ const filterCategories = [
   { id: 'Course Curriculum', label: '📚 Course Curriculums' }
 ];
 
-const reviewsList = ref([...(props.content.reviewsSection?.reviewsList || [])]);
+const reviewsList = ref([]);
+
+watch(() => props.allReviews, (val) => {
+  if (val) {
+    reviewsList.value = val;
+  }
+}, { immediate: true, deep: true });
 
 const newReview = ref({
   name: '',
@@ -353,20 +364,25 @@ const scrollToReviewForm = () => {
   }
 };
 
-const handleSubmitReview = () => {
+const handleSubmitReview = async () => {
   const reviewObj = {
     id: 'rev-' + Date.now(),
     name: newReview.value.name.trim(),
     role: newReview.value.role.trim(),
     avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=60',
-    date: 'Just Now',
+    date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
     rating: newReview.value.rating,
     category: newReview.value.category.replace(/^[^\w]+/, '').trim(),
-    comment: newReview.value.comment.trim()
+    comment: newReview.value.comment.trim(),
+    createdAt: new Date().toISOString()
   };
 
   reviewsList.value.unshift(reviewObj);
   emit('review-submitted', reviewObj);
+
+  try {
+    await saveReviewRecord(reviewObj);
+  } catch (e) {}
 
   // Reset form
   newReview.value = {
