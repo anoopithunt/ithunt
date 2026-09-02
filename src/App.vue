@@ -812,16 +812,28 @@ const submitNielitProject = async (projectData) => {
   showNielitModal.value = false;
   submittedNielitData.value = projectData;
 
-  const regId = projectData.nielitRegNo || ('NIELIT-' + Math.floor(100000 + Math.random() * 900000));
+  const regId = String(projectData.nielitRegNo || projectData.registrationNo || ('NIELIT-' + Math.floor(100000 + Math.random() * 900000))).trim();
   submittedRegistrationNo.value = regId;
 
   const nielitRecord = {
-    registrationNo: regId,
     ...projectData,
-    status: 'Submitted'
+    id: regId,
+    nielitRegNo: regId,
+    registrationNo: regId,
+    regNo: regId,
+    status: projectData.status || 'Submitted'
   };
 
-  liveNielitProjectsList.value.unshift(nielitRecord);
+  const existingIdx = liveNielitProjectsList.value.findIndex(p => {
+    const pId = String(p.registrationNo || p.nielitRegNo || p.regNo || p.id || '').trim();
+    return pId === regId;
+  });
+
+  if (existingIdx !== -1) {
+    liveNielitProjectsList.value[existingIdx] = { ...liveNielitProjectsList.value[existingIdx], ...nielitRecord };
+  } else {
+    liveNielitProjectsList.value.unshift(nielitRecord);
+  }
 
   // Save to Firebase Firestore & local storage
   let fbDocId = regId;
