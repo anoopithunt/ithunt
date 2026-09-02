@@ -45,7 +45,7 @@ body {
   background-color: var(--bg-cyber-dark);
   color: var(--text-main);
   line-height: 1.6;
-  overflow-x: hidden;
+  overflow-x: clip;
   min-height: 100vh;
   width: 100%;
   transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -151,16 +151,20 @@ button, input, select, textarea {
   -webkit-text-fill-color: transparent;
 }
 
-/* Header & Navigation Bar */
+/* Header & Navigation Bar (Sticky Pinning) */
 .navbar-header {
+  position: -webkit-sticky;
   position: sticky;
   top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
   z-index: 1000;
   background: var(--bg-nav-glass);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-cyber);
-  transition: var(--transition);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .navbar-container {
@@ -5533,8 +5537,9 @@ body.light-theme .exp-badge-required {
 
 /* 1. Global Touch & Viewport Fluidity */
 html, body {
-  overflow-x: hidden;
+  overflow-x: clip;
   width: 100%;
+  max-width: 100%;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -5542,12 +5547,12 @@ html, body {
   box-sizing: border-box;
 }
 
-img, svg, video, canvas {
+img, svg, video, canvas, iframe, embed, object {
   max-width: 100%;
   height: auto;
 }
 
-/* Form input touch optimization (avoids iOS Safari auto-zoom) */
+/* Form input touch optimization (avoids iOS Safari auto-zoom under 16px) */
 input, select, textarea, button {
   font-family: inherit;
   font-size: 16px;
@@ -5559,8 +5564,131 @@ input, select, textarea, button {
   }
 }
 
-/* 2. Large Tablet & Laptop Optimizations (901px - 1100px) */
-@media (max-width: 1100px) {
+/* Spotlight Sub-Grid for Hero & Events Banners */
+.spotlight-sub-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Student Portal Responsive Dashboard Styles */
+.student-welcome-banner {
+  background: var(--bg-card-glass);
+  border: 1px solid var(--border-cyber);
+  padding: 1.75rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+.student-welcome-user {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.student-avatar-badge {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--gradient-ai-btn);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  color: #fff;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.student-welcome-name {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 0.2rem;
+  word-break: break-word;
+}
+
+.student-welcome-meta {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  word-break: break-word;
+}
+
+.student-logout-btn {
+  padding: 0.5rem 1.2rem;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.student-status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.student-status-card {
+  background: var(--bg-card-glass);
+  border: 1px solid var(--border-cyber);
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.student-status-lbl {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.student-status-val {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--text-main);
+  margin-top: 0.4rem;
+  word-break: break-word;
+}
+
+.student-profile-card {
+  background: var(--bg-card-glass);
+  border: 1px solid var(--border-cyber);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+}
+
+.student-profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+  border-bottom: 1px solid var(--border-cyber);
+  padding-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.student-profile-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   1. Large Desktop & Laptops (1025px - 1280px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1200px) {
   .nav-links {
     gap: 0.2rem;
   }
@@ -5574,9 +5702,20 @@ input, select, textarea, button {
     padding: 0.45rem 0.95rem;
     font-size: 0.8rem;
   }
+
+  .leadership-spotlight-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+    gap: 1.75rem;
+  }
 }
 
-/* 3. Tablet & Medium Screen Optimizations (769px - 1024px) */
+/* --------------------------------------------------------------------------
+   2. Medium Tablet & Small Laptop (901px - 1024px)
+   -------------------------------------------------------------------------- */
 @media (max-width: 1024px) {
   .hero-grid {
     grid-template-columns: 1fr !important;
@@ -5593,6 +5732,10 @@ input, select, textarea, button {
     justify-content: center;
   }
 
+  .hero-highlights-row {
+    justify-content: center;
+  }
+
   .hero-media-wrapper {
     max-width: 620px;
     margin: 0 auto;
@@ -5600,6 +5743,21 @@ input, select, textarea, button {
   }
 
   .stats-grid {
+    justify-content: center;
+  }
+
+  .about-grid {
+    grid-template-columns: 1fr !important;
+    gap: 3rem;
+    text-align: center;
+  }
+
+  .about-text-content {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .about-features-list {
     justify-content: center;
   }
 
@@ -5634,12 +5792,28 @@ input, select, textarea, button {
   .director-img {
     margin: 0 auto;
   }
+
+  .courses-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .events-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 2rem;
+  }
 }
 
-/* 4. Small Tablet & Mobile Switch (769px - 900px) */
+/* --------------------------------------------------------------------------
+   3. Small Tablet & Mobile Switch (769px - 900px)
+   -------------------------------------------------------------------------- */
 @media (max-width: 900px) {
   .nav-links,
-  .cta-btn-header {
+  .cta-btn-header,
+  .nav-action-desktop {
     display: none !important;
   }
 
@@ -5647,9 +5821,9 @@ input, select, textarea, button {
     display: flex !important;
   }
 
-  .internship-banner,
-  .rating-summary-card {
+  .internship-banner {
     grid-template-columns: 1fr !important;
+    gap: 2rem;
   }
 
   .internship-tracks-grid,
@@ -5666,11 +5840,7 @@ input, select, textarea, button {
   .roadmap-grid,
   .internship-features-grid {
     grid-template-columns: 1fr 1fr !important;
-  }
-
-  .footer-grid {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 2rem;
+    gap: 1.25rem;
   }
 
   .admin-control-bar {
@@ -5685,9 +5855,16 @@ input, select, textarea, button {
     justify-content: flex-start;
     flex-wrap: wrap;
   }
+
+  .careers-benefits-ribbon {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1rem;
+  }
 }
 
-/* 5. Mobile Landscape & Standard Phones (601px - 768px) */
+/* --------------------------------------------------------------------------
+   4. Mobile Landscape & Standard Phones (601px - 768px)
+   -------------------------------------------------------------------------- */
 @media (max-width: 768px) {
   .section-title {
     font-size: 2rem !important;
@@ -5698,13 +5875,28 @@ input, select, textarea, button {
     line-height: 1.25;
   }
 
+  .hero-subtitle {
+    font-size: 1rem !important;
+  }
+
   .superadmin-stats-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 1rem;
   }
 
-  .careers-benefits-ribbon {
-    grid-template-columns: 1fr 1fr !important;
+  .events-controls-bar {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .events-search-box {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .events-grid {
+    grid-template-columns: 1fr !important;
   }
 
   .footer-bottom {
@@ -5737,6 +5929,7 @@ input, select, textarea, button {
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     padding-bottom: 0.35rem;
+    width: 100%;
   }
 
   .internship-filter-capsule::-webkit-scrollbar,
@@ -5751,9 +5944,37 @@ input, select, textarea, button {
     white-space: nowrap !important;
     flex-shrink: 0 !important;
   }
+
+  .student-welcome-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .student-logout-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .student-profile-form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+
+  .student-profile-card {
+    padding: 1.25rem !important;
+  }
+
+  .about-img-sub {
+    right: 0 !important;
+    bottom: -15px !important;
+    width: 180px !important;
+    height: 130px !important;
+  }
 }
 
-/* 6. Standard Smartphone Portrait (481px - 600px) */
+/* --------------------------------------------------------------------------
+   5. Standard Smartphone Portrait (481px - 600px)
+   -------------------------------------------------------------------------- */
 @media (max-width: 600px) {
   .container {
     padding: 0 1.15rem !important;
@@ -5788,11 +6009,28 @@ input, select, textarea, button {
     padding: 1rem 0.85rem !important;
   }
 
+  .spotlight-sub-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .courses-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .roadmap-grid,
+  .internship-features-grid {
+    grid-template-columns: 1fr !important;
+  }
+
   .form-grid,
   .form-grid-2,
   .form-grid-3 {
     grid-template-columns: 1fr !important;
     gap: 0.75rem;
+  }
+
+  .about-features-list {
+    grid-template-columns: 1fr !important;
   }
 
   .modal-card,
@@ -5808,6 +6046,10 @@ input, select, textarea, button {
     width: 96vw !important;
     max-width: 96vw !important;
     padding: 1.25rem 0.95rem !important;
+  }
+
+  .metric-stats-grid {
+    grid-template-columns: 1fr !important;
   }
 
   .review-highlight-card {
@@ -5842,9 +6084,44 @@ input, select, textarea, button {
     font-size: 0.8rem;
     overflow-x: auto;
   }
+
+  .track-card-actions {
+    flex-direction: column;
+  }
+
+  .track-view-btn,
+  .track-fast-btn {
+    width: 100%;
+  }
+
+  .detail-popup-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .detail-header-icon {
+    margin: 0 auto;
+  }
+
+  .detail-badge-group {
+    justify-content: center;
+  }
+
+  .detail-modal-footer,
+  .modal-actions-group {
+    flex-direction: column !important;
+  }
+
+  .detail-modal-footer button,
+  .modal-actions-group button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
 }
 
-/* 7. Extra-Small Mobile Devices (320px - 480px) */
+/* --------------------------------------------------------------------------
+   6. Extra-Small Mobile Devices (320px - 480px)
+   -------------------------------------------------------------------------- */
 @media (max-width: 480px) {
   .container {
     padding: 0 0.85rem !important;
@@ -6022,22 +6299,38 @@ input, select, textarea, button {
     font-size: 1.05rem !important;
   }
 
-  .floating-back-to-top {
-    bottom: 1.25rem !important;
-    right: 1.25rem !important;
-    width: 42px !important;
-    height: 42px !important;
-    font-size: 1.1rem !important;
+  .about-img-main {
+    height: 240px !important;
+  }
+
+  .about-img-sub {
+    display: none !important;
+  }
+
+  .director-img {
+    width: 140px !important;
+    height: 140px !important;
+  }
+
+  .student-status-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem;
   }
 }
 
-/* 8. Ultra-Compact Mobile Screens (< 360px) */
+/* --------------------------------------------------------------------------
+   7. Ultra-Compact Mobile Screens (< 360px)
+   -------------------------------------------------------------------------- */
 @media (max-width: 360px) {
   .superadmin-stats-grid {
     grid-template-columns: 1fr !important;
   }
 
   .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .alumni-stats-ribbon {
     grid-template-columns: 1fr !important;
   }
 
@@ -6049,10 +6342,17 @@ input, select, textarea, button {
     width: 32px !important;
     height: 32px !important;
   }
+
+  .hero-title {
+    font-size: 1.55rem !important;
+  }
 }
 
-/* 9. Universal Responsive Table & Document Scroll Wrappers */
+/* --------------------------------------------------------------------------
+   8. Universal Responsive Table & Document Scroll Wrappers
+   -------------------------------------------------------------------------- */
 .table-responsive,
+.table-responsive-container,
 .admin-table-wrap {
   width: 100%;
   overflow-x: auto;
@@ -6062,30 +6362,31 @@ input, select, textarea, button {
 }
 
 .table-responsive table,
+.table-responsive-container table,
 .admin-table-wrap table {
   min-width: 600px;
   width: 100%;
   border-collapse: collapse;
 }
 
-/* 10. Universal Mobile Touch Targets & Accessibility */
+/* --------------------------------------------------------------------------
+   9. Universal Mobile Touch Targets & Accessibility
+   -------------------------------------------------------------------------- */
 @media (max-width: 640px) {
   .btn-primary,
   .btn-secondary,
   .modal-close-btn,
-  .star-glow-btn {
+  .modal-close-icon,
+  .star-glow-btn,
+  .course-action-btn,
+  .event-explore-btn,
+  .filter-capsule-btn,
+  .event-cat-btn,
+  .admin-nav-tab-btn {
     min-height: 44px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-  }
-
-  canvas,
-  iframe,
-  embed,
-  object {
-    max-width: 100% !important;
-    height: auto !important;
   }
 }
 

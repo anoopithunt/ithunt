@@ -85,7 +85,7 @@
             {{ content.homeSpotlights?.internshipBanner?.ctaBtn || 'Apply for Internship Track →' }}
           </button>
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="spotlight-sub-grid">
           <div style="background: var(--bg-card-glass); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-cyber); text-align: center;">
             <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">⚡</div>
             <div style="font-weight: 800; font-size: 0.95rem;">{{ content.homeSpotlights?.internshipBanner?.track3MoTitle || '3-Month Track' }}</div>
@@ -144,7 +144,7 @@
             <span>{{ content.homeSpotlights?.eventsBanner?.ctaBtn || 'Explore Events & Media Gallery 🎪 →' }}</span>
           </button>
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="spotlight-sub-grid">
           <div style="background: var(--bg-card-glass); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-cyber); text-align: center; cursor: pointer;" @click="$emit('set-tab', 'events')">
             <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">💻</div>
             <div style="font-weight: 800; font-size: 0.95rem;">{{ content.homeSpotlights?.eventsBanner?.box1Title || 'Hackathons' }}</div>
