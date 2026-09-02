@@ -1,147 +1,402 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-card nielit-modal-card">
-      <button class="modal-close-btn" @click="$emit('close')">✕</button>
+      <!-- Theme Matched Top-Right Close Button -->
+      <button 
+        class="modal-close-icon" 
+        @click="$emit('close')" 
+        title="Close Project Submission Form (Esc)"
+        aria-label="Close Project Submission Form"
+      >
+        ✕
+      </button>
 
+      <!-- Modal Header -->
       <div class="modal-header">
-        <span class="modal-badge-pill">📜 OFFICIAL NIELIT PORTAL</span>
-        <h3 class="modal-title">NIELIT Project Form Submission</h3>
-        <p class="modal-subtitle">Fill in candidate, guide, and fee details. The official 4-Page NIELIT Project Document (Annexure II, III, Certificate & Fee Details) will be generated and sent directly to Admin for verification.</p>
+        <div class="modal-badge-pill">
+          <span class="pulse-dot"></span>
+          <span>📜 OFFICIAL NIELIT PORTAL • PROJECT SUBMISSION 2026</span>
+        </div>
+        <h2 class="modal-title">
+          NIELIT Student <span class="text-gradient">Project & Thesis Submission</span>
+        </h2>
+        <p class="modal-subtitle">
+          Submit candidate particulars, project synopsis, guide declaration, and fee details. The official 4-Page NIELIT Project Document (Annexure II, III, Guide Certificate & Fee Details) will be auto-generated and dispatched to Admin.
+        </p>
+
+        <!-- Step Navigation Pill Strip -->
+        <div class="nielit-steps-pill-strip">
+          <div class="step-pill" :class="{ active: activeSection === 1, done: isSection1Filled }" @click="activeSection = 1">
+            <span class="step-num">{{ isSection1Filled ? '✓' : '1' }}</span>
+            <span class="step-text">Candidate Info</span>
+          </div>
+          <div class="step-divider"></div>
+          <div class="step-pill" :class="{ active: activeSection === 2, done: isSection2Filled }" @click="activeSection = 2">
+            <span class="step-num">{{ isSection2Filled ? '✓' : '2' }}</span>
+            <span class="step-text">Project & Guide</span>
+          </div>
+          <div class="step-divider"></div>
+          <div class="step-pill" :class="{ active: activeSection === 3, done: isSection3Filled }" @click="activeSection = 3">
+            <span class="step-num">{{ isSection3Filled ? '✓' : '3' }}</span>
+            <span class="step-text">Fee & Payment</span>
+          </div>
+        </div>
       </div>
 
+      <!-- Project Submission Form -->
       <form @submit.prevent="handleSubmit" class="nielit-form">
         <!-- SECTION 1: CANDIDATE PARTICULARS -->
-        <div class="form-section-group">
-          <h4 class="form-section-heading">1. Candidate Particulars</h4>
+        <div class="form-section-group anim-stagger-1" :class="{ 'highlight-section': activeSection === 1 }">
+          <div class="form-section-header">
+            <div class="section-title-wrap">
+              <span class="section-icon-badge">🎓</span>
+              <div>
+                <h3 class="form-section-heading">1. Candidate Particulars</h3>
+                <span class="form-section-sub">Student registration identity and personal contact records</span>
+              </div>
+            </div>
+            <span class="section-badge-req">Mandatory</span>
+          </div>
+
           <div class="form-grid-2">
             <div class="form-field">
-              <label class="form-label">Candidate Name <span class="req">*</span></label>
-              <input type="text" v-model="form.candidateName" required class="form-control" placeholder="e.g. Anup Kumar" />
+              <label class="form-label">
+                <span class="label-icon">👤</span> Candidate Full Name <span class="req">*</span>
+              </label>
+              <input 
+                type="text" 
+                v-model="form.candidateName" 
+                required 
+                class="form-control" 
+                placeholder="e.g. Anup Kumar" 
+              />
             </div>
 
             <div class="form-field">
-              <label class="form-label">NIELIT Registration No <span class="req">*</span></label>
-              <input type="text" v-model="form.nielitRegNo" required class="form-control" placeholder="e.g. 1110423" />
+              <label class="form-label">
+                <span class="label-icon">🆔</span> NIELIT Registration No <span class="req">*</span>
+              </label>
+              <input 
+                type="text" 
+                v-model="form.nielitRegNo" 
+                required 
+                class="form-control font-mono" 
+                placeholder="e.g. 1110423" 
+              />
             </div>
 
             <div class="form-field">
-              <label class="form-label">NIELIT Examination Level <span class="req">*</span></label>
+              <label class="form-label">
+                <span class="label-icon">📜</span> Examination Level <span class="req">*</span>
+              </label>
               <select v-model="form.nielitLevel" required class="form-control">
-                <option value="O">O Level</option>
-                <option value="A">A Level</option>
-                <option value="B">B Level</option>
-                <option value="C">C Level</option>
+                <option value="O">O Level (Foundation Diploma)</option>
+                <option value="A">A Level (Advanced Diploma)</option>
+                <option value="B">B Level (MCA Equivalent)</option>
+                <option value="C">C Level (M.Tech Equivalent)</option>
               </select>
             </div>
 
             <div class="form-field">
-              <label class="form-label">Father's Name <span class="req">*</span></label>
-              <input type="text" v-model="form.fatherName" required class="form-control" placeholder="e.g. Shiv Shanker Mishra" />
+              <label class="form-label">
+                <span class="label-icon">👨‍👦</span> Father's Name <span class="req">*</span>
+              </label>
+              <input 
+                type="text" 
+                v-model="form.fatherName" 
+                required 
+                class="form-control" 
+                placeholder="e.g. Shiv Shanker Mishra" 
+              />
             </div>
 
             <div class="form-field">
-              <label class="form-label">Email Address <span class="req">*</span></label>
-              <input type="email" v-model="form.email" required class="form-control" placeholder="anupcodemaya@gmail.com" />
+              <label class="form-label">
+                <span class="label-icon">📧</span> Email Address <span class="req">*</span>
+              </label>
+              <input 
+                type="email" 
+                v-model="form.email" 
+                required 
+                class="form-control" 
+                placeholder="candidate@example.com" 
+              />
             </div>
 
             <div class="form-field">
-              <label class="form-label">Mobile Number <span class="req">*</span></label>
-              <input type="tel" v-model="form.mobile" required class="form-control" placeholder="9795771806" />
+              <label class="form-label">
+                <span class="label-icon">📱</span> Mobile Number <span class="req">*</span>
+              </label>
+              <input 
+                type="tel" 
+                v-model="form.mobile" 
+                pattern="[0-9]{10}"
+                required 
+                class="form-control font-mono" 
+                placeholder="10-digit mobile number" 
+              />
             </div>
           </div>
 
-          <div class="form-field" style="margin-top: 0.75rem;">
-            <label class="form-label">Residential Address <span class="req">*</span></label>
-            <input type="text" v-model="form.address" required class="form-control" placeholder="Kunda Pratapgarh " />
+          <div class="form-field" style="margin-top: 1rem;">
+            <label class="form-label">
+              <span class="label-icon">🏠</span> Permanent Residential Address <span class="req">*</span>
+            </label>
+            <input 
+              type="text" 
+              v-model="form.address" 
+              required 
+              class="form-control" 
+              placeholder="House/Street, Landmark, Village/Town" 
+            />
           </div>
 
-          <div class="form-grid-3" style="margin-top: 0.75rem;">
+          <div class="form-grid-3" style="margin-top: 1rem;">
             <div class="form-field">
-              <label class="form-label">District <span class="req">*</span></label>
-              <input type="text" v-model="form.district" required class="form-control" placeholder="Pratapgarh" />
+              <label class="form-label">
+                <span class="label-icon">📍</span> District / City <span class="req">*</span>
+              </label>
+              <input 
+                type="text" 
+                v-model="form.district" 
+                required 
+                class="form-control" 
+                placeholder="e.g. Prayagraj" 
+              />
             </div>
 
             <div class="form-field">
-              <label class="form-label">State <span class="req">*</span></label>
-              <input type="text" v-model="form.state" required class="form-control" placeholder="Uttar Pradesh" />
+              <label class="form-label">
+                <span class="label-icon">🗺️</span> State <span class="req">*</span>
+              </label>
+              <input 
+                type="text" 
+                v-model="form.state" 
+                required 
+                class="form-control" 
+                placeholder="e.g. Uttar Pradesh" 
+              />
             </div>
 
             <div class="form-field">
-              <label class="form-label">Pin Code <span class="req">*</span></label>
-              <input type="text" v-model="form.pin" required class="form-control" placeholder="230129" />
+              <label class="form-label">
+                <span class="label-icon">📮</span> Pin Code <span class="req">*</span>
+              </label>
+              <input 
+                type="text" 
+                v-model="form.pin" 
+                pattern="[0-9]{6}"
+                required 
+                class="form-control font-mono" 
+                placeholder="e.g. 212503" 
+              />
             </div>
           </div>
         </div>
 
         <!-- SECTION 2: PROJECT & GUIDE DETAILS -->
-        <div class="form-section-group" style="margin-top: 1.25rem;">
-          <h4 class="form-section-heading">2. Project & Guide Details</h4>
-          <div class="form-field">
-            <label class="form-label">Project / Dissertation Title <span class="req">*</span></label>
-            <input type="text" v-model="form.projectTitle" required class="form-control" placeholder="e.g. Network Monitoring and Management" />
+        <div class="form-section-group anim-stagger-2" :class="{ 'highlight-section': activeSection === 2 }" style="margin-top: 1.5rem;">
+          <div class="form-section-header">
+            <div class="section-title-wrap">
+              <span class="section-icon-badge">💻</span>
+              <div>
+                <h3 class="form-section-heading">2. Project Synopsis & Guide Mentorship</h3>
+                <span class="form-section-sub">Academic thesis topic and qualified guide credentials</span>
+              </div>
+            </div>
+            <span class="section-badge-req">Mandatory</span>
           </div>
 
-          <div class="form-grid-2" style="margin-top: 0.75rem;">
+          <div class="form-field">
+            <label class="form-label">
+              <span class="label-icon">💡</span> Project / Dissertation Title <span class="req">*</span>
+            </label>
+            <input 
+              type="text" 
+              v-model="form.projectTitle" 
+              required 
+              class="form-control" 
+              placeholder="e.g. AI-Powered Network Traffic Monitoring and Intrusion Detection System" 
+            />
+          </div>
+
+          <div class="form-grid-2" style="margin-top: 1rem;">
             <div class="form-field">
-              <label class="form-label">Guide / Supervisor Name <span class="req">*</span></label>
-              <input type="text" v-model="form.guideName" required class="form-control" placeholder="Sushil Kumar" />
+              <label class="form-label">
+                <span class="label-icon">👨‍🏫</span> Guide / Supervisor Name <span class="req">*</span>
+              </label>
+              <input 
+                type="text" 
+                v-model="form.guideName" 
+                required 
+                class="form-control" 
+                placeholder="e.g. Er. Sushil Kumar" 
+              />
             </div>
 
             <div class="form-field">
-              <label class="form-label">Guide Qualification <span class="req">*</span></label>
-              <input type="text" v-model="form.guideQualification" required class="form-control" placeholder="MCA" />
+              <label class="form-label">
+                <span class="label-icon">🎓</span> Guide Qualification <span class="req">*</span>
+              </label>
+              <input 
+                type="text" 
+                v-model="form.guideQualification" 
+                required 
+                class="form-control" 
+                placeholder="e.g. MCA / B.Tech (Computer Science)" 
+              />
             </div>
 
             <div class="form-field">
-              <label class="form-label">Guide Designation <span class="req">*</span></label>
-              <input type="text" v-model="form.guideDesignation" required class="form-control" placeholder="Sr. Laravel Developer" />
+              <label class="form-label">
+                <span class="label-icon">💼</span> Guide Designation & Organization <span class="req">*</span>
+              </label>
+              <input 
+                type="text" 
+                v-model="form.guideDesignation" 
+                required 
+                class="form-control" 
+                placeholder="e.g. Sr. Full-Stack Engineer / Academic Head" 
+              />
             </div>
 
             <div class="form-field">
-              <label class="form-label">Submission Date <span class="req">*</span></label>
-              <input type="text" v-model="form.projectDate" required class="form-control" placeholder="18/07/2026" />
+              <label class="form-label">
+                <span class="label-icon">📅</span> Submission Date <span class="req">*</span>
+              </label>
+              <input 
+                type="text" 
+                v-model="form.projectDate" 
+                required 
+                class="form-control font-mono" 
+                placeholder="DD/MM/YYYY" 
+              />
+            </div>
+          </div>
+
+          <!-- Guide Guidelines Tip Box -->
+          <div class="guide-tip-card" style="margin-top: 1rem;">
+            <span class="guide-tip-icon">ℹ️</span>
+            <div class="guide-tip-text">
+              <strong>Official NIELIT Requirement:</strong> The project guide/supervisor must possess a recognized MCA / B.Tech / M.Tech / DOEACC 'B' Level or equivalent industry qualification.
             </div>
           </div>
         </div>
 
-        <!-- SECTION 3: FEE & PAYMENT DETAILS -->
-        <div class="form-section-group" style="margin-top: 1.25rem;">
-          <h4 class="form-section-heading">3. Fee & Payment Details</h4>
+        <!-- SECTION 3: FEE & PAYMENT VERIFICATION -->
+        <div class="form-section-group anim-stagger-3" :class="{ 'highlight-section': activeSection === 3 }" style="margin-top: 1.5rem;">
+          <div class="form-section-header">
+            <div class="section-title-wrap">
+              <span class="section-icon-badge">💳</span>
+              <div>
+                <h3 class="form-section-heading">3. Fee & Payment Verification</h3>
+                <span class="form-section-sub">Bank transaction UTR reference and receipt particulars</span>
+              </div>
+            </div>
+            <span class="section-badge-req">Mandatory</span>
+          </div>
+
           <div class="form-grid-3">
             <div class="form-field">
-              <label class="form-label">Fee Amount (₹) <span class="req">*</span></label>
-              <input type="text" v-model="form.amount" required class="form-control" placeholder="1000" />
+              <label class="form-label">
+                <span class="label-icon">₹</span> Fee Amount (₹) <span class="req">*</span>
+              </label>
+              <input 
+                type="text" 
+                v-model="form.amount" 
+                required 
+                class="form-control font-mono" 
+                placeholder="1000" 
+              />
             </div>
 
             <div class="form-field">
-              <label class="form-label">Payment Date <span class="req">*</span></label>
-              <input type="text" v-model="form.paymentDate" required class="form-control" placeholder="25-Mar-2026" />
+              <label class="form-label">
+                <span class="label-icon">🗓️</span> Payment Date <span class="req">*</span>
+              </label>
+              <input 
+                type="text" 
+                v-model="form.paymentDate" 
+                required 
+                class="form-control font-mono" 
+                placeholder="e.g. 25-Mar-2026" 
+              />
             </div>
 
             <div class="form-field">
-              <label class="form-label">UTR / Transaction No <span class="req">*</span></label>
-              <input type="text" v-model="form.utrNumber" required class="form-control" placeholder="CHD550W1FMSF1B" />
+              <label class="form-label">
+                <span class="label-icon">🧾</span> UTR / Transaction No <span class="req">*</span>
+              </label>
+              <input 
+                type="text" 
+                v-model="form.utrNumber" 
+                required 
+                class="form-control font-mono" 
+                placeholder="e.g. CHD550W1FMSF1B" 
+              />
             </div>
           </div>
 
-          <div class="form-grid-2" style="margin-top: 0.75rem;">
+          <div class="form-grid-2" style="margin-top: 1rem;">
             <div class="form-field">
-              <label class="form-label">Account Holder / Sender Name <span class="req">*</span></label>
-              <input type="text" v-model="form.accountHolderName" required class="form-control" placeholder="Anup Kumar" />
+              <label class="form-label">
+                <span class="label-icon">🏦</span> Account Holder / Sender Name <span class="req">*</span>
+              </label>
+              <input 
+                type="text" 
+                v-model="form.accountHolderName" 
+                required 
+                class="form-control" 
+                placeholder="Name as registered with bank" 
+              />
             </div>
 
             <div class="form-field">
-              <label class="form-label">Remark <span class="req">*</span></label>
-              <input type="text" v-model="form.paymentRemark" required class="form-control" placeholder="Paid" />
+              <label class="form-label">
+                <span class="label-icon">📝</span> Payment Remark <span class="req">*</span>
+              </label>
+              <input 
+                type="text" 
+                v-model="form.paymentRemark" 
+                required 
+                class="form-control" 
+                placeholder="e.g. Paid / Verified" 
+              />
+            </div>
+          </div>
+
+          <!-- Official Document Generation Guarantee Banner -->
+          <div class="doc-guarantee-ribbon" style="margin-top: 1.25rem;">
+            <span class="doc-lock-icon">🔒</span>
+            <div>
+              <div class="doc-guarantee-title">Automatic 4-Page NIELIT PDF Compilation</div>
+              <div class="doc-guarantee-sub">Upon submission, Annexure II (Project Proforma), Annexure III (Guide Bio-Data), Project Completion Certificate, and Official Fee Receipt will be compiled.</div>
             </div>
           </div>
         </div>
 
-        <div class="modal-actions" style="margin-top: 1.5rem;">
-          <button type="button" class="btn-secondary" :disabled="isSubmitting" @click="$emit('close')">Cancel</button>
-          <button type="submit" class="btn-primary" :disabled="isSubmitting">
-            <span v-if="isSubmitting">Submitting NIELIT Form... ⏳</span>
-            <span v-else>Submit NIELIT Project Form 🚀</span>
+        <!-- Actions Bar -->
+        <div class="modal-actions-bar" style="margin-top: 2rem;">
+          <button 
+            type="button" 
+            class="btn-secondary modal-cancel-btn" 
+            :disabled="isSubmitting" 
+            @click="$emit('close')"
+          >
+            <span>Cancel</span>
+          </button>
+
+          <button 
+            type="submit" 
+            class="btn-primary modal-submit-btn" 
+            :disabled="isSubmitting"
+          >
+            <span v-if="isSubmitting" class="submitting-spinner-wrap">
+              <span class="spinner-circle"></span> Submitting NIELIT Form...
+            </span>
+            <span v-else>
+              Submit NIELIT Project Form 🚀
+            </span>
           </button>
         </div>
       </form>
@@ -150,8 +405,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { API, saveNielitProjectRecord } from '@/utils/apiClient';
+import { ref, computed } from 'vue';
+import { saveNielitProjectRecord } from '@/utils/apiClient';
 
 const props = defineProps({
   initialData: {
@@ -163,6 +418,7 @@ const props = defineProps({
 const emit = defineEmits(['close', 'submit-nielit-project']);
 
 const isSubmitting = ref(false);
+const activeSection = ref(1);
 
 const form = ref({
   studentName: props.initialData.studentName || props.initialData.candidateName || 'Anup Kumar',
@@ -175,14 +431,14 @@ const form = ref({
   email: props.initialData.email || 'anupcodemaya@gmail.com',
   mobile: props.initialData.mobile || '9795771806',
   address: props.initialData.address || 'Kunda Pratapgarh ',
-  district: props.initialData.district || 'Kunda',
+  district: props.initialData.district || 'Pratapgarh',
   state: props.initialData.state || 'Uttar Pradesh',
   pin: props.initialData.pin || '230129',
 
   projectTitle: props.initialData.projectTitle || 'Network Monitoring and Management',
-  guideName: props.initialData.guideName || 'Mr. Sushil Kumar',
+  guideName: props.initialData.guideName || 'Er. Sushil Kumar',
   guideQualification: props.initialData.guideQualification || 'MCA (Computer Science)',
-  guideDesignation: props.initialData.guideDesignation || 'Laraval/NodeJS Developer',
+  guideDesignation: props.initialData.guideDesignation || 'Sr. Laravel & Cloud Developer',
   guidePlace: props.initialData.guidePlace || 'Prayagraj',
   guideAddress: props.initialData.guideAddress || 'Holagarh, Prayagraj, UP',
   projectDate: props.initialData.projectDate || new Date().toLocaleDateString('en-GB'),
@@ -193,6 +449,21 @@ const form = ref({
   utrNumber: props.initialData.utrNumber || 'CHD550W1FMSF1B',
   accountHolderName: props.initialData.accountHolderName || 'Anup Kumar',
   paymentRemark: props.initialData.paymentRemark || 'Paid'
+});
+
+const isSection1Filled = computed(() => {
+  const f = form.value;
+  return !!(f.candidateName && f.nielitRegNo && f.email && f.mobile);
+});
+
+const isSection2Filled = computed(() => {
+  const f = form.value;
+  return !!(f.projectTitle && f.guideName && f.guideQualification);
+});
+
+const isSection3Filled = computed(() => {
+  const f = form.value;
+  return !!(f.amount && f.utrNumber && f.accountHolderName);
 });
 
 const handleSubmit = async () => {
@@ -227,42 +498,305 @@ const handleSubmit = async () => {
 
 <style scoped>
 .nielit-modal-card {
-  max-width: 720px;
+  max-width: 820px;
+  width: 95%;
   max-height: 90vh;
   overflow-y: auto;
+  position: relative;
+  padding: 2.25rem 2rem;
+  border-radius: var(--radius-xl, 20px);
+  background: var(--bg-card-glass);
+  border: 1px solid var(--border-cyber-glow);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.95), 0 0 40px rgba(249, 115, 22, 0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
+.modal-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-cyber);
+  padding-right: 3rem;
+}
+
+.modal-title {
+  font-family: var(--font-heading);
+  font-size: 1.85rem;
+  font-weight: 800;
+  margin: 0.6rem 0 0.4rem;
+  line-height: 1.25;
+}
+
+.modal-subtitle {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+}
+
+/* Step Navigation Strip */
+.nielit-steps-pill-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 0.4rem;
+  border-radius: var(--radius-full, 9999px);
+  border: 1px solid var(--border-cyber);
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.step-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.step-num {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+}
+
+.step-pill.active {
+  background: var(--gradient-ai-btn);
+  color: #fff;
+  box-shadow: 0 0 15px rgba(249, 115, 22, 0.4);
+}
+
+.step-pill.active .step-num {
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
+}
+
+.step-pill.done {
+  color: #10b981;
+}
+
+.step-pill.done .step-num {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.step-divider {
+  width: 12px;
+  height: 1px;
+  background: var(--border-cyber);
+}
+
+/* Form Section Panels */
 .form-section-group {
-  background: var(--color-surface-offset, rgba(255, 255, 255, 0.03));
-  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
-  padding: 1.25rem;
-  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid var(--border-cyber);
+  padding: 1.5rem;
+  border-radius: var(--radius-lg, 16px);
+  transition: var(--transition);
+}
+
+body.light-theme .form-section-group {
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.form-section-group.highlight-section {
+  border-color: rgba(249, 115, 22, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), 0 0 20px rgba(249, 115, 22, 0.1);
+}
+
+.form-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-cyber);
+  padding-bottom: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.section-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-icon-badge {
+  font-size: 1.4rem;
 }
 
 .form-section-heading {
-  color: var(--color-primary, #f97316);
-  font-size: 1.05rem;
+  font-family: var(--font-heading);
+  color: var(--color-ai-orange);
+  font-size: 1.1rem;
   font-weight: 800;
-  margin-bottom: 0.85rem;
-  border-bottom: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
-  padding-bottom: 0.4rem;
+  margin: 0;
 }
 
+.form-section-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.section-badge-req {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--color-ai-gold);
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.label-icon {
+  margin-right: 0.25rem;
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Tip & Guarantee Ribbons */
+.guide-tip-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: var(--radius-md);
+  font-size: 0.825rem;
+  color: var(--text-main);
+  line-height: 1.5;
+}
+
+.guide-tip-icon {
+  font-size: 1.15rem;
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+.doc-guarantee-ribbon {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.15rem;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: var(--radius-md);
+}
+
+.doc-lock-icon {
+  font-size: 1.35rem;
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+.doc-guarantee-title {
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: #10b981;
+  margin-bottom: 0.2rem;
+}
+
+.doc-guarantee-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+/* Grids */
 .form-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.85rem;
+  gap: 1rem;
 }
 
 .form-grid-3 {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 0.85rem;
+  gap: 1rem;
 }
 
-@media (max-width: 640px) {
+/* Modal Actions Bar */
+.modal-actions-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border-cyber);
+}
+
+.modal-cancel-btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.modal-submit-btn {
+  padding: 0.75rem 2rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.submitting-spinner-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.spinner-circle {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 680px) {
+  .nielit-modal-card {
+    padding: 1.5rem 1.15rem;
+  }
+
+  .modal-title {
+    font-size: 1.45rem;
+  }
+
   .form-grid-2, .form-grid-3 {
     grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .modal-actions-bar {
+    flex-direction: column;
+  }
+
+  .modal-cancel-btn,
+  .modal-submit-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 </style>
