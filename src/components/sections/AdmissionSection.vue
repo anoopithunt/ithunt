@@ -5,6 +5,24 @@
       <h2 class="section-title">{{ content.admissionSection?.titlePrefix || 'Candidate ' }}<span class="text-gradient">{{ content.admissionSection?.titleGradient || 'Admission Application' }}</span></h2>
     </div>
 
+    <!-- Multi-Step Progress Indicator -->
+    <div class="admission-steps-bar reveal-on-scroll" aria-label="Application Progress">
+      <div class="admission-step" :class="{ active: currentStep === 1, done: currentStep > 1 }">
+        <div class="step-circle">{{ currentStep > 1 ? '✓' : '1' }}</div>
+        <span class="step-label">Personal Info</span>
+      </div>
+      <div class="step-connector" :class="{ done: currentStep > 1 }"></div>
+      <div class="admission-step" :class="{ active: currentStep === 2, done: currentStep > 2 }">
+        <div class="step-circle">{{ currentStep > 2 ? '✓' : '2' }}</div>
+        <span class="step-label">Program</span>
+      </div>
+      <div class="step-connector" :class="{ done: currentStep > 2 }"></div>
+      <div class="admission-step" :class="{ active: currentStep === 3, done: isFormComplete }">
+        <div class="step-circle">{{ isFormComplete ? '✓' : '3' }}</div>
+        <span class="step-label">Contact</span>
+      </div>
+    </div>
+
     <div class="admission-container">
       <!-- Admission Form -->
       <div class="form-card anim-stagger-2">
@@ -182,7 +200,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { sendWhatsAppNotification, sendDeviceSmsNotification } from '../../utils/smsNotifier.js';
 
 const props = defineProps({
@@ -207,6 +225,20 @@ const props = defineProps({
 const emit = defineEmits(['submit-admission', 'download-pdf']);
 
 const isSubmitting = ref(false);
+
+// Computed progress step based on form fill state
+const currentStep = computed(() => {
+  const f = props.form;
+  if (f.mobile || f.email || f.address) return 3;
+  if (f.course && f.dob) return 2;
+  if (f.candidateName) return 2;
+  return 1;
+});
+
+const isFormComplete = computed(() => {
+  const f = props.form;
+  return !!(f.candidateName && f.mobile && f.email && f.course);
+});
 
 const handleSubmit = async () => {
   try {

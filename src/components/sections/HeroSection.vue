@@ -25,8 +25,8 @@
           </div>
 
           <!-- Quick Highlights Badges -->
-          <div style="display: flex; gap: 1rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; flex-wrap: wrap;">
-            <div v-for="hl in content.hero?.highlights" :key="hl">{{ hl }}</div>
+          <div class="hero-highlights-row">
+            <div class="hero-highlight-chip" v-for="hl in content.hero?.highlights" :key="hl">{{ hl }}</div>
           </div>
         </div>
 
@@ -61,17 +61,17 @@
     </div>
 
     <!-- Stats Counter Section -->
-    <div class="container stats-section anim-stagger-2">
+    <div class="container stats-section reveal-on-scroll">
       <div class="stats-grid">
         <div class="stat-card" v-for="(stat, idx) in content.stats" :key="idx">
-          <div class="stat-number" :class="stat.isGradientPrimary ? 'text-gradient' : 'text-gradient-secondary'">{{ stat.number }}</div>
+          <div class="stat-number" :class="stat.isGradientPrimary ? 'text-gradient' : 'text-gradient-secondary'">{{ animatedStats[idx] || stat.number }}</div>
           <div class="stat-label">{{ stat.label }}</div>
         </div>
       </div>
     </div>
 
     <!-- Internship Spotlight Banner -->
-    <div class="container anim-stagger-3" style="margin-bottom: 4rem;">
+    <div class="container reveal-on-scroll reveal-delay-1" style="margin-bottom: 4rem;">
       <div class="internship-banner">
         <div>
           <span class="duration-pill">{{ content.internshipVenture?.spotlightBadge }}</span>
@@ -101,7 +101,7 @@
     </div>
 
     <!-- Featured Programs Preview -->
-    <div class="container anim-stagger-3" style="padding-bottom: 4rem;">
+    <div class="container reveal-on-scroll reveal-delay-1" style="padding-bottom: 4rem;">
       <div class="section-header">
         <span class="section-tag">{{ content.coursesSection?.tagline }}</span>
         <h2 class="section-title">{{ content.coursesSection?.titlePrefix }}<span class="text-gradient">{{ content.coursesSection?.titleGradient }}</span></h2>
@@ -130,7 +130,7 @@
     </div>
 
     <!-- Campus Events & Hackathons Spotlight on Home Tab -->
-    <div class="container anim-stagger-4" style="padding-bottom: 4rem;">
+    <div class="container reveal-on-scroll reveal-delay-2" style="padding-bottom: 4rem;">
       <div class="internship-banner" style="background: linear-gradient(135deg, rgba(249, 115, 22, 0.18), rgba(250, 204, 21, 0.12));">
         <div>
           <span class="duration-pill">{{ content.homeSpotlights?.eventsBanner?.pillBadge || '🎪 CAMPUS EVENTS & GALLERY 2026' }}</span>
@@ -162,10 +162,10 @@
     <!-- 1. ABOUT US SECTION -->
     <div style="background: rgba(15, 23, 42, 0.4); border-top: 1px solid var(--border-cyber); padding: 4rem 0;">
       <div class="container">
-        <div class="about-grid">
+        <div class="about-grid reveal-on-scroll">
           <div class="about-card-stack">
-            <img :src="content.about?.mainImage" alt="IT HUNT Society" class="about-img-main" @error="onImgError">
-            <img :src="content.about?.subImage" alt="Computer Lab" class="about-img-sub" @error="onImgError">
+            <img :src="content.about?.mainImage" alt="IT HUNT Society" class="about-img-main" @error="onImgError" loading="lazy">
+            <img :src="content.about?.subImage" alt="Computer Lab" class="about-img-sub" @error="onImgError" loading="lazy">
           </div>
           <div class="about-text-content">
             <span class="section-tag">{{ content.about?.tagline }}</span>
@@ -222,7 +222,7 @@
     <!-- 2. FACULTY TEAM SECTION -->
     <div style="padding: 4rem 0; border-top: 1px solid var(--border-cyber);">
       <div class="container">
-        <div class="section-header">
+        <div class="section-header reveal-on-scroll">
           <span class="section-tag">{{ content.teamSection?.tagline }}</span>
           <h2 class="section-title">{{ content.teamSection?.titlePrefix }}<span class="text-gradient">{{ content.teamSection?.titleGradient }}</span></h2>
           <p class="section-subtitle">{{ content.teamSection?.description }}</p>
@@ -255,6 +255,10 @@ defineProps({
 });
 
 defineEmits(['set-tab', 'apply-course', 'open-job-modal']);
+
+import { ref, onMounted, computed } from 'vue';
+
+const animatedStats = ref([]);
 
 const onImgError = (event) => {
   event.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="%231e293b"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="16" fill="%2394a3b8">IT HUNT Center</text></svg>';
