@@ -201,12 +201,13 @@
               <span class="section-icon-badge">💻</span>
               <div>
                 <h3 class="form-section-heading">2. Project Synopsis & Guide Mentorship</h3>
-                <span class="form-section-sub">Academic thesis topic and qualified guide credentials</span>
+                <span class="form-section-sub">Enter your dissertation title; Official Guide is allocated by Admin</span>
               </div>
             </div>
-            <span class="section-badge-req">Mandatory</span>
+            <span class="section-badge-req">Candidate Enters Title</span>
           </div>
 
+          <!-- Project Title (Editable by Student) -->
           <div class="form-field">
             <label class="form-label">
               <span class="label-icon">💡</span> Project / Dissertation Title <span class="req">*</span>
@@ -220,65 +221,79 @@
             />
           </div>
 
-          <div class="form-grid-2" style="margin-top: 1rem;">
-            <div class="form-field">
-              <label class="form-label">
-                <span class="label-icon">👨‍🏫</span> Guide / Supervisor Name <span class="req">*</span>
-              </label>
-              <input 
-                type="text" 
-                v-model="form.guideName" 
-                required 
-                class="form-control" 
-                placeholder="e.g. Er. Sushil Kumar" 
-              />
+          <!-- Official Guide Details Header & Locked Notice -->
+          <div class="guide-allocation-container" style="margin-top: 1.25rem;">
+            <div class="guide-allocation-header">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span class="guide-lock-badge">🔒 OFFICIAL GUIDE ALLOCATION</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">(Assigned & Verified by Admin Only)</span>
+              </div>
+              <span class="admin-only-pill">Admin Managed</span>
             </div>
 
-            <div class="form-field">
-              <label class="form-label">
-                <span class="label-icon">🎓</span> Guide Qualification <span class="req">*</span>
-              </label>
-              <input 
-                type="text" 
-                v-model="form.guideQualification" 
-                required 
-                class="form-control" 
-                placeholder="e.g. MCA / B.Tech (Computer Science)" 
-              />
+            <div class="form-grid-2" style="margin-top: 0.85rem;">
+              <div class="form-field">
+                <label class="form-label text-muted">
+                  <span class="label-icon">👨‍🏫</span> Guide / Supervisor Name <span class="lock-indicator">🔒</span>
+                </label>
+                <input 
+                  type="text" 
+                  :value="form.guideName" 
+                  readonly 
+                  tabindex="-1"
+                  class="form-control form-control-locked" 
+                  title="Official guide allocated by IT HUNT Admin"
+                />
+              </div>
+
+              <div class="form-field">
+                <label class="form-label text-muted">
+                  <span class="label-icon">🎓</span> Guide Qualification <span class="lock-indicator">🔒</span>
+                </label>
+                <input 
+                  type="text" 
+                  :value="form.guideQualification" 
+                  readonly 
+                  tabindex="-1"
+                  class="form-control form-control-locked" 
+                  title="Verified qualification as per NIELIT guidelines"
+                />
+              </div>
+
+              <div class="form-field">
+                <label class="form-label text-muted">
+                  <span class="label-icon">💼</span> Guide Designation & Center <span class="lock-indicator">🔒</span>
+                </label>
+                <input 
+                  type="text" 
+                  :value="form.guideDesignation" 
+                  readonly 
+                  tabindex="-1"
+                  class="form-control form-control-locked" 
+                  title="Designation assigned by Admin"
+                />
+              </div>
+
+              <div class="form-field">
+                <label class="form-label">
+                  <span class="label-icon">📅</span> Submission Date <span class="req">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  v-model="form.projectDate" 
+                  required 
+                  class="form-control font-mono" 
+                  placeholder="DD/MM/YYYY" 
+                />
+              </div>
             </div>
 
-            <div class="form-field">
-              <label class="form-label">
-                <span class="label-icon">💼</span> Guide Designation & Organization <span class="req">*</span>
-              </label>
-              <input 
-                type="text" 
-                v-model="form.guideDesignation" 
-                required 
-                class="form-control" 
-                placeholder="e.g. Sr. Full-Stack Engineer / Academic Head" 
-              />
-            </div>
-
-            <div class="form-field">
-              <label class="form-label">
-                <span class="label-icon">📅</span> Submission Date <span class="req">*</span>
-              </label>
-              <input 
-                type="text" 
-                v-model="form.projectDate" 
-                required 
-                class="form-control font-mono" 
-                placeholder="DD/MM/YYYY" 
-              />
-            </div>
-          </div>
-
-          <!-- Guide Guidelines Tip Box -->
-          <div class="guide-tip-card" style="margin-top: 1rem;">
-            <span class="guide-tip-icon">ℹ️</span>
-            <div class="guide-tip-text">
-              <strong>Official NIELIT Requirement:</strong> The project guide/supervisor must possess a recognized MCA / B.Tech / M.Tech / DOEACC 'B' Level or equivalent industry qualification.
+            <!-- Guide Guidelines Tip Box -->
+            <div class="guide-tip-card" style="margin-top: 1rem;">
+              <span class="guide-tip-icon">🔒</span>
+              <div class="guide-tip-text">
+                <strong>Official Guide Allocation Policy:</strong> Project Supervisor and Guide credentials (MCA / B.Tech / DOEACC 'B' Level) are assigned & verified exclusively by <strong>IT HUNT Administration</strong> according to NIELIT examination bylaws. Students cannot modify guide credentials directly.
+              </div>
             </div>
           </div>
         </div>
@@ -352,15 +367,16 @@
             </div>
 
             <div class="form-field">
-              <label class="form-label">
-                <span class="label-icon">📝</span> Payment Remark <span class="req">*</span>
+              <label class="form-label text-muted">
+                <span class="label-icon">📝</span> Payment Remark <span class="lock-indicator">🔒</span>
               </label>
               <input 
                 type="text" 
-                v-model="form.paymentRemark" 
-                required 
-                class="form-control" 
-                placeholder="e.g. Paid / Verified" 
+                :value="form.paymentRemark || 'Paid'" 
+                readonly 
+                tabindex="-1"
+                class="form-control form-control-locked" 
+                title="Payment remark is locked to 'Paid' by default" 
               />
             </div>
           </div>
@@ -481,7 +497,8 @@ const handleSubmit = async () => {
       level: form.value.nielitLevel ? `${form.value.nielitLevel} Level` : 'O Level',
       status: 'Submitted',
       feePaid: `₹${form.value.amount || '1,000'}`,
-      utrNo: form.value.utrNumber || 'CHD550W1FMSF1B'
+      utrNo: form.value.utrNumber || 'CHD550W1FMSF1B',
+      paymentRemark: 'Paid'
     };
 
     // Save directly to Firebase Firestore Cloud Database
@@ -668,8 +685,76 @@ body.light-theme .form-section-group {
   margin-right: 0.25rem;
 }
 
-.font-mono {
-  font-family: var(--font-mono);
+/* Guide Allocation Locked Box */
+.guide-allocation-container {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px dashed var(--border-cyber);
+  padding: 1.25rem;
+  border-radius: var(--radius-lg, 14px);
+}
+
+body.light-theme .guide-allocation-container {
+  background: rgba(249, 115, 22, 0.04);
+}
+
+.guide-allocation-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.65rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+body.light-theme .guide-allocation-header {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.guide-lock-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.5px;
+}
+
+.admin-only-pill {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-control-locked {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: var(--text-muted) !important;
+  cursor: not-allowed !important;
+  user-select: none;
+}
+
+body.light-theme .form-control-locked {
+  background: rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.lock-indicator {
+  font-size: 0.75rem;
+  margin-left: 0.25rem;
+  opacity: 0.7;
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
 }
 
 /* Tip & Guarantee Ribbons */
