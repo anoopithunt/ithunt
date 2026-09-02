@@ -130,11 +130,6 @@ const CONTENT_DATA = {
       }
     ]
   },
-  "sampleAdmissions": [],
-  "sampleStudents": [],
-  "sampleNielitProjects": [],
-  "sampleJobApplications": [],
-  "sampleRsvps": [],
 
   // Header Navigation Items
   navigation: [
