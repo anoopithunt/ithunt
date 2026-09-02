@@ -926,6 +926,14 @@
                 <input type="text" v-model="editNielitForm.guideDesignation" required class="form-control" placeholder="e.g. Director & Founder, IT HUNT">
               </div>
               <div class="form-group">
+                <label class="form-label">Project Submission Date</label>
+                <input type="date" v-model="editNielitForm.projectDate" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Payment Date</label>
+                <input type="date" v-model="editNielitForm.paymentDate" class="form-control">
+              </div>
+              <div class="form-group">
                 <label class="form-label">Fee Amount (₹) <span class="req">*</span></label>
                 <input type="text" v-model="editNielitForm.amount" required class="form-control" placeholder="1000">
               </div>

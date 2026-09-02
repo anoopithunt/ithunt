@@ -223,14 +223,13 @@
 
             <div class="form-field">
               <label class="form-label">
-                <span class="label-icon">📅</span> Submission Date <span class="req">*</span>
+                <span class="label-icon">📅</span> Project Submission Date <span class="req">*</span>
               </label>
               <input 
-                type="text" 
+                type="date" 
                 v-model="form.projectDate" 
                 required 
-                class="form-control font-mono" 
-                placeholder="DD/MM/YYYY" 
+                class="form-control date-picker-input font-mono" 
               />
             </div>
           </div>
@@ -268,11 +267,10 @@
                 <span class="label-icon">🗓️</span> Payment Date <span class="req">*</span>
               </label>
               <input 
-                type="text" 
+                type="date" 
                 v-model="form.paymentDate" 
                 required 
-                class="form-control font-mono" 
-                placeholder="e.g. 25-Mar-2026" 
+                class="form-control date-picker-input font-mono" 
               />
             </div>
 
@@ -358,6 +356,31 @@ const emit = defineEmits(['close', 'submit-nielit-project']);
 const isSubmitting = ref(false);
 const activeSection = ref(1);
 
+function toIsoDate(val) {
+  if (!val) {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+  const str = String(val).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(str)) {
+    const [d, m, y] = str.split('/');
+    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+  }
+  const parsed = new Date(str);
+  if (!isNaN(parsed.getTime())) {
+    const year = parsed.getFullYear();
+    const month = String(parsed.getMonth() + 1).padStart(2, '0');
+    const day = String(parsed.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+  const today = new Date();
+  return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+}
+
 const form = ref({
   studentName: props.initialData.studentName || props.initialData.candidateName || '',
   candidateName: props.initialData.candidateName || props.initialData.studentName || '',
@@ -379,11 +402,11 @@ const form = ref({
   guideDesignation: props.initialData.guideDesignation || 'Sr. Laravel & Cloud Developer',
   guidePlace: props.initialData.guidePlace || 'Prayagraj',
   guideAddress: props.initialData.guideAddress || 'Holagarh, Prayagraj, UP',
-  projectDate: props.initialData.projectDate || new Date().toLocaleDateString('en-GB'),
+  projectDate: toIsoDate(props.initialData.projectDate),
   githubRepo: props.initialData.githubRepo || '',
 
   amount: props.initialData.amount || '1000',
-  paymentDate: props.initialData.paymentDate || new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+  paymentDate: toIsoDate(props.initialData.paymentDate),
   utrNumber: props.initialData.utrNumber || '',
   accountHolderName: props.initialData.accountHolderName || '',
   paymentRemark: 'Paid'
