@@ -55,7 +55,7 @@
       </div>
 
       <!-- 4. ALUMNI TESTIMONIALS CARDS GRID -->
-      <div class="alumni-cards-grid anim-stagger-3">
+      <div class="alumni-cards-grid reveal-on-scroll">
         <div class="alumni-card" v-for="alumni in filteredAlumni" :key="alumni.id">
           <!-- Card Header -->
           <div class="alumni-card-top">

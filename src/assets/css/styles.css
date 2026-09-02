@@ -407,6 +407,35 @@ body.light-theme .nav-item-btn:hover {
   margin-bottom: 2.5rem;
 }
 
+/* Hero highlights badges row */
+.hero-highlights-row {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.hero-highlight-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-full);
+  background: rgba(249, 115, 22, 0.08);
+  border: 1px solid rgba(249, 115, 22, 0.18);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  transition: var(--transition);
+}
+
+.hero-highlight-chip:hover {
+  background: rgba(249, 115, 22, 0.14);
+  color: var(--color-ai-orange);
+  border-color: rgba(249, 115, 22, 0.35);
+}
+
 .btn-primary {
   background: var(--gradient-ai-btn);
   color: #ffffff;
@@ -6124,3 +6153,575 @@ input, select, textarea, button {
 }
 
 
+/* ==========================================================================
+   PROFESSIONAL UPGRADES v3.0 - Animations, Interactions & Polish
+   ========================================================================== */
+
+/* --- Focus Visible Accessibility Ring --- */
+:focus-visible {
+  outline: 2px solid var(--color-ai-orange);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* --- Scroll-Reveal Animation System --- */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-on-scroll.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-on-scroll.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-on-scroll.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-on-scroll.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-on-scroll.reveal-delay-4 { transition-delay: 0.45s; }
+.reveal-on-scroll.reveal-delay-5 { transition-delay: 0.6s; }
+
+/* --- Keyframes --- */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeScale {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  from { background-position: -200% center; }
+  to   { background-position: 200% center; }
+}
+
+@keyframes floatBob {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
+@keyframes glowPulseRing {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
+  50%       { box-shadow: 0 0 0 12px rgba(249, 115, 22, 0); }
+}
+
+@keyframes whatsappBounce {
+  0%, 100% { transform: scale(1); }
+  25%       { transform: scale(1.12); }
+  50%       { transform: scale(1.06); }
+  75%       { transform: scale(1.1); }
+}
+
+@keyframes toastSlideIn {
+  from { opacity: 0; transform: translateX(100%) scale(0.95); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes toastSlideOut {
+  from { opacity: 1; transform: translateX(0) scale(1); }
+  to   { opacity: 0; transform: translateX(100%) scale(0.9); }
+}
+
+@keyframes navbarShrink {
+  from { height: 72px; }
+  to   { height: 60px; }
+}
+
+/* --- Loading Shimmer Skeleton --- */
+.skeleton {
+  background: linear-gradient(90deg,
+    var(--bg-card-glass) 25%,
+    rgba(249, 115, 22, 0.08) 50%,
+    var(--bg-card-glass) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease infinite;
+  border-radius: var(--radius-md);
+}
+
+/* --- Confetti Burst --- */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9998;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -16px;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  animation: confettiFall 3.5s ease-in forwards;
+  will-change: transform, opacity;
+}
+
+/* --- Toast Notification System --- */
+.toast-stack {
+  position: fixed;
+  top: 90px;
+  right: 1.25rem;
+  z-index: 9997;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  max-width: 380px;
+  width: calc(100vw - 2.5rem);
+  pointer-events: none;
+}
+
+.toast-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: var(--radius-md);
+  background: rgba(15, 23, 42, 0.97);
+  border: 1px solid var(--border-cyber);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 0 20px rgba(249, 115, 22, 0.12);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-main);
+  pointer-events: auto;
+  animation: toastSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+body.light-theme .toast-item {
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12), 0 0 20px rgba(249, 115, 22, 0.08);
+}
+
+.toast-success { border-left: 3px solid #10b981; }
+.toast-error   { border-left: 3px solid #f43f5e; }
+.toast-info    { border-left: 3px solid var(--color-ai-orange); }
+
+.toast-icon { font-size: 1.15rem; flex-shrink: 0; }
+.toast-msg  { flex: 1; line-height: 1.4; }
+
+.toast-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.15rem 0.3rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  transition: color 0.2s, background 0.2s;
+}
+
+.toast-close:hover {
+  color: var(--text-main);
+  background: rgba(255,255,255,0.08);
+}
+
+.toast-enter-active { animation: toastSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.toast-leave-active { animation: toastSlideOut 0.3s ease forwards; }
+.toast-enter-from, .toast-leave-to { opacity: 0; }
+
+/* --- WhatsApp Floating CTA Button --- */
+.whatsapp-float-btn {
+  position: fixed;
+  bottom: 5.5rem;
+  right: 1.5rem;
+  z-index: 990;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4), 0 2px 8px rgba(0,0,0,0.3);
+  opacity: 0;
+  transform: scale(0.7) translateY(20px);
+  transition: opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s;
+  pointer-events: none;
+  text-decoration: none;
+}
+
+.whatsapp-float-btn.visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: auto;
+  animation: whatsappBounce 3.5s ease-in-out 1.5s infinite;
+}
+
+.whatsapp-float-btn:hover {
+  box-shadow: 0 8px 30px rgba(37, 211, 102, 0.55), 0 4px 12px rgba(0,0,0,0.3);
+  transform: scale(1.1) translateY(-2px) !important;
+  animation-play-state: paused;
+}
+
+/* Position back-to-top above WhatsApp */
+.floating-back-to-top {
+  bottom: 1.5rem;
+}
+
+/* --- Navbar Scroll-Shrink Enhancement --- */
+.navbar-header.scrolled {
+  height: 60px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4), 0 0 20px rgba(249, 115, 22, 0.08);
+}
+
+.navbar-header.scrolled .navbar-container {
+  height: 60px;
+}
+
+.navbar-header.scrolled .brand-logo-img {
+  width: 36px;
+  height: 36px;
+}
+
+/* --- Mobile Nav Backdrop Overlay --- */
+.mobile-nav-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.mobile-nav-backdrop.open {
+  display: block;
+  opacity: 1;
+}
+
+/* Mobile drawer slide animation */
+.mobile-nav-drawer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
+  opacity: 0;
+  display: flex !important;
+}
+
+.mobile-nav-drawer.open {
+  max-height: 100vh;
+  opacity: 1;
+}
+
+/* --- Enhanced Card Hover Spring Physics --- */
+.course-card,
+.team-card,
+.modern-track-card,
+.feature-pillar-card,
+.roadmap-step-card,
+.career-benefit-card,
+.stat-card {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s !important;
+}
+
+.course-card:hover,
+.team-card:hover,
+.modern-track-card:hover {
+  transform: translateY(-8px) scale(1.012) !important;
+  box-shadow: 0 24px 50px -12px rgba(0,0,0,0.7), 0 0 30px rgba(249, 115, 22, 0.22) !important;
+  border-color: rgba(249, 115, 22, 0.4) !important;
+}
+
+.feature-pillar-card:hover,
+.roadmap-step-card:hover,
+.career-benefit-card:hover {
+  transform: translateY(-5px) !important;
+}
+
+/* --- Hero Badge Animated Pulse Dot --- */
+.hero-badge-dot {
+  animation: glowPulseRing 2s ease-in-out infinite;
+}
+
+/* --- Staggered Hero Content Entrance --- */
+.hero-content.anim-stagger-1 .hero-badge { animation: fadeSlideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both; }
+.hero-content.anim-stagger-1 .hero-title { animation: fadeSlideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both; }
+.hero-content.anim-stagger-1 .hero-subtitle { animation: fadeSlideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both; }
+.hero-content.anim-stagger-1 .hero-cta-group { animation: fadeSlideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.48s both; }
+.hero-media-wrapper.anim-stagger-2 { animation: fadeScale 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both; }
+
+/* Hero media floating bob */
+.code-terminal-card {
+  animation: floatBob 5s ease-in-out infinite;
+}
+
+/* --- Stats Counter Animation --- */
+.stat-number {
+  display: inline-block;
+}
+
+/* --- Animated Gradient Heading Shine --- */
+.text-gradient {
+  background-size: 200% auto;
+  animation: shimmer 4s linear infinite;
+}
+
+/* --- Button Press Micro-feedback --- */
+.btn-primary:active {
+  transform: translateY(1px) scale(0.98) !important;
+}
+
+.btn-secondary:active {
+  transform: translateY(1px) scale(0.98) !important;
+}
+
+/* --- Internship Card Stagger Entrance --- */
+.internship-tracks-grid .modern-track-card:nth-child(1) { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both; }
+.internship-tracks-grid .modern-track-card:nth-child(2) { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+.internship-tracks-grid .modern-track-card:nth-child(3) { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both; }
+.internship-tracks-grid .modern-track-card:nth-child(4) { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both; }
+.internship-tracks-grid .modern-track-card:nth-child(5) { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both; }
+.internship-tracks-grid .modern-track-card:nth-child(n+6) { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both; }
+
+/* --- Course Card Stagger --- */
+.courses-grid .course-card:nth-child(1) { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both; }
+.courses-grid .course-card:nth-child(2) { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+.courses-grid .course-card:nth-child(3) { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both; }
+.courses-grid .course-card:nth-child(n+4) { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both; }
+
+/* --- Admission Multi-Step Progress --- */
+.admission-steps-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 2rem;
+  padding: 1.25rem;
+  background: var(--bg-card-glass);
+  border: 1px solid var(--border-cyber);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(12px);
+}
+
+.admission-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 80px;
+  position: relative;
+  z-index: 1;
+}
+
+.step-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--border-cyber);
+  background: var(--bg-input-cyber);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.admission-step.active .step-circle {
+  background: var(--gradient-ai-btn);
+  border-color: var(--color-ai-orange);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.4);
+  transform: scale(1.12);
+}
+
+.admission-step.done .step-circle {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-color: #34d399;
+  color: #fff;
+}
+
+.step-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.admission-step.active .step-label {
+  color: var(--color-ai-orange);
+}
+
+.admission-step.done .step-label {
+  color: #34d399;
+}
+
+.step-connector {
+  flex: 1;
+  height: 2px;
+  background: var(--border-cyber);
+  margin-bottom: 1.1rem;
+  transition: background 0.4s;
+  min-width: 24px;
+}
+
+.step-connector.done {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+/* --- Login Card Glassmorphism Enhancement --- */
+.login-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.login-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.06) 0%, transparent 50%, rgba(245, 158, 11, 0.04) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.login-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(249, 115, 22, 0.07) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 0;
+  animation: floatBob 8s ease-in-out infinite;
+}
+
+.login-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* --- Footer Link Hover Slide --- */
+.footer-links a {
+  transition: color 0.2s, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), padding-left 0.25s;
+  display: inline-block;
+}
+
+.footer-links a:hover {
+  color: var(--color-ai-orange) !important;
+  padding-left: 6px;
+  transform: translateX(0);
+}
+
+/* --- Section Header Enhanced Typography --- */
+.section-title {
+  background: var(--gradient-ai-hero);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline;
+}
+
+/* Override for non-gradient parts */
+.section-title > .text-gradient {
+  background: var(--gradient-ai-hero);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* --- Shimmer on Skill Tags --- */
+.skill-tag {
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.skill-tag:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 12px rgba(249, 115, 22, 0.3);
+}
+
+/* --- Form Control Enhanced Focus --- */
+.form-control:focus {
+  border-color: var(--color-ai-orange) !important;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18), 0 2px 8px rgba(249, 115, 22, 0.12) !important;
+  transform: none;
+}
+
+/* --- Ambient Orb Float Animations --- */
+.ambient-orb-1 { animation: orbFloat1 12s ease-in-out infinite; }
+.ambient-orb-2 { animation: orbFloat2 15s ease-in-out infinite; }
+.ambient-orb-3 { animation: orbFloat3 18s ease-in-out infinite; }
+
+/* --- Internship Hero Banner Entrance --- */
+.internship-hero-banner .internship-live-pill {
+  animation: fadeSlideDown 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+
+.internship-hero-banner .internship-main-title {
+  animation: fadeSlideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+.internship-hero-banner .internship-main-desc {
+  animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+}
+
+/* --- Scroll Progress Bar Polish --- */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: var(--gradient-ai-hero);
+  z-index: 10000;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 12px rgba(249, 115, 22, 0.6);
+  border-radius: 0 2px 2px 0;
+}
+
+/* --- Highlight Pulse Button --- */
+.highlight-pulse-btn {
+  animation: glowPulseRing 2.5s ease-in-out infinite;
+}
+
+/* --- Responsive WhatsApp / Back-to-top on mobile --- */
+@media (max-width: 768px) {
+  .whatsapp-float-btn {
+    width: 50px;
+    height: 50px;
+    right: 1rem;
+    bottom: 5rem;
+  }
+
+  .floating-back-to-top {
+    right: 1rem;
+    bottom: 1rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .toast-stack {
+    right: 0.75rem;
+    left: 0.75rem;
+    max-width: 100%;
+    width: auto;
+  }
+
+  .admission-steps-bar {
+    padding: 0.85rem 0.5rem;
+    gap: 0;
+  }
+
+  .step-label {
+    font-size: 0.6rem;
+  }
+}

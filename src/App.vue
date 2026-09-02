@@ -23,6 +23,35 @@
     <!-- Subtle Clean Background Accent Layer -->
     <div class="subtle-bg-gradient" aria-hidden="true"></div>
 
+    <!-- Confetti Burst Layer -->
+    <div v-if="showConfetti" class="confetti-container" aria-hidden="true">
+      <div v-for="piece in confettiPieces" :key="piece.id" class="confetti-piece" :style="piece.style"></div>
+    </div>
+
+    <!-- Toast Notification Stack -->
+    <div class="toast-stack" aria-live="polite" aria-label="Notifications">
+      <Transition name="toast" v-for="toast in toasts" :key="toast.id">
+        <div :class="['toast-item', 'toast-' + toast.type]">
+          <span class="toast-icon">{{ toast.type === 'success' ? '✅' : toast.type === 'error' ? '❌' : 'ℹ️' }}</span>
+          <span class="toast-msg">{{ toast.message }}</span>
+          <button class="toast-close" @click="toasts = toasts.filter(t => t.id !== toast.id)">✕</button>
+        </div>
+      </Transition>
+    </div>
+
+    <!-- WhatsApp Floating CTA -->
+    <a
+      :href="'https://wa.me/' + (content.contact?.whatsapp || '919795771806') + '?text=Hello%20IT%20HUNT%20Team%2C%20I%20want%20to%20know%20more%20about%20your%20internship%20programs.'" 
+      target="_blank" 
+      rel="noopener noreferrer"
+      class="whatsapp-float-btn"
+      :class="{ visible: showBackToTop }"
+      title="Chat with us on WhatsApp"
+      aria-label="Chat on WhatsApp"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="26" height="26"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+    </a>
+
 
     <!-- Navbar Component -->
     <Navbar 
@@ -389,7 +418,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onUnmounted } from 'vue';
+import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import CONTENT_DATA from './data/contentData.js';
 import { generateAdmissionPdf, generatePrivacyPolicyPdf, generateTermsConditionsPdf, getAdmissionPdfBlob } from './utils/pdfGenerator.js';
 import { generateNielitProjectPdf, getNielitProjectPdfBlob } from './utils/nielitPdfGenerator.js';
@@ -413,10 +442,12 @@ import {
   fetchUsersFromBackend,
   deleteStudentFromBackend,
   deleteUserFromBackend,
+  deleteAdmissionFromBackend,
   registerStudentUser, 
   loginStudentUser, 
   updateStudentProfile 
 } from './utils/apiClient.js';
+import { triggerMobileMessageNotification } from './utils/smsNotifier.js';
 
 import Navbar from './components/layout/Navbar.vue';
 import Footer from './components/layout/Footer.vue';
@@ -448,6 +479,20 @@ const scrollProgress = ref(0);
 const showBackToTop = ref(false);
 const showConfetti = ref(false);
 const confettiPieces = ref([]);
+
+// Toast Notification System
+const toasts = ref([]);
+let toastIdCounter = 0;
+const showToast = (message, type = 'success', duration = 4000) => {
+  const id = ++toastIdCounter;
+  toasts.value.push({ id, message, type });
+  setTimeout(() => {
+    toasts.value = toasts.value.filter(t => t.id !== id);
+  }, duration);
+};
+
+// Scroll-reveal IntersectionObserver
+let revealObserver = null;
 
 // SuperAdmin & Auth Session State
 const isAdminLoggedIn = ref(false);
@@ -1138,9 +1183,35 @@ onMounted(() => {
 
   // Initialize SEO Metadata for active view
   updateSeoMetadata(activeTab.value);
+
+  // Initialize scroll-reveal IntersectionObserver
+  const initReveal = () => {
+    if (revealObserver) revealObserver.disconnect();
+    revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+    );
+    nextTick(() => {
+      document.querySelectorAll('.reveal-on-scroll').forEach(el => {
+        revealObserver.observe(el);
+      });
+    });
+  };
+  initReveal();
+  watch(activeTab, () => {
+    setTimeout(initReveal, 300);
+  });
 });
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
+  if (revealObserver) revealObserver.disconnect();
 });
 </script>

@@ -22,7 +22,7 @@
       </div>
 
       <!-- Key Benefits Ribbon -->
-      <div class="careers-benefits-ribbon anim-stagger-2" v-if="content.careersSection?.benefits">
+      <div class="careers-benefits-ribbon reveal-on-scroll" v-if="content.careersSection?.benefits">
         <div class="career-benefit-card" v-for="(ben, bIdx) in content.careersSection.benefits" :key="bIdx">
           <div class="benefit-icon">{{ ben.icon }}</div>
           <div>
@@ -80,7 +80,7 @@
     </div>
 
     <!-- 3. VACANCIES SHOWCASE GRID -->
-    <div class="careers-grid anim-stagger-3" v-else>
+    <div class="careers-grid anim-stagger-3 reveal-on-scroll" v-else>
       <div class="career-card" v-for="job in filteredJobs" :key="job.id">
         <!-- Top Meta Row -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
