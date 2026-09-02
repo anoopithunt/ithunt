@@ -1531,7 +1531,19 @@ const filteredAdmissions = computed(() => {
 });
 
 const filteredNielitProjects = computed(() => {
-  return nielitProjectsList.value.filter(p => {
+  const map = new Map();
+  nielitProjectsList.value.forEach(p => {
+    const key = String(p.nielitRegNo || p.registrationNo || p.regNo || p.id || '').trim();
+    if (key) {
+      if (!map.has(key)) {
+        map.set(key, p);
+      } else {
+        map.set(key, { ...map.get(key), ...p });
+      }
+    }
+  });
+
+  return Array.from(map.values()).filter(p => {
     const matchStatus = nielitStatusFilter.value === 'all' || p.status === nielitStatusFilter.value;
     const query = nielitSearch.value.trim().toLowerCase();
     if (!query) return matchStatus;

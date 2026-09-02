@@ -900,10 +900,13 @@ export async function fetchNielitProjectsFromBackend() {
     const fbRecords = await fetchFromFirebaseCloud('nielit_projects');
     if (fbRecords.length > 0) {
       const map = new Map();
-      list.forEach(p => map.set(p.id || p.regNo || p.registrationNo || p.nielitRegNo, p));
+      list.forEach(p => {
+        const k = String(p.nielitRegNo || p.registrationNo || p.regNo || p.id || '').trim();
+        if (k) map.set(k, p);
+      });
       fbRecords.forEach(p => {
-        const k = p.id || p.regNo || p.registrationNo || p.nielitRegNo;
-        map.set(k, { ...map.get(k), ...p });
+        const k = String(p.nielitRegNo || p.registrationNo || p.regNo || p.id || '').trim();
+        if (k) map.set(k, { ...map.get(k), ...p });
       });
       list = Array.from(map.values());
     }
@@ -922,7 +925,15 @@ export async function fetchNielitProjectsFromBackend() {
   }
 
   const normalized = list.map(normalizeNielitProject);
-  const filtered = normalized.filter(p => !deletedIds.has(p.id) && !deletedIds.has(p.registrationNo) && !deletedIds.has(p.nielitRegNo));
+  const uniqueMap = new Map();
+  normalized.forEach(p => {
+    const k = String(p.nielitRegNo || p.registrationNo || p.regNo || p.id || '').trim();
+    if (k && !uniqueMap.has(k)) {
+      uniqueMap.set(k, p);
+    }
+  });
+
+  const filtered = Array.from(uniqueMap.values()).filter(p => !deletedIds.has(p.id) && !deletedIds.has(p.registrationNo) && !deletedIds.has(p.nielitRegNo));
   try { localStorage.setItem('ithunt_nielit_cache', JSON.stringify(filtered)); } catch (e) {}
   return filtered;
 }

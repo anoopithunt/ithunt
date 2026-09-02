@@ -598,7 +598,7 @@ const goToStep = (step) => {
   }
 };
 
-const handleFormSubmit = async () => {
+const handleFormSubmit = () => {
   if (!validateStep1()) {
     activeSection.value = 1;
     return;
@@ -612,38 +612,28 @@ const handleFormSubmit = async () => {
     return;
   }
 
-  try {
-    isSubmitting.value = true;
-    const regId = form.value.nielitRegNo || form.value.regNo || String(Date.now());
-    const payload = {
-      ...form.value,
-      id: regId,
-      studentName: form.value.candidateName || form.value.studentName || '',
-      candidateName: form.value.candidateName || form.value.studentName || '',
-      regNo: regId,
-      registrationNo: regId,
-      nielitRegNo: regId,
-      level: form.value.nielitLevel ? `${form.value.nielitLevel} Level` : 'O Level',
-      status: 'Submitted',
-      feePaid: `₹${form.value.amount || '1,000'}`,
-      utrNo: form.value.utrNumber || '',
-      paymentRemark: 'Paid',
-      guideName: form.value.guideName || 'Er. Sushil Kumar',
-      guideQualification: form.value.guideQualification || 'MCA (Computer Science)',
-      guideDesignation: form.value.guideDesignation || 'Sr. Laravel & Cloud Developer',
-      guidePlace: form.value.guidePlace || 'Prayagraj',
-      guideAddress: form.value.guideAddress || 'Holagarh, Prayagraj, UP'
-    };
+  const regId = form.value.nielitRegNo || form.value.regNo || String(Date.now());
+  const payload = {
+    ...form.value,
+    id: regId,
+    studentName: form.value.candidateName || form.value.studentName || '',
+    candidateName: form.value.candidateName || form.value.studentName || '',
+    regNo: regId,
+    registrationNo: regId,
+    nielitRegNo: regId,
+    level: form.value.nielitLevel ? `${form.value.nielitLevel} Level` : 'O Level',
+    status: 'Submitted',
+    feePaid: `₹${form.value.amount || '1,000'}`,
+    utrNo: form.value.utrNumber || '',
+    paymentRemark: 'Paid',
+    guideName: form.value.guideName || 'Er. Sushil Kumar',
+    guideQualification: form.value.guideQualification || 'MCA (Computer Science)',
+    guideDesignation: form.value.guideDesignation || 'Sr. Laravel & Cloud Developer',
+    guidePlace: form.value.guidePlace || 'Prayagraj',
+    guideAddress: form.value.guideAddress || 'Holagarh, Prayagraj, UP'
+  };
 
-    // Save directly to Firebase Firestore Cloud Database
-    await saveNielitProjectRecord(payload);
-    emit('submit-nielit-project', payload);
-  } catch (err) {
-    console.warn('API submission note:', err.message);
-    emit('submit-nielit-project', { ...form.value });
-  } finally {
-    isSubmitting.value = false;
-  }
+  emit('submit-nielit-project', payload);
 };
 </script>
 
