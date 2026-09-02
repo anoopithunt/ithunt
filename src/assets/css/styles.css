@@ -1506,31 +1506,50 @@ body.light-theme .sig-name {
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(249, 115, 22, 0.25);
 }
 
-.modal-close-icon {
+.modal-close-icon,
+.modal-close-btn {
   position: absolute;
   top: 1.25rem;
   right: 1.25rem;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--border-cyber);
-  color: var(--text-main);
-  width: 38px;
-  height: 38px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid var(--border-cyber-glow);
+  color: var(--color-ai-orange);
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 1.15rem;
-  font-weight: 700;
-  transition: var(--transition);
-  z-index: 20;
+  font-size: 1.2rem;
+  font-weight: 800;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 30;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 15px rgba(249, 115, 22, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
-.modal-close-icon:hover {
-  background: rgba(239, 68, 68, 0.25);
-  border-color: #ef4444;
-  color: #ef4444;
-  transform: rotate(90deg) scale(1.1);
+.modal-close-icon:hover,
+.modal-close-btn:hover {
+  background: var(--gradient-ai-btn);
+  border-color: var(--color-ai-gold);
+  color: #ffffff;
+  transform: rotate(90deg) scale(1.12);
+  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.55), 0 0 25px rgba(250, 204, 21, 0.45);
+}
+
+.modal-close-icon:active,
+.modal-close-btn:active {
+  transform: rotate(90deg) scale(0.95);
+}
+
+body.light-theme .modal-close-icon,
+body.light-theme .modal-close-btn {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(249, 115, 22, 0.4);
+  color: var(--color-ai-orange);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1), 0 0 15px rgba(249, 115, 22, 0.15);
 }
 
 /* Detail Popup Header */
