@@ -179,91 +179,144 @@ export async function sendAdminAdmissionEmail(admissionRecord, adminPdfBlob = nu
  * @param {Object} admissionRecord 
  * @param {Blob|null} studentPdfBlob 
  */
-/**
- * Dispatch distinct Student Email Notification with Student PDF Slip attachment
- * Ensures 100% clean official communication without FormSubmit "Someone just submitted your form on localhost" header
- * @param {Object} admissionRecord 
- * @param {Blob|null} studentPdfBlob 
- */
 export async function sendStudentAdmissionEmail(admissionRecord, studentPdfBlob = null) {
   if (!admissionRecord || !admissionRecord.email || !admissionRecord.email.includes('@')) {
     return { success: false, reason: 'Invalid or missing candidate email' };
   }
 
   const regNo = admissionRecord.registrationNo || 'ITH-000000';
-  const candName = admissionRecord.candidateName || admissionRecord.fullName || 'Candidate';
-  const courseTitle = admissionRecord.course || admissionRecord.track || 'Selected Program';
+  const candName = admissionRecord.candidateName || 'Candidate';
+  const courseTitle = admissionRecord.course || 'Selected Program';
   const candidateCleanName = candName.replace(/[^a-zA-Z0-9]/g, '_');
   const filename = `IT_HUNT_Student_Slip_${regNo}_${candidateCleanName}.pdf`;
   const subjectText = `🎓 [STUDENT CONFIRMATION] Welcome ${candName} to IT HUNT Academy! [Reg: ${regNo}]`;
 
-  // Pre-generate clean email content and 1-click Gmail direct compose link
-  const cleanEmail = getStudentAdmissionEmailContent(admissionRecord);
-  admissionRecord._cleanEmailContent = cleanEmail.body;
-  admissionRecord._cleanEmailSubject = cleanEmail.subject;
-  admissionRecord._gmailDirectUrl = getStudentAdmissionGmailUrl(admissionRecord);
-
-  // 1. If Web3Forms key is configured, dispatch clean, header-free email directly to candidate
-  if (WEB3FORMS_ACCESS_KEY) {
+  // Auto-generate Student PDF blob if missing
+  if (!studentPdfBlob) {
     try {
-      const w3Res = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({
-          access_key: WEB3FORMS_ACCESS_KEY,
-          subject: subjectText,
-          from_name: OFFICIAL_SITE_NAME,
-          to: admissionRecord.email,
-          email: admissionRecord.email,
-          message: cleanEmail.body
-        })
-      });
-      if (w3Res.ok) {
-        console.log('✓ Clean student admission email dispatched via Web3Forms to:', admissionRecord.email);
-        return { success: true, method: 'web3forms' };
+      studentPdfBlob = getAdmissionPdfBlob(admissionRecord, 'student');
+    } catch (e) {
+      console.warn('Could not auto-generate Student PDF blob:', e);
+    }
+  }
+
+  // Submit via verified FORMSUBMIT_FORM_URL with _cc set to student email so FormSubmit delivers the PDF attachment directly to candidate
+  if (studentPdfBlob && typeof document !== 'undefined') {
+    try {
+      let iframe = document.getElementById('formsubmit_student_iframe');
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'formsubmit_student_iframe';
+        iframe.name = 'formsubmit_student_iframe';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
       }
-    } catch (w3Err) {
-      console.warn('Web3Forms dispatch warning:', w3Err.message);
+
+      const form = document.createElement('form');
+      form.action = FORMSUBMIT_FORM_URL;
+      form.method = 'POST';
+      form.enctype = 'multipart/form-data';
+      form.target = 'formsubmit_student_iframe';
+      form.style.display = 'none';
+
+      form.setAttribute('referrerpolicy', 'no-referrer');
+
+      const addField = (name, value) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value || '';
+        form.appendChild(input);
+      };
+
+      addField('_subject', subjectText);
+      addField('_replyto', TARGET_EMAIL);
+      addField('_template', 'table');
+      addField('_captcha', 'false');
+      addField('_url', `${OFFICIAL_SITE_NAME} (${OFFICIAL_SITE_URL})`);
+      addField('_site', OFFICIAL_SITE_NAME);
+      addField('_cc', admissionRecord.email);
+      addField('email', admissionRecord.email);
+
+      // Student Email Body Content
+      addField('OFFICIAL NOTICE', '🎓 IT HUNT ACADEMY - OFFICIAL ADMISSION CONFIRMATION');
+      addField('WELCOME GREETING', `Dear ${candName}, Welcome to IT HUNT Academy & Software Solutions! Your admission is officially confirmed.`);
+      addField('REGISTRATION ID', regNo);
+      addField('STUDENT FULL NAME', candName);
+      addField('ENROLLED PROGRAM', courseTitle);
+      addField("FATHER'S NAME", admissionRecord.fatherName || 'Not Specified');
+      addField('STUDENT PORTAL USER ID', admissionRecord.email || 'N/A');
+      addField('DEFAULT LOGIN PASSWORD', 'Ithunt@123');
+      addField('PASSWORD NOTICE', 'You can log in to your Student Dashboard anytime using your Email and change your password.');
+      addField('CONTACT MOBILE', admissionRecord.mobile || 'N/A');
+      addField('REGISTERED DATE', admissionRecord.date || new Date().toLocaleDateString('en-GB'));
+      addField('DAY 1 ONBOARDING', 'Reporting Time: 09:30 AM Onboarding Day 1 at Holagarh Campus');
+      addField('MANDATORY DOCUMENTS TO BRING', `1. Printed or Digital Admission Slip (${regNo})\n2. 2 Passport Photos & Photo ID Proof (Aadhaar / Voter ID)`);
+      addField('TRAINING CAMPUS LOCATION', '📍 IT HUNT Software Studio, Dahiyawa Holagarh, Prayagraj, UP – 212502');
+      addField('ACADEMIC HELPLINES', '📞 +91 9795771806 | +91 8299544315 | 📧 softtechithunt@gmail.com');
+
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.name = 'attachment';
+
+      const pdfFile = new File([studentPdfBlob], filename, { type: 'application/pdf' });
+      const dt = new DataTransfer();
+      dt.items.add(pdfFile);
+      fileInput.files = dt.files;
+      form.appendChild(fileInput);
+
+      document.body.appendChild(form);
+      form.submit();
+
+      setTimeout(() => {
+        if (form.parentNode) form.parentNode.removeChild(form);
+      }, 3000);
+
+      console.log(`✓ Student email (${subjectText}) with attached Student Slip PDF (${filename}) submitted to ${admissionRecord.email}`);
+      return { success: true };
+    } catch (err) {
+      console.warn('Student hidden form submission failed, executing AJAX fallback:', err);
     }
   }
 
-  // 2. Write to Firebase Firestore 'mail' collection for Firebase Trigger Email extension / Cloud Functions
+  // AJAX fallback for Student Email
   try {
-    const { db } = await import('./firebaseConfig.js');
-    if (db) {
-      const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
-      await addDoc(collection(db, 'mail'), {
-        to: [admissionRecord.email],
-        from: TARGET_EMAIL,
-        message: {
-          subject: subjectText,
-          text: cleanEmail.body,
-          html: `
-            <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 620px; margin: 0 auto; color: #1e293b; line-height: 1.6;">
-              <div style="background: #0f172a; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
-                <h2 style="color: #ea580c; margin: 0; font-size: 20px;">🎓 IT HUNT Software Solutions & Tech Academy</h2>
-                <p style="color: #94a3b8; margin: 5px 0 0 0; font-size: 13px;">Official Candidate Admission Confirmation</p>
-              </div>
-              <div style="padding: 24px; border: 1px solid #e2e8f0; border-top: none; background: #ffffff;">
-                <pre style="font-family: inherit; white-space: pre-wrap; font-size: 14px; margin: 0;">${cleanEmail.body}</pre>
-              </div>
-            </div>
-          `
-        },
-        registrationNo: regNo,
-        createdAt: serverTimestamp ? serverTimestamp() : new Date().toISOString()
-      });
-      console.log('✓ Student admission email queued to Firebase mail collection for candidate:', admissionRecord.email);
-    }
-  } catch (fbMailErr) {
-    // Non-blocking firestore queue
-  }
+    const payload = {
+      _subject: subjectText,
+      _replyto: TARGET_EMAIL,
+      _template: 'table',
+      _captcha: 'false',
+      _url: `${OFFICIAL_SITE_NAME} (${OFFICIAL_SITE_URL})`,
+      _site: OFFICIAL_SITE_NAME,
+      _cc: admissionRecord.email,
+      email: admissionRecord.email,
+      'OFFICIAL NOTICE': '🎓 IT HUNT ACADEMY - OFFICIAL ADMISSION CONFIRMATION',
+      'WELCOME GREETING': `Dear ${candName}, Welcome to IT HUNT Academy & Software Solutions! Your admission is officially confirmed.`,
+      'REGISTRATION ID': regNo,
+      'STUDENT FULL NAME': candName,
+      'ENROLLED PROGRAM': courseTitle,
+      "FATHER'S NAME": admissionRecord.fatherName || 'Not Specified',
+      'STUDENT PORTAL USER ID': admissionRecord.email || 'N/A',
+      'DEFAULT LOGIN PASSWORD': 'Ithunt@123',
+      'PASSWORD NOTICE': 'You can log in to your Student Dashboard anytime using your Email and change your password.',
+      'CONTACT MOBILE': admissionRecord.mobile || 'N/A',
+      'REGISTERED DATE': admissionRecord.date || new Date().toLocaleDateString('en-GB'),
+      'DAY 1 ONBOARDING': 'Reporting Time: 09:30 AM Onboarding Day 1 at Holagarh Campus',
+      'MANDATORY DOCUMENTS TO BRING': `1. Printed or Digital Admission Slip (${regNo})\n2. 2 Passport Photos & Photo ID Proof (Aadhaar / Voter ID)`,
+      'TRAINING CAMPUS LOCATION': '📍 IT HUNT Software Studio, Dahiyawa Holagarh, Prayagraj, UP – 212502',
+      'ACADEMIC HELPLINES': '📞 +91 9795771806 | +91 8299544315 | 📧 softtechithunt@gmail.com'
+    };
 
-  // Note: We deliberately do NOT use FormSubmit with _cc to student email here,
-  // because FormSubmit hardcodes "Someone just submitted your form on localhost"
-  // which is an internal website-owner notification and must never be shown to a self-registering student!
-  console.log(`✓ Clean student admission confirmation prepared for ${admissionRecord.email} [Reg: ${regNo}]`);
-  return { success: true, method: 'clean_direct' };
+    await fetch(FORMSUBMIT_AJAX_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    return { success: true };
+  } catch (err) {
+    console.error('Failed to send Student email:', err);
+    return { success: false, error: err.message };
+  }
 }
 
 /**
@@ -322,6 +375,7 @@ export async function sendJobEmailNotification(jobRecord) {
   };
 
   if (jobRecord.email && jobRecord.email.includes('@')) {
+    payload._cc = jobRecord.email;
     payload.email = jobRecord.email;
   }
 
@@ -362,6 +416,7 @@ export async function sendRsvpEmailNotification(rsvpRecord) {
   };
 
   if (rsvpRecord.email && rsvpRecord.email.includes('@')) {
+    payload._cc = rsvpRecord.email;
     payload.email = rsvpRecord.email;
   }
 
@@ -558,9 +613,10 @@ export async function sendFeeReceiptJpgEmail(studentRecord, jpgBlob = null) {
       };
 
       addField('_subject', subjectText);
-      addField('_replyto', studentRecord.email || TARGET_EMAIL);
+      addField('_replyto', TARGET_EMAIL);
       addField('_template', 'table');
       addField('_captcha', 'false');
+      addField('_cc', studentRecord.email);
       addField('email', studentRecord.email);
 
       addField('ACKNOWLEDGMENT', '💳 IT HUNT ACADEMY - OFFICIAL FEE PAYMENT RECEIPT (JPG)');
@@ -600,9 +656,10 @@ export async function sendFeeReceiptJpgEmail(studentRecord, jpgBlob = null) {
   try {
     const payload = {
       _subject: subjectText,
-      _replyto: studentRecord.email || TARGET_EMAIL,
+      _replyto: TARGET_EMAIL,
       _template: 'table',
       _captcha: 'false',
+      _cc: studentRecord.email,
       email: studentRecord.email,
       'ACKNOWLEDGMENT': '💳 IT HUNT ACADEMY - OFFICIAL FEE PAYMENT RECEIPT (JPG)',
       'PAYMENT STATUS': 'CONFIRMED & VERIFIED ✓',
