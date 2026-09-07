@@ -314,6 +314,93 @@
             </div>
           </form>
         </div>
+
+        <!-- Student Security & Password Management Card -->
+        <div class="dash-panel" style="margin-top: 2rem;">
+          <div class="panel-header">
+            <div>
+              <h3 class="panel-title" style="font-size: 1.3rem;">
+                <span>🔐</span> Student Security & Login Password
+              </h3>
+              <p class="panel-subtitle">
+                Your registered email is your student User ID. You can change your default password (<code>Ithunt@123</code>) to your own private password below.
+              </p>
+            </div>
+            <span class="status-pill status-active">
+              User ID: {{ studentUser.email }}
+            </span>
+          </div>
+
+          <form @submit.prevent="handlePasswordChange" class="student-password-form">
+            <div class="form-grid-3">
+              <div class="form-group">
+                <label class="form-label">Current Password <span class="req">*</span></label>
+                <div class="password-input-wrap">
+                  <input 
+                    :type="showOldPass ? 'text' : 'password'" 
+                    v-model="passwordForm.oldPassword" 
+                    required 
+                    class="form-control" 
+                    placeholder="Current password (default: Ithunt@123)"
+                  >
+                  <button type="button" class="eye-toggle-btn" @click="showOldPass = !showOldPass" :title="showOldPass ? 'Hide' : 'Show'">
+                    {{ showOldPass ? '🙈' : '👁️' }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">New Password <span class="req">*</span></label>
+                <div class="password-input-wrap">
+                  <input 
+                    :type="showNewPass ? 'text' : 'password'" 
+                    v-model="passwordForm.newPassword" 
+                    required 
+                    minlength="6"
+                    class="form-control" 
+                    placeholder="New password (min. 6 chars)"
+                  >
+                  <button type="button" class="eye-toggle-btn" @click="showNewPass = !showNewPass" :title="showNewPass ? 'Hide' : 'Show'">
+                    {{ showNewPass ? '🙈' : '👁️' }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Confirm New Password <span class="req">*</span></label>
+                <div class="password-input-wrap">
+                  <input 
+                    :type="showConfirmPass ? 'text' : 'password'" 
+                    v-model="passwordForm.confirmPassword" 
+                    required 
+                    minlength="6"
+                    class="form-control" 
+                    placeholder="Confirm new password"
+                  >
+                  <button type="button" class="eye-toggle-btn" @click="showConfirmPass = !showConfirmPass" :title="showConfirmPass ? 'Hide' : 'Show'">
+                    {{ showConfirmPass ? '🙈' : '👁️' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="passwordError" class="login-error-alert" style="margin-top: 1.25rem;">
+              <span style="font-size: 1.2rem;">⚠️</span>
+              <div>{{ passwordError }}</div>
+            </div>
+
+            <div v-if="passwordSuccess" class="success-alert-pill" style="margin-top: 1.25rem; display: inline-block;">
+              ✓ {{ passwordSuccess }}
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn-primary save-btn" :disabled="isChangingPass">
+                <span v-if="isChangingPass" class="spinner-inline"></span>
+                <span>{{ isChangingPass ? 'Updating Password...' : 'Update & Save New Password 🔒' }}</span>
+              </button>
+            </div>
+          </form>
+        </div>
       </section>
 
       <!-- =============================================================== -->
@@ -1014,6 +1101,7 @@
 
 <script setup>
 import { ref, reactive, computed, watch, onMounted } from 'vue';
+import { changeStudentPassword } from '../../utils/apiClient.js';
 import { 
   PUBLIC_HOLIDAYS_2026, 
   ALL_STUDENT_EXAM_RESULTS, 
@@ -1270,6 +1358,64 @@ const printAttendanceSheet = () => {
   window.print();
 };
 
+// Password Change State
+const passwordForm = reactive({
+  oldPassword: '',
+  newPassword: '',
+  confirmPassword: ''
+});
+const showOldPass = ref(false);
+const showNewPass = ref(false);
+const showConfirmPass = ref(false);
+const isChangingPass = ref(false);
+const passwordError = ref('');
+const passwordSuccess = ref('');
+
+const handlePasswordChange = async () => {
+  passwordError.value = '';
+  passwordSuccess.value = '';
+
+  const oldPass = passwordForm.oldPassword.trim();
+  const newPass = passwordForm.newPassword.trim();
+  const confPass = passwordForm.confirmPassword.trim();
+
+  if (!oldPass) {
+    passwordError.value = 'Please enter your current password (default is Ithunt@123).';
+    return;
+  }
+  if (!newPass || newPass.length < 6) {
+    passwordError.value = 'New password must be at least 6 characters long.';
+    return;
+  }
+  if (newPass !== confPass) {
+    passwordError.value = 'New password and confirmation do not match.';
+    return;
+  }
+
+  isChangingPass.value = true;
+  try {
+    const studentEmail = props.studentUser?.email || props.studentUser?.userId;
+    const res = await changeStudentPassword(studentEmail, oldPass, newPass);
+
+    if (res && res.success) {
+      passwordSuccess.value = res.message || 'Password successfully updated! Use your new password for all future sign-ins.';
+      passwordForm.oldPassword = '';
+      passwordForm.newPassword = '';
+      passwordForm.confirmPassword = '';
+      if (props.studentUser) {
+        props.studentUser.password = newPass;
+      }
+      setTimeout(() => { passwordSuccess.value = ''; }, 6000);
+    } else {
+      passwordError.value = res?.error || 'Failed to update password.';
+    }
+  } catch (err) {
+    passwordError.value = err.message || 'Error changing password.';
+  } finally {
+    isChangingPass.value = false;
+  }
+};
+
 const handleLogout = () => {
   emit('student-logout');
 };
@@ -1279,6 +1425,32 @@ const handleLogout = () => {
 .student-portal-root {
   position: relative;
   z-index: 1;
+}
+
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.password-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrap input {
+  padding-right: 2.75rem;
+}
+
+.eye-toggle-btn {
+  position: absolute;
+  right: 0.75rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.25rem;
 }
 
 .student-dashboard-wrap {

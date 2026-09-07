@@ -498,6 +498,8 @@ export const DAILY_ATTENDANCE_LOG = [
 
 // Default Demo Student Profile
 export const DEFAULT_DEMO_STUDENT = {
+  userId: "student@ithunt.com",
+  password: "Ithunt@123",
   candidateName: "Rohan Verma",
   registrationNo: "ITH-2026-001",
   email: "student@ithunt.com",

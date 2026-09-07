@@ -449,6 +449,7 @@ import {
   deleteAdmissionFromBackend,
   registerStudentUser, 
   loginStudentUser, 
+  saveStudentAccount,
   updateStudentProfile,
   setupRealtimeFirebaseListeners,
   submitReviewToBackend
@@ -916,6 +917,8 @@ const submitAdmission = async (formData) => {
     mobile: formData.mobile || formData.phone || '',
     phone: formData.phone || formData.mobile || '',
     email: formData.email || '',
+    userId: formData.email || '',
+    password: 'Ithunt@123',
     district: formData.district || 'PRAYAGRAJ',
     address: formData.address || '',
     status: 'Confirmed'
@@ -944,8 +947,10 @@ const submitAdmission = async (formData) => {
     }
     triggerMobileMessageNotification(newAdmissionRecord).catch(() => {});
 
+    saveStudentAccount(newAdmissionRecord);
+
     modalTitle.value = '🎉 Admission Application Submitted Successfully!';
-    modalBody.value = `Congratulations ${newAdmissionRecord.candidateName}! Your student admission for "${newAdmissionRecord.course}" has been successfully submitted to the database API (http://localhost:3000/api/admissions).\n\n📋 Registration No: ${finalRegNo}\n✉️ Confirmation details sent to ${newAdmissionRecord.email}.`;
+    modalBody.value = `Congratulations ${newAdmissionRecord.candidateName}! Your student admission for "${newAdmissionRecord.course}" has been successfully submitted.\n\n📋 Registration No: ${finalRegNo}\n🔑 Student Portal User ID: ${newAdmissionRecord.email}\n🔒 Default Password: Ithunt@123 (You can change this from your Student Dashboard)\n\n✉️ Confirmation details sent to ${newAdmissionRecord.email}.`;
     showModal.value = true;
     triggerConfetti();
   } else {
@@ -972,6 +977,8 @@ const handleAdminLogout = () => {
 };
 
 const handleDirectAdmission = async (newAdm) => {
+  newAdm.userId = newAdm.email;
+  newAdm.password = newAdm.password || 'Ithunt@123';
   lastSubmittedAdmission.value = newAdm;
   
   // 1. Immediately update local state to show in admissions list
@@ -980,7 +987,10 @@ const handleDirectAdmission = async (newAdm) => {
     liveAdmissionsList.value.unshift(newAdm);
   }
 
-  // 2. Persist directly to Firebase Firestore, Realtime DB & REST API backend
+  // 2. Persist student account for Student Portal login
+  saveStudentAccount(newAdm);
+
+  // 3. Persist directly to Firebase Firestore, Realtime DB & REST API backend
   try {
     await saveAdmissionRecord(newAdm);
     console.log('✓ Admin direct admission saved to Firebase Firestore & Users collection:', newAdm.registrationNo);
@@ -988,7 +998,7 @@ const handleDirectAdmission = async (newAdm) => {
     console.warn('Firebase save warning (Direct Admission):', err.message);
   }
 
-  // 3. Trigger dual email notification for Admin & Student as well as mobile notifications
+  // 4. Trigger dual email notification for Admin & Student as well as mobile notifications
   try {
     const pdfBlob = getAdmissionPdfBlob(newAdm);
     sendAdmissionEmailNotification(newAdm, pdfBlob).catch(() => {});
@@ -997,6 +1007,7 @@ const handleDirectAdmission = async (newAdm) => {
   }
   triggerMobileMessageNotification(newAdm).catch(() => {});
   triggerConfetti();
+  showToast(`Direct admission registered! Student User ID: ${newAdm.email} | Default Password: Ithunt@123`, 'success', 6000);
 };
 
 const handleDeleteAdmission = async (adm) => {
