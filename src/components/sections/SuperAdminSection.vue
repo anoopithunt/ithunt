@@ -1098,7 +1098,7 @@
                   <option>Android App Engineering (Kotlin & Jetpack Compose)</option>
                   <option>Python Programming, Generative AI & Data Analytics</option>
                   <option>Full-Funnel Digital Marketing & Growth Hacking</option>
-                  <option>NIELIT 'O' Level Official Diploma</option>
+                  <option>NIELIT 'O' Level Diploma</option>
                 </select>
               </div>
             </div>
