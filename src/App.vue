@@ -977,12 +977,17 @@ const handleAdminLogout = () => {
 };
 
 const handleDirectAdmission = async (newAdm) => {
+  newAdm.id = newAdm.id || newAdm.registrationNo;
+  newAdm.registrationNumber = newAdm.registrationNumber || newAdm.registrationNo;
   newAdm.userId = newAdm.email;
   newAdm.password = newAdm.password || 'Ithunt@123';
   lastSubmittedAdmission.value = newAdm;
   
   // 1. Immediately update local state to show in admissions list
-  const existingIdx = liveAdmissionsList.value.findIndex(a => a.registrationNo === newAdm.registrationNo);
+  const existingIdx = liveAdmissionsList.value.findIndex(a => 
+    (a.registrationNo && a.registrationNo === newAdm.registrationNo) || 
+    (a.id && a.id === newAdm.id)
+  );
   if (existingIdx === -1) {
     liveAdmissionsList.value.unshift(newAdm);
   }
@@ -1011,13 +1016,24 @@ const handleDirectAdmission = async (newAdm) => {
 };
 
 const handleDeleteAdmission = async (adm) => {
-  const idToDelete = adm.registrationNo || adm.id;
+  const idToDelete = typeof adm === 'object' ? (adm.registrationNo || adm.id) : adm;
+  const altId = typeof adm === 'object' ? (adm.id || adm.registrationNo) : adm;
   liveAdmissionsList.value = liveAdmissionsList.value.filter(a => 
     a.registrationNo !== idToDelete && 
     a.id !== idToDelete &&
-    a.registrationNo !== adm.registrationNo && 
-    a.id !== adm.id
+    a.registrationNo !== altId && 
+    a.id !== altId
   );
+  try {
+    const cached = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
+    const filtered = cached.filter(a => 
+      a.registrationNo !== idToDelete && 
+      a.id !== idToDelete && 
+      a.registrationNo !== altId && 
+      a.id !== altId
+    );
+    localStorage.setItem('ithunt_admissions', JSON.stringify(filtered));
+  } catch (e) {}
   await deleteAdmissionFromBackend(adm);
 };
 
@@ -1235,18 +1251,18 @@ onMounted(() => {
   // Attach Real-time Firebase Firestore / Realtime DB Live Listeners
   try {
     unsubscribeRealtime = setupRealtimeFirebaseListeners({
-      onAdmissions: (data) => { if (data && data.length > 0) liveAdmissionsList.value = data; },
-      onStudents: (data) => { if (data && data.length > 0) liveStudentsList.value = data; },
-      onNielitProjects: (data) => { if (data && data.length > 0) liveNielitProjectsList.value = data; },
-      onJobApplications: (data) => { if (data && data.length > 0) liveJobApplicationsList.value = data; },
-      onRsvps: (data) => { if (data && data.length > 0) liveRsvpsList.value = data; },
-      onReviews: (data) => { if (data && data.length > 0) liveReviewsList.value = data; },
-      onInternships: (data) => { if (data && data.length > 0) liveInternshipsList.value = data; },
-      onFees: (data) => { if (data && data.length > 0) liveFeesList.value = data; },
-      onCertificates: (data) => { if (data && data.length > 0) liveCertificatesList.value = data; },
-      onProjects: (data) => { if (data && data.length > 0) liveProjectsList.value = data; },
-      onContactInquiries: (data) => { if (data && data.length > 0) liveContactInquiriesList.value = data; },
-      onUsers: (data) => { if (data && data.length > 0) liveUsersList.value = data; }
+      onAdmissions: (data) => { if (Array.isArray(data)) liveAdmissionsList.value = data; },
+      onStudents: (data) => { if (Array.isArray(data)) liveStudentsList.value = data; },
+      onNielitProjects: (data) => { if (Array.isArray(data)) liveNielitProjectsList.value = data; },
+      onJobApplications: (data) => { if (Array.isArray(data)) liveJobApplicationsList.value = data; },
+      onRsvps: (data) => { if (Array.isArray(data)) liveRsvpsList.value = data; },
+      onReviews: (data) => { if (Array.isArray(data)) liveReviewsList.value = data; },
+      onInternships: (data) => { if (Array.isArray(data)) liveInternshipsList.value = data; },
+      onFees: (data) => { if (Array.isArray(data)) liveFeesList.value = data; },
+      onCertificates: (data) => { if (Array.isArray(data)) liveCertificatesList.value = data; },
+      onProjects: (data) => { if (Array.isArray(data)) liveProjectsList.value = data; },
+      onContactInquiries: (data) => { if (Array.isArray(data)) liveContactInquiriesList.value = data; },
+      onUsers: (data) => { if (Array.isArray(data)) liveUsersList.value = data; }
     });
   } catch (e) {
     console.warn('Realtime Firebase listeners initialization notice:', e);

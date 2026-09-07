@@ -269,13 +269,57 @@ export async function fetchFromFirebaseCloud(collectionName) {
 export async function deleteFromFirebaseCloud(collectionName, docId) {
   if (!collectionName || !docId) return;
   const cleanId = String(docId).replace(/\//g, '_');
+  const rawId = String(docId);
 
+  // 1. Direct delete by cleanId and rawId from Firestore
   try {
-    if (db) await deleteDoc(doc(db, collectionName, cleanId));
+    if (db) {
+      await deleteDoc(doc(db, collectionName, cleanId));
+      if (cleanId !== rawId) {
+        await deleteDoc(doc(db, collectionName, rawId));
+      }
+    }
   } catch (e) {}
 
+  // 2. Scan and delete any matching documents in Firestore collection (covers auto-ids, custom regNo/id fields)
   try {
-    if (rtdb) await dbRemove(dbRef(rtdb, `${collectionName}/${cleanId}`));
+    if (db) {
+      const snap = await getDocs(collection(db, collectionName));
+      const targetClean = cleanId.toLowerCase();
+      const targetRaw = rawId.toLowerCase();
+      const deletePromises = [];
+      snap.forEach(d => {
+        const dId = d.id.toLowerCase();
+        const data = d.data() || {};
+        const reg = String(data.registrationNo || data.registrationNumber || data.nielitRegNo || '').toLowerCase();
+        const idField = String(data.id || '').toLowerCase();
+        const emailField = String(data.email || '').toLowerCase();
+        if (
+          dId === targetClean || dId === targetRaw ||
+          reg === targetClean || reg === targetRaw ||
+          idField === targetClean || idField === targetRaw ||
+          (emailField && (emailField === targetClean || emailField === targetRaw))
+        ) {
+          deletePromises.push(deleteDoc(d.ref));
+        }
+      });
+      if (deletePromises.length > 0) {
+        await Promise.all(deletePromises);
+        console.log(`✓ Deleted ${deletePromises.length} document(s) from Firestore collection "${collectionName}" for ID: ${docId}`);
+      }
+    }
+  } catch (e) {
+    console.warn(`Firestore delete notice (${collectionName}/${docId}):`, e.message);
+  }
+
+  // 3. Delete from Firebase Realtime Database
+  try {
+    if (rtdb) {
+      await dbRemove(dbRef(rtdb, `${collectionName}/${cleanId}`));
+      if (cleanId !== rawId) {
+        await dbRemove(dbRef(rtdb, `${collectionName}/${rawId}`));
+      }
+    }
   } catch (e) {}
 }
 
@@ -306,14 +350,28 @@ export function setupRealtimeFirebaseListeners(callbacks = {}) {
       if (typeof callback === 'function') {
         try {
           const unsub = onSnapshot(collection(db, name), (snapshot) => {
-            if (!snapshot.empty) {
-              const records = [];
-              snapshot.forEach(docSnap => {
-                records.push({ id: docSnap.id, ...docSnap.data() });
-              });
-              const normalized = normalizer ? records.map(normalizer) : records;
-              callback(normalized);
-            }
+            const records = [];
+            snapshot.forEach(docSnap => {
+              records.push({ id: docSnap.id, ...docSnap.data() });
+            });
+            const deletedIds = (() => {
+              try {
+                return JSON.parse(
+                  localStorage.getItem(`ithunt_deleted_${name}_ids`) || 
+                  localStorage.getItem('ithunt_deleted_admission_ids') || 
+                  '[]'
+                );
+              } catch (e) {
+                return [];
+              }
+            })();
+            const filtered = records.filter(r => {
+              const rId = String(r.id || r.registrationNo || r.nielitRegNo || '');
+              const rReg = String(r.registrationNo || r.nielitRegNo || r.id || '');
+              return !deletedIds.includes(rId) && !deletedIds.includes(rReg);
+            });
+            const normalized = normalizer ? filtered.map(normalizer) : filtered;
+            callback(normalized);
           }, (err) => {
             console.warn(`Realtime Firestore listener notice (${name}):`, err.message);
           });
@@ -536,59 +594,90 @@ export async function submitAdmissionToBackend(data) {
 }
 
 /**
- * Save admission record (Unified API wrapper with local persistence)
+ * Save admission record (Unified API wrapper with connected database persistence)
  */
 export async function saveAdmissionRecord(data) {
   if (!data) return { success: false, error: 'No form data provided' };
   
   const payload = {
     ...data,
-    fullName: data.fullName || data.candidateName || data.name,
-    candidateName: data.candidateName || data.fullName || data.name,
-    phone: data.phone || data.mobile,
-    mobile: data.mobile || data.phone,
+    fullName: data.fullName || data.candidateName || data.name || '',
+    candidateName: data.candidateName || data.fullName || data.name || '',
+    phone: data.phone || data.mobile || '',
+    mobile: data.mobile || data.phone || '',
     type: 'ADMISSION',
-    createdAt: new Date().toISOString()
+    createdAt: data.createdAt || new Date().toISOString()
   };
 
-  const res = await submitAdmissionToBackend(payload);
-
-  if (res && res.success) {
-    const returnedAdm = res.admission || res.data?.admission || payload;
-    const finalRecord = {
-      ...payload,
-      id: returnedAdm.id || returnedAdm.registrationNumber || payload.registrationNo,
-      registrationNo: returnedAdm.registrationNumber || payload.registrationNo,
-      registrationNumber: returnedAdm.registrationNumber || payload.registrationNo,
-      status: returnedAdm.status || 'Confirmed'
-    };
-
-    // Save directly to Firebase Cloud Database (ithunt-3a42d)
-    saveToFirebaseCloud('admissions', finalRecord.id, finalRecord);
-
-    return {
-      success: true,
-      id: finalRecord.registrationNo,
-      record: finalRecord,
-      data: res.data
-    };
-  } else {
-    // Save to Firebase Cloud Database as fallback for live deployment
-    const fallbackId = payload.id || payload.registrationNo || `ADM-${Date.now()}`;
-    const fallbackRecord = { ...payload, id: fallbackId, status: 'Confirmed' };
-    saveToFirebaseCloud('admissions', fallbackId, fallbackRecord);
-
-    return {
-      success: true,
-      id: fallbackId,
-      record: fallbackRecord,
-      data: { admission: fallbackRecord }
-    };
+  let res = null;
+  try {
+    res = await submitAdmissionToBackend(payload);
+  } catch (e) {
+    console.warn('Backend REST admission submit notice:', e.message);
   }
+
+  const returnedAdm = (res && res.success) ? (res.admission || res.data?.admission || payload) : payload;
+  const finalRegNo = returnedAdm.registrationNumber || returnedAdm.registrationNo || payload.registrationNo || payload.id || `ITH-${Math.floor(100000 + Math.random() * 900000)}`;
+  const finalRecord = {
+    ...payload,
+    id: finalRegNo,
+    registrationNo: finalRegNo,
+    registrationNumber: finalRegNo,
+    status: returnedAdm.status || payload.status || 'Confirmed'
+  };
+
+  const cleanId = String(finalRegNo).replace(/\//g, '_');
+
+  // 1. Save directly to Firebase Cloud Firestore and Realtime DB
+  await saveToFirebaseCloud('admissions', cleanId, finalRecord);
+  if (cleanId !== String(finalRegNo)) {
+    await saveToFirebaseCloud('admissions', String(finalRegNo), finalRecord);
+  }
+  if (payload.id && payload.id !== finalRegNo) {
+    await saveToFirebaseCloud('admissions', String(payload.id).replace(/\//g, '_'), finalRecord);
+  }
+
+  // 2. Also save to students collection in Firebase Cloud
+  await saveToFirebaseCloud('students', cleanId, normalizeStudent({
+    ...finalRecord,
+    enrollmentNumber: finalRegNo,
+    userId: finalRecord.email || cleanId
+  }));
+
+  // 3. Clear from deleted admissions IDs if present
+  try {
+    const deletedIds = JSON.parse(localStorage.getItem('ithunt_deleted_admission_ids') || '[]');
+    const updated = deletedIds.filter(id => id !== finalRegNo && id !== cleanId && id !== payload.id);
+    localStorage.setItem('ithunt_deleted_admission_ids', JSON.stringify(updated));
+  } catch (e) {}
+
+  // 4. Update localStorage cache 'ithunt_admissions'
+  try {
+    const cached = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
+    const filtered = cached.filter(a => {
+      const aId = a.id || a.registrationNo;
+      const aReg = a.registrationNo || a.id;
+      return aId !== finalRegNo && aReg !== finalRegNo && aId !== cleanId && aReg !== cleanId;
+    });
+    filtered.unshift(finalRecord);
+    localStorage.setItem('ithunt_admissions', JSON.stringify(filtered));
+  } catch (e) {}
+
+  // 5. Ensure Student Portal User Account exists with email as userId and default password Ithunt@123
+  if (finalRecord.email) {
+    saveStudentAccount(finalRecord);
+  }
+
+  return {
+    success: true,
+    id: finalRecord.registrationNo,
+    record: finalRecord,
+    data: res?.data || { admission: finalRecord }
+  };
 }
 
 /**
- * Fetch all stored Admissions from backend REST API or local storage
+ * Fetch all stored Admissions from connected database (Firebase Cloud Firestore, Realtime DB, REST API, and local storage)
  */
 export async function fetchAdmissionsFromBackend() {
   let list = [];
@@ -606,7 +695,7 @@ export async function fetchAdmissionsFromBackend() {
     console.warn('Notice loading admissions from REST API:', e.message);
   }
 
-  // Fetch/merge live records directly from Firebase Cloud Firestore
+  // Fetch/merge live records directly from Firebase Cloud Firestore & Realtime DB
   try {
     const fbRecords = await fetchFromFirebaseCloud('admissions');
     if (fbRecords.length > 0) {
@@ -627,17 +716,94 @@ export async function fetchAdmissionsFromBackend() {
     } catch (e) {}
   }
 
-  return list.map(normalizeAdmission);
+  // Filter out any deleted admissions recorded in blacklist
+  const deletedIds = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('ithunt_deleted_admission_ids') || '[]');
+    } catch (e) {
+      return [];
+    }
+  })();
+
+  const filtered = list.filter(a => {
+    const aId = String(a.id || a.registrationNo || a.registrationNumber || '');
+    const aReg = String(a.registrationNo || a.id || '');
+    return !deletedIds.includes(aId) && !deletedIds.includes(aReg);
+  });
+
+  return filtered.map(normalizeAdmission);
 }
 
 /**
- * Delete admission record from backend REST API
+ * Delete admission record from connected database (Firebase Firestore, Realtime DB, REST API, and caches)
  */
 export async function deleteAdmissionFromBackend(adm) {
-  const targetId = typeof adm === 'object' ? (adm.id || adm.registrationNo) : adm;
-  const regNo = typeof adm === 'object' ? (adm.registrationNo || adm.id) : adm;
+  if (!adm) return { success: false };
 
-  const idsToTry = Array.from(new Set([targetId, regNo].filter(Boolean)));
+  const targetId = typeof adm === 'object' ? (adm.registrationNo || adm.id) : adm;
+  const altId = typeof adm === 'object' ? (adm.id || adm.registrationNo) : adm;
+  const email = typeof adm === 'object' ? adm.email : null;
+
+  const rawIds = Array.from(new Set([targetId, altId].filter(Boolean)));
+  const idsToTry = [];
+  rawIds.forEach(id => {
+    idsToTry.push(String(id));
+    idsToTry.push(String(id).replace(/\//g, '_'));
+  });
+
+  // 1. Delete from Firebase Cloud (Firestore + Realtime DB) for 'admissions' and 'students'
+  for (const id of Array.from(new Set(idsToTry))) {
+    await deleteFromFirebaseCloud('admissions', id);
+    await deleteFromFirebaseCloud('students', id);
+  }
+
+  // 2. Also clean up users collection if student email exists
+  if (email) {
+    const cleanEmail = String(email).replace(/[@.]/g, '_');
+    await deleteFromFirebaseCloud('users', cleanEmail);
+    await deleteFromFirebaseCloud('users', email);
+  }
+
+  // 3. Mark in deleted admission IDs blacklist
+  try {
+    const deletedIds = JSON.parse(localStorage.getItem('ithunt_deleted_admission_ids') || '[]');
+    idsToTry.forEach(id => {
+      if (!deletedIds.includes(id)) deletedIds.push(id);
+    });
+    localStorage.setItem('ithunt_deleted_admission_ids', JSON.stringify(deletedIds));
+  } catch (e) {}
+
+  // 4. Immediately clean up localStorage 'ithunt_admissions'
+  try {
+    const cached = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
+    const filtered = cached.filter(a => {
+      const aId = String(a.id || a.registrationNo || '');
+      const aReg = String(a.registrationNo || a.id || '');
+      return !idsToTry.includes(aId) && !idsToTry.includes(aReg) && (!email || a.email !== email);
+    });
+    localStorage.setItem('ithunt_admissions', JSON.stringify(filtered));
+  } catch (e) {}
+
+  // 5. Clean up localStorage 'ithunt_student_accounts'
+  try {
+    const accounts = JSON.parse(localStorage.getItem('ithunt_student_accounts') || '{}');
+    let changed = false;
+    if (email && accounts[email.toLowerCase().trim()]) {
+      delete accounts[email.toLowerCase().trim()];
+      changed = true;
+    }
+    Object.keys(accounts).forEach(k => {
+      if (idsToTry.includes(accounts[k]?.registrationNo) || idsToTry.includes(accounts[k]?.id)) {
+        delete accounts[k];
+        changed = true;
+      }
+    });
+    if (changed) {
+      localStorage.setItem('ithunt_student_accounts', JSON.stringify(accounts));
+    }
+  } catch (e) {}
+
+  // 6. Delete from REST API backend
   for (const id of idsToTry) {
     try {
       await API.deleteAdmission(id);
@@ -1152,17 +1318,36 @@ export async function fetchStudentsFromBackend(filters = {}) {
 }
 
 /**
- * Delete student record from backend REST API
+ * Delete student record from connected database (Firebase Firestore, Realtime DB, REST API, and caches)
  */
 export async function deleteStudentFromBackend(student) {
-  const targetId = typeof student === 'object' ? (student.id || student.userId || student.enrollmentNumber) : student;
+  if (!student) return { success: false };
+  const targetId = typeof student === 'object' ? (student.id || student.userId || student.enrollmentNumber || student.registrationNo) : student;
+  const email = typeof student === 'object' ? student.email : null;
+  const cleanId = String(targetId).replace(/\//g, '_');
+
+  await deleteFromFirebaseCloud('students', cleanId);
+  await deleteFromFirebaseCloud('admissions', cleanId);
+  if (targetId !== cleanId) {
+    await deleteFromFirebaseCloud('students', targetId);
+    await deleteFromFirebaseCloud('admissions', targetId);
+  }
+  if (email) {
+    await deleteFromFirebaseCloud('users', email.replace(/[@.]/g, '_'));
+    await deleteFromFirebaseCloud('users', email);
+  }
+  try {
+    const cached = JSON.parse(localStorage.getItem('ithunt_students') || '[]');
+    const filtered = cached.filter(s => s.id !== targetId && s.userId !== targetId && (!email || s.email !== email));
+    localStorage.setItem('ithunt_students', JSON.stringify(filtered));
+  } catch (e) {}
+
   try {
     await API.deleteStudent(targetId);
-    return { success: true };
   } catch (e) {
-    console.warn('Error deleting student:', e.message);
-    return { success: false, error: e.message };
+    console.warn('REST API notice deleting student:', e.message);
   }
+  return { success: true };
 }
 
 /**
@@ -1271,13 +1456,20 @@ export function saveStudentAccount(account) {
   try {
     const email = (account.email || account.userId || '').toLowerCase().trim();
     const accounts = JSON.parse(localStorage.getItem('ithunt_student_accounts') || '{}');
-    accounts[email] = {
+    const userObj = {
       ...account,
       userId: email,
       email: email,
-      password: account.password || 'Ithunt@123'
+      password: account.password || 'Ithunt@123',
+      role: 'STUDENT',
+      updatedAt: new Date().toISOString()
     };
+    accounts[email] = userObj;
     localStorage.setItem('ithunt_student_accounts', JSON.stringify(accounts));
+
+    // Also persist student user to Firebase Cloud 'users' collection
+    const cleanEmail = email.replace(/[@.]/g, '_');
+    saveToFirebaseCloud('users', cleanEmail, userObj).catch(() => {});
   } catch (e) {}
 }
 
@@ -1704,7 +1896,21 @@ export async function fetchUsersFromBackend() {
  */
 export async function deleteUserFromBackend(userId, token = '') {
   if (!userId) return { success: false, error: 'User ID is required' };
-  
+  const cleanId = String(userId).replace(/[@.]/g, '_');
+
+  await deleteFromFirebaseCloud('users', cleanId);
+  await deleteFromFirebaseCloud('users', userId);
+  await deleteFromFirebaseCloud('admissions', userId);
+  await deleteFromFirebaseCloud('students', userId);
+
+  try {
+    const accounts = JSON.parse(localStorage.getItem('ithunt_student_accounts') || '{}');
+    if (accounts[userId]) {
+      delete accounts[userId];
+      localStorage.setItem('ithunt_student_accounts', JSON.stringify(accounts));
+    }
+  } catch (e) {}
+
   try {
     await API.deleteUser(userId);
     return { success: true };
