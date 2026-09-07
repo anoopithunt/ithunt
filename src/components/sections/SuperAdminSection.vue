@@ -1262,88 +1262,12 @@
         </div>
       </div>
     </div>
-
-    <!-- Official Admission Confirmation Email Dispatch Modal (100% Clean, No FormSubmit Header) -->
-    <div class="modal-overlay" v-if="showAdmissionEmailModal" @click.self="showAdmissionEmailModal = false">
-      <div class="modal-card" style="max-width: 720px;">
-        <div class="modal-header">
-          <div class="modal-title"><span>✉️</span> Official Student Admission Confirmation Email</div>
-          <button class="modal-close-btn" @click="showAdmissionEmailModal = false">✕</button>
-        </div>
-        <div class="modal-body" style="padding: 1.5rem;" v-if="selectedAdmissionForEmail">
-          <!-- Candidate Quick Info -->
-          <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-md); padding: 0.9rem 1.15rem; margin-bottom: 1rem;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.85rem;">
-              <div><span style="color: var(--text-dim);">Candidate:</span> <strong style="color: var(--text-main);">{{ selectedAdmissionForEmail.candidateName }}</strong></div>
-              <div><span style="color: var(--text-dim);">Registration No:</span> <span style="font-family: var(--font-mono); color: var(--color-ai-yellow); font-weight: 700;">{{ selectedAdmissionForEmail.registrationNo }}</span></div>
-              <div><span style="color: var(--text-dim);">Recipient Email:</span> <span style="color: var(--color-ai-cyan); font-weight: 600;">{{ selectedAdmissionForEmail.email }}</span></div>
-              <div><span style="color: var(--text-dim);">Program:</span> <span style="color: var(--text-main);">{{ selectedAdmissionForEmail.course }}</span></div>
-            </div>
-            <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed rgba(255, 255, 255, 0.08); font-size: 0.8rem; color: var(--text-muted);">
-              🔑 <strong>Student Login Credentials:</strong> User ID: <code style="color: var(--color-ai-cyan);">{{ selectedAdmissionForEmail.email }}</code> | Default Password: <code style="color: var(--color-ai-orange);">Ithunt@123</code>
-            </div>
-          </div>
-
-          <!-- 100% Clean Guarantee Notice -->
-          <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-md); padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 0.82rem; color: #10b981; display: flex; align-items: center; gap: 0.5rem;">
-            <span>✨</span>
-            <span><strong>100% Clean Official Email:</strong> Sends an authentic letter directly to the student without third-party headers, form submission disclaimers, or localhost URLs.</span>
-          </div>
-
-          <!-- Subject Line Preview -->
-          <div style="margin-bottom: 0.85rem;">
-            <label style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.25rem;">EMAIL SUBJECT LINE</label>
-            <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 0.55rem 0.85rem; font-size: 0.825rem; font-weight: 600; color: var(--text-main);">
-              {{ getStudentAdmissionEmailContent(selectedAdmissionForEmail).subject }}
-            </div>
-          </div>
-
-          <!-- Clean Letter Preview -->
-          <div style="margin-bottom: 1rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-              <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted);">CLEAN OFFICIAL LETTER BODY (NO THIRD-PARTY DISCLAIMER)</label>
-              <button class="admin-icon-btn" style="padding: 0.2rem 0.6rem; font-size: 0.75rem;" @click="handleCopyCleanEmailBody">
-                <span v-if="emailModalCopySuccess" style="color: #10b981;">✓ Copied to Clipboard!</span>
-                <span v-else>📋 Copy Letter</span>
-              </button>
-            </div>
-            <textarea 
-              readonly 
-              class="form-control" 
-              rows="10" 
-              style="font-family: var(--font-mono); font-size: 0.78rem; line-height: 1.5; resize: vertical; background: rgba(0,0,0,0.4); color: var(--text-main);"
-              :value="getStudentAdmissionEmailContent(selectedAdmissionForEmail).body"
-            ></textarea>
-          </div>
-
-          <!-- Action Buttons -->
-          <div style="display: flex; flex-wrap: wrap; gap: 0.65rem; justify-content: flex-end; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.08);">
-            <button class="btn-secondary" @click="handleSendViaMailto" title="Open in default system email application (Outlook / Apple Mail)">
-              <span>📫 Open in Mail App</span>
-            </button>
-            <button class="btn-secondary" @click="handleDispatchViaCloudNotifier" title="Dispatch in background via Cloud Service">
-              <span>⚡ Cloud Dispatch</span>
-            </button>
-            <button class="btn-primary" @click="handleSendViaGmailWeb" style="background: linear-gradient(135deg, #ea4335, #c5221f); border-color: #ea4335;" title="Open in Gmail Web with clean pre-filled official letter">
-              <span>🚀 Open in Gmail Web (100% Clean)</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
   </section>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
-import { 
-  sendStudentAdmissionEmail, 
-  sendFeeReceiptJpgEmail,
-  getStudentAdmissionEmailContent,
-  getStudentAdmissionGmailUrl,
-  getStudentAdmissionMailtoUrl,
-  getFeeReceiptGmailUrl
-} from '../../utils/emailNotifier.js';
+import { sendStudentAdmissionEmail, sendFeeReceiptJpgEmail } from '../../utils/emailNotifier.js';
 import { generateFeeReceiptJpgBlob } from '../../utils/jpgReceiptGenerator.js';
 import { API, deleteAdmissionFromBackend, deleteUserFromBackend, updateNielitProjectInBackend, deleteNielitProjectFromBackend, deleteProject } from '../../utils/apiClient.js';
 
@@ -1414,67 +1338,23 @@ const props = defineProps({
 const emit = defineEmits(['logout', 'download-slip', 'download-nielit-pdf', 'add-admission', 'delete-admission', 'update-nielit-project', 'delete-nielit-project', 'delete-student']);
 
 const emailActionMsg = ref('');
-const showAdmissionEmailModal = ref(false);
-const selectedAdmissionForEmail = ref(null);
-const emailModalCopySuccess = ref(false);
 
-const openAdmissionEmailModal = (adm) => {
+const sendAdmissionEmailToStudent = async (adm) => {
   if (!adm || !adm.email) {
     alert('Candidate record has no valid email address.');
     return;
   }
-  selectedAdmissionForEmail.value = adm;
-  showAdmissionEmailModal.value = true;
-};
-
-const sendAdmissionEmailToStudent = (adm) => {
-  openAdmissionEmailModal(adm);
-};
-
-const handleSendViaGmailWeb = () => {
-  if (!selectedAdmissionForEmail.value) return;
-  const url = getStudentAdmissionGmailUrl(selectedAdmissionForEmail.value);
-  window.open(url, '_blank');
-  selectedAdmissionForEmail.value.status = 'Admission Form Sent';
-  emailActionMsg.value = `✓ Opened in Gmail Web! Clean official letter ready to send to ${selectedAdmissionForEmail.value.email}`;
-  showAdmissionEmailModal.value = false;
-  setTimeout(() => { emailActionMsg.value = ''; }, 5000);
-};
-
-const handleSendViaMailto = () => {
-  if (!selectedAdmissionForEmail.value) return;
-  const url = getStudentAdmissionMailtoUrl(selectedAdmissionForEmail.value);
-  window.location.href = url;
-  selectedAdmissionForEmail.value.status = 'Admission Form Sent';
-  emailActionMsg.value = `✓ Opened in Mail client! Sending clean letter to ${selectedAdmissionForEmail.value.email}`;
-  showAdmissionEmailModal.value = false;
-  setTimeout(() => { emailActionMsg.value = ''; }, 5000);
-};
-
-const handleCopyCleanEmailBody = () => {
-  if (!selectedAdmissionForEmail.value) return;
-  const { body } = getStudentAdmissionEmailContent(selectedAdmissionForEmail.value);
-  navigator.clipboard.writeText(body).then(() => {
-    emailModalCopySuccess.value = true;
-    setTimeout(() => { emailModalCopySuccess.value = false; }, 3000);
-  });
-};
-
-const handleDispatchViaCloudNotifier = async () => {
-  if (!selectedAdmissionForEmail.value) return;
-  const adm = selectedAdmissionForEmail.value;
-  emailActionMsg.value = `Dispatching official email to ${adm.email}...`;
-  showAdmissionEmailModal.value = false;
+  emailActionMsg.value = `Sending Admission Confirmation Email to ${adm.email}...`;
   try {
     const res = await sendStudentAdmissionEmail(adm);
     if (res.success) {
       adm.status = 'Admission Form Sent';
-      emailActionMsg.value = `✓ Official Admission Email dispatched to ${adm.email}`;
+      emailActionMsg.value = `✓ Admission Confirmation Email & Slip sent to ${adm.email}`;
     } else {
-      emailActionMsg.value = `⚠️ Notification dispatched (Fallback): ${adm.email}`;
+      emailActionMsg.value = `⚠️ Email notification sent (Fallback): ${adm.email}`;
     }
   } catch (err) {
-    emailActionMsg.value = `⚠️ Notice: ${err.message}`;
+    emailActionMsg.value = `⚠️ Error dispatching email: ${err.message}`;
   }
   setTimeout(() => { emailActionMsg.value = ''; }, 5000);
 };
