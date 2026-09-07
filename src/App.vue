@@ -58,6 +58,7 @@
       :content="content" 
       :activeTab="activeTab" 
       :isDarkMode="isDarkMode" 
+      :studentUser="studentUser"
       :isAdminLoggedIn="isAdminLoggedIn"
       @set-tab="setTab" 
       @toggle-theme="toggleTheme" 
@@ -144,12 +145,13 @@
           @download-pdf="downloadAdmissionPdf" 
         />
 
-        <!-- 9. Dedicated Administrator Login View -->
+        <!-- 9. Unified Portal Login View (Student & Admin) -->
         <LoginSection 
           v-else-if="activeTab === 'login'" 
           key="login"
           :content="content" 
           @login-success="handleLoginSuccess" 
+          @student-login-success="handleStudentLoginSuccess"
           @set-tab="setTab" 
         />
 
@@ -192,6 +194,7 @@
           @student-signup="handleStudentSignup"
           @update-student-profile="handleUpdateStudentProfile"
           @student-logout="handleStudentLogout"
+          @go-to-login="setTab('login')"
         />
       </Transition>
     </main>
@@ -579,9 +582,23 @@ const handleUpdateStudentProfile = async (updatedData) => {
   await updateStudentProfile(merged);
 };
 
+const handleStudentLoginSuccess = (user) => {
+  studentUser.value = user;
+  try {
+    localStorage.setItem('ithunt_student_user', JSON.stringify(user));
+  } catch (e) {}
+  activeTab.value = 'student-portal';
+  triggerConfetti();
+  showToast(`Welcome back, ${user.candidateName || 'Student'}! Logged into Student Dashboard.`, 'success');
+};
+
 const handleStudentLogout = () => {
   studentUser.value = null;
-  localStorage.removeItem('ithunt_student_user');
+  try {
+    localStorage.removeItem('ithunt_student_user');
+  } catch (e) {}
+  activeTab.value = 'home';
+  showToast('You have been logged out of the Student Portal.', 'info');
 };
 
 // Live registries synced 100% dynamically with live database API & Firebase Cloud

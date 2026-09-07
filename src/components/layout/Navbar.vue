@@ -41,17 +41,7 @@
           <span>{{ content.navbar?.applyCtaText || 'Apply NIELIT Project' }}</span> {{ content.navbar?.applyCtaIcon || '✨' }}
         </button>
 
-        <!-- Student Portal Button (Desktop) -->
-        <button 
-          class="theme-toggle-btn nav-action-desktop" 
-          style="width: auto; padding: 0.45rem 0.85rem; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 700; color: var(--color-ai-orange); border-color: rgba(249, 115, 22, 0.4);"
-          @click="$emit('set-tab', 'student-portal')"
-          title="Student Login & Profile Portal"
-        >
-          <span>🎓 Student Portal</span>
-        </button>
-
-        <!-- SuperAdmin / Login Portal Button (Desktop) -->
+        <!-- Unified Single Login / Portal Button (Desktop) -->
         <button 
           v-if="isAdminLoggedIn"
           class="cta-btn-header nav-action-desktop" 
@@ -62,11 +52,20 @@
           <span>⚡ SuperAdmin</span>
         </button>
         <button 
+          v-else-if="studentUser"
+          class="cta-btn-header nav-action-desktop" 
+          style="background: linear-gradient(135deg, #f97316, #ea580c); border-color: #fb923c; box-shadow: 0 0 15px rgba(249, 115, 22, 0.4);"
+          @click="$emit('set-tab', 'student-portal')"
+          :title="'Student Dashboard (' + (studentUser.candidateName || 'Student') + ')'"
+        >
+          <span>🎓 Student Dashboard</span>
+        </button>
+        <button 
           v-else
           class="theme-toggle-btn nav-action-desktop" 
-          style="width: auto; padding: 0.45rem 0.85rem; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 700;"
+          style="width: auto; padding: 0.45rem 1.15rem; border-radius: var(--radius-full); font-size: 0.85rem; font-weight: 700; border-color: rgba(249, 115, 22, 0.4); color: var(--color-ai-yellow);"
           @click="$emit('set-tab', 'login')"
-          :title="'SuperAdmin / Staff Login'"
+          title="Login to Student or Admin Portal"
         >
           <span>🔐 Login</span>
         </button>
@@ -103,15 +102,7 @@
         {{ item.icon }} {{ item.label }}
       </button>
 
-      <button 
-        class="nav-item-btn" 
-        :class="{ active: activeTab === 'student-portal' }" 
-        @click="$emit('set-tab', 'student-portal'); closeMobileNav();"
-        style="color: var(--color-ai-orange); font-weight: 800;"
-      >
-        🎓 Student Portal & Profile
-      </button>
-
+      <!-- Single Mobile Login / Dashboard Button -->
       <button 
         v-if="isAdminLoggedIn"
         class="nav-item-btn" 
@@ -122,13 +113,22 @@
         ⚡ SuperAdmin Dashboard
       </button>
       <button 
+        v-else-if="studentUser"
+        class="nav-item-btn" 
+        :class="{ active: activeTab === 'student-portal' }" 
+        @click="$emit('set-tab', 'student-portal'); closeMobileNav();"
+        style="color: var(--color-ai-orange); font-weight: 800;"
+      >
+        🎓 Student Dashboard ({{ studentUser.candidateName || 'Student' }})
+      </button>
+      <button 
         v-else
         class="nav-item-btn" 
         :class="{ active: activeTab === 'login' }" 
         @click="$emit('set-tab', 'login'); closeMobileNav();"
         style="color: var(--color-ai-yellow); font-weight: 800;"
       >
-        🔐 Admin / Staff Login
+        🔐 Login
       </button>
     </div>
   </header>
@@ -149,6 +149,10 @@ defineProps({
   isDarkMode: {
     type: Boolean,
     default: true
+  },
+  studentUser: {
+    type: Object,
+    default: null
   },
   isAdminLoggedIn: {
     type: Boolean,
