@@ -924,7 +924,7 @@ const submitAdmission = async (formData) => {
     status: 'Confirmed'
   };
 
-  // POST http://localhost:3000/api/admissions
+  // Save admission record to Firebase Cloud (Firestore + Realtime DB)
   const apiRes = await saveAdmissionRecord(newAdmissionRecord);
 
   if (apiRes && apiRes.success) {

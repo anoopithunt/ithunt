@@ -12,8 +12,9 @@ const RAW_API_URL = (
 
 const IS_LOCAL_DEV = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
-// Use localhost:3000 only in local development when explicitly running; in production or when blank, defaults to direct Firebase mode
-const API_BASE_URL = (RAW_API_URL || (IS_LOCAL_DEV ? 'http://localhost:3000/api' : '')).replace(/\/+$/, '');
+// Direct Firebase Cloud Mode: All data operations go through Firebase SDK (Firestore + Realtime DB)
+// Only uses REST API if VITE_API_URL is explicitly set to a running backend server URL
+const API_BASE_URL = RAW_API_URL ? RAW_API_URL.replace(/\/+$/, '') : '';
 
 let memoryToken = null;
 

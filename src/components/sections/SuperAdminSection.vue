@@ -1013,8 +1013,7 @@
               <span class="config-val">5500 (Active)</span>
             </div>
             <div class="config-row">
-              <span class="config-key">API_BASE_URL:</span>
-              <span class="config-val">http://localhost:5500/api</span>
+              <span class="config-val">Direct Firebase Cloud Mode ✅</span>
             </div>
             <div class="config-row">
               <span class="config-key">ACCREDITATION:</span>
