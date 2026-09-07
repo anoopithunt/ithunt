@@ -180,7 +180,7 @@
           <!-- Demo Quick-Fill Pill for Student -->
           <div class="login-demo-helper">
             <div class="demo-cred-text">
-              🔑 Demo Student: <strong>student@ithunt.com</strong> / <strong>student123</strong>
+              🔑 Student Login: User ID = <strong>Student Email</strong> • Default Password = <strong>Ithunt@123</strong>
             </div>
             <button type="button" class="btn-secondary quick-fill-btn" @click="quickFillStudent">
               <span>Auto-Fill Demo Student Credentials ⚡</span>
@@ -363,20 +363,7 @@ const handleStudentLoginSubmit = async () => {
     return;
   }
 
-  // 1. Check if matching default demo student
-  if (emailInput.toLowerCase() === 'student@ithunt.com' && (passInput === 'student123' || passInput === 'student' || passInput === 'password')) {
-    const studentUser = { ...DEFAULT_DEMO_STUDENT };
-    if (rememberMe.value) {
-      try {
-        localStorage.setItem('ithunt_student_user', JSON.stringify(studentUser));
-      } catch (e) {}
-    }
-    isLoading.value = false;
-    emit('student-login-success', studentUser);
-    return;
-  }
-
-  // 2. Check local registration records or backend API
+  // 1. Check student credentials through unified auth service
   try {
     const apiRes = await loginStudentUser(emailInput, passInput);
     if (apiRes && apiRes.success && apiRes.user) {
@@ -389,45 +376,30 @@ const handleStudentLoginSubmit = async () => {
       isLoading.value = false;
       emit('student-login-success', studentUser);
       return;
+    } else if (apiRes && apiRes.error && apiRes.error.toLowerCase().includes('password')) {
+      isLoading.value = false;
+      errorMessage.value = apiRes.error;
+      return;
     }
   } catch (err) {
-    console.warn('Student login API error:', err);
+    console.warn('Student login auth notice:', err);
   }
 
-  // 3. Fallback: check saved student in localStorage or cached admissions
-  try {
-    const saved = JSON.parse(localStorage.getItem('ithunt_student_user') || 'null');
-    if (saved && (saved.email?.toLowerCase() === emailInput.toLowerCase() || saved.registrationNo?.toLowerCase() === emailInput.toLowerCase())) {
-      isLoading.value = false;
-      emit('student-login-success', saved);
-      return;
-    }
-
-    const admissions = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
-    const match = admissions.find(a => 
-      a.email?.toLowerCase() === emailInput.toLowerCase() || 
-      a.registrationNo?.toLowerCase() === emailInput.toLowerCase()
-    );
-    if (match) {
-      const studentUser = {
-        ...DEFAULT_DEMO_STUDENT,
-        candidateName: match.candidateName || match.fullName || 'Student',
-        email: match.email || emailInput,
-        mobile: match.mobile || match.phone || '9876543210',
-        course: match.course || '3-Month MERN Stack Web Engineer',
-        registrationNo: match.registrationNo || 'ITH-2026-' + Math.floor(100 + Math.random() * 900)
-      };
-      if (rememberMe.value) {
+  // 2. Check if matching default demo student
+  if (emailInput.toLowerCase() === 'student@ithunt.com' && (passInput === 'Ithunt@123' || passInput === 'student123' || passInput === 'student' || passInput === 'password')) {
+    const studentUser = { ...DEFAULT_DEMO_STUDENT };
+    if (rememberMe.value) {
+      try {
         localStorage.setItem('ithunt_student_user', JSON.stringify(studentUser));
-      }
-      isLoading.value = false;
-      emit('student-login-success', studentUser);
-      return;
+      } catch (e) {}
     }
-  } catch (e) {}
+    isLoading.value = false;
+    emit('student-login-success', studentUser);
+    return;
+  }
 
   isLoading.value = false;
-  errorMessage.value = 'Invalid student credentials. Please check your email/password or use "Auto-Fill Demo Student Credentials".';
+  errorMessage.value = 'Invalid student credentials. Candidate Email is your User ID and default password is Ithunt@123.';
 };
 
 const handleStudentSignupSubmit = async () => {
@@ -435,11 +407,18 @@ const handleStudentSignupSubmit = async () => {
   isLoading.value = true;
 
   try {
-    const res = await registerStudentUser({ ...studentSignup });
+    const signupPayload = {
+      ...studentSignup,
+      userId: studentSignup.email,
+      password: studentSignup.password || 'Ithunt@123'
+    };
+    const res = await registerStudentUser(signupPayload);
     const studentUser = (res && res.user) ? { ...res.user } : {
       ...DEFAULT_DEMO_STUDENT,
       candidateName: studentSignup.candidateName,
+      userId: studentSignup.email,
       email: studentSignup.email,
+      password: studentSignup.password || 'Ithunt@123',
       mobile: studentSignup.mobile,
       course: studentSignup.course,
       registrationNo: 'ITH-2026-' + Math.floor(100 + Math.random() * 900)
@@ -461,7 +440,7 @@ const handleStudentSignupSubmit = async () => {
 
 const quickFillStudent = () => {
   studentLoginEmail.value = 'student@ithunt.com';
-  studentLoginPassword.value = 'student123';
+  studentLoginPassword.value = 'Ithunt@123';
   studentMode.value = 'login';
   errorMessage.value = '';
 };

@@ -1102,6 +1102,19 @@
                 </select>
               </div>
             </div>
+
+            <!-- Student Login Credentials Preview -->
+            <div class="credentials-info-notice" style="margin-top: 1.25rem; padding: 0.9rem 1.15rem; background: rgba(249, 115, 22, 0.09); border: 1px dashed rgba(249, 115, 22, 0.4); border-radius: var(--radius-md); font-size: 0.825rem; line-height: 1.55;">
+              <div style="font-weight: 800; color: var(--color-ai-yellow); display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.35rem;">
+                <span>🔑</span> Auto-Generated Student Portal Login Credentials
+              </div>
+              <div style="color: var(--text-muted);">
+                • <strong>Student User ID:</strong> <span style="color: var(--color-ai-cyan); font-weight: 700;">{{ quickForm.email || 'Candidate Email Address' }}</span><br>
+                • <strong>Default Password:</strong> <code style="color: var(--color-ai-orange); font-weight: 800; background: rgba(0,0,0,0.3); padding: 0.15rem 0.45rem; border-radius: 4px;">Ithunt@123</code><br>
+                • <em>The student can log in immediately using their email & this default password, and can change it anytime from their Student Dashboard.</em>
+              </div>
+            </div>
+
             <div style="margin-top: 1.5rem;">
               <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
                 <span>Enroll & Generate Official Registration Slip 🎓</span>
@@ -1782,18 +1795,21 @@ const handleCreateDirectAdmission = () => {
   const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
+  const studentEmail = (quickForm.value.email || '').trim();
   const newAdm = {
     registrationNo: regId,
     date: dateStr,
     time: timeStr,
-    candidateName: quickForm.value.candidateName,
-    fatherName: quickForm.value.fatherName,
+    candidateName: (quickForm.value.candidateName || '').trim(),
+    fatherName: (quickForm.value.fatherName || '').trim(),
     motherName: 'Not Specified',
     dob: '2003-01-01',
     gender: 'Male',
     course: quickForm.value.course,
-    mobile: quickForm.value.mobile,
-    email: quickForm.value.email,
+    mobile: (quickForm.value.mobile || '').trim(),
+    email: studentEmail,
+    userId: studentEmail,
+    password: 'Ithunt@123',
     district: 'PRAYAGRAJ',
     address: 'Holagarh Studio, Prayagraj',
     status: 'Confirmed'
