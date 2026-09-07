@@ -954,9 +954,8 @@ const submitAdmission = async (formData) => {
     showModal.value = true;
     triggerConfetti();
   } else {
-    submittedRegistrationNo.value = '';
-    modalTitle.value = '❌ Admission Submission Failed';
-    modalBody.value = `Error submitting admission application: ${apiRes?.error || 'Unable to connect to http://localhost:3000/api/admissions'}. Please check if the backend API server is running and try again.`;
+    modalTitle.value = '❌ Admission Submission Notice';
+    modalBody.value = `Error submitting admission application: ${apiRes?.error || 'Unable to complete submission'}. Please verify your connection and try again.`;
     showModal.value = true;
   }
 };

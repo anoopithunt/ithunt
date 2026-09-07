@@ -4,11 +4,16 @@ import { db, rtdb } from './firebaseConfig.js';
 import { collection, doc, setDoc, getDocs, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { ref as dbRef, set as dbSet, get as dbGet, remove as dbRemove, onValue } from 'firebase/database';
 
-const API_BASE_URL = (
+const RAW_API_URL = (
   import.meta.env.VITE_API_URL || 
   import.meta.env.VITE_API_BASE_URL || 
-  'http://localhost:3000/api'
-).replace(/\/+$/, '');
+  ''
+).trim();
+
+const IS_LOCAL_DEV = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+// Use localhost:3000 only in local development when explicitly running; in production or when blank, defaults to direct Firebase mode
+const API_BASE_URL = (RAW_API_URL || (IS_LOCAL_DEV ? 'http://localhost:3000/api' : '')).replace(/\/+$/, '');
 
 let memoryToken = null;
 
@@ -416,6 +421,10 @@ export async function apiRequest(endpoint, options = {}) {
     ...options.headers
   };
 
+  if (!API_BASE_URL) {
+    return { success: false, reason: 'No REST API configured. Operating in Direct Cloud Firebase Mode.' };
+  }
+
   const url = endpoint.startsWith('http') 
     ? endpoint 
     : `${API_BASE_URL}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
@@ -588,7 +597,7 @@ export async function submitAdmissionToBackend(data) {
     console.warn('API Error submitting admission:', error.message);
     return {
       success: false,
-      error: error.message || 'Failed to submit admission to API backend (http://localhost:3000/api/admissions)'
+      error: error.message || 'Failed to submit admission to API backend'
     };
   }
 }
