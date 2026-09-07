@@ -1482,7 +1482,14 @@ const filteredStudents = computed(() => {
 });
 
 watch(() => props.allAdmissions, (val) => {
-  admissionsList.value = val || [];
+  const deleted = (() => {
+    try { return JSON.parse(localStorage.getItem('ithunt_deleted_admission_ids') || '[]'); } catch (e) { return []; }
+  })();
+  admissionsList.value = (val || []).filter(a => {
+    const aId = String(a.id || a.registrationNo || '');
+    const aReg = String(a.registrationNo || a.id || '');
+    return !deleted.includes(aId) && !deleted.includes(aReg);
+  });
 }, { immediate: true, deep: true });
 
 watch(() => props.allJobApplications, (val) => {
@@ -1724,16 +1731,12 @@ const deleteAdmission = async (adm) => {
   // 3. Emit delete to parent App.vue
   emit('delete-admission', typeof adm === 'object' ? adm : { id: idToDelete, registrationNo: idToDelete });
 
-  // 4. Delete from REST API backend via API helper
+  // 4. Delete from connected database (Firebase Firestore, Realtime DB, REST API, & local caches)
   try {
-    await API.deleteAdmission(idToDelete);
+    await deleteAdmissionFromBackend(adm);
     emailActionMsg.value = `✓ Candidate record ${idToDelete} removed successfully from Database & API.`;
-  } catch (e) {
-    try {
-      await deleteAdmissionFromBackend(adm);
-    } catch (err) {
-      console.warn('Delete admission warning:', e.message);
-    }
+  } catch (err) {
+    console.warn('Delete admission warning:', err.message);
   }
   setTimeout(() => { emailActionMsg.value = ''; }, 4000);
 };
@@ -1797,16 +1800,21 @@ const handleCreateDirectAdmission = () => {
 
   const studentEmail = (quickForm.value.email || '').trim();
   const newAdm = {
+    id: regId,
     registrationNo: regId,
+    registrationNumber: regId,
     date: dateStr,
     time: timeStr,
     candidateName: (quickForm.value.candidateName || '').trim(),
+    fullName: (quickForm.value.candidateName || '').trim(),
     fatherName: (quickForm.value.fatherName || '').trim(),
     motherName: 'Not Specified',
     dob: '2003-01-01',
     gender: 'Male',
     course: quickForm.value.course,
+    track: quickForm.value.course,
     mobile: (quickForm.value.mobile || '').trim(),
+    phone: (quickForm.value.mobile || '').trim(),
     email: studentEmail,
     userId: studentEmail,
     password: 'Ithunt@123',
