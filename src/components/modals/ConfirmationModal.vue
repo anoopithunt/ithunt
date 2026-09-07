@@ -56,6 +56,29 @@
             <div style="font-weight: 800; color: var(--color-ai-orange);">{{ admission.course }}</div>
           </div>
         </div>
+
+        <!-- Student Portal Login Credentials Highlight -->
+        <div style="margin-top: 0.85rem; padding: 0.75rem; background: rgba(56, 189, 248, 0.08); border: 1px dashed rgba(56, 189, 248, 0.35); border-radius: var(--radius-sm);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <span style="font-size: 0.75rem; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px;">
+              🔑 Student Dashboard Login Access
+            </span>
+            <span style="font-size: 0.7rem; color: #34d399; font-weight: 700; background: rgba(52, 211, 153, 0.15); padding: 0.15rem 0.4rem; border-radius: 4px;">Active</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.82rem;">
+            <div>
+              <span style="color: var(--text-muted); font-size: 0.72rem; display: block;">User ID (Email):</span>
+              <strong style="color: var(--text-main); word-break: break-all;">{{ admission.email || admission.userId || '—' }}</strong>
+            </div>
+            <div>
+              <span style="color: var(--text-muted); font-size: 0.72rem; display: block;">Default Password:</span>
+              <strong style="color: #34d399; font-family: var(--font-mono); font-size: 0.95rem;">Ithunt@123</strong>
+            </div>
+          </div>
+          <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.35rem;">
+            💡 You can log in anytime to your Student Dashboard using this email & password.
+          </div>
+        </div>
       </div>
 
       <div class="modal-actions-group" style="display: flex; flex-wrap: wrap; gap: 0.6rem;">
@@ -66,6 +89,16 @@
           :disabled="isGeneratingPdf"
         >
           <span>{{ isGeneratingPdf ? (content?.ui?.generatingPdfLabel || '⏳ Generating PDF...') : (content?.ui?.downloadPdfSlipBtn || '📄 Download Slip (PDF)') }}</span>
+        </button>
+
+        <button 
+          v-if="admission && admission.email" 
+          class="btn-secondary" 
+          style="border-color: rgba(234, 88, 12, 0.5); color: #fb923c; background: rgba(234, 88, 12, 0.1);"
+          @click="openStudentGmailLetter(admission)"
+          title="Open Official Admission Confirmation Letter in Gmail"
+        >
+          <span>📧 Save to Gmail</span>
         </button>
 
         <button 
@@ -104,6 +137,7 @@
 
 <script setup>
 import { sendWhatsAppNotification, sendDeviceSmsNotification } from '../../utils/smsNotifier.js';
+import { getStudentAdmissionGmailUrl } from '../../utils/emailNotifier.js';
 
 defineProps({
   isOpen: {
@@ -137,4 +171,10 @@ defineProps({
 });
 
 defineEmits(['close', 'download-pdf', 'print-slip']);
+
+const openStudentGmailLetter = (adm) => {
+  if (!adm) return;
+  const url = getStudentAdmissionGmailUrl(adm);
+  window.open(url, '_blank', 'noopener,noreferrer');
+};
 </script>

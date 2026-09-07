@@ -142,7 +142,7 @@
         <div>
           <h3 class="panel-title">🎓 Students Directory & Master Academic List</h3>
           <p class="panel-subtitle">
-            Live database students API (`GET http://localhost:3000/api/students`) | Total Registered: <strong style="color: var(--color-ai-orange);">{{ studentsList.length }}</strong>
+            Connected Cloud Database (Firestore & Realtime DB) | Total Registered: <strong style="color: var(--color-ai-orange);">{{ studentsList.length }}</strong>
           </p>
         </div>
 
@@ -392,8 +392,8 @@
                   <div class="admin-row-actions">
                     <button 
                       class="admin-icon-btn" 
-                      @click="sendAdmissionEmailToStudent(adm)" 
-                      title="Send Admission Form & Confirmation Email to Candidate"
+                      @click="openAdmissionEmailModal(adm)" 
+                      title="Open Official Admission Confirmation Letter Dispatch Modal"
                       style="color: var(--color-ai-orange); border-color: rgba(249, 115, 22, 0.4);"
                     >
                       📩 Admission Email
@@ -1262,12 +1262,70 @@
         </div>
       </div>
     </div>
+
+    <!-- Official Admission Email Modal (100% Clean Dispatch) -->
+    <div class="modal-overlay" v-if="showAdmissionEmailModal" @click.self="showAdmissionEmailModal = false">
+      <div class="modal-card" style="max-width: 640px; text-align: left;">
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+          <div>
+            <h3 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: var(--color-ai-orange);">
+              ✉️ Official Admission Confirmation Dispatch
+            </h3>
+            <p style="margin: 0.2rem 0 0 0; font-size: 0.8rem; color: var(--text-muted);">
+              Dispatch authentic admission letter from <strong>softtechithunt@gmail.com</strong> with candidate portal credentials.
+            </p>
+          </div>
+          <button class="modal-close-btn" @click="showAdmissionEmailModal = false">✕</button>
+        </div>
+
+        <div v-if="selectedAdmissionForEmail" style="display: flex; flex-direction: column; gap: 0.85rem;">
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-cyber); border-radius: var(--radius-sm); padding: 0.85rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.85rem;">
+            <div><span style="color: var(--text-muted); font-size: 0.72rem; display: block;">Candidate:</span><strong>{{ selectedAdmissionForEmail.candidateName || selectedAdmissionForEmail.fullName }}</strong></div>
+            <div><span style="color: var(--text-muted); font-size: 0.72rem; display: block;">Registration No:</span><strong style="color: var(--color-ai-yellow); font-family: var(--font-mono);">{{ selectedAdmissionForEmail.registrationNo }}</strong></div>
+            <div><span style="color: var(--text-muted); font-size: 0.72rem; display: block;">Student Portal User ID:</span><strong style="color: #38bdf8;">{{ selectedAdmissionForEmail.email }}</strong></div>
+            <div><span style="color: var(--text-muted); font-size: 0.72rem; display: block;">Default Password:</span><strong style="color: #34d399; font-family: var(--font-mono);">Ithunt@123</strong></div>
+            <div style="grid-column: 1 / -1;"><span style="color: var(--text-muted); font-size: 0.72rem; display: block;">Course:</span><strong style="color: var(--color-ai-orange);">{{ selectedAdmissionForEmail.course }}</strong></div>
+          </div>
+
+          <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius-sm); padding: 0.75rem; max-height: 200px; overflow-y: auto;">
+            <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.4rem;">
+              Preview of Official Admission Letter
+            </div>
+            <pre style="margin: 0; font-family: var(--font-mono); font-size: 0.78rem; color: #cbd5e1; white-space: pre-wrap; line-height: 1.45;">{{ emailLetterPreview }}</pre>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: flex-end; margin-top: 1.25rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.08);">
+          <button class="btn-primary" style="background: #ea580c; border-color: #ea580c;" @click="openDirectGmailCompose" title="Open Gmail with official letter pre-filled to send from softtechithunt@gmail.com">
+            <span>🚀 Open in Gmail Web (100% Clean)</span>
+          </button>
+          <button class="btn-secondary" @click="openDirectMailto" title="Open in default system mail client">
+            <span>📫 Open in Mail App</span>
+          </button>
+          <button class="btn-secondary" @click="copyLetterToClipboard">
+            <span>📋 Copy Letter</span>
+          </button>
+          <button class="btn-secondary" @click="triggerBackgroundAdmissionEmail">
+            <span>⚡ Cloud Dispatch</span>
+          </button>
+          <button class="btn-secondary" @click="showAdmissionEmailModal = false">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
-import { sendStudentAdmissionEmail, sendFeeReceiptJpgEmail } from '../../utils/emailNotifier.js';
+import { 
+  sendStudentAdmissionEmail, 
+  sendFeeReceiptJpgEmail,
+  getStudentAdmissionGmailUrl,
+  getStudentAdmissionMailtoUrl,
+  getStudentAdmissionEmailContent
+} from '../../utils/emailNotifier.js';
 import { generateFeeReceiptJpgBlob } from '../../utils/jpgReceiptGenerator.js';
 import { API, deleteAdmissionFromBackend, deleteUserFromBackend, updateNielitProjectInBackend, deleteNielitProjectFromBackend, deleteProject } from '../../utils/apiClient.js';
 
@@ -1338,6 +1396,49 @@ const props = defineProps({
 const emit = defineEmits(['logout', 'download-slip', 'download-nielit-pdf', 'add-admission', 'delete-admission', 'update-nielit-project', 'delete-nielit-project', 'delete-student']);
 
 const emailActionMsg = ref('');
+const showAdmissionEmailModal = ref(false);
+const selectedAdmissionForEmail = ref(null);
+const emailLetterPreview = ref('');
+
+const openAdmissionEmailModal = (adm) => {
+  if (!adm || !adm.email) {
+    alert('Candidate record has no valid email address.');
+    return;
+  }
+  selectedAdmissionForEmail.value = adm;
+  const content = getStudentAdmissionEmailContent(adm);
+  emailLetterPreview.value = content.body;
+  showAdmissionEmailModal.value = true;
+};
+
+const openDirectGmailCompose = () => {
+  if (!selectedAdmissionForEmail.value) return;
+  const url = getStudentAdmissionGmailUrl(selectedAdmissionForEmail.value);
+  window.open(url, '_blank', 'noopener,noreferrer');
+  emailActionMsg.value = `✓ Opened Gmail Web compose for ${selectedAdmissionForEmail.value.email}`;
+  setTimeout(() => { emailActionMsg.value = ''; }, 5000);
+};
+
+const openDirectMailto = () => {
+  if (!selectedAdmissionForEmail.value) return;
+  const url = getStudentAdmissionMailtoUrl(selectedAdmissionForEmail.value);
+  window.location.href = url;
+};
+
+const copyLetterToClipboard = async () => {
+  try {
+    await navigator.clipboard.writeText(emailLetterPreview.value);
+    alert('✓ Admission Confirmation Letter copied to clipboard!');
+  } catch (e) {
+    alert('Could not copy letter automatically.');
+  }
+};
+
+const triggerBackgroundAdmissionEmail = async () => {
+  if (!selectedAdmissionForEmail.value) return;
+  await sendAdmissionEmailToStudent(selectedAdmissionForEmail.value);
+  showAdmissionEmailModal.value = false;
+};
 
 const sendAdmissionEmailToStudent = async (adm) => {
   if (!adm || !adm.email) {
@@ -1349,9 +1450,9 @@ const sendAdmissionEmailToStudent = async (adm) => {
     const res = await sendStudentAdmissionEmail(adm);
     if (res.success) {
       adm.status = 'Admission Form Sent';
-      emailActionMsg.value = `✓ Admission Confirmation Email & Slip sent to ${adm.email}`;
+      emailActionMsg.value = `✓ Admission Confirmation Email & Slip prepared for ${adm.email}`;
     } else {
-      emailActionMsg.value = `⚠️ Email notification sent (Fallback): ${adm.email}`;
+      emailActionMsg.value = `⚠️ Email notification status: ${adm.email}`;
     }
   } catch (err) {
     emailActionMsg.value = `⚠️ Error dispatching email: ${err.message}`;
