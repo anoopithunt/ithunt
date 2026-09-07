@@ -10,6 +10,11 @@ const FORMSUBMIT_TOKEN = (typeof import.meta !== 'undefined' && import.meta.env 
 
 const FORMSUBMIT_AJAX_URL = `https://formsubmit.co/ajax/${FORMSUBMIT_TOKEN}`;
 const FORMSUBMIT_FORM_URL = `https://formsubmit.co/${FORMSUBMIT_TOKEN}`;
+const WEB3FORMS_ACCESS_KEY = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_WEB3FORMS_ACCESS_KEY)
+  ? import.meta.env.VITE_WEB3FORMS_ACCESS_KEY
+  : '';
+const OFFICIAL_SITE_NAME = 'IT HUNT Software Solutions & Tech Academy';
+const OFFICIAL_SITE_URL = 'https://ithunt.org';
 
 import { getAdmissionPdfBlob } from './pdfGenerator.js';
 import { getNielitProjectPdfBlob } from './nielitPdfGenerator.js';
@@ -70,6 +75,8 @@ export async function sendAdminAdmissionEmail(admissionRecord, adminPdfBlob = nu
       form.target = 'formsubmit_admin_iframe';
       form.style.display = 'none';
 
+      form.setAttribute('referrerpolicy', 'no-referrer');
+
       const addField = (name, value) => {
         const input = document.createElement('input');
         input.type = 'hidden';
@@ -82,6 +89,8 @@ export async function sendAdminAdmissionEmail(admissionRecord, adminPdfBlob = nu
       addField('_replyto', admissionRecord.email || TARGET_EMAIL);
       addField('_template', 'table');
       addField('_captcha', 'false');
+      addField('_url', `${OFFICIAL_SITE_NAME} (${OFFICIAL_SITE_URL})`);
+      addField('_site', OFFICIAL_SITE_NAME);
 
       // Admin Email Body Content
       addField('NOTIFICATION TYPE', '👑 SUPERADMIN CONTROL PANEL ALERT');
@@ -130,6 +139,8 @@ export async function sendAdminAdmissionEmail(admissionRecord, adminPdfBlob = nu
       _replyto: admissionRecord.email || TARGET_EMAIL,
       _template: 'table',
       _captcha: 'false',
+      _url: `${OFFICIAL_SITE_NAME} (${OFFICIAL_SITE_URL})`,
+      _site: OFFICIAL_SITE_NAME,
       'NOTIFICATION TYPE': '👑 SUPERADMIN CONTROL PANEL ALERT',
       'ADMIN NOTICE': 'A new candidate admission has been provisionally submitted.',
       'REGISTRATION ID': regNo,
@@ -208,6 +219,8 @@ export async function sendStudentAdmissionEmail(admissionRecord, studentPdfBlob 
       form.target = 'formsubmit_student_iframe';
       form.style.display = 'none';
 
+      form.setAttribute('referrerpolicy', 'no-referrer');
+
       const addField = (name, value) => {
         const input = document.createElement('input');
         input.type = 'hidden';
@@ -220,16 +233,21 @@ export async function sendStudentAdmissionEmail(admissionRecord, studentPdfBlob 
       addField('_replyto', TARGET_EMAIL);
       addField('_template', 'table');
       addField('_captcha', 'false');
+      addField('_url', `${OFFICIAL_SITE_NAME} (${OFFICIAL_SITE_URL})`);
+      addField('_site', OFFICIAL_SITE_NAME);
       addField('_cc', admissionRecord.email);
       addField('email', admissionRecord.email);
 
       // Student Email Body Content
-      addField('ACKNOWLEDGMENT', '🎓 IT HUNT ACADEMY - OFFICIAL ADMISSION CONFIRMATION');
-      addField('WELCOME GREETING', `Dear ${candName}, Welcome to IT HUNT Academy & Software Solutions! Your registration is provisionally confirmed.`);
+      addField('OFFICIAL NOTICE', '🎓 IT HUNT ACADEMY - OFFICIAL ADMISSION CONFIRMATION');
+      addField('WELCOME GREETING', `Dear ${candName}, Welcome to IT HUNT Academy & Software Solutions! Your admission is officially confirmed.`);
       addField('REGISTRATION ID', regNo);
       addField('STUDENT FULL NAME', candName);
       addField('ENROLLED PROGRAM', courseTitle);
-      addField("FATHER'S NAME", admissionRecord.fatherName || 'N/A');
+      addField("FATHER'S NAME", admissionRecord.fatherName || 'Not Specified');
+      addField('STUDENT PORTAL USER ID', admissionRecord.email || 'N/A');
+      addField('DEFAULT LOGIN PASSWORD', 'Ithunt@123');
+      addField('PASSWORD NOTICE', 'You can log in to your Student Dashboard anytime using your Email and change your password.');
       addField('CONTACT MOBILE', admissionRecord.mobile || 'N/A');
       addField('REGISTERED DATE', admissionRecord.date || new Date().toLocaleDateString('en-GB'));
       addField('DAY 1 ONBOARDING', 'Reporting Time: 09:30 AM Onboarding Day 1 at Holagarh Campus');
@@ -268,14 +286,19 @@ export async function sendStudentAdmissionEmail(admissionRecord, studentPdfBlob 
       _replyto: TARGET_EMAIL,
       _template: 'table',
       _captcha: 'false',
+      _url: `${OFFICIAL_SITE_NAME} (${OFFICIAL_SITE_URL})`,
+      _site: OFFICIAL_SITE_NAME,
       _cc: admissionRecord.email,
       email: admissionRecord.email,
-      'ACKNOWLEDGMENT': '🎓 IT HUNT ACADEMY - OFFICIAL ADMISSION CONFIRMATION',
-      'WELCOME GREETING': `Dear ${candName}, Welcome to IT HUNT Academy & Software Solutions! Your registration is provisionally confirmed.`,
+      'OFFICIAL NOTICE': '🎓 IT HUNT ACADEMY - OFFICIAL ADMISSION CONFIRMATION',
+      'WELCOME GREETING': `Dear ${candName}, Welcome to IT HUNT Academy & Software Solutions! Your admission is officially confirmed.`,
       'REGISTRATION ID': regNo,
       'STUDENT FULL NAME': candName,
       'ENROLLED PROGRAM': courseTitle,
-      "FATHER'S NAME": admissionRecord.fatherName || 'N/A',
+      "FATHER'S NAME": admissionRecord.fatherName || 'Not Specified',
+      'STUDENT PORTAL USER ID': admissionRecord.email || 'N/A',
+      'DEFAULT LOGIN PASSWORD': 'Ithunt@123',
+      'PASSWORD NOTICE': 'You can log in to your Student Dashboard anytime using your Email and change your password.',
       'CONTACT MOBILE': admissionRecord.mobile || 'N/A',
       'REGISTERED DATE': admissionRecord.date || new Date().toLocaleDateString('en-GB'),
       'DAY 1 ONBOARDING': 'Reporting Time: 09:30 AM Onboarding Day 1 at Holagarh Campus',
@@ -659,11 +682,126 @@ export async function sendFeeReceiptJpgEmail(studentRecord, jpgBlob = null) {
   }
 }
 
+// ==============================================================================
+// Clean Direct Email Content & Client Dispatch URL Generators
+// (Zero FormSubmit Header, Zero Third-Party Branding, 100% Official)
+// ==============================================================================
+
+/**
+ * Generate clean, official text letter for candidate admission
+ */
+export function getStudentAdmissionEmailContent(adm) {
+  if (!adm) return { subject: '', body: '', to: '' };
+
+  const regNo = adm.registrationNo || adm.id || 'ITH-000000';
+  const candName = adm.candidateName || adm.fullName || adm.name || 'Candidate';
+  const course = adm.course || 'Software Engineering Track';
+  const email = adm.email || '';
+  const date = adm.date || new Date().toLocaleDateString('en-GB');
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://ithunt.vercel.app';
+
+  const subject = `🎓 [OFFICIAL ADMISSION CONFIRMATION] Welcome ${candName} to IT HUNT Academy! [Reg: ${regNo}]`;
+  const body = `Dear ${candName},
+
+Congratulations! Your provisional admission at IT HUNT Software Solutions & Tech Academy has been successfully confirmed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 OFFICIAL ADMISSION DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Registration ID: ${regNo}
+• Candidate Name: ${candName}
+• Father's Name: ${adm.fatherName || 'Not Specified'}
+• Enrolled Program: ${course}
+• Registered Date: ${date}
+• Admission Status: Confirmed & Enrolled ✓
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔑 STUDENT PORTAL LOGIN CREDENTIALS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Portal URL: ${origin}/#login
+• Student User ID: ${email}
+• Default Password: Ithunt@123
+(You can log in to your Student Dashboard anytime to view your enrolled course syllabus, public holidays calendar, batch scoreboard, and change your password)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏫 REPORTING & ONBOARDING ORIENTATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Reporting Time: 09:30 AM Onboarding Day 1
+• Training Campus: IT HUNT Software Studio, Dahiyawa Holagarh (Near Mela Ground in Front of Kali Maa Mandir), Prayagraj, UP – 212502
+• Documents to Bring:
+  1. Printed or Digital Copy of this Admission Notice (${regNo})
+  2. 2 Passport Size Photos & Government Photo ID Proof (Aadhaar / Voter ID)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📞 ACADEMIC HELPLINE & OFFICIAL SUPPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Admissions Helpline: +91 9795771806 / +91 8299544315
+• Official Email: softtechithunt@gmail.com
+• Official Web Portal: https://ithunt.org / https://ithunt.vercel.app
+
+We look forward to empowering your tech career!
+
+Warm regards,
+Admissions & Academic Directorate
+IT HUNT Software Solutions & Tech Academy
+(ISO 9001:2015 Accredited Institute)
+`;
+
+  return { subject, body, to: email, regNo, candName, course };
+}
+
+/**
+ * Generate 1-click direct Gmail Web Compose URL (100% clean body, no FormSubmit wrapper)
+ */
+export function getStudentAdmissionGmailUrl(adm) {
+  const { to, subject, body } = getStudentAdmissionEmailContent(adm);
+  return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+/**
+ * Generate mailto URL for default system email client
+ */
+export function getStudentAdmissionMailtoUrl(adm) {
+  const { to, subject, body } = getStudentAdmissionEmailContent(adm);
+  return `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+/**
+ * Generate 1-click direct Gmail Web Compose URL for JPG Fee Receipt
+ */
+export function getFeeReceiptGmailUrl(studentRecord) {
+  const candName = studentRecord.candidateName || studentRecord.name || 'Student';
+  const regNo = studentRecord.registrationNo || 'ITH-2026';
+  const email = studentRecord.email || '';
+  const amount = studentRecord.amountPaid || '₹5,000';
+  const subject = `💳 [FEE CONFIRMED] Official Fee Receipt for ${candName} [Reg: ${regNo}]`;
+  const body = `Dear ${candName},
+
+We are pleased to confirm that your fee payment of ${amount} for your enrolled program (${studentRecord.course || 'IT Track'}) at IT HUNT Academy has been successfully verified.
+
+Registration No: ${regNo}
+Amount Paid: ${amount}
+Fee Status: Confirmed & Verified ✓
+
+Please find attached your official Verified Fee Receipt.
+
+Warm regards,
+Accounts & Finance Department
+IT HUNT Software Solutions & Tech Academy
+Helpline: +91 9795771806 | softtechithunt@gmail.com
+`;
+  return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
 export default {
   sendAdmissionEmailNotification,
   sendJobEmailNotification,
   sendRsvpEmailNotification,
   sendNielitProjectEmailNotification,
-  sendFeeReceiptJpgEmail
+  sendFeeReceiptJpgEmail,
+  getStudentAdmissionEmailContent,
+  getStudentAdmissionGmailUrl,
+  getStudentAdmissionMailtoUrl,
+  getFeeReceiptGmailUrl
 };
 
