@@ -42,14 +42,15 @@
               <div class="terminal-title">{{ content.hero?.codeSnippetHeader }}</div>
             </div>
             <div class="code-terminal-body">
-              <span v-for="(line, idx) in content.hero?.codeSnippetLines" :key="idx" class="code-line">
-                <span style="color: #64748b; margin-right: 12px; user-select: none;">{{ idx + 1 }}</span>
-                <span>{{ line }}</span>
-              </span>
+              <div v-for="(line, idx) in (content.hero?.codeSnippetLines || [])" :key="idx" class="code-line">
+                <span class="code-line-num">{{ idx + 1 }}</span>
+                <span class="code-line-content" v-html="highlightCode(line)"></span>
+                <span v-if="idx === (content.hero?.codeSnippetLines?.length || 1) - 1" class="terminal-cursor"></span>
+              </div>
             </div>
           </div>
           
-          <div class="hero-floating-badge" style="bottom: -25px; right: 10px; left: auto;">
+          <div class="hero-floating-badge">
             <div class="hero-floating-icon">💼</div>
             <div>
               <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-main);">{{ content.hero?.floatingBadgeTitle }}</div>
@@ -61,7 +62,7 @@
     </div>
 
     <!-- Stats Counter Section -->
-    <div class="container stats-section reveal-on-scroll">
+    <div class="container stats-section reveal-on-scroll" ref="statsSectionRef">
       <div class="stats-grid">
         <div class="stat-card" v-for="(stat, idx) in content.stats" :key="idx">
           <div class="stat-number" :class="stat.isGradientPrimary ? 'text-gradient' : 'text-gradient-secondary'">{{ animatedStats[idx] || stat.number }}</div>
@@ -247,7 +248,9 @@
 </template>
 
 <script setup>
-defineProps({
+import { ref, onMounted, onUnmounted } from 'vue';
+
+const props = defineProps({
   content: {
     type: Object,
     required: true
@@ -256,9 +259,118 @@ defineProps({
 
 defineEmits(['set-tab', 'apply-course', 'open-job-modal']);
 
-import { ref, onMounted, computed } from 'vue';
-
+const statsSectionRef = ref(null);
 const animatedStats = ref([]);
+let observer = null;
+
+// HTML Escaping Helper for Code Terminal
+const escapeHtml = (text) => {
+  return String(text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+};
+
+// Syntax Highlighting Tokens
+const highlightCode = (line) => {
+  if (!line) return '&nbsp;';
+  const trimmed = line.trim();
+  if (trimmed.startsWith('//') || trimmed.startsWith('/*')) {
+    return `<span class="code-comment">${escapeHtml(line)}</span>`;
+  }
+  let escaped = escapeHtml(line);
+  // Strings
+  escaped = escaped.replace(/(&#39;.*?&#39;|&#34;.*?&#34;|'.*?'|".*?")/g, '<span class="code-str">$1</span>');
+  // Keywords
+  escaped = escaped.replace(/\b(import|from|export|default|function|const|let|var|return)\b/g, '<span class="code-kw">$1</span>');
+  // Functions & Components
+  escaped = escaped.replace(/\b(useState|useEffect|SoftwareStudio|ITHuntSoftwareVenture|setTrack|setExperience)\b/g, '<span class="code-fn">$1</span>');
+  // Attributes / Props
+  escaped = escaped.replace(/\b(status|mode)\b/g, '<span class="code-prop">$1</span>');
+  return escaped;
+};
+
+// Dynamic Easing Number Counter on Scroll
+const startStatsAnimation = () => {
+  const statsList = props.content?.stats || [];
+  if (!statsList.length) return;
+
+  const duration = 1600;
+  const startTime = performance.now();
+
+  const parsedStats = statsList.map(s => {
+    const raw = String(s.number || '');
+    if (raw.includes('4.9')) {
+      return { target: 4.9, isFloat: true, suffix: ' ★' };
+    }
+    if (raw.includes('5,000') || raw.includes('5000')) {
+      return { target: 5000, isFloat: false, formatComma: true, suffix: '+' };
+    }
+    if (raw.includes('100')) {
+      return { target: 100, isFloat: false, suffix: '%' };
+    }
+    if (raw.includes('4')) {
+      return { target: 4, isFloat: false, suffix: '+ Yrs' };
+    }
+    const match = raw.match(/([0-9.]+)/);
+    if (match) {
+      const val = parseFloat(match[1]);
+      const suffix = raw.replace(match[1], '');
+      return { target: val, isFloat: raw.includes('.'), suffix };
+    }
+    return { target: null, fallback: raw };
+  });
+
+  const step = (now) => {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    // Smooth easeOutExpo physics
+    const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+
+    animatedStats.value = parsedStats.map(item => {
+      if (item.target === null) return item.fallback;
+      const current = item.target * ease;
+      if (item.isFloat) {
+        return current.toFixed(1) + item.suffix;
+      }
+      const intVal = Math.round(current);
+      const formatted = item.formatComma ? intVal.toLocaleString('en-US') : String(intVal);
+      return formatted + item.suffix;
+    });
+
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    }
+  };
+
+  requestAnimationFrame(step);
+};
+
+onMounted(() => {
+  const statsList = props.content?.stats || [];
+  animatedStats.value = statsList.map(s => s.number);
+
+  if (typeof window !== 'undefined' && 'IntersectionObserver' in window && statsSectionRef.value) {
+    let triggered = false;
+    observer = new IntersectionObserver((entries) => {
+      if (entries[0] && entries[0].isIntersecting && !triggered) {
+        triggered = true;
+        startStatsAnimation();
+      }
+    }, { threshold: 0.15 });
+    observer.observe(statsSectionRef.value);
+  } else {
+    startStatsAnimation();
+  }
+});
+
+onUnmounted(() => {
+  if (observer) {
+    observer.disconnect();
+  }
+});
 
 const onImgError = (event) => {
   event.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="%231e293b"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="16" fill="%2394a3b8">IT HUNT Center</text></svg>';
