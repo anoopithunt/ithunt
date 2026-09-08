@@ -85,6 +85,22 @@
             <div class="form-group">
               <label class="form-label">{{ content.admissionSection?.fields?.email || 'Email Address' }} <span class="req">*</span></label>
               <input type="email" v-model="form.email" required class="form-control" :placeholder="content.admissionSection?.fields?.emailPlaceholder || 'name@example.com'">
+              <small style="display: block; margin-top: 0.35rem; color: var(--color-ai-orange); font-size: 0.78rem; font-weight: 700;">
+                🔑 Student Portal Username (Login ID)
+              </small>
+            </div>
+
+            <div class="form-group">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                <label class="form-label" style="margin-bottom: 0;">Portal Password <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">(Optional)</span></label>
+                <button type="button" class="password-toggle-btn" @click="showAdmPassword = !showAdmPassword" style="font-size: 0.75rem;">
+                  {{ showAdmPassword ? '🙈 Hide' : '👁️ Show' }}
+                </button>
+              </div>
+              <input :type="showAdmPassword ? 'text' : 'password'" v-model="form.password" class="form-control" placeholder="Default: Ithunt@123">
+              <small style="display: block; margin-top: 0.35rem; color: #34d399; font-size: 0.78rem; font-weight: 600;">
+                🔒 By default: Ithunt@123 (or set custom password)
+              </small>
             </div>
 
             <div class="form-group full-width">
@@ -149,6 +165,10 @@
             <span class="receipt-label">{{ content.admissionSection?.previewCard?.districtLabel || 'District & State:' }}</span>
             <span class="receipt-val">{{ form.district }}, UP</span>
           </div>
+          <div class="receipt-row" style="background: rgba(56, 189, 248, 0.08); padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px dashed rgba(56, 189, 248, 0.35);">
+            <span class="receipt-label" style="color: #38bdf8; font-weight: 700;">Student Login ID:</span>
+            <span class="receipt-val" style="color: var(--text-main); font-weight: 800; word-break: break-all;">{{ form.email || 'Candidate Email' }}</span>
+          </div>
         </div>
 
         <!-- Receipt Footer / Security Stamp -->
@@ -165,6 +185,15 @@
 
         <!-- Receipt Actions if submitted -->
         <div v-if="lastSubmittedAdmission" style="margin-top: 1.25rem; padding: 0 1.25rem 1.25rem; display: flex; flex-direction: column; gap: 0.6rem;">
+          <button 
+            class="btn-primary" 
+            style="width: 100%; justify-content: center; background: linear-gradient(135deg, var(--color-ai-orange), #ea580c); box-shadow: 0 4px 15px rgba(249, 115, 22, 0.35);"
+            @click="$emit('login-as-student', lastSubmittedAdmission)"
+            title="Sign in directly to your new Student Dashboard"
+          >
+            <span>🎓 Sign In as Student Now →</span>
+          </button>
+
           <button 
             class="btn-primary pdf-download-btn" 
             style="width: 100%; justify-content: center;" 
@@ -222,9 +251,10 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['submit-admission', 'download-pdf']);
+const emit = defineEmits(['submit-admission', 'download-pdf', 'login-as-student', 'go-to-login']);
 
 const isSubmitting = ref(false);
+const showAdmPassword = ref(false);
 
 // Computed progress step based on form fill state
 const currentStep = computed(() => {

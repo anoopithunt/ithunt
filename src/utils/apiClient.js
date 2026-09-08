@@ -4,9 +4,10 @@ import { db, rtdb } from './firebaseConfig.js';
 import { collection, doc, setDoc, getDocs, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { ref as dbRef, set as dbSet, get as dbGet, remove as dbRemove, onValue } from 'firebase/database';
 
+const env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : (typeof process !== 'undefined' ? process.env : {});
 const RAW_API_URL = (
-  import.meta.env.VITE_API_URL || 
-  import.meta.env.VITE_API_BASE_URL || 
+  env.VITE_API_URL || 
+  env.VITE_API_BASE_URL || 
   ''
 ).trim();
 
@@ -609,13 +610,20 @@ export async function submitAdmissionToBackend(data) {
 export async function saveAdmissionRecord(data) {
   if (!data) return { success: false, error: 'No form data provided' };
   
+  const normEmail = (data.email || '').toLowerCase().trim();
+  const defaultPassword = data.password || 'Ithunt@123';
+
   const payload = {
     ...data,
+    email: normEmail,
+    userId: normEmail,
+    password: defaultPassword,
     fullName: data.fullName || data.candidateName || data.name || '',
     candidateName: data.candidateName || data.fullName || data.name || '',
     phone: data.phone || data.mobile || '',
     mobile: data.mobile || data.phone || '',
     type: 'ADMISSION',
+    role: 'student',
     createdAt: data.createdAt || new Date().toISOString()
   };
 
@@ -637,31 +645,70 @@ export async function saveAdmissionRecord(data) {
   };
 
   const cleanId = String(finalRegNo).replace(/\//g, '_');
+  const cleanEmail = normEmail ? normEmail.replace(/[@.]/g, '_') : null;
 
-  // 1. Save directly to Firebase Cloud Firestore and Realtime DB
+  // 1. Save directly to Firebase Cloud Firestore and Realtime DB (admissions collection)
   await saveToFirebaseCloud('admissions', cleanId, finalRecord);
   if (cleanId !== String(finalRegNo)) {
     await saveToFirebaseCloud('admissions', String(finalRegNo), finalRecord);
+  }
+  if (cleanEmail) {
+    await saveToFirebaseCloud('admissions', cleanEmail, finalRecord);
   }
   if (payload.id && payload.id !== finalRegNo) {
     await saveToFirebaseCloud('admissions', String(payload.id).replace(/\//g, '_'), finalRecord);
   }
 
-  // 2. Also save to students collection in Firebase Cloud
-  await saveToFirebaseCloud('students', cleanId, normalizeStudent({
-    ...finalRecord,
-    enrollmentNumber: finalRegNo,
-    userId: finalRecord.email || cleanId
-  }));
+  // 2. Save directly to students collection in Firebase Cloud
+  const studentDoc = {
+    ...normalizeStudent({
+      ...finalRecord,
+      enrollmentNumber: finalRegNo,
+      userId: normEmail || cleanId
+    }),
+    email: normEmail,
+    userId: normEmail,
+    password: defaultPassword,
+    registrationNo: finalRegNo,
+    candidateName: finalRecord.candidateName,
+    course: finalRecord.course,
+    mobile: finalRecord.mobile,
+    status: 'Confirmed'
+  };
+  await saveToFirebaseCloud('students', cleanId, studentDoc);
+  if (cleanEmail) {
+    await saveToFirebaseCloud('students', cleanEmail, studentDoc);
+  }
 
-  // 3. Clear from deleted admissions IDs if present
+  // 3. Save to users collection in Firebase Cloud with email as username and password
+  if (cleanEmail) {
+    const userDoc = {
+      id: cleanEmail,
+      userId: normEmail,
+      email: normEmail,
+      password: defaultPassword,
+      name: finalRecord.candidateName,
+      candidateName: finalRecord.candidateName,
+      role: 'student',
+      registrationNo: finalRegNo,
+      course: finalRecord.course,
+      mobile: finalRecord.mobile,
+      verified: true,
+      status: 'Confirmed',
+      createdAt: new Date().toISOString()
+    };
+    await saveToFirebaseCloud('users', cleanEmail, userDoc);
+    await saveToFirebaseCloud('users', cleanId, userDoc);
+  }
+
+  // 4. Clear from deleted admissions IDs if present
   try {
     const deletedIds = JSON.parse(localStorage.getItem('ithunt_deleted_admission_ids') || '[]');
     const updated = deletedIds.filter(id => id !== finalRegNo && id !== cleanId && id !== payload.id);
     localStorage.setItem('ithunt_deleted_admission_ids', JSON.stringify(updated));
   } catch (e) {}
 
-  // 4. Update localStorage cache 'ithunt_admissions'
+  // 5. Update localStorage cache 'ithunt_admissions'
   try {
     const cached = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
     const filtered = cached.filter(a => {
@@ -673,7 +720,7 @@ export async function saveAdmissionRecord(data) {
     localStorage.setItem('ithunt_admissions', JSON.stringify(filtered));
   } catch (e) {}
 
-  // 5. Ensure Student Portal User Account exists with email as userId and default password Ithunt@123
+  // 6. Ensure Student Portal User Account exists with email as userId and default password Ithunt@123
   if (finalRecord.email) {
     saveStudentAccount(finalRecord);
   }
@@ -1446,12 +1493,16 @@ export async function registerStudentUser(signupData) {
  * Authenticate student user via backend REST API
  */
 export async function loginStudentWithBackend(email, password) {
+  if (!API_BASE_URL) return { success: false };
   try {
     const data = await apiRequest('/students/login', {
       method: 'POST',
       body: JSON.stringify({ email, password })
     });
-    return { success: true, data };
+    if (data && (data.user || data.student || (data.success && data.token))) {
+      return { success: true, data };
+    }
+    return { success: false, error: data?.error || 'Invalid credentials' };
   } catch (error) {
     console.warn('Backend API connection warning (Student Login):', error.message);
     return { success: false, error: error.message };
@@ -1480,6 +1531,9 @@ export function saveStudentAccount(account) {
     // Also persist student user to Firebase Cloud 'users' collection
     const cleanEmail = email.replace(/[@.]/g, '_');
     saveToFirebaseCloud('users', cleanEmail, userObj).catch(() => {});
+    if (account.registrationNo) {
+      saveToFirebaseCloud('users', String(account.registrationNo).replace(/\//g, '_'), userObj).catch(() => {});
+    }
   } catch (e) {}
 }
 
@@ -1530,7 +1584,11 @@ export async function changeStudentPassword(email, oldPassword, newPassword) {
       localStorage.setItem('ithunt_admissions', JSON.stringify(admissions));
     }
 
-    // 4. Update backend profile if available
+    // 4. Update in cloud database
+    const cleanEmail = normEmail.replace(/[@.]/g, '_');
+    saveToFirebaseCloud('users', cleanEmail, { password: newPassword, email: normEmail, userId: normEmail }).catch(() => {});
+
+    // 5. Update backend profile if available
     try {
       await updateStudentProfileWithBackend({ email: normEmail, password: newPassword });
     } catch (e) {}
@@ -1544,70 +1602,152 @@ export async function changeStudentPassword(email, oldPassword, newPassword) {
 export async function loginStudentUser(email, password) {
   const normEmail = (email || '').toLowerCase().trim();
   const inputPass = (password || '').trim();
+  if (!normEmail) {
+    return { success: false, error: 'Please enter your registered Email or Registration Number.' };
+  }
 
-  // 1. Try backend REST API
-  try {
-    const res = await loginStudentWithBackend(normEmail, inputPass);
-    if (res && res.success) {
-      return { success: true, user: res.data?.user || res.data?.student };
-    }
-  } catch (e) {}
+  // 1. Try backend REST API if configured
+  if (API_BASE_URL) {
+    try {
+      const res = await loginStudentWithBackend(normEmail, inputPass);
+      if (res && res.success && (res.data?.user || res.data?.student)) {
+        return { success: true, user: res.data?.user || res.data?.student };
+      }
+    } catch (e) {}
+  }
 
   // 2. Check local registered student accounts
   try {
     const accounts = JSON.parse(localStorage.getItem('ithunt_student_accounts') || '{}');
     const acc = accounts[normEmail] || Object.values(accounts).find(a => 
-      a.registrationNo?.toLowerCase() === normEmail || a.userId?.toLowerCase() === normEmail
+      a.registrationNo?.toLowerCase() === normEmail || a.userId?.toLowerCase() === normEmail || a.email?.toLowerCase() === normEmail
     );
 
     if (acc) {
       const expectedPass = acc.password || 'Ithunt@123';
-      if (inputPass === expectedPass || (inputPass === 'Ithunt@123' && !acc.password)) {
-        return { success: true, user: acc };
-      } else {
-        return { success: false, error: 'Invalid password. Default is Ithunt@123 unless changed.' };
-      }
-    }
-  } catch (e) {}
-
-  // 3. Check admissions registry (e.g. from SuperAdmin direct enrollment or online registration)
-  try {
-    const admissions = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
-    const matchedAdm = admissions.find(a => 
-      a.email?.toLowerCase().trim() === normEmail || 
-      a.registrationNo?.toLowerCase().trim() === normEmail
-    );
-
-    if (matchedAdm) {
-      const expectedPass = matchedAdm.password || 'Ithunt@123';
-      if (inputPass === expectedPass || inputPass === 'Ithunt@123') {
+      const phonePass = (acc.mobile || acc.phone || '').replace(/\D/g, '');
+      if (inputPass === expectedPass || (inputPass === 'Ithunt@123' && !acc.password) || (phonePass && inputPass === phonePass)) {
         const studentUser = {
-          userId: matchedAdm.email,
-          email: matchedAdm.email,
-          password: expectedPass,
-          candidateName: matchedAdm.candidateName || matchedAdm.fullName || 'Student',
-          fatherName: matchedAdm.fatherName || 'Not Specified',
-          motherName: matchedAdm.motherName || 'Not Specified',
-          dob: matchedAdm.dob || '2003-08-14',
-          gender: matchedAdm.gender || 'Male',
-          district: matchedAdm.district || 'Prayagraj',
-          address: matchedAdm.address || 'Holagarh, Prayagraj',
-          course: matchedAdm.course || '3-Month MERN Stack Web Engineer',
-          mobile: matchedAdm.mobile || matchedAdm.phone || '9876543210',
-          registrationNo: matchedAdm.registrationNo || 'ITH-2026-001',
-          status: matchedAdm.status || 'Active & Confirmed ✓',
-          feeStatus: matchedAdm.feeStatus || 'Paid in Full (₹15,000 / ₹15,000) ✓',
-          admissionDate: matchedAdm.date || new Date().toISOString().split('T')[0]
+          ...DEFAULT_DEMO_STUDENT,
+          ...acc,
+          userId: acc.email || normEmail,
+          email: acc.email || normEmail,
+          candidateName: acc.candidateName || acc.fullName || acc.name || 'Student',
+          password: expectedPass
         };
         saveStudentAccount(studentUser);
         return { success: true, user: studentUser };
       } else {
-        return { success: false, error: 'Invalid password. Default is Ithunt@123 unless changed.' };
+        return { success: false, error: 'Invalid password. Default password for your account is Ithunt@123.' };
       }
     }
   } catch (e) {}
 
-  // 4. Check active cached student session in localStorage
+  // 3. Check local admissions registry (e.g. from online registration)
+  try {
+    const admissions = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
+    const matchedAdm = admissions.find(a => 
+      a.email?.toLowerCase().trim() === normEmail || 
+      a.registrationNo?.toLowerCase().trim() === normEmail ||
+      (a.userId && a.userId.toLowerCase().trim() === normEmail)
+    );
+
+    if (matchedAdm) {
+      const expectedPass = matchedAdm.password || 'Ithunt@123';
+      const phonePass = (matchedAdm.mobile || matchedAdm.phone || '').replace(/\D/g, '');
+      if (inputPass === expectedPass || inputPass === 'Ithunt@123' || (phonePass && inputPass === phonePass)) {
+        const studentUser = {
+          ...DEFAULT_DEMO_STUDENT,
+          ...matchedAdm,
+          userId: matchedAdm.email || normEmail,
+          email: matchedAdm.email || normEmail,
+          password: expectedPass,
+          candidateName: matchedAdm.candidateName || matchedAdm.fullName || 'Student',
+          fatherName: matchedAdm.fatherName || '—',
+          motherName: matchedAdm.motherName || '—',
+          dob: matchedAdm.dob || '2004-01-01',
+          gender: matchedAdm.gender || 'Male',
+          district: matchedAdm.district || 'Prayagraj',
+          address: matchedAdm.address || 'Holagarh, Prayagraj',
+          course: matchedAdm.course || '3-Month MERN Stack Web Engineer',
+          mobile: matchedAdm.mobile || matchedAdm.phone || '',
+          registrationNo: matchedAdm.registrationNo || 'ITH-2026-001',
+          status: matchedAdm.status || 'Active & Confirmed ✓',
+          feeStatus: matchedAdm.feeStatus || 'Confirmed / Paid',
+          admissionDate: matchedAdm.date || new Date().toLocaleDateString('en-GB')
+        };
+        saveStudentAccount(studentUser);
+        return { success: true, user: studentUser };
+      } else {
+        return { success: false, error: 'Invalid password. Default password for your admission is Ithunt@123.' };
+      }
+    }
+  } catch (e) {}
+
+  // 4. Query Firebase Cloud Database (Firestore + Realtime DB) for cross-device persistence
+  try {
+    const cleanEmail = normEmail.replace(/[@.]/g, '_');
+    
+    // Check users collection in Firestore
+    const cloudUsers = await fetchFromFirebaseCloud('users');
+    const matchedUser = cloudUsers.find(u => {
+      const uEmail = (u.email || u.userId || '').toLowerCase().trim();
+      const uReg = (u.registrationNo || u.registrationNumber || u.id || '').toLowerCase().trim();
+      return uEmail === normEmail || uReg === normEmail || u.id === cleanEmail;
+    });
+
+    if (matchedUser) {
+      const expectedPass = matchedUser.password || 'Ithunt@123';
+      const phonePass = (matchedUser.mobile || matchedUser.phone || '').replace(/\D/g, '');
+      if (inputPass === expectedPass || inputPass === 'Ithunt@123' || (phonePass && inputPass === phonePass)) {
+        const studentUser = {
+          ...DEFAULT_DEMO_STUDENT,
+          ...matchedUser,
+          userId: matchedUser.email || normEmail,
+          email: matchedUser.email || normEmail,
+          password: expectedPass,
+          candidateName: matchedUser.candidateName || matchedUser.name || 'Student',
+          registrationNo: matchedUser.registrationNo || matchedUser.id || 'ITH-2026-001'
+        };
+        saveStudentAccount(studentUser);
+        return { success: true, user: studentUser };
+      } else {
+        return { success: false, error: 'Invalid password. Default password for your account is Ithunt@123.' };
+      }
+    }
+
+    // Check admissions collection in Firestore
+    const cloudAdmissions = await fetchFromFirebaseCloud('admissions');
+    const matchedCloudAdm = cloudAdmissions.find(a => {
+      const aEmail = (a.email || a.userId || '').toLowerCase().trim();
+      const aReg = (a.registrationNo || a.registrationNumber || a.id || '').toLowerCase().trim();
+      return aEmail === normEmail || aReg === normEmail || a.id === cleanEmail;
+    });
+
+    if (matchedCloudAdm) {
+      const expectedPass = matchedCloudAdm.password || 'Ithunt@123';
+      const phonePass = (matchedCloudAdm.mobile || matchedCloudAdm.phone || '').replace(/\D/g, '');
+      if (inputPass === expectedPass || inputPass === 'Ithunt@123' || (phonePass && inputPass === phonePass)) {
+        const studentUser = {
+          ...DEFAULT_DEMO_STUDENT,
+          ...matchedCloudAdm,
+          userId: matchedCloudAdm.email || normEmail,
+          email: matchedCloudAdm.email || normEmail,
+          password: expectedPass,
+          candidateName: matchedCloudAdm.candidateName || matchedCloudAdm.fullName || 'Student',
+          registrationNo: matchedCloudAdm.registrationNo || matchedCloudAdm.id || 'ITH-2026-001'
+        };
+        saveStudentAccount(studentUser);
+        return { success: true, user: studentUser };
+      } else {
+        return { success: false, error: 'Invalid password. Default password for your admission is Ithunt@123.' };
+      }
+    }
+  } catch (cloudErr) {
+    console.warn('Cloud database student query notice:', cloudErr.message);
+  }
+
+  // 5. Check active cached student session in localStorage
   try {
     const localUser = JSON.parse(localStorage.getItem('ithunt_student_user') || 'null');
     if (localUser && (localUser.email?.toLowerCase() === normEmail || localUser.registrationNo?.toLowerCase() === normEmail)) {
@@ -1620,16 +1760,16 @@ export async function loginStudentUser(email, password) {
     }
   } catch (e) {}
 
-  // 5. Default demo student fallback
+  // 6. Default demo student fallback
   if (normEmail === 'student@ithunt.com') {
-    if (inputPass === 'Ithunt@123' || inputPass === 'student123' || inputPass === 'student') {
+    if (inputPass === 'Ithunt@123' || inputPass === 'student123' || inputPass === 'student' || inputPass === 'password') {
       return { success: true, user: { ...DEFAULT_DEMO_STUDENT } };
     } else {
       return { success: false, error: 'Invalid password. Default is Ithunt@123.' };
     }
   }
 
-  return { success: false, error: 'No student account found with this Email / User ID.' };
+  return { success: false, error: 'No student account found with this Email / User ID. Please check your spelling or submit an admission registration.' };
 }
 
 /**

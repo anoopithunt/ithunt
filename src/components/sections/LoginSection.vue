@@ -83,7 +83,7 @@
           <form v-if="studentMode === 'login'" @submit.prevent="handleStudentLoginSubmit" class="login-form">
             <div class="form-group" style="margin-bottom: 1.25rem;">
               <label class="form-label" for="student-email">
-                <span>📧</span> Registered Email or Reg No <span class="req">*</span>
+                <span>📧</span> Student Email / Username <span class="req">*</span>
               </label>
               <input 
                 id="student-email"
@@ -91,7 +91,7 @@
                 v-model="studentLoginEmail" 
                 required 
                 class="form-control" 
-                placeholder="student@ithunt.com or ITH-2026-001"
+                placeholder="your.email@example.com or ITH-2026-001"
                 autocomplete="username"
               >
             </div>
@@ -116,9 +116,12 @@
                 v-model="studentLoginPassword" 
                 required 
                 class="form-control" 
-                placeholder="Enter student password"
+                placeholder="Default password is Ithunt@123"
                 autocomplete="current-password"
               >
+              <small style="display: block; margin-top: 0.4rem; color: #38bdf8; font-size: 0.78rem; font-weight: 600;">
+                💡 Registered for Admission? Username = <strong>Email</strong> • Default Password = <strong>Ithunt@123</strong>
+              </small>
             </div>
 
             <div class="login-options-row">
@@ -376,7 +379,7 @@ const handleStudentLoginSubmit = async () => {
       isLoading.value = false;
       emit('student-login-success', studentUser);
       return;
-    } else if (apiRes && apiRes.error && apiRes.error.toLowerCase().includes('password')) {
+    } else if (apiRes && apiRes.error) {
       isLoading.value = false;
       errorMessage.value = apiRes.error;
       return;

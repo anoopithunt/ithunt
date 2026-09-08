@@ -72,7 +72,7 @@
             </div>
             <div>
               <span style="color: var(--text-muted); font-size: 0.72rem; display: block;">Default Password:</span>
-              <strong style="color: #34d399; font-family: var(--font-mono); font-size: 0.95rem;">Ithunt@123</strong>
+              <strong style="color: #34d399; font-family: var(--font-mono); font-size: 0.95rem;">{{ admission.password || 'Ithunt@123' }}</strong>
             </div>
           </div>
           <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.35rem;">
@@ -82,6 +82,16 @@
       </div>
 
       <div class="modal-actions-group" style="display: flex; flex-wrap: wrap; gap: 0.6rem;">
+        <button 
+          v-if="admission" 
+          class="btn-primary login-direct-btn" 
+          style="width: 100%; justify-content: center; background: linear-gradient(135deg, var(--color-ai-orange), #ea580c); font-weight: 800; padding: 0.8rem 1.25rem; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);"
+          @click="$emit('login-as-student', admission)"
+          title="Sign in directly to your personalized Student Dashboard"
+        >
+          <span>🎓 Sign In as Student Now →</span>
+        </button>
+
         <button 
           v-if="admission" 
           class="btn-primary pdf-download-btn" 
@@ -170,7 +180,7 @@ defineProps({
   }
 });
 
-defineEmits(['close', 'download-pdf', 'print-slip']);
+defineEmits(['close', 'download-pdf', 'print-slip', 'login-as-student']);
 
 const openStudentGmailLetter = (adm) => {
   if (!adm) return;
