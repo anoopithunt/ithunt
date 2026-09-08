@@ -6,7 +6,7 @@
         <div class="hero-content anim-stagger-1">
           <div class="hero-badge">
             <span class="hero-badge-dot"></span>
-            <span>{{ content.hero?.badgeText }}</span>
+            <span class="hero-badge-text">{{ content.hero?.badgeText }}</span>
           </div>
           <h1 class="hero-title">
             {{ content.hero?.titlePrefix }}<span class="text-gradient">{{ content.hero?.titleGradient }}</span>
@@ -52,9 +52,9 @@
           
           <div class="hero-floating-badge">
             <div class="hero-floating-icon">💼</div>
-            <div>
-              <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-main);">{{ content.hero?.floatingBadgeTitle }}</div>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">{{ content.hero?.floatingBadgeSubtitle }}</div>
+            <div class="hero-floating-text">
+              <div class="hero-floating-title">{{ content.hero?.floatingBadgeTitle }}</div>
+              <div class="hero-floating-sub">{{ content.hero?.floatingBadgeSubtitle }}</div>
             </div>
           </div>
         </div>
@@ -72,37 +72,37 @@
     </div>
 
     <!-- Internship Spotlight Banner -->
-    <div class="container reveal-on-scroll reveal-delay-1" style="margin-bottom: 4rem;">
+    <div class="container reveal-on-scroll reveal-delay-1 home-section-spacer">
       <div class="internship-banner">
         <div>
           <span class="duration-pill">{{ content.internshipVenture?.spotlightBadge }}</span>
-          <h2 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; margin-bottom: 0.85rem;">
+          <h2 class="spotlight-banner-heading">
             {{ content.internshipVenture?.spotlightTitlePrefix }}<span class="text-gradient">{{ content.internshipVenture?.spotlightTitleGradient }}</span>
           </h2>
-          <p style="color: var(--text-muted); line-height: 1.7; margin-bottom: 1.25rem; font-size: 0.95rem;">
+          <p class="spotlight-banner-desc">
             {{ content.internshipVenture?.spotlightDesc }}
           </p>
-          <button class="btn-primary" @click="$emit('set-tab', 'internships')">
-            {{ content.homeSpotlights?.internshipBanner?.ctaBtn || 'Apply for Internship Track →' }}
+          <button class="btn-primary banner-cta-btn" @click="$emit('set-tab', 'internships')">
+            <span>{{ content.homeSpotlights?.internshipBanner?.ctaBtn || 'Apply for Internship Track →' }}</span>
           </button>
         </div>
         <div class="spotlight-sub-grid">
-          <div style="background: var(--bg-card-glass); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-cyber); text-align: center;">
-            <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">⚡</div>
-            <div style="font-weight: 800; font-size: 0.95rem;">{{ content.homeSpotlights?.internshipBanner?.track3MoTitle || '3-Month Track' }}</div>
-            <div style="font-size: 0.75rem; color: var(--text-muted);">{{ content.homeSpotlights?.internshipBanner?.track3MoDesc || 'Fast-track Skill Acceleration' }}</div>
+          <div class="spotlight-sub-card">
+            <div class="spotlight-icon">⚡</div>
+            <div class="spotlight-card-title">{{ content.homeSpotlights?.internshipBanner?.track3MoTitle || '3-Month Track' }}</div>
+            <div class="spotlight-card-desc">{{ content.homeSpotlights?.internshipBanner?.track3MoDesc || 'Fast-track Skill Acceleration' }}</div>
           </div>
-          <div style="background: var(--bg-card-glass); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-cyber); text-align: center;">
-            <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">🚀</div>
-            <div style="font-weight: 800; font-size: 0.95rem;">{{ content.homeSpotlights?.internshipBanner?.track6MoTitle || '6-Month Track' }}</div>
-            <div style="font-size: 0.75rem; color: var(--text-muted);">{{ content.homeSpotlights?.internshipBanner?.track6MoDesc || 'Complete Industry Masterclass' }}</div>
+          <div class="spotlight-sub-card">
+            <div class="spotlight-icon">🚀</div>
+            <div class="spotlight-card-title">{{ content.homeSpotlights?.internshipBanner?.track6MoTitle || '6-Month Track' }}</div>
+            <div class="spotlight-card-desc">{{ content.homeSpotlights?.internshipBanner?.track6MoDesc || 'Complete Industry Masterclass' }}</div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Featured Programs Preview -->
-    <div class="container reveal-on-scroll reveal-delay-1" style="padding-bottom: 4rem;">
+    <div class="container reveal-on-scroll reveal-delay-1 home-section-spacer">
       <div class="section-header">
         <span class="section-tag">{{ content.coursesSection?.tagline }}</span>
         <h2 class="section-title">{{ content.coursesSection?.titlePrefix }}<span class="text-gradient">{{ content.coursesSection?.titleGradient }}</span></h2>
@@ -131,37 +131,37 @@
     </div>
 
     <!-- Campus Events & Hackathons Spotlight on Home Tab -->
-    <div class="container reveal-on-scroll reveal-delay-2" style="padding-bottom: 4rem;">
-      <div class="internship-banner" style="background: linear-gradient(135deg, rgba(249, 115, 22, 0.18), rgba(250, 204, 21, 0.12));">
+    <div class="container reveal-on-scroll reveal-delay-2 home-section-spacer">
+      <div class="internship-banner events-spotlight-banner">
         <div>
           <span class="duration-pill">{{ content.homeSpotlights?.eventsBanner?.pillBadge || '🎪 CAMPUS EVENTS & GALLERY 2026' }}</span>
-          <h2 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; margin-bottom: 0.85rem;">
+          <h2 class="spotlight-banner-heading">
             {{ content.homeSpotlights?.eventsBanner?.titlePrefix || 'Where Tech Innovation Meets ' }}<span class="text-gradient">{{ content.homeSpotlights?.eventsBanner?.titleGradient || 'Celebration' }}</span>
           </h2>
-          <p style="color: var(--text-muted); line-height: 1.7; margin-bottom: 1.25rem; font-size: 0.95rem;">
+          <p class="spotlight-banner-desc">
             {{ content.homeSpotlights?.eventsBanner?.desc }}
           </p>
-          <button class="btn-primary" @click="$emit('set-tab', 'events')">
+          <button class="btn-primary banner-cta-btn" @click="$emit('set-tab', 'events')">
             <span>{{ content.homeSpotlights?.eventsBanner?.ctaBtn || 'Explore Events & Media Gallery 🎪 →' }}</span>
           </button>
         </div>
         <div class="spotlight-sub-grid">
-          <div style="background: var(--bg-card-glass); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-cyber); text-align: center; cursor: pointer;" @click="$emit('set-tab', 'events')">
-            <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">💻</div>
-            <div style="font-weight: 800; font-size: 0.95rem;">{{ content.homeSpotlights?.eventsBanner?.box1Title || 'Hackathons' }}</div>
-            <div style="font-size: 0.75rem; color: var(--text-muted);">{{ content.homeSpotlights?.eventsBanner?.box1Desc || '24-Hr Coding Sprints' }}</div>
+          <div class="spotlight-sub-card clickable" @click="$emit('set-tab', 'events')">
+            <div class="spotlight-icon">💻</div>
+            <div class="spotlight-card-title">{{ content.homeSpotlights?.eventsBanner?.box1Title || 'Hackathons' }}</div>
+            <div class="spotlight-card-desc">{{ content.homeSpotlights?.eventsBanner?.box1Desc || '24-Hr Coding Sprints' }}</div>
           </div>
-          <div style="background: var(--bg-card-glass); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-cyber); text-align: center; cursor: pointer;" @click="$emit('set-tab', 'events')">
-            <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">🏆</div>
-            <div style="font-weight: 800; font-size: 0.95rem;">{{ content.homeSpotlights?.eventsBanner?.box2Title || 'Convocation' }}</div>
-            <div style="font-size: 0.75rem; color: var(--text-muted);">{{ content.homeSpotlights?.eventsBanner?.box2Desc || 'Awards & Degrees' }}</div>
+          <div class="spotlight-sub-card clickable" @click="$emit('set-tab', 'events')">
+            <div class="spotlight-icon">🏆</div>
+            <div class="spotlight-card-title">{{ content.homeSpotlights?.eventsBanner?.box2Title || 'Convocation' }}</div>
+            <div class="spotlight-card-desc">{{ content.homeSpotlights?.eventsBanner?.box2Desc || 'Awards & Degrees' }}</div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- 1. ABOUT US SECTION -->
-    <div style="background: rgba(15, 23, 42, 0.4); border-top: 1px solid var(--border-cyber); padding: 4rem 0;">
+    <div class="about-wrapper-band">
       <div class="container">
         <div class="about-grid reveal-on-scroll">
           <div class="about-card-stack">
@@ -170,12 +170,13 @@
           </div>
           <div class="about-text-content">
             <span class="section-tag">{{ content.about?.tagline }}</span>
-            <h2>{{ content.about?.titlePrefix }}<span class="text-gradient">{{ content.about?.titleGradient }}</span></h2>
-            <p>{{ content.about?.description }}</p>
+            <h2 class="about-title">{{ content.about?.titlePrefix }}<span class="text-gradient">{{ content.about?.titleGradient }}</span></h2>
+            <p class="about-desc">{{ content.about?.description }}</p>
 
             <div class="about-features-list">
               <div class="about-feature-item" v-for="feat in content.about?.features" :key="feat">
-                <span class="about-check-icon">✓</span> {{ feat.replace('✓ ', '') }}
+                <span class="about-check-icon">✓</span>
+                <span>{{ feat.replace('✓ ', '') }}</span>
               </div>
             </div>
           </div>
@@ -187,14 +188,14 @@
           <div class="director-spotlight-card protected-img-wrapper">
             <div class="protected-img-overlay" @contextmenu.prevent></div>
             <img :src="content.director?.image" :alt="content.director?.name" class="director-img protected-img" draggable="false" @contextmenu.prevent @dragstart.prevent @error="onImgError">
-            <div>
+            <div class="director-info-body">
               <span class="section-tag">{{ content.director?.tagline }}</span>
-              <h3 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; margin-bottom: 0.3rem;">{{ content.director?.name }}</h3>
-              <div style="color: var(--color-ai-cyan); font-weight: 700; margin-bottom: 0.65rem; font-size: 0.85rem; font-family: var(--font-mono);">{{ content.director?.title }}</div>
-              <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 0.85rem; font-size: 0.9rem;">
+              <h3 class="director-name">{{ content.director?.name }}</h3>
+              <div class="director-title">{{ content.director?.title }}</div>
+              <p class="director-message">
                 "{{ content.director?.message }}"
               </p>
-              <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+              <div class="director-skills">
                 <span class="skill-tag" v-for="sk in content.director?.skills" :key="sk">{{ sk }}</span>
               </div>
             </div>
@@ -204,14 +205,14 @@
           <div class="director-spotlight-card protected-img-wrapper" v-if="content.coFounder">
             <div class="protected-img-overlay" @contextmenu.prevent></div>
             <img :src="content.coFounder?.image" :alt="content.coFounder?.name" class="director-img protected-img" draggable="false" @contextmenu.prevent @dragstart.prevent @error="onImgError">
-            <div>
+            <div class="director-info-body">
               <span class="section-tag">{{ content.coFounder?.tagline }}</span>
-              <h3 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; margin-bottom: 0.3rem;">{{ content.coFounder?.name }}</h3>
-              <div style="color: var(--color-ai-yellow); font-weight: 700; margin-bottom: 0.65rem; font-size: 0.85rem; font-family: var(--font-mono);">{{ content.coFounder?.title }}</div>
-              <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 0.85rem; font-size: 0.9rem;">
+              <h3 class="director-name">{{ content.coFounder?.name }}</h3>
+              <div class="director-title cofounder-title">{{ content.coFounder?.title }}</div>
+              <p class="director-message">
                 "{{ content.coFounder?.message }}"
               </p>
-              <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+              <div class="director-skills">
                 <span class="skill-tag" v-for="sk in content.coFounder?.skills" :key="sk">{{ sk }}</span>
               </div>
             </div>
@@ -221,7 +222,7 @@
     </div>
 
     <!-- 2. FACULTY TEAM SECTION -->
-    <div style="padding: 4rem 0; border-top: 1px solid var(--border-cyber);">
+    <div class="faculty-wrapper-band">
       <div class="container">
         <div class="section-header reveal-on-scroll">
           <span class="section-tag">{{ content.teamSection?.tagline }}</span>
