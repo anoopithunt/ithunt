@@ -143,6 +143,8 @@
           :isGeneratingPdf="isGeneratingPdf" 
           @submit-admission="submitAdmission" 
           @download-pdf="downloadAdmissionPdf" 
+          @login-as-student="handleLoginAsStudent"
+          @go-to-login="activeTab = 'login'"
         />
 
         <!-- 9. Unified Portal Login View (Student & Admin) -->
@@ -265,6 +267,7 @@
       @close="showModal = false" 
       @download-pdf="downloadAdmissionPdf" 
       @print-slip="printAdmissionSlip" 
+      @login-as-student="handleLoginAsStudent"
     />
 
     <!-- Hidden Printable Slip for Browser Print Engine -->
@@ -424,6 +427,7 @@
 <script setup>
 import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import CONTENT_DATA from './data/contentData.js';
+import { DEFAULT_DEMO_STUDENT } from './data/studentAcademicData.js';
 import { generateAdmissionPdf, generatePrivacyPolicyPdf, generateTermsConditionsPdf, getAdmissionPdfBlob } from './utils/pdfGenerator.js';
 import { generateNielitProjectPdf, getNielitProjectPdfBlob } from './utils/nielitPdfGenerator.js';
 import { sendAdmissionEmailNotification, sendJobEmailNotification, sendRsvpEmailNotification, sendNielitProjectEmailNotification } from './utils/emailNotifier.js';
@@ -901,6 +905,9 @@ const submitAdmission = async (formData) => {
   const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
+  const normEmail = (formData.email || '').toLowerCase().trim();
+  const studentPassword = (formData.password || '').trim() || 'Ithunt@123';
+
   const newAdmissionRecord = {
     registrationNo: randomRegId,
     date: dateStr,
@@ -916,12 +923,14 @@ const submitAdmission = async (formData) => {
     qualification: formData.qualification || '',
     mobile: formData.mobile || formData.phone || '',
     phone: formData.phone || formData.mobile || '',
-    email: formData.email || '',
-    userId: formData.email || '',
-    password: 'Ithunt@123',
+    email: normEmail,
+    userId: normEmail,
+    password: studentPassword,
     district: formData.district || 'PRAYAGRAJ',
     address: formData.address || '',
-    status: 'Confirmed'
+    status: 'Confirmed',
+    feeStatus: 'Verified & Paid',
+    role: 'student'
   };
 
   // Save admission record to Firebase Cloud (Firestore + Realtime DB)
@@ -950,7 +959,7 @@ const submitAdmission = async (formData) => {
     saveStudentAccount(newAdmissionRecord);
 
     modalTitle.value = '🎉 Admission Application Submitted Successfully!';
-    modalBody.value = `Congratulations ${newAdmissionRecord.candidateName}! Your student admission for "${newAdmissionRecord.course}" has been successfully submitted.\n\n📋 Registration No: ${finalRegNo}\n🔑 Student Portal User ID: ${newAdmissionRecord.email}\n🔒 Default Password: Ithunt@123 (You can change this from your Student Dashboard)\n\n✉️ Confirmation details sent to ${newAdmissionRecord.email}.`;
+    modalBody.value = `Congratulations ${newAdmissionRecord.candidateName}! Your student admission for "${newAdmissionRecord.course}" has been successfully submitted.\n\n📋 Registration No: ${finalRegNo}\n🔑 Student Portal Username: ${newAdmissionRecord.email}\n🔒 Default Password: ${studentPassword}\n\n✉️ Confirmation details sent to ${newAdmissionRecord.email}.`;
     showModal.value = true;
     triggerConfetti();
   } else {
@@ -958,6 +967,34 @@ const submitAdmission = async (formData) => {
     modalBody.value = `Error submitting admission application: ${apiRes?.error || 'Unable to complete submission'}. Please verify your connection and try again.`;
     showModal.value = true;
   }
+};
+
+const handleLoginAsStudent = (admission) => {
+  if (!admission) return;
+  const normEmail = (admission.email || admission.userId || '').toLowerCase().trim();
+  const currentStudent = {
+    ...DEFAULT_DEMO_STUDENT,
+    ...admission,
+    userId: normEmail,
+    email: normEmail,
+    password: admission.password || 'Ithunt@123',
+    candidateName: admission.candidateName || admission.fullName || 'Student',
+    fullName: admission.fullName || admission.candidateName || 'Student',
+    registrationNo: admission.registrationNo || admission.id || 'ITH-2026-001',
+    status: admission.status || 'Active & Confirmed ✓',
+    course: admission.course || '3-Month MERN Stack Web Engineer'
+  };
+
+  saveStudentAccount(currentStudent);
+  studentUser.value = currentStudent;
+  try {
+    localStorage.setItem('ithunt_student_user', JSON.stringify(currentStudent));
+  } catch (e) {}
+
+  showModal.value = false;
+  activeTab.value = 'student-portal';
+  triggerConfetti();
+  showToast(`Welcome ${currentStudent.candidateName}! Logged into Student Dashboard.`, 'success');
 };
 
 const handleLoginSuccess = (user) => {
