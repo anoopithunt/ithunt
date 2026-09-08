@@ -13,14 +13,14 @@
         <p style="font-size: 0.875rem; line-height: 1.7; color: var(--text-muted);">
           {{ content.footer?.aboutText }}
         </p>
-        <div style="margin-top: 1.15rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-          <a href="#" @click.prevent="$emit('set-tab', 'reviews')" class="skill-tag" style="background: rgba(250, 204, 21, 0.15); color: var(--color-ai-yellow); border-color: rgba(250, 204, 21, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.9rem; font-weight: 800; font-size: 0.825rem; border-radius: var(--radius-full);">
+        <div class="footer-action-chips">
+          <a href="#" @click.prevent="$emit('set-tab', 'reviews')" class="skill-tag footer-chip footer-chip-yellow">
             {{ content.footerSections?.reviewRatingBadge || '⭐ Student Reviews & Ratings (4.9 / 5.0) →' }}
           </a>
-          <a href="#" @click.prevent="$emit('set-tab', 'careers')" class="skill-tag" style="background: rgba(249, 115, 22, 0.15); color: var(--color-ai-orange); border-color: rgba(249, 115, 22, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.9rem; font-weight: 800; font-size: 0.825rem; border-radius: var(--radius-full);">
+          <a href="#" @click.prevent="$emit('set-tab', 'careers')" class="skill-tag footer-chip footer-chip-orange">
             💼 We Are Hiring (Teachers & Devs) →
           </a>
-          <a href="#" @click.prevent="$emit('set-tab', 'login')" class="skill-tag" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.9rem; font-weight: 800; font-size: 0.825rem; border-radius: var(--radius-full);">
+          <a href="#" @click.prevent="$emit('set-tab', 'login')" class="skill-tag footer-chip footer-chip-green">
             🔐 SuperAdmin Portal →
           </a>
         </div>
