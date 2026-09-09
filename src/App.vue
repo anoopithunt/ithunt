@@ -1060,46 +1060,20 @@ const handleDeleteAdmission = async (adm) => {
     a.registrationNo !== altId && 
     a.id !== altId
   );
-  try {
-    const cached = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
-    const filtered = cached.filter(a => 
-      a.registrationNo !== idToDelete && 
-      a.id !== idToDelete && 
-      a.registrationNo !== altId && 
-      a.id !== altId
-    );
-    localStorage.setItem('ithunt_admissions', JSON.stringify(filtered));
-  } catch (e) {}
   await deleteAdmissionFromBackend(adm);
 };
 
-const handleUpdateNielitProject = (updatedProject) => {
+const handleUpdateNielitProject = async (updatedProject) => {
   const targetId = updatedProject.registrationNo || updatedProject.nielitRegNo;
   const idx = liveNielitProjectsList.value.findIndex(p => p.registrationNo === targetId || p.nielitRegNo === targetId);
   if (idx !== -1) {
     liveNielitProjectsList.value[idx] = { ...liveNielitProjectsList.value[idx], ...updatedProject };
   }
-  try {
-    const existing = JSON.parse(localStorage.getItem('ithunt_nielit_projects') || '[]');
-    const eIdx = existing.findIndex(p => p.registrationNo === targetId || p.nielitRegNo === targetId);
-    if (eIdx !== -1) {
-      existing[eIdx] = { ...existing[eIdx], ...updatedProject };
-      localStorage.setItem('ithunt_nielit_projects', JSON.stringify(existing));
-    }
-  } catch (e) {}
+  await updateNielitProjectInBackend(targetId, updatedProject);
 };
 
-const handleDeleteNielitProject = (project) => {
+const handleDeleteNielitProject = async (project) => {
   const targetId = project.registrationNo || project.nielitRegNo || project.id;
-  try {
-    const deleted = JSON.parse(localStorage.getItem('ithunt_deleted_nielit_ids') || '[]');
-    if (project.registrationNo && !deleted.includes(project.registrationNo)) deleted.push(project.registrationNo);
-    if (project.nielitRegNo && !deleted.includes(project.nielitRegNo)) deleted.push(project.nielitRegNo);
-    if (project.id && !deleted.includes(project.id)) deleted.push(project.id);
-    if (targetId && !deleted.includes(targetId)) deleted.push(targetId);
-    localStorage.setItem('ithunt_deleted_nielit_ids', JSON.stringify(deleted));
-  } catch (e) {}
-
   liveNielitProjectsList.value = liveNielitProjectsList.value.filter(p => 
     p.registrationNo !== targetId && 
     p.nielitRegNo !== targetId && 
@@ -1108,18 +1082,7 @@ const handleDeleteNielitProject = (project) => {
     p.nielitRegNo !== project.nielitRegNo && 
     p.id !== project.id
   );
-  try {
-    const existing = JSON.parse(localStorage.getItem('ithunt_nielit_projects') || '[]');
-    const filtered = existing.filter(p => 
-      p.registrationNo !== targetId && 
-      p.nielitRegNo !== targetId && 
-      p.id !== targetId &&
-      p.registrationNo !== project.registrationNo && 
-      p.nielitRegNo !== project.nielitRegNo && 
-      p.id !== project.id
-    );
-    localStorage.setItem('ithunt_nielit_projects', JSON.stringify(filtered));
-  } catch (e) {}
+  await deleteNielitProjectFromBackend(targetId);
 };
 
 const downloadCustomAdmissionSlip = (adm) => {
@@ -1218,6 +1181,35 @@ watch(activeTab, (newTab) => {
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true });
   handleScroll();
+
+  // Clear any legacy stale data caches from localStorage so UI displays 100% directly from database
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const STALE_DATA_KEYS = [
+      'ithunt_admissions',
+      'ithunt_students',
+      'ithunt_student_accounts',
+      'ithunt_nielit_projects',
+      'ithunt_nielit_cache',
+      'ithunt_job_applications',
+      'ithunt_careers_cache',
+      'ithunt_rsvps',
+      'ithunt_rsvps_cache',
+      'ithunt_reviews',
+      'ithunt_internships',
+      'ithunt_fees',
+      'ithunt_certificates',
+      'ithunt_projects',
+      'ithunt_contact_inquiries',
+      'ithunt_users',
+      'ithunt_deleted_admission_ids',
+      'ithunt_deleted_nielit_ids',
+      'ithunt_deleted_job_ids',
+      'ithunt_deleted_rsvp_ids'
+    ];
+    try {
+      STALE_DATA_KEYS.forEach(k => localStorage.removeItem(k));
+    } catch (e) {}
+  }
 
   // Restore saved admin session if any
   try {

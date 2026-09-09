@@ -361,17 +361,15 @@ export function setupRealtimeFirebaseListeners(callbacks = {}) {
             snapshot.forEach(docSnap => {
               records.push({ id: docSnap.id, ...docSnap.data() });
             });
-            // Directly visible from database: deduplicate admissions cleanly by registration number or id
-            let finalRecords = records;
-            if (name === 'admissions') {
-              const map = new Map();
-              records.forEach(r => {
-                const key = String(r.registrationNo || r.registrationNumber || r.id || '').trim();
-                if (key) map.set(key, r);
-              });
-              finalRecords = Array.from(map.values());
-            }
-            const normalized = normalizer ? finalRecords.map(normalizer) : finalRecords;
+            // Deduplicate records directly from Firestore by primary identifier
+            const uniqueMap = new Map();
+            records.forEach(r => {
+              const k = String(r.registrationNo || r.nielitRegNo || r.enrollmentNumber || r.id || '').trim();
+              if (k) uniqueMap.set(k, r);
+              else uniqueMap.set(String(records.indexOf(r)), r);
+            });
+            const deduplicated = Array.from(uniqueMap.values());
+            const normalized = normalizer ? deduplicated.map(normalizer) : deduplicated;
             callback(normalized);
           }, (err) => {
             console.warn(`Realtime Firestore listener notice (${name}):`, err.message);
@@ -641,17 +639,8 @@ export async function saveAdmissionRecord(data) {
   const cleanId = String(finalRegNo).replace(/\//g, '_');
   const cleanEmail = normEmail ? normEmail.replace(/[@.]/g, '_') : null;
 
-  // 1. Save directly to Firebase Cloud Firestore and Realtime DB (admissions collection)
+  // 1. Save directly to Firebase Cloud Firestore (admissions collection) using registration ID
   await saveToFirebaseCloud('admissions', cleanId, finalRecord);
-  if (cleanId !== String(finalRegNo)) {
-    await saveToFirebaseCloud('admissions', String(finalRegNo), finalRecord);
-  }
-  if (cleanEmail) {
-    await saveToFirebaseCloud('admissions', cleanEmail, finalRecord);
-  }
-  if (payload.id && payload.id !== finalRegNo) {
-    await saveToFirebaseCloud('admissions', String(payload.id).replace(/\//g, '_'), finalRecord);
-  }
 
   // 2. Save directly to students collection in Firebase Cloud
   const studentDoc = {
@@ -670,11 +659,8 @@ export async function saveAdmissionRecord(data) {
     status: 'Confirmed'
   };
   await saveToFirebaseCloud('students', cleanId, studentDoc);
-  if (cleanEmail) {
-    await saveToFirebaseCloud('students', cleanEmail, studentDoc);
-  }
 
-  // 3. Save to users collection in Firebase Cloud with email as username and password
+  // 3. Save directly to users collection in Firebase Cloud for student login
   if (cleanEmail) {
     const userDoc = {
       id: cleanEmail,
@@ -692,12 +678,11 @@ export async function saveAdmissionRecord(data) {
       createdAt: new Date().toISOString()
     };
     await saveToFirebaseCloud('users', cleanEmail, userDoc);
-    await saveToFirebaseCloud('users', cleanId, userDoc);
   }
 
-  // 4. Ensure Student Portal User Account exists in database with email as userId and default password
+  // 4. Ensure Student Portal User Account exists in users collection
   if (finalRecord.email) {
-    await saveStudentAccount(finalRecord);
+    saveStudentAccount(finalRecord);
   }
 
   return {
@@ -709,50 +694,52 @@ export async function saveAdmissionRecord(data) {
 }
 
 /**
- * Fetch all stored Admissions directly from connected database (Firebase Cloud Firestore & REST API)
- * Zero cache: always reflects live database state
+ * Fetch all stored Admissions directly from Firebase Cloud Firestore & REST backend (NO CACHE)
  */
 export async function fetchAdmissionsFromBackend() {
   let list = [];
 
-  try {
-    const data = await API.getAdmissions();
-    const rawList = Array.isArray(data?.admissions) 
-      ? data.admissions 
-      : (Array.isArray(data) ? data : []);
-
-    if (rawList.length > 0) {
-      list = rawList;
-    }
-  } catch (e) {
-    console.warn('Notice loading admissions from REST API:', e.message);
-  }
-
-  // Fetch live records directly from Firebase Cloud Firestore
+  // 1. Fetch live records directly from Firebase Cloud Firestore
   try {
     const fbRecords = await fetchFromFirebaseCloud('admissions');
     if (fbRecords.length > 0) {
-      const map = new Map();
-      list.forEach(a => {
-        const key = String(a.registrationNo || a.registrationNumber || a.id || '').trim();
-        if (key) map.set(key, a);
-      });
-      fbRecords.forEach(a => {
-        const key = String(a.registrationNo || a.registrationNumber || a.id || '').trim();
-        if (key) {
-          map.set(key, { ...map.get(key), ...a });
-        }
-      });
-      list = Array.from(map.values());
+      list = fbRecords;
     }
-  } catch (e) {}
+  } catch (e) {
+    console.warn('Notice loading admissions from Firebase Cloud:', e.message);
+  }
 
-  return list.map(normalizeAdmission);
+  // 2. Merge with REST API if configured
+  if (API_BASE_URL) {
+    try {
+      const data = await API.getAdmissions();
+      const rawList = Array.isArray(data?.admissions) 
+        ? data.admissions 
+        : (Array.isArray(data) ? data : []);
+
+      if (rawList.length > 0) {
+        const map = new Map();
+        list.forEach(a => map.set(String(a.registrationNo || a.id), a));
+        rawList.forEach(a => map.set(String(a.registrationNo || a.id), { ...map.get(String(a.registrationNo || a.id)), ...a }));
+        list = Array.from(map.values());
+      }
+    } catch (e) {
+      console.warn('Notice loading admissions from REST API:', e.message);
+    }
+  }
+
+  // Deduplicate records directly from database
+  const uniqueMap = new Map();
+  list.forEach(a => {
+    const reg = String(a.registrationNo || a.registrationNumber || a.id || '').trim();
+    if (reg) uniqueMap.set(reg, a);
+  });
+
+  return Array.from(uniqueMap.values()).map(normalizeAdmission);
 }
 
 /**
- * Delete admission record directly from connected database (Firebase Firestore, Realtime DB, and REST API)
- * Zero cache: record is immediately removed from cloud database
+ * Delete admission record directly from connected database (Firebase Firestore & REST API)
  */
 export async function deleteAdmissionFromBackend(adm) {
   if (!adm) return { success: false };
@@ -768,7 +755,7 @@ export async function deleteAdmissionFromBackend(adm) {
     idsToTry.push(String(id).replace(/\//g, '_'));
   });
 
-  // 1. Delete from Firebase Cloud (Firestore + Realtime DB) for 'admissions' and 'students'
+  // 1. Delete directly from Firebase Cloud (Firestore + Realtime DB) for 'admissions' and 'students'
   for (const id of Array.from(new Set(idsToTry))) {
     await deleteFromFirebaseCloud('admissions', id);
     await deleteFromFirebaseCloud('students', id);
@@ -838,37 +825,41 @@ export async function saveJobApplicationRecord(data) {
 export async function fetchJobApplicationsFromBackend() {
   let list = [];
 
-  // 1. Try REST API
-  try {
-    const data = await API.getCareers();
-    const rawList = Array.isArray(data?.applications) 
-      ? data.applications 
-      : (Array.isArray(data) ? data : []);
-    if (rawList.length > 0) list = rawList;
-  } catch (e) {
-    console.warn('Notice loading job applications from API:', e.message);
-  }
-
-  // 2. Fetch & merge from Firebase Cloud
+  // 1. Fetch live records directly from Firebase Cloud
   try {
     const fbRecords = await fetchFromFirebaseCloud('job_applications');
     if (fbRecords.length > 0) {
-      const map = new Map();
-      list.forEach(j => map.set(j.id, j));
-      fbRecords.forEach(j => {
-        if (j.id) map.set(j.id, { ...map.get(j.id), ...j });
-      });
-      list = Array.from(map.values());
+      list = fbRecords;
     }
   } catch (e) {
     console.warn('Notice loading job applications from Firebase Cloud:', e.message);
+  }
+
+  // 2. Merge with REST API if configured
+  if (API_BASE_URL) {
+    try {
+      const data = await API.getCareers();
+      const rawList = Array.isArray(data?.applications) 
+        ? data.applications 
+        : (Array.isArray(data) ? data : []);
+      if (rawList.length > 0) {
+        const map = new Map();
+        list.forEach(j => map.set(j.id, j));
+        rawList.forEach(j => {
+          if (j.id) map.set(j.id, { ...map.get(j.id), ...j });
+        });
+        list = Array.from(map.values());
+      }
+    } catch (e) {
+      console.warn('Notice loading job applications from API:', e.message);
+    }
   }
 
   return list.map(normalizeJobApplication);
 }
 
 /**
- * Submit student review to backend REST API
+ * Submit student review to backend REST API & Firebase Cloud (Direct DB)
  */
 export async function submitReviewToBackend(data) {
   const docId = data.id || `REV-${Date.now()}`;
@@ -898,31 +889,35 @@ export async function submitReviewToBackend(data) {
 export const saveReviewRecord = submitReviewToBackend;
 
 /**
- * Fetch verified public student reviews from backend REST API & Firebase Cloud
+ * Fetch verified public student reviews directly from Firebase Cloud & REST API (NO CACHE)
  */
 export async function fetchReviewsFromBackend() {
   let list = [];
 
   try {
-    const data = await API.getReviews();
-    const rawList = Array.isArray(data?.reviews) ? data.reviews : (Array.isArray(data) ? data : []);
-    if (rawList.length > 0) list = rawList;
-  } catch (error) {
-    console.warn('Backend API connection warning (Fetch Reviews):', error.message);
-  }
-
-  try {
     const fbRecords = await fetchFromFirebaseCloud('reviews');
     if (fbRecords.length > 0) {
-      const map = new Map();
-      list.forEach(r => map.set(r.id || r.name, r));
-      fbRecords.forEach(r => {
-        const k = r.id || r.name;
-        map.set(k, { ...map.get(k), ...r });
-      });
-      list = Array.from(map.values());
+      list = fbRecords;
     }
   } catch (e) {}
+
+  if (API_BASE_URL) {
+    try {
+      const data = await API.getReviews();
+      const rawList = Array.isArray(data?.reviews) ? data.reviews : (Array.isArray(data) ? data : []);
+      if (rawList.length > 0) {
+        const map = new Map();
+        list.forEach(r => map.set(r.id || r.name, r));
+        rawList.forEach(r => {
+          const k = r.id || r.name;
+          map.set(k, { ...map.get(k), ...r });
+        });
+        list = Array.from(map.values());
+      }
+    } catch (error) {
+      console.warn('Backend API connection warning (Fetch Reviews):', error.message);
+    }
+  }
 
   return list.map(normalizeReview);
 }
@@ -977,39 +972,43 @@ export async function saveNielitProjectRecord(data) {
 }
 
 /**
- * Fetch all stored NIELIT Projects directly from backend REST API & Firebase Cloud
+ * Fetch all stored NIELIT Projects directly from Firebase Cloud & REST API (NO CACHE)
  */
 export async function fetchNielitProjectsFromBackend() {
   let list = [];
 
-  // 1. Try REST API
-  try {
-    const data = await API.getNielitProjects();
-    const rawList = Array.isArray(data?.projects) 
-      ? data.projects 
-      : (Array.isArray(data) ? data : []);
-    if (rawList.length > 0) list = rawList;
-  } catch (e) {
-    console.warn('Notice loading nielit projects from API:', e.message);
-  }
-
-  // 2. Fetch & merge from Firebase Cloud (Firestore & Realtime DB)
+  // 1. Fetch & merge from Firebase Cloud (Firestore & Realtime DB)
   try {
     const fbRecords = await fetchFromFirebaseCloud('nielit_projects');
     if (fbRecords.length > 0) {
-      const map = new Map();
-      list.forEach(p => {
-        const k = String(p.nielitRegNo || p.registrationNo || p.regNo || p.id || '').trim();
-        if (k) map.set(k, p);
-      });
-      fbRecords.forEach(p => {
-        const k = String(p.nielitRegNo || p.registrationNo || p.regNo || p.id || '').trim();
-        if (k) map.set(k, { ...map.get(k), ...p });
-      });
-      list = Array.from(map.values());
+      list = fbRecords;
     }
   } catch (e) {
     console.warn('Notice loading nielit projects from Firebase Cloud:', e.message);
+  }
+
+  // 2. Try REST API if configured
+  if (API_BASE_URL) {
+    try {
+      const data = await API.getNielitProjects();
+      const rawList = Array.isArray(data?.projects) 
+        ? data.projects 
+        : (Array.isArray(data) ? data : []);
+      if (rawList.length > 0) {
+        const map = new Map();
+        list.forEach(p => {
+          const k = String(p.nielitRegNo || p.registrationNo || p.regNo || p.id || '').trim();
+          if (k) map.set(k, p);
+        });
+        rawList.forEach(p => {
+          const k = String(p.nielitRegNo || p.registrationNo || p.regNo || p.id || '').trim();
+          if (k) map.set(k, { ...map.get(k), ...p });
+        });
+        list = Array.from(map.values());
+      }
+    } catch (e) {
+      console.warn('Notice loading nielit projects from API:', e.message);
+    }
   }
 
   const normalized = list.map(normalizeNielitProject);
@@ -1025,13 +1024,13 @@ export async function fetchNielitProjectsFromBackend() {
 }
 
 /**
- * Update submitted NIELIT Project in backend REST API & Firebase Cloud
+ * Update submitted NIELIT Project in Firebase Cloud & REST backend (Direct DB)
  */
 export async function updateNielitProjectInBackend(id, data) {
   if (!id) return { success: false };
   const cleanId = String(id).replace(/\//g, '_');
 
-  // 1. Update in Firebase Cloud
+  // 1. Update directly in Firebase Cloud
   await saveToFirebaseCloud('nielit_projects', cleanId, data);
 
   try {
@@ -1045,13 +1044,13 @@ export async function updateNielitProjectInBackend(id, data) {
 }
 
 /**
- * Delete submitted NIELIT Project directly from backend REST API & Firebase Cloud
+ * Delete submitted NIELIT Project directly from Firebase Cloud & REST backend
  */
 export async function deleteNielitProjectFromBackend(id, token = '') {
   if (!id) return false;
   const cleanId = String(id).replace(/\//g, '_');
 
-  // 1. Delete from Firebase Cloud
+  // 1. Delete directly from Firebase Cloud
   await deleteFromFirebaseCloud('nielit_projects', cleanId);
 
   return await deleteProject(cleanId, true);
@@ -1122,28 +1121,32 @@ export async function saveRsvpRecord(data) {
 export async function fetchRsvpsFromBackend() {
   let list = [];
 
-  // 1. Try REST API
-  try {
-    const data = await API.getEvents();
-    const rawList = Array.isArray(data?.rsvps)
-      ? data.rsvps
-      : (Array.isArray(data?.events) ? data.events : (Array.isArray(data) ? data : []));
-    if (rawList.length > 0) list = rawList;
-  } catch (e) {}
-
-  // 2. Fetch & merge from Firebase Cloud
+  // 1. Fetch directly from Firebase Cloud
   try {
     const fbRecords = await fetchFromFirebaseCloud('event_rsvps');
     if (fbRecords.length > 0) {
-      const map = new Map();
-      list.forEach(r => map.set(r.id, r));
-      fbRecords.forEach(r => {
-        if (r.id) map.set(r.id, { ...map.get(r.id), ...r });
-      });
-      list = Array.from(map.values());
+      list = fbRecords;
     }
   } catch (e) {
     console.warn('Notice loading RSVPs from Firebase Cloud:', e.message);
+  }
+
+  // 2. Try REST API if configured
+  if (API_BASE_URL) {
+    try {
+      const data = await API.getEvents();
+      const rawList = Array.isArray(data?.rsvps)
+        ? data.rsvps
+        : (Array.isArray(data?.events) ? data.events : (Array.isArray(data) ? data : []));
+      if (rawList.length > 0) {
+        const map = new Map();
+        list.forEach(r => map.set(r.id, r));
+        rawList.forEach(r => {
+          if (r.id) map.set(r.id, { ...map.get(r.id), ...r });
+        });
+        list = Array.from(map.values());
+      }
+    } catch (e) {}
   }
 
   return list.map(normalizeRsvp);
@@ -1173,7 +1176,7 @@ export async function fetchStudentsFromBackend(filters = {}) {
     console.warn('Notice loading students from REST API:', e.message);
   }
 
-  // Fetch/merge live student records directly from Firebase Cloud Firestore
+  // 1. Fetch live student records directly from Firebase Cloud Firestore 'students' collection
   try {
     const fbRecords = await fetchFromFirebaseCloud('students');
     if (fbRecords.length > 0) {
@@ -1184,12 +1187,48 @@ export async function fetchStudentsFromBackend(filters = {}) {
     }
   } catch (e) {}
 
-  return list.map(normalizeStudent);
+  // 2. Also merge all admitted candidates from Firestore 'admissions' collection directly into students
+  try {
+    const fbAdmissions = await fetchFromFirebaseCloud('admissions');
+    if (fbAdmissions.length > 0) {
+      const existingKeys = new Set(list.map(s => String(s.enrollmentNumber || s.registrationNo || s.id || s.email || '').toLowerCase().trim()));
+      fbAdmissions.forEach(adm => {
+        const reg = String(adm.registrationNo || adm.registrationNumber || adm.id || '').trim();
+        const email = String(adm.email || '').toLowerCase().trim();
+        if (!existingKeys.has(reg.toLowerCase()) && !existingKeys.has(email)) {
+          list.push(normalizeStudent({
+            ...adm,
+            id: reg,
+            enrollmentNumber: reg,
+            name: adm.candidateName || adm.fullName || 'Student',
+            fullName: adm.candidateName || adm.fullName || 'Student',
+            candidateName: adm.candidateName || adm.fullName || 'Student',
+            email: adm.email,
+            phone: adm.mobile || adm.phone,
+            mobile: adm.mobile || adm.phone,
+            course: adm.course,
+            status: adm.status || 'ACTIVE',
+            academicStatus: adm.status || 'ACTIVE'
+          }));
+          existingKeys.add(reg.toLowerCase());
+          if (email) existingKeys.add(email);
+        }
+      });
+    }
+  } catch (e) {}
+
+  // Deduplicate students directly from database
+  const uniqueMap = new Map();
+  list.forEach(s => {
+    const k = String(s.enrollmentNumber || s.registrationNo || s.userId || s.id || s.email || '').trim();
+    if (k) uniqueMap.set(k, s);
+  });
+
+  return Array.from(uniqueMap.values()).map(normalizeStudent);
 }
 
 /**
- * Delete student record directly from connected database (Firebase Firestore, Realtime DB, and REST API)
- * Zero cache: record is immediately removed from cloud database
+ * Delete student record directly from connected database (Firebase Firestore & REST API)
  */
 export async function deleteStudentFromBackend(student) {
   if (!student) return { success: false };
@@ -1217,7 +1256,7 @@ export async function deleteStudentFromBackend(student) {
 }
 
 /**
- * Register a new student user via backend REST API
+ * Register a new student user via backend REST API & Firebase Cloud
  */
 export async function registerStudentWithBackend(studentData) {
   const studentId = studentData.id || `STU-${Date.now()}`;
@@ -1319,13 +1358,12 @@ export async function loginStudentWithBackend(email, password) {
 }
 
 /**
- * Persist or register a student account locally with email as userId and default password
+ * Persist or register a student account directly to Firebase Cloud 'users' collection
  */
 export function saveStudentAccount(account) {
   if (!account || (!account.email && !account.userId)) return;
   try {
     const email = (account.email || account.userId || '').toLowerCase().trim();
-    const accounts = JSON.parse(localStorage.getItem('ithunt_student_accounts') || '{}');
     const userObj = {
       ...account,
       userId: email,
@@ -1334,10 +1372,8 @@ export function saveStudentAccount(account) {
       role: 'STUDENT',
       updatedAt: new Date().toISOString()
     };
-    accounts[email] = userObj;
-    localStorage.setItem('ithunt_student_accounts', JSON.stringify(accounts));
 
-    // Also persist student user to Firebase Cloud 'users' collection
+    // Directly persist student user to Firebase Cloud 'users' collection
     const cleanEmail = email.replace(/[@.]/g, '_');
     saveToFirebaseCloud('users', cleanEmail, userObj).catch(() => {});
     if (account.registrationNo) {
@@ -1347,22 +1383,22 @@ export function saveStudentAccount(account) {
 }
 
 /**
- * Change student password from student dashboard
+ * Change student password directly in Firebase Cloud database
  */
 export async function changeStudentPassword(email, oldPassword, newPassword) {
   const normEmail = (email || '').toLowerCase().trim();
   
   try {
-    const accounts = JSON.parse(localStorage.getItem('ithunt_student_accounts') || '{}');
-    const existingAcc = accounts[normEmail];
-    const savedStudent = JSON.parse(localStorage.getItem('ithunt_student_user') || 'null');
-    const admissions = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
-    const matchedAdm = admissions.find(a => a.email?.toLowerCase().trim() === normEmail);
+    const cleanEmail = normEmail.replace(/[@.]/g, '_');
 
-    const currentPass = (existingAcc && existingAcc.password) || 
-                        (savedStudent && savedStudent.email?.toLowerCase() === normEmail && savedStudent.password) ||
-                        (matchedAdm && matchedAdm.password) ||
-                        'Ithunt@123';
+    // Fetch user directly from Firebase Cloud
+    const cloudUsers = await fetchFromFirebaseCloud('users');
+    const user = cloudUsers.find(u => (u.email || u.userId || '').toLowerCase().trim() === normEmail || u.id === cleanEmail);
+
+    const cloudAdmissions = await fetchFromFirebaseCloud('admissions');
+    const adm = cloudAdmissions.find(a => (a.email || a.userId || '').toLowerCase().trim() === normEmail);
+
+    const currentPass = user?.password || adm?.password || 'Ithunt@123';
 
     if (oldPassword !== currentPass && oldPassword !== 'Ithunt@123') {
       return { success: false, error: 'Current password does not match. Default password is Ithunt@123.' };
@@ -1372,42 +1408,42 @@ export async function changeStudentPassword(email, oldPassword, newPassword) {
       return { success: false, error: 'New password must be at least 6 characters long.' };
     }
 
-    // 1. Update in accounts
-    accounts[normEmail] = {
-      ...(existingAcc || savedStudent || matchedAdm || {}),
-      userId: normEmail,
-      email: normEmail,
-      password: newPassword
-    };
-    localStorage.setItem('ithunt_student_accounts', JSON.stringify(accounts));
-
-    // 2. Update in saved active session
-    if (savedStudent && savedStudent.email?.toLowerCase() === normEmail) {
-      savedStudent.password = newPassword;
-      localStorage.setItem('ithunt_student_user', JSON.stringify(savedStudent));
+    // 1. Update directly in Firestore 'users' collection
+    await saveToFirebaseCloud('users', cleanEmail, { password: newPassword, email: normEmail, userId: normEmail });
+    if (adm?.registrationNo) {
+      await saveToFirebaseCloud('users', String(adm.registrationNo).replace(/\//g, '_'), { password: newPassword });
     }
 
-    // 3. Update in admissions cache
-    if (matchedAdm) {
-      matchedAdm.password = newPassword;
-      localStorage.setItem('ithunt_admissions', JSON.stringify(admissions));
+    // 2. Update directly in Firestore 'admissions' collection
+    if (adm?.registrationNo) {
+      await saveToFirebaseCloud('admissions', String(adm.registrationNo).replace(/\//g, '_'), { password: newPassword });
     }
 
-    // 4. Update in cloud database
-    const cleanEmail = normEmail.replace(/[@.]/g, '_');
-    saveToFirebaseCloud('users', cleanEmail, { password: newPassword, email: normEmail, userId: normEmail }).catch(() => {});
+    // 3. Update in saved active session if current user
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        const savedStudent = JSON.parse(localStorage.getItem('ithunt_student_user') || 'null');
+        if (savedStudent && savedStudent.email?.toLowerCase() === normEmail) {
+          savedStudent.password = newPassword;
+          localStorage.setItem('ithunt_student_user', JSON.stringify(savedStudent));
+        }
+      } catch (e) {}
+    }
 
-    // 5. Update backend profile if available
+    // 4. Update backend profile if available
     try {
       await updateStudentProfileWithBackend({ email: normEmail, password: newPassword });
     } catch (e) {}
 
-    return { success: true, message: 'Password updated successfully! Use your new password for all future sign-ins.' };
+    return { success: true, message: 'Password updated successfully in database! Use your new password for all future sign-ins.' };
   } catch (err) {
-    return { success: false, error: err.message || 'Failed to update password.' };
+    return { success: false, error: err.message || 'Failed to update password in database.' };
   }
 }
 
+/**
+ * Authenticate student user DIRECTLY against Firebase Cloud database (Firestore: users, admissions, students)
+ */
 export async function loginStudentUser(email, password) {
   const normEmail = (email || '').toLowerCase().trim();
   const inputPass = (password || '').trim();
@@ -1425,79 +1461,11 @@ export async function loginStudentUser(email, password) {
     } catch (e) {}
   }
 
-  // 2. Check local registered student accounts
-  try {
-    const accounts = JSON.parse(localStorage.getItem('ithunt_student_accounts') || '{}');
-    const acc = accounts[normEmail] || Object.values(accounts).find(a => 
-      a.registrationNo?.toLowerCase() === normEmail || a.userId?.toLowerCase() === normEmail || a.email?.toLowerCase() === normEmail
-    );
-
-    if (acc) {
-      const expectedPass = acc.password || 'Ithunt@123';
-      const phonePass = (acc.mobile || acc.phone || '').replace(/\D/g, '');
-      if (inputPass === expectedPass || (inputPass === 'Ithunt@123' && !acc.password) || (phonePass && inputPass === phonePass)) {
-        const studentUser = {
-          ...DEFAULT_DEMO_STUDENT,
-          ...acc,
-          userId: acc.email || normEmail,
-          email: acc.email || normEmail,
-          candidateName: acc.candidateName || acc.fullName || acc.name || 'Student',
-          password: expectedPass
-        };
-        saveStudentAccount(studentUser);
-        return { success: true, user: studentUser };
-      } else {
-        return { success: false, error: 'Invalid password. Default password for your account is Ithunt@123.' };
-      }
-    }
-  } catch (e) {}
-
-  // 3. Check local admissions registry (e.g. from online registration)
-  try {
-    const admissions = JSON.parse(localStorage.getItem('ithunt_admissions') || '[]');
-    const matchedAdm = admissions.find(a => 
-      a.email?.toLowerCase().trim() === normEmail || 
-      a.registrationNo?.toLowerCase().trim() === normEmail ||
-      (a.userId && a.userId.toLowerCase().trim() === normEmail)
-    );
-
-    if (matchedAdm) {
-      const expectedPass = matchedAdm.password || 'Ithunt@123';
-      const phonePass = (matchedAdm.mobile || matchedAdm.phone || '').replace(/\D/g, '');
-      if (inputPass === expectedPass || inputPass === 'Ithunt@123' || (phonePass && inputPass === phonePass)) {
-        const studentUser = {
-          ...DEFAULT_DEMO_STUDENT,
-          ...matchedAdm,
-          userId: matchedAdm.email || normEmail,
-          email: matchedAdm.email || normEmail,
-          password: expectedPass,
-          candidateName: matchedAdm.candidateName || matchedAdm.fullName || 'Student',
-          fatherName: matchedAdm.fatherName || '—',
-          motherName: matchedAdm.motherName || '—',
-          dob: matchedAdm.dob || '2004-01-01',
-          gender: matchedAdm.gender || 'Male',
-          district: matchedAdm.district || 'Prayagraj',
-          address: matchedAdm.address || 'Holagarh, Prayagraj',
-          course: matchedAdm.course || '3-Month MERN Stack Web Engineer',
-          mobile: matchedAdm.mobile || matchedAdm.phone || '',
-          registrationNo: matchedAdm.registrationNo || 'ITH-2026-001',
-          status: matchedAdm.status || 'Active & Confirmed ✓',
-          feeStatus: matchedAdm.feeStatus || 'Confirmed / Paid',
-          admissionDate: matchedAdm.date || new Date().toLocaleDateString('en-GB')
-        };
-        saveStudentAccount(studentUser);
-        return { success: true, user: studentUser };
-      } else {
-        return { success: false, error: 'Invalid password. Default password for your admission is Ithunt@123.' };
-      }
-    }
-  } catch (e) {}
-
-  // 4. Query Firebase Cloud Database (Firestore + Realtime DB) for cross-device persistence
+  // 2. Query Firebase Cloud Database DIRECTLY (Users, Admissions, Students collections in Firestore)
   try {
     const cleanEmail = normEmail.replace(/[@.]/g, '_');
     
-    // Check users collection in Firestore
+    // A. Check Firestore 'users' collection directly from DB
     const cloudUsers = await fetchFromFirebaseCloud('users');
     const matchedUser = cloudUsers.find(u => {
       const uEmail = (u.email || u.userId || '').toLowerCase().trim();
@@ -1518,14 +1486,13 @@ export async function loginStudentUser(email, password) {
           candidateName: matchedUser.candidateName || matchedUser.name || 'Student',
           registrationNo: matchedUser.registrationNo || matchedUser.id || 'ITH-2026-001'
         };
-        saveStudentAccount(studentUser);
         return { success: true, user: studentUser };
       } else {
         return { success: false, error: 'Invalid password. Default password for your account is Ithunt@123.' };
       }
     }
 
-    // Check admissions collection in Firestore
+    // B. Check Firestore 'admissions' collection directly from DB
     const cloudAdmissions = await fetchFromFirebaseCloud('admissions');
     const matchedCloudAdm = cloudAdmissions.find(a => {
       const aEmail = (a.email || a.userId || '').toLowerCase().trim();
@@ -1546,30 +1513,34 @@ export async function loginStudentUser(email, password) {
           candidateName: matchedCloudAdm.candidateName || matchedCloudAdm.fullName || 'Student',
           registrationNo: matchedCloudAdm.registrationNo || matchedCloudAdm.id || 'ITH-2026-001'
         };
-        saveStudentAccount(studentUser);
         return { success: true, user: studentUser };
       } else {
         return { success: false, error: 'Invalid password. Default password for your admission is Ithunt@123.' };
+      }
+    }
+
+    // C. Check Firestore 'students' collection directly from DB
+    const cloudStudents = await fetchFromFirebaseCloud('students');
+    const matchedCloudStu = cloudStudents.find(s => {
+      const sEmail = (s.email || s.userId || '').toLowerCase().trim();
+      const sEnroll = (s.enrollmentNumber || s.registrationNo || s.id || '').toLowerCase().trim();
+      return sEmail === normEmail || sEnroll === normEmail;
+    });
+
+    if (matchedCloudStu) {
+      const expectedPass = matchedCloudStu.password || 'Ithunt@123';
+      const phonePass = (matchedCloudStu.mobile || matchedCloudStu.phone || '').replace(/\D/g, '');
+      if (inputPass === expectedPass || inputPass === 'Ithunt@123' || (phonePass && inputPass === phonePass)) {
+        return { success: true, user: { ...DEFAULT_DEMO_STUDENT, ...matchedCloudStu } };
+      } else {
+        return { success: false, error: 'Invalid password. Default password is Ithunt@123.' };
       }
     }
   } catch (cloudErr) {
     console.warn('Cloud database student query notice:', cloudErr.message);
   }
 
-  // 5. Check active cached student session in localStorage
-  try {
-    const localUser = JSON.parse(localStorage.getItem('ithunt_student_user') || 'null');
-    if (localUser && (localUser.email?.toLowerCase() === normEmail || localUser.registrationNo?.toLowerCase() === normEmail)) {
-      const expectedPass = localUser.password || 'Ithunt@123';
-      if (inputPass === expectedPass || inputPass === 'Ithunt@123') {
-        return { success: true, user: localUser };
-      } else {
-        return { success: false, error: 'Invalid password. Default is Ithunt@123 unless changed.' };
-      }
-    }
-  } catch (e) {}
-
-  // 6. Default demo student fallback
+  // 3. Default demo student fallback for presentation
   if (normEmail === 'student@ithunt.com') {
     if (inputPass === 'Ithunt@123' || inputPass === 'student123' || inputPass === 'student' || inputPass === 'password') {
       return { success: true, user: { ...DEFAULT_DEMO_STUDENT } };
@@ -1578,7 +1549,7 @@ export async function loginStudentUser(email, password) {
     }
   }
 
-  return { success: false, error: 'No student account found with this Email / User ID. Please check your spelling or submit an admission registration.' };
+  return { success: false, error: 'No student account found in the database with this Email / Registration ID. Please submit an admission or verify your credentials.' };
 }
 
 /**
@@ -1655,203 +1626,173 @@ export async function fetchInternshipsFromBackend() {
     }
   } catch (e) {}
 
-  if (list.length === 0) {
-    try {
-      const cached = JSON.parse(localStorage.getItem('ithunt_internships') || '[]');
-      if (Array.isArray(cached) && cached.length > 0) {
-        list = cached;
-      }
-    } catch (e) {}
-  }
-
   return list.map(normalizeInternship);
 }
 
 /**
- * Fetch all Fees Ledger Payments from backend REST API (GET /api/fees)
+ * Fetch all Fees Ledger Payments from backend REST API (GET /api/fees) & Firebase Cloud (NO CACHE)
  */
 export async function fetchFeesFromBackend() {
   let list = [];
 
   try {
-    const data = await API.getFees();
-    const rawList = Array.isArray(data?.transactions) ? data.transactions : (Array.isArray(data) ? data : []);
-    if (rawList.length > 0) list = rawList;
-  } catch (e) {
-    console.warn('Notice loading fee transactions from API:', e.message);
-  }
-
-  try {
     const fbRecords = await fetchFromFirebaseCloud('fees');
     if (fbRecords.length > 0) {
-      const map = new Map();
-      list.forEach(f => map.set(f.id || f.receiptNo || f.receiptNumber, f));
-      fbRecords.forEach(f => map.set(f.id || f.receiptNo || f.receiptNumber, { ...map.get(f.id || f.receiptNo || f.receiptNumber), ...f }));
-      list = Array.from(map.values());
+      list = fbRecords;
     }
   } catch (e) {}
 
-  if (list.length === 0) {
+  if (API_BASE_URL) {
     try {
-      const cached = JSON.parse(localStorage.getItem('ithunt_fees') || '[]');
-      if (Array.isArray(cached) && cached.length > 0) {
-        list = cached;
+      const data = await API.getFees();
+      const rawList = Array.isArray(data?.transactions) ? data.transactions : (Array.isArray(data) ? data : []);
+      if (rawList.length > 0) {
+        const map = new Map();
+        list.forEach(f => map.set(f.id || f.receiptNo || f.receiptNumber, f));
+        rawList.forEach(f => map.set(f.id || f.receiptNo || f.receiptNumber, { ...map.get(f.id || f.receiptNo || f.receiptNumber), ...f }));
+        list = Array.from(map.values());
       }
-    } catch (e) {}
+    } catch (e) {
+      console.warn('Notice loading fee transactions from API:', e.message);
+    }
   }
 
   return list.map(normalizeFee);
 }
 
 /**
- * Fetch all Verified Certificates from backend REST API (GET /api/certificates)
+ * Fetch all Verified Certificates directly from Firebase Cloud & REST API (NO CACHE)
  */
 export async function fetchCertificatesFromBackend() {
   let list = [];
 
   try {
-    const data = await API.getCertificates();
-    const rawList = Array.isArray(data?.certificates) ? data.certificates : (Array.isArray(data) ? data : []);
-    if (rawList.length > 0) list = rawList;
-  } catch (e) {
-    console.warn('Notice loading certificates from API:', e.message);
-  }
-
-  try {
     const fbRecords = await fetchFromFirebaseCloud('certificates');
     if (fbRecords.length > 0) {
-      const map = new Map();
-      list.forEach(c => map.set(c.id || c.certNo || c.certificateNumber, c));
-      fbRecords.forEach(c => map.set(c.id || c.certNo || c.certificateNumber, { ...map.get(c.id || c.certNo || c.certificateNumber), ...c }));
-      list = Array.from(map.values());
+      list = fbRecords;
     }
   } catch (e) {}
 
-  if (list.length === 0) {
+  if (API_BASE_URL) {
     try {
-      const cached = JSON.parse(localStorage.getItem('ithunt_certificates') || '[]');
-      if (Array.isArray(cached) && cached.length > 0) {
-        list = cached;
+      const data = await API.getCertificates();
+      const rawList = Array.isArray(data?.certificates) ? data.certificates : (Array.isArray(data) ? data : []);
+      if (rawList.length > 0) {
+        const map = new Map();
+        list.forEach(c => map.set(c.id || c.certNo || c.certificateNumber, c));
+        rawList.forEach(c => map.set(c.id || c.certNo || c.certificateNumber, { ...map.get(c.id || c.certNo || c.certificateNumber), ...c }));
+        list = Array.from(map.values());
       }
-    } catch (e) {}
+    } catch (e) {
+      console.warn('Notice loading certificates from API:', e.message);
+    }
   }
 
   return list.map(normalizeCertificate);
 }
 
 /**
- * Fetch all Capstone Projects from backend REST API (GET /api/projects)
+ * Fetch all Capstone Projects directly from Firebase Cloud & REST API (NO CACHE)
  */
 export async function fetchProjectsFromBackend() {
   let list = [];
 
   try {
-    const data = await API.getProjects();
-    const rawList = Array.isArray(data?.projects) ? data.projects : (Array.isArray(data) ? data : []);
-    if (rawList.length > 0) list = rawList;
-  } catch (e) {
-    console.warn('Notice loading capstone projects from API:', e.message);
-  }
-
-  try {
     const fbRecords = await fetchFromFirebaseCloud('projects');
     if (fbRecords.length > 0) {
-      const map = new Map();
-      list.forEach(p => map.set(p.id || p.title, p));
-      fbRecords.forEach(p => map.set(p.id || p.title, { ...map.get(p.id || p.title), ...p }));
-      list = Array.from(map.values());
+      list = fbRecords;
     }
   } catch (e) {}
 
-  if (list.length === 0) {
+  if (API_BASE_URL) {
     try {
-      const cached = JSON.parse(localStorage.getItem('ithunt_projects') || '[]');
-      if (Array.isArray(cached) && cached.length > 0) {
-        list = cached;
+      const data = await API.getProjects();
+      const rawList = Array.isArray(data?.projects) ? data.projects : (Array.isArray(data) ? data : []);
+      if (rawList.length > 0) {
+        const map = new Map();
+        list.forEach(p => map.set(p.id || p.title, p));
+        rawList.forEach(p => map.set(p.id || p.title, { ...map.get(p.id || p.title), ...p }));
+        list = Array.from(map.values());
       }
-    } catch (e) {}
+    } catch (e) {
+      console.warn('Notice loading capstone projects from API:', e.message);
+    }
   }
 
   return list.map(normalizeProject);
 }
 
 /**
- * Fetch all Contact Inquiries from backend REST API (GET /api/contact)
+ * Fetch all Contact Inquiries directly from Firebase Cloud & REST API (NO CACHE)
  */
 export async function fetchContactInquiriesFromBackend() {
   let list = [];
 
   try {
-    const data = await API.getContactInquiries();
-    const rawList = Array.isArray(data?.contacts) ? data.contacts : (Array.isArray(data?.inquiries) ? data.inquiries : (Array.isArray(data) ? data : []));
-    if (rawList.length > 0) list = rawList;
-  } catch (e) {
-    console.warn('Notice loading contact inquiries from API:', e.message);
-  }
-
-  try {
     const fbRecords = await fetchFromFirebaseCloud('contact');
     if (fbRecords.length > 0) {
-      const map = new Map();
-      list.forEach(c => map.set(c.id || c.email, c));
-      fbRecords.forEach(c => map.set(c.id || c.email, { ...map.get(c.id || c.email), ...c }));
-      list = Array.from(map.values());
+      list = fbRecords;
     }
   } catch (e) {}
 
-  if (list.length === 0) {
+  if (API_BASE_URL) {
     try {
-      const cached = JSON.parse(localStorage.getItem('ithunt_contact_inquiries') || '[]');
-      if (Array.isArray(cached) && cached.length > 0) {
-        list = cached;
+      const data = await API.getContactInquiries();
+      const rawList = Array.isArray(data?.contacts) ? data.contacts : (Array.isArray(data?.inquiries) ? data.inquiries : (Array.isArray(data) ? data : []));
+      if (rawList.length > 0) {
+        const map = new Map();
+        list.forEach(c => map.set(c.id || c.email, c));
+        rawList.forEach(c => map.set(c.id || c.email, { ...map.get(c.id || c.email), ...c }));
+        list = Array.from(map.values());
       }
-    } catch (e) {}
+    } catch (e) {
+      console.warn('Notice loading contact inquiries from API:', e.message);
+    }
   }
 
   return list.map(normalizeContactInquiry);
 }
 
 /**
- * Fetch all Auth Users from backend REST API (GET /api/auth/users)
+ * Fetch all Auth Users directly from Firebase Cloud 'users' collection & REST API (NO CACHE)
  */
 export async function fetchUsersFromBackend() {
   let list = [];
 
-  try {
-    const data = await API.getUsers();
-    const rawList = Array.isArray(data?.users) ? data.users : (Array.isArray(data) ? data : []);
-    if (rawList.length > 0) {
-      list = rawList;
-    }
-  } catch (e) {
-    console.warn('Notice loading auth users from API:', e.message);
-  }
-
-  // Fetch/merge live user accounts directly from Firebase Cloud Firestore
+  // Fetch live user accounts directly from Firebase Cloud Firestore
   try {
     const fbRecords = await fetchFromFirebaseCloud('users');
     if (fbRecords.length > 0) {
-      const map = new Map();
-      list.forEach(u => map.set(u.id || u.email, u));
-      fbRecords.forEach(u => map.set(u.id || u.email, { ...map.get(u.id || u.email), ...u }));
-      list = Array.from(map.values());
+      list = fbRecords;
     }
   } catch (e) {}
 
-  if (list.length === 0) {
+  if (API_BASE_URL) {
     try {
-      const cached = JSON.parse(localStorage.getItem('ithunt_users') || '[]');
-      if (Array.isArray(cached) && cached.length > 0) {
-        list = cached;
+      const data = await API.getUsers();
+      const rawList = Array.isArray(data?.users) ? data.users : (Array.isArray(data) ? data : []);
+      if (rawList.length > 0) {
+        const map = new Map();
+        list.forEach(u => map.set(u.id || u.email, u));
+        rawList.forEach(u => map.set(u.id || u.email, { ...map.get(u.id || u.email), ...u }));
+        list = Array.from(map.values());
       }
-    } catch (e) {}
+    } catch (e) {
+      console.warn('Notice loading auth users from API:', e.message);
+    }
   }
 
-  return list.map(normalizeUser);
+  const uniqueMap = new Map();
+  list.forEach(u => {
+    const k = String(u.email || u.userId || u.id || '').trim();
+    if (k) uniqueMap.set(k, u);
+  });
+
+  return Array.from(uniqueMap.values()).map(normalizeUser);
 }
 
 /**
- * Delete user account or admission by ID from backend REST API
+ * Delete user account directly from Firebase Cloud database & REST API
  */
 export async function deleteUserFromBackend(userId, token = '') {
   if (!userId) return { success: false, error: 'User ID is required' };
@@ -1861,14 +1802,6 @@ export async function deleteUserFromBackend(userId, token = '') {
   await deleteFromFirebaseCloud('users', userId);
   await deleteFromFirebaseCloud('admissions', userId);
   await deleteFromFirebaseCloud('students', userId);
-
-  try {
-    const accounts = JSON.parse(localStorage.getItem('ithunt_student_accounts') || '{}');
-    if (accounts[userId]) {
-      delete accounts[userId];
-      localStorage.setItem('ithunt_student_accounts', JSON.stringify(accounts));
-    }
-  } catch (e) {}
 
   try {
     await API.deleteUser(userId);

@@ -1540,25 +1540,6 @@ const contactInquiriesList = ref([]);
 const reviewsList = ref([]);
 const usersList = ref([]);
 
-const getDeletedIds = (key) => {
-  try {
-    return new Set(JSON.parse(localStorage.getItem(key) || '[]'));
-  } catch (e) {
-    return new Set();
-  }
-};
-
-const addDeletedId = (key, id) => {
-  if (!id) return;
-  try {
-    const existing = JSON.parse(localStorage.getItem(key) || '[]');
-    if (!existing.includes(id)) {
-      existing.push(id);
-      localStorage.setItem(key, JSON.stringify(existing));
-    }
-  } catch (e) {}
-};
-
 watch(() => props.allStudents, (val) => {
   studentsList.value = val || [];
 }, { immediate: true, deep: true });
@@ -1582,14 +1563,7 @@ const filteredStudents = computed(() => {
 });
 
 watch(() => props.allAdmissions, (val) => {
-  const deleted = (() => {
-    try { return JSON.parse(localStorage.getItem('ithunt_deleted_admission_ids') || '[]'); } catch (e) { return []; }
-  })();
-  admissionsList.value = (val || []).filter(a => {
-    const aId = String(a.id || a.registrationNo || '');
-    const aReg = String(a.registrationNo || a.id || '');
-    return !deleted.includes(aId) && !deleted.includes(aReg);
-  });
+  admissionsList.value = val || [];
 }, { immediate: true, deep: true });
 
 watch(() => props.allJobApplications, (val) => {
@@ -1759,25 +1733,17 @@ const deleteNielitProject = async (p) => {
     return;
   }
 
-  // 1. Blacklist IDs in localStorage
-  if (typeof p === 'object') {
-    if (p.registrationNo) addDeletedId('ithunt_deleted_nielit_ids', p.registrationNo);
-    if (p.nielitRegNo) addDeletedId('ithunt_deleted_nielit_ids', p.nielitRegNo);
-    if (p.id) addDeletedId('ithunt_deleted_nielit_ids', p.id);
-  }
-  if (targetId) addDeletedId('ithunt_deleted_nielit_ids', targetId);
-
-  // 2. Immediately remove from local list
+  // 1. Immediately remove from local list
   nielitProjectsList.value = nielitProjectsList.value.filter(item => 
     item.registrationNo !== targetId &&
     item.nielitRegNo !== targetId &&
     item.id !== targetId
   );
 
-  // 3. Emit delete to parent App.vue
+  // 2. Emit delete to parent App.vue
   emit('delete-nielit-project', typeof p === 'object' ? p : { id: targetId, registrationNo: targetId });
 
-  // 4. Delete from Firebase Cloud & REST API backend
+  // 3. Delete from Firebase Cloud & REST API backend
   try {
     await deleteNielitProjectFromBackend(targetId);
     emailActionMsg.value = `✓ NIELIT project form (${targetId}) removed successfully from Firebase Database & API.`;
@@ -1815,23 +1781,16 @@ const deleteAdmission = async (adm) => {
     return;
   }
 
-  // 1. Blacklist IDs in localStorage
-  if (typeof adm === 'object') {
-    if (adm.registrationNo) addDeletedId('ithunt_deleted_admission_ids', adm.registrationNo);
-    if (adm.id) addDeletedId('ithunt_deleted_admission_ids', adm.id);
-  }
-  if (idToDelete) addDeletedId('ithunt_deleted_admission_ids', idToDelete);
-
-  // 2. Immediately remove from local list
+  // 1. Immediately remove from local list
   admissionsList.value = admissionsList.value.filter(a => 
     a.registrationNo !== idToDelete && 
     a.id !== idToDelete
   );
 
-  // 3. Emit delete to parent App.vue
+  // 2. Emit delete to parent App.vue
   emit('delete-admission', typeof adm === 'object' ? adm : { id: idToDelete, registrationNo: idToDelete });
 
-  // 4. Delete from connected database (Firebase Firestore, Realtime DB, REST API, & local caches)
+  // 3. Delete directly from connected database (Firebase Firestore & REST API)
   try {
     await deleteAdmissionFromBackend(adm);
     emailActionMsg.value = `✓ Candidate record ${idToDelete} removed successfully from Database & API.`;
