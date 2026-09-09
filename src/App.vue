@@ -485,7 +485,7 @@ import ConfirmationModal from './components/modals/ConfirmationModal.vue';
 
 const content = ref(CONTENT_DATA);
 const activeTab = ref('home');
-const isDarkMode = ref(true);
+const isDarkMode = ref(false);
 const scrollProgress = ref(0);
 const showBackToTop = ref(false);
 const showConfetti = ref(false);
@@ -719,6 +719,9 @@ const setTab = (tab) => {
 const toggleTheme = () => {
   isDarkMode.value = !isDarkMode.value;
   document.body.classList.toggle('light-theme', !isDarkMode.value);
+  try {
+    localStorage.setItem('ithunt_theme', isDarkMode.value ? 'dark' : 'light');
+  } catch (e) {}
 };
 
 const applyForCourse = (courseName) => {
@@ -1179,6 +1182,21 @@ watch(activeTab, (newTab) => {
 });
 
 onMounted(() => {
+  // Default to Light Mode unless explicitly set to 'dark' by user preference
+  try {
+    const savedTheme = localStorage.getItem('ithunt_theme');
+    if (savedTheme === 'dark') {
+      isDarkMode.value = true;
+      document.body.classList.remove('light-theme');
+    } else {
+      isDarkMode.value = false;
+      document.body.classList.add('light-theme');
+    }
+  } catch (e) {
+    isDarkMode.value = false;
+    document.body.classList.add('light-theme');
+  }
+
   window.addEventListener('scroll', handleScroll, { passive: true });
   handleScroll();
 

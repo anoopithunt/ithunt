@@ -376,7 +376,7 @@ defineProps({
   },
   isDarkMode: {
     type: Boolean,
-    default: true
+    default: false
   },
   studentUser: {
     type: Object,
