@@ -1271,15 +1271,27 @@ export async function deleteStudentFromBackend(student) {
  * Register a new student user via backend REST API & Firebase Cloud
  */
 export async function registerStudentWithBackend(studentData) {
-  const studentId = studentData.id || `STU-${Date.now()}`;
+  const enrollmentNumber = studentData.enrollmentNumber || studentData.registrationNo || `ITH-${new Date().getFullYear()}-STU${Math.floor(1000 + Math.random() * 9000)}`;
+  const regNo = studentData.registrationNo || studentData.id || enrollmentNumber;
+  const studentId = studentData.id || regNo;
   const userId = studentData.userId || `USR-${Date.now()}`;
-  const enrollmentNumber = studentData.enrollmentNumber || `ITH-${new Date().getFullYear()}-STU${Math.floor(1000 + Math.random() * 9000)}`;
+
+  const now = new Date();
+  const dateStr = studentData.date || (() => {
+    try { return now.toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata' }); }
+    catch (_) { return now.toLocaleDateString('en-GB'); }
+  })();
+  const timeStr = studentData.time || (() => {
+    try { return now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' }); }
+    catch (_) { return now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }); }
+  })();
 
   const payload = {
     ...studentData,
     id: studentId,
     userId,
     enrollmentNumber,
+    registrationNo: regNo,
     name: studentData.candidateName || studentData.name || 'Student',
     fullName: studentData.candidateName || studentData.name || 'Student',
     candidateName: studentData.candidateName || studentData.name || 'Student',
@@ -1294,40 +1306,78 @@ export async function registerStudentWithBackend(studentData) {
     dob: studentData.dob || '',
     gender: studentData.gender || 'Male',
     address: studentData.address || 'Holagarh, Prayagraj',
-    createdAt: new Date().toISOString()
+    date: dateStr,
+    time: timeStr,
+    createdAt: studentData.createdAt || now.toISOString()
+  };
+
+  const admissionRecord = {
+    id: regNo,
+    registrationNo: regNo,
+    registrationNumber: regNo,
+    candidateName: payload.name,
+    fullName: payload.name,
+    email: payload.email,
+    phone: payload.phone || '+91 9795771806',
+    mobile: payload.mobile || '+91 9795771806',
+    course: payload.course,
+    fatherName: studentData.fatherName || 'Not Specified',
+    motherName: studentData.motherName || 'Not Specified',
+    district: studentData.district || 'Prayagraj',
+    address: payload.address,
+    gender: payload.gender,
+    dob: payload.dob || '2004-01-01',
+    status: studentData.status || 'Active Registered Student',
+    feeStatus: studentData.feeStatus || 'Pending Verification',
+    amountPaid: studentData.amountPaid || '₹0',
+    date: dateStr,
+    time: timeStr,
+    createdAt: payload.createdAt
   };
 
   // 1. Save directly to Firebase Cloud Database (ithunt-3a42d)
   saveToFirebaseCloud('students', studentId, payload);
+  saveToFirebaseCloud('admissions', regNo, admissionRecord);
   saveToFirebaseCloud('users', userId, {
     id: userId,
     name: payload.name,
     email: payload.email,
     role: 'student',
     verified: true,
-    createdAt: new Date().toISOString()
+    createdAt: payload.createdAt
   });
 
   // 2. Try REST API endpoint
   try {
     const data = await API.registerStudent(payload);
-    return { success: true, data };
+    return { success: true, data: { ...data, admission: data?.admission || admissionRecord } };
   } catch (error) {
     console.warn('Backend API notice, returning saved Firebase Cloud student record:', error.message);
-    return { success: true, data: { user: payload, student: payload } };
+    return { success: true, data: { user: payload, student: payload, admission: admissionRecord } };
   }
 }
 
 export async function registerStudentUser(signupData) {
-  const regNo = `ITH-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`;
+  const regNo = signupData.registrationNo || `ITH-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`;
+  const now = new Date();
+  const dateStr = signupData.date || (() => {
+    try { return now.toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata' }); }
+    catch (_) { return now.toLocaleDateString('en-GB'); }
+  })();
+  const timeStr = signupData.time || (() => {
+    try { return now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' }); }
+    catch (_) { return now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }); }
+  })();
+
   const studentRecord = {
     id: regNo,
     registrationNo: regNo,
     name: signupData.candidateName || signupData.name || 'Student',
     candidateName: signupData.candidateName || signupData.name || 'Student',
+    fullName: signupData.candidateName || signupData.name || 'Student',
     email: signupData.email,
-    mobile: signupData.mobile || '',
-    phone: signupData.mobile || '',
+    mobile: signupData.mobile || signupData.phone || '',
+    phone: signupData.mobile || signupData.phone || '',
     course: signupData.course || 'MERN Stack Web Engineer',
     fatherName: signupData.fatherName || 'Not Specified',
     motherName: signupData.motherName || 'Not Specified',
@@ -1335,16 +1385,20 @@ export async function registerStudentUser(signupData) {
     dob: signupData.dob || new Date().toISOString().split('T')[0],
     district: signupData.district || 'Prayagraj',
     address: signupData.address || 'Holagarh, Prayagraj',
-    date: new Date().toLocaleDateString('en-GB'),
-    time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-    status: 'Active Registered Student',
-    feeStatus: 'Pending Verification',
+    date: dateStr,
+    time: timeStr,
+    status: signupData.status || 'Active Registered Student',
+    feeStatus: signupData.feeStatus || 'Pending Verification',
     password: signupData.password
   };
 
   const apiRes = await registerStudentWithBackend(studentRecord);
   if (apiRes && apiRes.success) {
-    return { success: true, user: apiRes.data?.user || studentRecord };
+    return { 
+      success: true, 
+      user: apiRes.data?.user || apiRes.data?.student || studentRecord,
+      admission: apiRes.data?.admission 
+    };
   }
   return { success: true, user: studentRecord };
 }

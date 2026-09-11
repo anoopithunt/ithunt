@@ -410,13 +410,19 @@ const handleStudentSignupSubmit = async () => {
   isLoading.value = true;
 
   try {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-GB');
+    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
     const signupPayload = {
       ...studentSignup,
       userId: studentSignup.email,
-      password: studentSignup.password || 'Ithunt@123'
+      password: studentSignup.password || 'Ithunt@123',
+      date: dateStr,
+      time: timeStr
     };
     const res = await registerStudentUser(signupPayload);
-    const studentUser = (res && res.user) ? { ...res.user } : {
+    const studentUser = (res && res.user) ? { ...res.user, admission: res.admission } : {
       ...DEFAULT_DEMO_STUDENT,
       candidateName: studentSignup.candidateName,
       userId: studentSignup.email,
@@ -424,6 +430,8 @@ const handleStudentSignupSubmit = async () => {
       password: studentSignup.password || 'Ithunt@123',
       mobile: studentSignup.mobile,
       course: studentSignup.course,
+      date: dateStr,
+      time: timeStr,
       registrationNo: 'ITH-2026-' + Math.floor(100 + Math.random() * 900)
     };
 

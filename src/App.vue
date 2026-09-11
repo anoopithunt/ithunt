@@ -592,6 +592,12 @@ const handleStudentLoginSuccess = (user) => {
   try {
     localStorage.setItem('ithunt_student_user', JSON.stringify(user));
   } catch (e) {}
+  if (user && user.admission) {
+    const existingIdx = liveAdmissionsList.value.findIndex(a => a.registrationNo === user.admission.registrationNo || a.email === user.admission.email);
+    if (existingIdx === -1) {
+      liveAdmissionsList.value.unshift(user.admission);
+    }
+  }
   activeTab.value = 'student-portal';
   triggerConfetti();
   showToast(`Welcome back, ${user.candidateName || 'Student'}! Logged into Student Dashboard.`, 'success');
