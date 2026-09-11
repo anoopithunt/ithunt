@@ -21,15 +21,12 @@
     "@vercel/analytics": "^2.0.1",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
-    "firebase": "^12.18.0",
-    "firebase-admin": "^14.3.0",
     "jspdf": "^4.2.1",
     "mongoose": "^9.10.0",
     "vue": "^3.4.21"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
-    "firebase-tools": "^15.28.1",
     "purgecss": "^8.0.0",
     "vite": "^6.2.0"
   },

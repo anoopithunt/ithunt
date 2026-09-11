@@ -317,41 +317,6 @@ export async function sendStudentAdmissionEmail(admissionRecord, studentPdfBlob 
     }
   }
 
-  // 2. Write to Firebase Firestore 'mail' collection for Firebase Trigger Email extension / Cloud Functions
-  try {
-    const { db } = await import('./firebaseConfig.js');
-    if (db) {
-      const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
-      await addDoc(collection(db, 'mail'), {
-        to: [admissionRecord.email],
-        from: TARGET_EMAIL,
-        message: {
-          subject: cleanEmail.subject,
-          text: cleanEmail.body,
-          html: `
-            <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 620px; margin: 0 auto; color: #1e293b; line-height: 1.6;">
-              <div style="background: #0f172a; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
-                <h2 style="color: #ea580c; margin: 0; font-size: 20px;">🎓 IT HUNT Software Solutions & Tech Academy</h2>
-                <p style="color: #94a3b8; margin: 5px 0 0 0; font-size: 13px;">Official Candidate Admission Confirmation</p>
-              </div>
-              <div style="padding: 24px; border: 1px solid #e2e8f0; border-top: none; background: #ffffff;">
-                <pre style="font-family: inherit; white-space: pre-wrap; font-size: 14px; margin: 0;">${cleanEmail.body}</pre>
-              </div>
-            </div>
-          `
-        },
-        registrationNo: regNo,
-        createdAt: serverTimestamp ? serverTimestamp() : new Date().toISOString()
-      });
-      console.log('✓ Student admission email queued to Firebase mail collection for candidate:', admissionRecord.email);
-    }
-  } catch (fbMailErr) {
-    // Non-blocking firestore queue
-  }
-
-  // Note: We deliberately do NOT use FormSubmit with _cc to student email here,
-  // because FormSubmit hardcodes "Someone just submitted your form on localhost"
-  // which is an internal website-owner notification and must never be shown to a self-registering student!
   console.log(`✓ Clean student admission confirmation prepared for ${admissionRecord.email} [Reg: ${regNo}]`);
   return { success: true, method: 'clean_direct' };
 }
