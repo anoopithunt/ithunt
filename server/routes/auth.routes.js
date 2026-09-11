@@ -40,33 +40,47 @@ router.post('/login', async (req, res) => {
     // 2. Check Database Users, Admissions, and Students
     const allUsers = await dbAdapter.find('users');
     let user = allUsers.find(u => 
+      (u.userId && u.userId.toLowerCase() === normEmail) ||
       (u.email && u.email.toLowerCase() === normEmail) || 
       (u.registrationNo && u.registrationNo.toLowerCase() === normEmail) ||
+      (u.enrollmentNumber && u.enrollmentNumber.toLowerCase() === normEmail) ||
       (u.id && u.id.toLowerCase() === normEmail)
     );
 
     if (!user) {
       const allAdmissions = await dbAdapter.find('admissions');
       const adm = allAdmissions.find(a => 
+        (a.userId && a.userId.toLowerCase() === normEmail) ||
         (a.email && a.email.toLowerCase() === normEmail) || 
         (a.registrationNo && a.registrationNo.toLowerCase() === normEmail) ||
+        (a.enrollmentNumber && a.enrollmentNumber.toLowerCase() === normEmail) ||
         (a.id && a.id.toLowerCase() === normEmail)
       );
       if (adm) {
         user = {
-          id: adm.registrationNo || adm.id,
+          id: adm.userId || adm.registrationNo || adm.id,
+          userId: adm.userId || adm.registrationNo || adm.id,
           name: adm.candidateName || adm.fullName || 'Student',
           email: adm.email,
           password: adm.password || 'Ithunt@123',
           role: 'student',
           registrationNo: adm.registrationNo || adm.id,
-          verified: true
+          enrollmentNumber: adm.enrollmentNumber || adm.userId || adm.registrationNo || '',
+          verified: adm.status === 'Confirmed' || adm.admissionConfirmed
         };
       }
     }
 
     if (!user) {
       return res.status(401).json({ success: false, message: 'Invalid credentials. User not found.' });
+    }
+
+    if (user.role === 'student' && user.verified === false) {
+      return res.status(403).json({
+        success: false,
+        pending: true,
+        message: 'Your admission registration is currently pending review by SuperAdmin. Once confirmed, your generated User ID and Password will be activated for login.'
+      });
     }
 
     let isMatch = false;

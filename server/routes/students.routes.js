@@ -215,32 +215,35 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body || {};
     if (!email) {
-      return res.status(400).json({ success: false, message: 'Email or registration number is required' });
+      return res.status(400).json({ success: false, message: 'User ID, Email, or Registration Number is required' });
     }
     const norm = email.toLowerCase().trim();
     const inputPass = (password || '').trim();
 
-    // 1. Check students
+    // 1. Check students collection
     const students = await dbAdapter.find('students');
     let student = students.find(s => 
+      (s.userId && s.userId.toLowerCase() === norm) ||
       (s.email && s.email.toLowerCase() === norm) || 
       (s.registrationNo && s.registrationNo.toLowerCase() === norm) ||
       (s.enrollmentNumber && s.enrollmentNumber.toLowerCase() === norm) ||
       (s.id && s.id.toLowerCase() === norm)
     );
 
-    // 2. Check admissions
+    // 2. Check admissions collection
     const admissions = await dbAdapter.find('admissions');
     let adm = admissions.find(a => 
+      (a.userId && a.userId.toLowerCase() === norm) ||
       (a.email && a.email.toLowerCase() === norm) || 
       (a.registrationNo && a.registrationNo.toLowerCase() === norm) ||
       (a.registrationNumber && a.registrationNumber.toLowerCase() === norm) ||
       (a.id && a.id.toLowerCase() === norm)
     );
 
-    // 3. Check users
+    // 3. Check users collection
     const users = await dbAdapter.find('users');
     let user = users.find(u => 
+      (u.userId && u.userId.toLowerCase() === norm) ||
       (u.email && u.email.toLowerCase() === norm) || 
       (u.registrationNo && u.registrationNo.toLowerCase() === norm) ||
       (u.id && u.id.toLowerCase() === norm)
@@ -259,7 +262,17 @@ router.post('/login', async (req, res) => {
         const token = generateToken(demoUser);
         return res.json({ success: true, token, user: demoUser, student: demoUser });
       }
-      return res.status(404).json({ success: false, message: 'No student account found with this ID / Email' });
+      return res.status(404).json({ success: false, message: 'No student account found with this User ID / Email' });
+    }
+
+    // Check admission confirmation status
+    const isAdmissionPending = adm && (adm.status === 'Pending Verification' || adm.status === 'Pending Confirmation') && !adm.admissionConfirmed;
+    if (isAdmissionPending && !student?.admissionConfirmed && (!user || !user.verified)) {
+      return res.status(403).json({
+        success: false,
+        pending: true,
+        message: 'Your admission registration is currently pending review by SuperAdmin. Once confirmed, your generated User ID and Password will be activated for login.'
+      });
     }
 
     const expectedPass = user?.password || adm?.password || student?.password || 'Ithunt@123';
@@ -267,16 +280,20 @@ router.post('/login', async (req, res) => {
     const isMatch = !inputPass || inputPass === expectedPass || inputPass === 'Ithunt@123' || (mobilePass && inputPass === mobilePass);
 
     if (!isMatch) {
-      return res.status(401).json({ success: false, message: 'Invalid password. Default password is Ithunt@123.' });
+      return res.status(401).json({ success: false, message: 'Invalid password. Please check your credentials or contact SuperAdmin.' });
     }
 
     const resolvedUser = {
-      id: student?.id || adm?.id || user?.id || `STU-${Date.now()}`,
+      id: student?.userId || adm?.userId || student?.id || adm?.id || user?.id || `STU-${Date.now()}`,
+      userId: student?.userId || adm?.userId || user?.userId || student?.enrollmentNumber || adm?.registrationNo || '',
+      enrollmentNumber: student?.enrollmentNumber || adm?.enrollmentNumber || student?.userId || adm?.registrationNo || '',
       name: student?.name || student?.fullName || adm?.candidateName || user?.name || 'Student',
+      fullName: student?.fullName || student?.name || adm?.candidateName || 'Student',
       email: student?.email || adm?.email || user?.email || norm,
       registrationNo: student?.registrationNo || adm?.registrationNo || user?.registrationNo || '',
-      course: student?.course || adm?.course || 'MERN Stack Developer',
-      role: 'student'
+      course: student?.course || adm?.course || 'Software Engineering',
+      role: 'student',
+      status: 'ACTIVE'
     };
     const token = generateToken(resolvedUser);
     res.json({
@@ -286,6 +303,47 @@ router.post('/login', async (req, res) => {
       data: { token, user: resolvedUser, student: resolvedUser },
       user: resolvedUser,
       student: resolvedUser
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * POST /api/students/:id/reset-password
+ * SuperAdmin can reset student credentials
+ */
+router.post('/:id/reset-password', async (req, res) => {
+  try {
+    const targetId = req.params.id;
+    const { newPassword } = req.body || {};
+    const generatedPass = newPassword || `ITH@${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const allStudents = await dbAdapter.find('students');
+    const student = allStudents.find(s => s.id === targetId || s.userId === targetId || s.registrationNo === targetId || s.email === targetId);
+    if (student) {
+      await dbAdapter.update('students', student.id, { password: generatedPass });
+    }
+
+    const allAdmissions = await dbAdapter.find('admissions');
+    const adm = allAdmissions.find(a => a.id === targetId || a.userId === targetId || a.registrationNo === targetId || a.email === targetId);
+    if (adm) {
+      await dbAdapter.update('admissions', adm.id, { password: generatedPass });
+    }
+
+    const allUsers = await dbAdapter.find('users');
+    const user = allUsers.find(u => u.id === targetId || u.userId === targetId || u.registrationNo === targetId || u.email === targetId);
+    if (user) {
+      await dbAdapter.update('users', user.id, { password: generatedPass });
+    }
+
+    res.json({
+      success: true,
+      message: 'Student password reset successfully by SuperAdmin',
+      data: {
+        userId: targetId,
+        newPassword: generatedPass
+      }
     });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

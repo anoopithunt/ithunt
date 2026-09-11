@@ -83,7 +83,7 @@
           <form v-if="studentMode === 'login'" @submit.prevent="handleStudentLoginSubmit" class="login-form">
             <div class="form-group" style="margin-bottom: 1.25rem;">
               <label class="form-label" for="student-email">
-                <span>📧</span> Student Email / Username <span class="req">*</span>
+                <span>📧</span> Student User ID / Email / Reg No <span class="req">*</span>
               </label>
               <input 
                 id="student-email"
@@ -91,7 +91,7 @@
                 v-model="studentLoginEmail" 
                 required 
                 class="form-control" 
-                placeholder="your.email@example.com or ITH-2026-001"
+                placeholder="e.g. ITH-2026-STU8492 or your.email@example.com"
                 autocomplete="username"
               >
             </div>
@@ -379,9 +379,9 @@ const handleStudentLoginSubmit = async () => {
       isLoading.value = false;
       emit('student-login-success', studentUser);
       return;
-    } else if (apiRes && apiRes.error) {
+    } else if (apiRes && (apiRes.error || apiRes.message)) {
       isLoading.value = false;
-      errorMessage.value = apiRes.error;
+      errorMessage.value = apiRes.message || apiRes.error;
       return;
     }
   } catch (err) {
@@ -402,7 +402,7 @@ const handleStudentLoginSubmit = async () => {
   }
 
   isLoading.value = false;
-  errorMessage.value = 'Invalid student credentials. Candidate Email is your User ID and default password is Ithunt@123.';
+  errorMessage.value = 'Invalid student credentials. Please enter your confirmed Student User ID / Email and your generated password.';
 };
 
 const handleStudentSignupSubmit = async () => {
