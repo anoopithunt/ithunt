@@ -136,6 +136,54 @@ router.post('/register', async (req, res) => {
 });
 
 /**
+ * PUT /api/students/profile
+ */
+router.put('/profile', async (req, res) => {
+  try {
+    const body = req.body || {};
+    const targetId = body.id || body.registrationNo || body.email || body.userId;
+    if (!targetId) {
+      return res.status(400).json({ success: false, message: 'Student ID, Registration Number, or Email required' });
+    }
+
+    const allStudents = await dbAdapter.find('students');
+    const student = allStudents.find(s => 
+      s.id === targetId || 
+      s.registrationNo === targetId || 
+      (s.email && s.email.toLowerCase() === String(targetId).toLowerCase())
+    );
+
+    let updated = null;
+    if (student) {
+      updated = await dbAdapter.update('students', student.id, body);
+    } else {
+      updated = await dbAdapter.create('students', { ...body, id: targetId });
+    }
+
+    const allAdmissions = await dbAdapter.find('admissions');
+    const admission = allAdmissions.find(a => 
+      a.id === targetId || 
+      a.registrationNo === targetId || 
+      (a.email && a.email.toLowerCase() === String(targetId).toLowerCase())
+    );
+    if (admission) {
+      await dbAdapter.update('admissions', admission.id, {
+        candidateName: body.candidateName || body.fullName || admission.candidateName,
+        fullName: body.fullName || body.candidateName || admission.fullName,
+        phone: body.phone || body.mobile || admission.phone,
+        mobile: body.mobile || body.phone || admission.mobile,
+        address: body.address !== undefined ? body.address : admission.address,
+        course: body.course || admission.course
+      });
+    }
+
+    res.json({ success: true, data: updated, message: 'Student profile updated successfully in database' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
  * PUT /api/students/:id
  */
 router.put('/:id', async (req, res) => {

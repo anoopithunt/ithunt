@@ -102,36 +102,6 @@
         </button>
 
         <button 
-          v-if="admission && admission.email" 
-          class="btn-secondary" 
-          style="border-color: rgba(234, 88, 12, 0.5); color: #fb923c; background: rgba(234, 88, 12, 0.1);"
-          @click="openStudentGmailLetter(admission)"
-          title="Open Official Admission Confirmation Letter in Gmail"
-        >
-          <span>📧 Save to Gmail</span>
-        </button>
-
-        <button 
-          v-if="admission && admission.mobile" 
-          class="btn-primary" 
-          style="background: linear-gradient(135deg, #25D366, #128C7E); border-color: #25D366; color: #ffffff;"
-          @click="sendWhatsAppNotification(admission)"
-          title="Send Official Admission Confirmation Pass on WhatsApp"
-        >
-          <span>💬 WhatsApp Pass</span>
-        </button>
-
-        <button 
-          v-if="admission && admission.mobile" 
-          class="btn-secondary" 
-          style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;"
-          @click="sendDeviceSmsNotification(admission)"
-          title="Send Confirmation via Mobile SMS"
-        >
-          <span>📱 Mobile SMS</span>
-        </button>
-        
-        <button 
           v-if="admission" 
           class="btn-secondary" 
           @click="$emit('print-slip')"
@@ -146,9 +116,6 @@
 </template>
 
 <script setup>
-import { sendWhatsAppNotification, sendDeviceSmsNotification } from '../../utils/smsNotifier.js';
-import { getStudentAdmissionGmailUrl } from '../../utils/emailNotifier.js';
-
 defineProps({
   isOpen: {
     type: Boolean,

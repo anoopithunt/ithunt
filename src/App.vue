@@ -430,7 +430,6 @@ import CONTENT_DATA from './data/contentData.js';
 import { DEFAULT_DEMO_STUDENT } from './data/studentAcademicData.js';
 import { generateAdmissionPdf, generatePrivacyPolicyPdf, generateTermsConditionsPdf, getAdmissionPdfBlob } from './utils/pdfGenerator.js';
 import { generateNielitProjectPdf, getNielitProjectPdfBlob } from './utils/nielitPdfGenerator.js';
-import { sendAdmissionEmailNotification, sendJobEmailNotification, sendRsvpEmailNotification, sendNielitProjectEmailNotification } from './utils/emailNotifier.js';
 import { 
   saveNielitProjectRecord, 
   saveAdmissionRecord, 
@@ -458,7 +457,6 @@ import {
   setupRealtimeFirebaseListeners,
   submitReviewToBackend
 } from './utils/apiClient.js';
-import { triggerMobileMessageNotification } from './utils/smsNotifier.js';
 
 import Navbar from './components/layout/Navbar.vue';
 import Footer from './components/layout/Footer.vue';
@@ -770,33 +768,37 @@ const openRsvpModal = (upEv) => {
   showRsvpModal.value = true;
 };
 
-const submitEventRsvp = (rsvpData) => {
+const submitEventRsvp = async (rsvpData) => {
   showRsvpModal.value = false;
   const passId = 'EVT-' + Math.floor(100000 + Math.random() * 900000);
   submittedRegistrationNo.value = passId;
   
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
   const rsvpRecord = {
     id: passId,
-    date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+    date: dateStr,
+    time: timeStr,
     name: rsvpData.name,
+    candidateName: rsvpData.name,
     email: rsvpData.email,
     phone: rsvpData.phone,
+    mobile: rsvpData.phone,
     eventTitle: rsvpData.eventTitle,
     college: rsvpData.college,
-    status: 'VIP Entry Pass Confirmed'
+    status: 'Confirmed'
   };
 
   // Real-time sync into SuperAdmin registry
   liveRsvpsList.value.unshift(rsvpRecord);
 
-  // Save to Firebase Firestore & local storage
-  saveRsvpRecord(rsvpRecord).catch(() => {});
-
-  // Send automatic email notification to softtechithunt@gmail.com
-  sendRsvpEmailNotification(rsvpRecord).catch(() => {});
+  // Save via specific REST API call to backend database
+  await saveRsvpRecord(rsvpRecord).catch((e) => console.warn('Save RSVP error:', e.message));
 
   modalTitle.value = content.value?.ui?.eventRsvpSuccessTitle || 'Free Event Pass Confirmed! 🎟️';
-  modalBody.value = `Congratulations ${rsvpData.name}! Your free VIP entry pass for "${rsvpData.eventTitle}" has been booked. A confirmation SMS will be sent to +91 ${rsvpData.phone}.`;
+  modalBody.value = `Congratulations ${rsvpData.name}! Your VIP entry pass (ID: ${passId}) for "${rsvpData.eventTitle}" has been booked and saved to the database.`;
   showModal.value = true;
   triggerConfetti();
 };
@@ -806,35 +808,41 @@ const openJobModal = (job) => {
   showJobModal.value = true;
 };
 
-const submitJobApplication = (jobData) => {
+const submitJobApplication = async (jobData) => {
   showJobModal.value = false;
   const appId = 'JOB-' + Math.floor(100000 + Math.random() * 900000);
   submittedRegistrationNo.value = appId;
   
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
   const jobRecord = {
     id: appId,
-    date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+    date: dateStr,
+    time: timeStr,
     name: jobData.name,
+    fullName: jobData.name,
     email: jobData.email,
     phone: jobData.phone,
+    mobile: jobData.phone,
     position: jobData.jobTitle,
+    role: jobData.jobTitle,
     experience: jobData.experience || '4+ Years',
-    portfolio: jobData.portfolio,
+    portfolio: jobData.portfolio || jobData.link || '',
+    resumeLink: jobData.resumeLink || jobData.portfolio || jobData.link || '',
     currentCompany: jobData.currentCompany || 'Software Company',
-    status: 'Reviewing Profile'
+    status: 'Pending Review'
   };
 
   // Real-time sync into SuperAdmin registry
   liveJobApplicationsList.value.unshift(jobRecord);
 
-  // Save to Firebase Firestore & local storage
-  saveJobApplicationRecord(jobRecord).catch(() => {});
-
-  // Send automatic email notification to softtechithunt@gmail.com
-  sendJobEmailNotification(jobRecord).catch(() => {});
+  // Save via specific REST API call to backend database
+  await saveJobApplicationRecord(jobRecord).catch((e) => console.warn('Save job application error:', e.message));
 
   modalTitle.value = content.value?.ui?.jobApplicationSuccessTitle || 'Job Application Received! 💼';
-  modalBody.value = `Thank you ${jobData.name}! Your application for "${jobData.jobTitle}" has been forwarded to our HR & Academic Board.`;
+  modalBody.value = `Thank you ${jobData.name}! Your application for "${jobData.jobTitle}" has been received and saved to the database for HR review.`;
   showModal.value = true;
   triggerConfetti();
 };
@@ -846,12 +854,18 @@ const submitNielitProject = async (projectData) => {
   const regId = String(projectData.nielitRegNo || projectData.registrationNo || ('NIELIT-' + Math.floor(100000 + Math.random() * 900000))).trim();
   submittedRegistrationNo.value = regId;
 
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
   const nielitRecord = {
     ...projectData,
     id: regId,
     nielitRegNo: regId,
     registrationNo: regId,
     regNo: regId,
+    date: projectData.date || dateStr,
+    time: projectData.time || timeStr,
     status: projectData.status || 'Submitted'
   };
 
@@ -866,24 +880,12 @@ const submitNielitProject = async (projectData) => {
     liveNielitProjectsList.value.unshift(nielitRecord);
   }
 
-  // Save to Firebase Firestore & local storage
-  let fbDocId = regId;
-  try {
-    const res = await saveNielitProjectRecord(nielitRecord);
-    if (res && res.id) fbDocId = res.id;
-  } catch (e) {}
+  // Save via specific REST API call to backend database
+  await saveNielitProjectRecord(nielitRecord).catch((e) => console.warn('Save NIELIT project error:', e.message));
 
-  // Dispatch email notification with 4-page PDF attachment EXCLUSIVELY to Admin
-  try {
-    const pdfBlob = getNielitProjectPdfBlob(projectData);
-    sendNielitProjectEmailNotification(projectData, pdfBlob).catch(() => {});
-  } catch (e) {
-    sendNielitProjectEmailNotification(projectData).catch(() => {});
-  }
-
-  // Display Success Dialog Box
-  modalTitle.value = '🎉 Project Data Stored Successfully in Firebase!';
-  modalBody.value = `Congratulations ${projectData.candidateName}! Your ${projectData.nielitLevel || 'O'} Level Project record (Reg No: ${regId}) has been successfully saved to your Firebase Firestore Database & Users collection.\n\n🔥 Firebase Document ID: ${fbDocId}`;
+  // Display clean, professional confirmation dialog
+  modalTitle.value = '🎉 NIELIT Project Registered Successfully!';
+  modalBody.value = `Congratulations ${projectData.candidateName}! Your ${projectData.nielitLevel || 'O Level'} Project submission (Reg No: ${regId}) has been recorded and saved in the database.`;
   showModal.value = true;
   triggerConfetti();
 };
@@ -942,7 +944,7 @@ const submitAdmission = async (formData) => {
     role: 'student'
   };
 
-  // Save admission record to Firebase Cloud (Firestore + Realtime DB)
+  // Save admission record to backend API & Database
   const apiRes = await saveAdmissionRecord(newAdmissionRecord);
 
   if (apiRes && apiRes.success) {
@@ -957,18 +959,10 @@ const submitAdmission = async (formData) => {
       liveAdmissionsList.value.unshift(newAdmissionRecord);
     }
 
-    try {
-      const pdfBlob = getAdmissionPdfBlob(newAdmissionRecord);
-      sendAdmissionEmailNotification(newAdmissionRecord, pdfBlob).catch(() => {});
-    } catch (e) {
-      sendAdmissionEmailNotification(newAdmissionRecord).catch(() => {});
-    }
-    triggerMobileMessageNotification(newAdmissionRecord).catch(() => {});
-
     saveStudentAccount(newAdmissionRecord);
 
     modalTitle.value = '🎉 Admission Application Submitted Successfully!';
-    modalBody.value = `Congratulations ${newAdmissionRecord.candidateName}! Your student admission for "${newAdmissionRecord.course}" has been successfully submitted.\n\n📋 Registration No: ${finalRegNo}\n🔑 Student Portal Username: ${newAdmissionRecord.email}\n🔒 Default Password: ${studentPassword}\n\n✉️ Confirmation details sent to ${newAdmissionRecord.email}.`;
+    modalBody.value = `Congratulations ${newAdmissionRecord.candidateName}! Your student admission for "${newAdmissionRecord.course}" has been successfully submitted and saved to the database.\n\n📋 Registration No: ${finalRegNo}\n🔑 Student Portal Username: ${newAdmissionRecord.email}\n🔒 Default Password: ${studentPassword}`;
     showModal.value = true;
     triggerConfetti();
   } else {
@@ -1048,16 +1042,8 @@ const handleDirectAdmission = async (newAdm) => {
     console.warn('Firebase save warning (Direct Admission):', err.message);
   }
 
-  // 4. Trigger dual email notification for Admin & Student as well as mobile notifications
-  try {
-    const pdfBlob = getAdmissionPdfBlob(newAdm);
-    sendAdmissionEmailNotification(newAdm, pdfBlob).catch(() => {});
-  } catch (e) {
-    sendAdmissionEmailNotification(newAdm).catch(() => {});
-  }
-  triggerMobileMessageNotification(newAdm).catch(() => {});
   triggerConfetti();
-  showToast(`Direct admission registered! Student User ID: ${newAdm.email} | Default Password: Ithunt@123`, 'success', 6000);
+  showToast(`Direct admission registered and saved to database! Student User ID: ${newAdm.email} | Default Password: Ithunt@123`, 'success', 6000);
 };
 
 const handleDeleteAdmission = async (adm) => {
