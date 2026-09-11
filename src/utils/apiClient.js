@@ -203,27 +203,7 @@ export const normalizeUser = (u) => ({
   createdAt: u.createdAt ? (String(u.createdAt).includes('/') ? u.createdAt : new Date(u.createdAt).toLocaleDateString('en-GB')) : new Date().toLocaleDateString('en-GB')
 });
 
-/**
- * Database Persistence Helpers (Pure MongoDB ithunt)
- * All data persistence is handled natively by the Express REST API backed by MongoDB.
- * Compatibility stubs are maintained for seamless client integration.
- */
-export async function saveToFirebaseCloud(collectionName, docId, data) {
-  return { success: true, id: docId };
-}
 
-export async function fetchFromFirebaseCloud(collectionName) {
-  return [];
-}
-
-export async function deleteFromFirebaseCloud(collectionName, docId) {
-  return;
-}
-
-export function setupRealtimeFirebaseListeners(callbacks = {}) {
-  // Pure REST API replaces Firebase Listen/channel long-polling
-  return () => {};
-}
 
 /**
  * Standard Core API Request Handler with automatic Auth header attachment & response unwrapping
@@ -356,7 +336,7 @@ export const API = {
   getUsers: () => apiRequest('/auth/users'),
   deleteUser: (id) => apiRequest(`/auth/users/${id}`, { method: 'DELETE' }),
   getDashboardStats: () => apiRequest('/admin/stats'),
-  syncFirebase: () => apiRequest('/admin/stats')
+  syncDatabase: () => apiRequest('/admin/stats')
 };
 
 /**
@@ -483,49 +463,7 @@ export async function saveAdmissionRecord(data) {
     status: backendAdm?.status || payload.status || 'Confirmed'
   };
 
-  const cleanId = String(finalRegNo).replace(/\//g, '_');
-  const cleanEmail = normEmail ? normEmail.replace(/[@.]/g, '_') : null;
-
-  // 2. Non-blocking mirror to Firebase Cloud Firestore if active
-  saveToFirebaseCloud('admissions', cleanId, finalRecord).catch(() => {});
-
-  // 3. Mirror student record
-  const studentDoc = {
-    ...normalizeStudent({
-      ...finalRecord,
-      enrollmentNumber: finalRegNo,
-      userId: normEmail || cleanId
-    }),
-    email: normEmail,
-    userId: normEmail,
-    password: defaultPassword,
-    registrationNo: finalRegNo,
-    candidateName: finalRecord.candidateName,
-    course: finalRecord.course,
-    mobile: finalRecord.mobile,
-    status: 'Confirmed'
-  };
-  saveToFirebaseCloud('students', cleanId, studentDoc).catch(() => {});
-
-  // 4. Mirror student user login account
-  if (cleanEmail) {
-    const userDoc = {
-      id: cleanEmail,
-      userId: normEmail,
-      email: normEmail,
-      password: defaultPassword,
-      name: finalRecord.candidateName,
-      candidateName: finalRecord.candidateName,
-      role: 'student',
-      registrationNo: finalRegNo,
-      course: finalRecord.course,
-      mobile: finalRecord.mobile,
-      verified: true,
-      status: 'Confirmed',
-      createdAt: new Date().toISOString()
-    };
-    saveToFirebaseCloud('users', cleanEmail, userDoc).catch(() => {});
-  }
+  // Backend already creates student + user records via POST /api/admissions
 
   // 5. Ensure Student Portal User Account exists in local storage
   if (finalRecord.email) {
@@ -543,12 +481,11 @@ export async function saveAdmissionRecord(data) {
 }
 
 /**
- * Fetch all stored Admissions directly from REST backend (MongoDB ithunt) & Cloud (NO CACHE)
+ * Fetch all stored Admissions from MongoDB (ithunt) via REST API
  */
 export async function fetchAdmissionsFromBackend() {
   let list = [];
 
-  // 1. Primary: Fetch live records directly from REST API (MongoDB database 'ithunt')
   try {
     const data = await API.getAdmissions();
     const rawList = Array.isArray(data?.admissions) 
@@ -562,23 +499,7 @@ export async function fetchAdmissionsFromBackend() {
     console.warn('Notice loading admissions from REST API:', e.message);
   }
 
-  // 2. Secondary: Merge with Firebase Cloud Firestore if any remote records exist
-  try {
-    const fbRecords = await fetchFromFirebaseCloud('admissions');
-    if (fbRecords && fbRecords.length > 0) {
-      const map = new Map();
-      list.forEach(a => map.set(String(a.registrationNo || a.id), a));
-      fbRecords.forEach(a => {
-        const key = String(a.registrationNo || a.id);
-        if (!map.has(key)) map.set(key, a);
-      });
-      list = Array.from(map.values());
-    }
-  } catch (e) {
-    console.warn('Notice loading admissions from Firebase Cloud:', e.message);
-  }
-
-  // Deduplicate records directly from database
+  // Deduplicate records
   const uniqueMap = new Map();
   list.forEach(a => {
     const reg = String(a.registrationNo || a.registrationNumber || a.id || '').trim();
@@ -589,14 +510,13 @@ export async function fetchAdmissionsFromBackend() {
 }
 
 /**
- * Delete admission record directly from connected database (Firebase Firestore & REST API)
+ * Delete admission record from MongoDB (ithunt) via REST API
  */
 export async function deleteAdmissionFromBackend(adm) {
   if (!adm) return { success: false };
 
   const targetId = typeof adm === 'object' ? (adm.registrationNo || adm.id) : adm;
   const altId = typeof adm === 'object' ? (adm.id || adm.registrationNo) : adm;
-  const email = typeof adm === 'object' ? adm.email : null;
 
   const rawIds = Array.from(new Set([targetId, altId].filter(Boolean)));
   const idsToTry = [];
@@ -605,27 +525,9 @@ export async function deleteAdmissionFromBackend(adm) {
     idsToTry.push(String(id).replace(/\//g, '_'));
   });
 
-  // 1. Delete directly from Firebase Cloud (Firestore + Realtime DB) for 'admissions' and 'students'
   for (const id of Array.from(new Set(idsToTry))) {
-    await deleteFromFirebaseCloud('admissions', id);
-    await deleteFromFirebaseCloud('students', id);
-  }
-
-  // 2. Also clean up users collection if student email exists
-  if (email) {
-    const cleanEmail = String(email).replace(/[@.]/g, '_');
-    await deleteFromFirebaseCloud('users', cleanEmail);
-    await deleteFromFirebaseCloud('users', email);
-  }
-
-  // 3. Delete from REST API backend
-  for (const id of idsToTry) {
-    try {
-      await API.deleteAdmission(id);
-    } catch (e) {}
-    try {
-      await API.deleteStudent(id);
-    } catch (e) {}
+    try { await API.deleteAdmission(id); } catch (e) {}
+    try { await API.deleteStudent(id); } catch (e) {}
   }
 
   return { success: true };
@@ -664,10 +566,6 @@ export async function saveJobApplicationRecord(data) {
     createdAt: data.createdAt || new Date().toISOString()
   };
 
-  // 1. Direct save to Firebase Cloud (Firestore & Realtime DB)
-  await saveToFirebaseCloud('job_applications', docId, payload);
-
-  // 2. REST API backend sync
   const apiRes = await submitJobApplicationToBackend(payload);
   return { success: true, id: docId, record: payload, ...apiRes };
 }
@@ -675,41 +573,23 @@ export async function saveJobApplicationRecord(data) {
 export async function fetchJobApplicationsFromBackend() {
   let list = [];
 
-  // 1. Fetch live records directly from Firebase Cloud
   try {
-    const fbRecords = await fetchFromFirebaseCloud('job_applications');
-    if (fbRecords.length > 0) {
-      list = fbRecords;
+    const data = await API.getCareers();
+    const rawList = Array.isArray(data?.applications) 
+      ? data.applications 
+      : (Array.isArray(data) ? data : []);
+    if (rawList.length > 0) {
+      list = rawList;
     }
   } catch (e) {
-    console.warn('Notice loading job applications from Firebase Cloud:', e.message);
-  }
-
-  // 2. Merge with REST API if configured
-  if (API_BASE_URL) {
-    try {
-      const data = await API.getCareers();
-      const rawList = Array.isArray(data?.applications) 
-        ? data.applications 
-        : (Array.isArray(data) ? data : []);
-      if (rawList.length > 0) {
-        const map = new Map();
-        list.forEach(j => map.set(j.id, j));
-        rawList.forEach(j => {
-          if (j.id) map.set(j.id, { ...map.get(j.id), ...j });
-        });
-        list = Array.from(map.values());
-      }
-    } catch (e) {
-      console.warn('Notice loading job applications from API:', e.message);
-    }
+    console.warn('Notice loading job applications from API:', e.message);
   }
 
   return list.map(normalizeJobApplication);
 }
 
 /**
- * Submit student review to backend REST API & Firebase Cloud (Direct DB)
+ * Submit student review to backend REST API (MongoDB ithunt)
  */
 export async function submitReviewToBackend(data) {
   const docId = data.id || `REV-${Date.now()}`;
@@ -727,9 +607,6 @@ export async function submitReviewToBackend(data) {
     createdAt: data.createdAt || new Date().toISOString()
   };
 
-  // 1. Direct save to Firebase Cloud
-  await saveToFirebaseCloud('reviews', docId, payload);
-
   try {
     return await API.submitReview(payload);
   } catch (error) {
@@ -741,34 +618,19 @@ export async function submitReviewToBackend(data) {
 export const saveReviewRecord = submitReviewToBackend;
 
 /**
- * Fetch verified public student reviews directly from Firebase Cloud & REST API (NO CACHE)
+ * Fetch verified public student reviews from MongoDB (ithunt) via REST API
  */
 export async function fetchReviewsFromBackend() {
   let list = [];
 
   try {
-    const fbRecords = await fetchFromFirebaseCloud('reviews');
-    if (fbRecords.length > 0) {
-      list = fbRecords;
+    const data = await API.getReviews();
+    const rawList = Array.isArray(data?.reviews) ? data.reviews : (Array.isArray(data) ? data : []);
+    if (rawList.length > 0) {
+      list = rawList;
     }
-  } catch (e) {}
-
-  if (API_BASE_URL) {
-    try {
-      const data = await API.getReviews();
-      const rawList = Array.isArray(data?.reviews) ? data.reviews : (Array.isArray(data) ? data : []);
-      if (rawList.length > 0) {
-        const map = new Map();
-        list.forEach(r => map.set(r.id || r.name, r));
-        rawList.forEach(r => {
-          const k = r.id || r.name;
-          map.set(k, { ...map.get(k), ...r });
-        });
-        list = Array.from(map.values());
-      }
-    } catch (error) {
-      console.warn('Backend API connection warning (Fetch Reviews):', error.message);
-    }
+  } catch (error) {
+    console.warn('Backend API connection warning (Fetch Reviews):', error.message);
   }
 
   return list.map(normalizeReview);
@@ -815,52 +677,26 @@ export async function saveNielitProjectRecord(data) {
     createdAt: data.createdAt || new Date().toISOString()
   };
 
-  // 1. Direct save to Firebase Cloud (Firestore & Realtime DB)
-  await saveToFirebaseCloud('nielit_projects', docId, payload);
-
-  // 2. REST API backend sync
   const apiRes = await submitNielitProjectToBackend(payload);
   return { success: true, id: docId, data: payload, record: payload, ...apiRes };
 }
 
 /**
- * Fetch all stored NIELIT Projects directly from Firebase Cloud & REST API (NO CACHE)
+ * Fetch all stored NIELIT Projects from MongoDB (ithunt) via REST API
  */
 export async function fetchNielitProjectsFromBackend() {
   let list = [];
 
-  // 1. Fetch & merge from Firebase Cloud (Firestore & Realtime DB)
   try {
-    const fbRecords = await fetchFromFirebaseCloud('nielit_projects');
-    if (fbRecords.length > 0) {
-      list = fbRecords;
+    const data = await API.getNielitProjects();
+    const rawList = Array.isArray(data?.projects) 
+      ? data.projects 
+      : (Array.isArray(data) ? data : []);
+    if (rawList.length > 0) {
+      list = rawList;
     }
   } catch (e) {
-    console.warn('Notice loading nielit projects from Firebase Cloud:', e.message);
-  }
-
-  // 2. Try REST API if configured
-  if (API_BASE_URL) {
-    try {
-      const data = await API.getNielitProjects();
-      const rawList = Array.isArray(data?.projects) 
-        ? data.projects 
-        : (Array.isArray(data) ? data : []);
-      if (rawList.length > 0) {
-        const map = new Map();
-        list.forEach(p => {
-          const k = String(p.nielitRegNo || p.registrationNo || p.regNo || p.id || '').trim();
-          if (k) map.set(k, p);
-        });
-        rawList.forEach(p => {
-          const k = String(p.nielitRegNo || p.registrationNo || p.regNo || p.id || '').trim();
-          if (k) map.set(k, { ...map.get(k), ...p });
-        });
-        list = Array.from(map.values());
-      }
-    } catch (e) {
-      console.warn('Notice loading nielit projects from API:', e.message);
-    }
+    console.warn('Notice loading nielit projects from API:', e.message);
   }
 
   const normalized = list.map(normalizeNielitProject);
@@ -876,14 +712,11 @@ export async function fetchNielitProjectsFromBackend() {
 }
 
 /**
- * Update submitted NIELIT Project in Firebase Cloud & REST backend (Direct DB)
+ * Update submitted NIELIT Project in MongoDB (ithunt) via REST API
  */
 export async function updateNielitProjectInBackend(id, data) {
   if (!id) return { success: false };
   const cleanId = String(id).replace(/\//g, '_');
-
-  // 1. Update directly in Firebase Cloud
-  await saveToFirebaseCloud('nielit_projects', cleanId, data);
 
   try {
     return await API.updateNielitProject(cleanId, data);
@@ -896,15 +729,11 @@ export async function updateNielitProjectInBackend(id, data) {
 }
 
 /**
- * Delete submitted NIELIT Project directly from Firebase Cloud & REST backend
+ * Delete submitted NIELIT Project from MongoDB (ithunt) via REST API
  */
 export async function deleteNielitProjectFromBackend(id, token = '') {
   if (!id) return false;
   const cleanId = String(id).replace(/\//g, '_');
-
-  // 1. Delete directly from Firebase Cloud
-  await deleteFromFirebaseCloud('nielit_projects', cleanId);
-
   return await deleteProject(cleanId, true);
 }
 
@@ -962,10 +791,7 @@ export async function saveRsvpRecord(data) {
     createdAt: data.createdAt || new Date().toISOString()
   };
 
-  // 1. Direct save to Firebase Cloud (Firestore & Realtime DB)
-  await saveToFirebaseCloud('event_rsvps', docId, payload);
-
-  // 2. REST API backend sync
+  // REST API backend sync
   const apiRes = await submitRsvpToBackend(payload);
   return { success: true, id: docId, record: payload, ...apiRes };
 }
@@ -973,32 +799,16 @@ export async function saveRsvpRecord(data) {
 export async function fetchRsvpsFromBackend() {
   let list = [];
 
-  // 1. Fetch directly from Firebase Cloud
   try {
-    const fbRecords = await fetchFromFirebaseCloud('event_rsvps');
-    if (fbRecords.length > 0) {
-      list = fbRecords;
+    const data = await API.getEvents();
+    const rawList = Array.isArray(data?.rsvps)
+      ? data.rsvps
+      : (Array.isArray(data?.events) ? data.events : (Array.isArray(data) ? data : []));
+    if (rawList.length > 0) {
+      list = rawList;
     }
   } catch (e) {
-    console.warn('Notice loading RSVPs from Firebase Cloud:', e.message);
-  }
-
-  // 2. Try REST API if configured
-  if (API_BASE_URL) {
-    try {
-      const data = await API.getEvents();
-      const rawList = Array.isArray(data?.rsvps)
-        ? data.rsvps
-        : (Array.isArray(data?.events) ? data.events : (Array.isArray(data) ? data : []));
-      if (rawList.length > 0) {
-        const map = new Map();
-        list.forEach(r => map.set(r.id, r));
-        rawList.forEach(r => {
-          if (r.id) map.set(r.id, { ...map.get(r.id), ...r });
-        });
-        list = Array.from(map.values());
-      }
-    } catch (e) {}
+    console.warn('Notice loading RSVPs from API:', e.message);
   }
 
   return list.map(normalizeRsvp);
@@ -1028,46 +838,6 @@ export async function fetchStudentsFromBackend(filters = {}) {
     console.warn('Notice loading students from REST API:', e.message);
   }
 
-  // 1. Fetch live student records directly from Firebase Cloud Firestore 'students' collection
-  try {
-    const fbRecords = await fetchFromFirebaseCloud('students');
-    if (fbRecords.length > 0) {
-      const map = new Map();
-      list.forEach(s => map.set(s.id || s.userId || s.email, s));
-      fbRecords.forEach(s => map.set(s.id || s.userId || s.email, { ...map.get(s.id || s.userId || s.email), ...s }));
-      list = Array.from(map.values());
-    }
-  } catch (e) {}
-
-  // 2. Also merge all admitted candidates from Firestore 'admissions' collection directly into students
-  try {
-    const fbAdmissions = await fetchFromFirebaseCloud('admissions');
-    if (fbAdmissions.length > 0) {
-      const existingKeys = new Set(list.map(s => String(s.enrollmentNumber || s.registrationNo || s.id || s.email || '').toLowerCase().trim()));
-      fbAdmissions.forEach(adm => {
-        const reg = String(adm.registrationNo || adm.registrationNumber || adm.id || '').trim();
-        const email = String(adm.email || '').toLowerCase().trim();
-        if (!existingKeys.has(reg.toLowerCase()) && !existingKeys.has(email)) {
-          list.push(normalizeStudent({
-            ...adm,
-            id: reg,
-            enrollmentNumber: reg,
-            name: adm.candidateName || adm.fullName || 'Student',
-            fullName: adm.candidateName || adm.fullName || 'Student',
-            candidateName: adm.candidateName || adm.fullName || 'Student',
-            email: adm.email,
-            phone: adm.mobile || adm.phone,
-            mobile: adm.mobile || adm.phone,
-            course: adm.course,
-            status: adm.status || 'ACTIVE',
-            academicStatus: adm.status || 'ACTIVE'
-          }));
-          existingKeys.add(reg.toLowerCase());
-          if (email) existingKeys.add(email);
-        }
-      });
-    }
-  } catch (e) {}
 
   // Deduplicate students directly from database
   const uniqueMap = new Map();
@@ -1080,24 +850,11 @@ export async function fetchStudentsFromBackend(filters = {}) {
 }
 
 /**
- * Delete student record directly from connected database (Firebase Firestore & REST API)
+ * Delete student record from MongoDB (ithunt) via REST API
  */
 export async function deleteStudentFromBackend(student) {
   if (!student) return { success: false };
   const targetId = typeof student === 'object' ? (student.id || student.userId || student.enrollmentNumber || student.registrationNo) : student;
-  const email = typeof student === 'object' ? student.email : null;
-  const cleanId = String(targetId).replace(/\//g, '_');
-
-  await deleteFromFirebaseCloud('students', cleanId);
-  await deleteFromFirebaseCloud('admissions', cleanId);
-  if (targetId !== cleanId) {
-    await deleteFromFirebaseCloud('students', targetId);
-    await deleteFromFirebaseCloud('admissions', targetId);
-  }
-  if (email) {
-    await deleteFromFirebaseCloud('users', email.replace(/[@.]/g, '_'));
-    await deleteFromFirebaseCloud('users', email);
-  }
 
   try {
     await API.deleteStudent(targetId);
@@ -1108,7 +865,7 @@ export async function deleteStudentFromBackend(student) {
 }
 
 /**
- * Register a new student user via backend REST API & Firebase Cloud
+ * Register a new student user via backend REST API (MongoDB ithunt)
  */
 export async function registerStudentWithBackend(studentData) {
   const enrollmentNumber = studentData.enrollmentNumber || studentData.registrationNo || `ITH-${new Date().getFullYear()}-STU${Math.floor(1000 + Math.random() * 9000)}`;
@@ -1175,24 +932,12 @@ export async function registerStudentWithBackend(studentData) {
     createdAt: payload.createdAt
   };
 
-  // 1. Save directly to Firebase Cloud Database (ithunt-3a42d)
-  saveToFirebaseCloud('students', studentId, payload);
-  saveToFirebaseCloud('admissions', regNo, admissionRecord);
-  saveToFirebaseCloud('users', userId, {
-    id: userId,
-    name: payload.name,
-    email: payload.email,
-    role: 'student',
-    verified: true,
-    createdAt: payload.createdAt
-  });
-
-  // 2. Try REST API endpoint
+  // Save via REST API (backend creates student, admission & user records in MongoDB)
   try {
     const data = await API.registerStudent(payload);
     return { success: true, data: { ...data, admission: data?.admission || admissionRecord } };
   } catch (error) {
-    console.warn('Backend API notice, returning saved Firebase Cloud student record:', error.message);
+    console.warn('Backend API notice registering student:', error.message);
     return { success: true, data: { user: payload, student: payload, admission: admissionRecord } };
   }
 }
@@ -1264,7 +1009,7 @@ export async function loginStudentWithBackend(email, password) {
 }
 
 /**
- * Persist or register a student account directly to Firebase Cloud 'users' collection
+ * Persist student account to localStorage for Student Portal login
  */
 export function saveStudentAccount(account) {
   if (!account || (!account.email && !account.userId)) return;
@@ -1278,13 +1023,7 @@ export function saveStudentAccount(account) {
       role: 'STUDENT',
       updatedAt: new Date().toISOString()
     };
-
-    // Directly persist student user to Firebase Cloud 'users' collection
-    const cleanEmail = email.replace(/[@.]/g, '_');
-    saveToFirebaseCloud('users', cleanEmail, userObj).catch(() => {});
-    if (account.registrationNo) {
-      saveToFirebaseCloud('users', String(account.registrationNo).replace(/\//g, '_'), userObj).catch(() => {});
-    }
+    localStorage.setItem('ithunt_student_user', JSON.stringify(userObj));
   } catch (e) {}
 }
 
@@ -1434,7 +1173,7 @@ export async function fetchAdminStatsFromBackend(token) {
 }
 
 /**
- * Fetch all Internship Applications from backend REST API (GET /api/internships/applications)
+ * Fetch all Internship Applications from MongoDB (ithunt) via REST API
  */
 export async function fetchInternshipsFromBackend() {
   let list = [];
@@ -1447,170 +1186,89 @@ export async function fetchInternshipsFromBackend() {
     console.warn('Notice loading internship applications from API:', e.message);
   }
 
-  try {
-    const fbRecords = await fetchFromFirebaseCloud('internships');
-    if (fbRecords.length > 0) {
-      const map = new Map();
-      list.forEach(i => map.set(i.id || i.candidateName, i));
-      fbRecords.forEach(i => map.set(i.id || i.candidateName, { ...map.get(i.id || i.candidateName), ...i }));
-      list = Array.from(map.values());
-    }
-  } catch (e) {}
-
   return list.map(normalizeInternship);
 }
 
 /**
- * Fetch all Fees Ledger Payments from backend REST API (GET /api/fees) & Firebase Cloud (NO CACHE)
+ * Fetch all Fees Ledger Payments from MongoDB (ithunt) via REST API
  */
 export async function fetchFeesFromBackend() {
   let list = [];
 
   try {
-    const fbRecords = await fetchFromFirebaseCloud('fees');
-    if (fbRecords.length > 0) {
-      list = fbRecords;
-    }
-  } catch (e) {}
-
-  if (API_BASE_URL) {
-    try {
-      const data = await API.getFees();
-      const rawList = Array.isArray(data?.transactions) ? data.transactions : (Array.isArray(data) ? data : []);
-      if (rawList.length > 0) {
-        const map = new Map();
-        list.forEach(f => map.set(f.id || f.receiptNo || f.receiptNumber, f));
-        rawList.forEach(f => map.set(f.id || f.receiptNo || f.receiptNumber, { ...map.get(f.id || f.receiptNo || f.receiptNumber), ...f }));
-        list = Array.from(map.values());
-      }
-    } catch (e) {
-      console.warn('Notice loading fee transactions from API:', e.message);
-    }
+    const data = await API.getFees();
+    const rawList = Array.isArray(data?.transactions) ? data.transactions : (Array.isArray(data) ? data : []);
+    if (rawList.length > 0) list = rawList;
+  } catch (e) {
+    console.warn('Notice loading fee transactions from API:', e.message);
   }
 
   return list.map(normalizeFee);
 }
 
 /**
- * Fetch all Verified Certificates directly from Firebase Cloud & REST API (NO CACHE)
+ * Fetch all Verified Certificates from MongoDB (ithunt) via REST API
  */
 export async function fetchCertificatesFromBackend() {
   let list = [];
 
   try {
-    const fbRecords = await fetchFromFirebaseCloud('certificates');
-    if (fbRecords.length > 0) {
-      list = fbRecords;
-    }
-  } catch (e) {}
-
-  if (API_BASE_URL) {
-    try {
-      const data = await API.getCertificates();
-      const rawList = Array.isArray(data?.certificates) ? data.certificates : (Array.isArray(data) ? data : []);
-      if (rawList.length > 0) {
-        const map = new Map();
-        list.forEach(c => map.set(c.id || c.certNo || c.certificateNumber, c));
-        rawList.forEach(c => map.set(c.id || c.certNo || c.certificateNumber, { ...map.get(c.id || c.certNo || c.certificateNumber), ...c }));
-        list = Array.from(map.values());
-      }
-    } catch (e) {
-      console.warn('Notice loading certificates from API:', e.message);
-    }
+    const data = await API.getCertificates();
+    const rawList = Array.isArray(data?.certificates) ? data.certificates : (Array.isArray(data) ? data : []);
+    if (rawList.length > 0) list = rawList;
+  } catch (e) {
+    console.warn('Notice loading certificates from API:', e.message);
   }
 
   return list.map(normalizeCertificate);
 }
 
 /**
- * Fetch all Capstone Projects directly from Firebase Cloud & REST API (NO CACHE)
+ * Fetch all Capstone Projects from MongoDB (ithunt) via REST API
  */
 export async function fetchProjectsFromBackend() {
   let list = [];
 
   try {
-    const fbRecords = await fetchFromFirebaseCloud('projects');
-    if (fbRecords.length > 0) {
-      list = fbRecords;
-    }
-  } catch (e) {}
-
-  if (API_BASE_URL) {
-    try {
-      const data = await API.getProjects();
-      const rawList = Array.isArray(data?.projects) ? data.projects : (Array.isArray(data) ? data : []);
-      if (rawList.length > 0) {
-        const map = new Map();
-        list.forEach(p => map.set(p.id || p.title, p));
-        rawList.forEach(p => map.set(p.id || p.title, { ...map.get(p.id || p.title), ...p }));
-        list = Array.from(map.values());
-      }
-    } catch (e) {
-      console.warn('Notice loading capstone projects from API:', e.message);
-    }
+    const data = await API.getProjects();
+    const rawList = Array.isArray(data?.projects) ? data.projects : (Array.isArray(data) ? data : []);
+    if (rawList.length > 0) list = rawList;
+  } catch (e) {
+    console.warn('Notice loading capstone projects from API:', e.message);
   }
 
   return list.map(normalizeProject);
 }
 
 /**
- * Fetch all Contact Inquiries directly from Firebase Cloud & REST API (NO CACHE)
+ * Fetch all Contact Inquiries from MongoDB (ithunt) via REST API
  */
 export async function fetchContactInquiriesFromBackend() {
   let list = [];
 
   try {
-    const fbRecords = await fetchFromFirebaseCloud('contact');
-    if (fbRecords.length > 0) {
-      list = fbRecords;
-    }
-  } catch (e) {}
-
-  if (API_BASE_URL) {
-    try {
-      const data = await API.getContactInquiries();
-      const rawList = Array.isArray(data?.contacts) ? data.contacts : (Array.isArray(data?.inquiries) ? data.inquiries : (Array.isArray(data) ? data : []));
-      if (rawList.length > 0) {
-        const map = new Map();
-        list.forEach(c => map.set(c.id || c.email, c));
-        rawList.forEach(c => map.set(c.id || c.email, { ...map.get(c.id || c.email), ...c }));
-        list = Array.from(map.values());
-      }
-    } catch (e) {
-      console.warn('Notice loading contact inquiries from API:', e.message);
-    }
+    const data = await API.getContactInquiries();
+    const rawList = Array.isArray(data?.contacts) ? data.contacts : (Array.isArray(data?.inquiries) ? data.inquiries : (Array.isArray(data) ? data : []));
+    if (rawList.length > 0) list = rawList;
+  } catch (e) {
+    console.warn('Notice loading contact inquiries from API:', e.message);
   }
 
   return list.map(normalizeContactInquiry);
 }
 
 /**
- * Fetch all Auth Users directly from Firebase Cloud 'users' collection & REST API (NO CACHE)
+ * Fetch all Auth Users from MongoDB (ithunt) via REST API
  */
 export async function fetchUsersFromBackend() {
   let list = [];
 
-  // Fetch live user accounts directly from Firebase Cloud Firestore
   try {
-    const fbRecords = await fetchFromFirebaseCloud('users');
-    if (fbRecords.length > 0) {
-      list = fbRecords;
-    }
-  } catch (e) {}
-
-  if (API_BASE_URL) {
-    try {
-      const data = await API.getUsers();
-      const rawList = Array.isArray(data?.users) ? data.users : (Array.isArray(data) ? data : []);
-      if (rawList.length > 0) {
-        const map = new Map();
-        list.forEach(u => map.set(u.id || u.email, u));
-        rawList.forEach(u => map.set(u.id || u.email, { ...map.get(u.id || u.email), ...u }));
-        list = Array.from(map.values());
-      }
-    } catch (e) {
-      console.warn('Notice loading auth users from API:', e.message);
-    }
+    const data = await API.getUsers();
+    const rawList = Array.isArray(data?.users) ? data.users : (Array.isArray(data) ? data : []);
+    if (rawList.length > 0) list = rawList;
+  } catch (e) {
+    console.warn('Notice loading auth users from API:', e.message);
   }
 
   const uniqueMap = new Map();
@@ -1623,16 +1281,10 @@ export async function fetchUsersFromBackend() {
 }
 
 /**
- * Delete user account directly from Firebase Cloud database & REST API
+ * Delete user account from MongoDB (ithunt) via REST API
  */
 export async function deleteUserFromBackend(userId, token = '') {
   if (!userId) return { success: false, error: 'User ID is required' };
-  const cleanId = String(userId).replace(/[@.]/g, '_');
-
-  await deleteFromFirebaseCloud('users', cleanId);
-  await deleteFromFirebaseCloud('users', userId);
-  await deleteFromFirebaseCloud('admissions', userId);
-  await deleteFromFirebaseCloud('students', userId);
 
   try {
     await API.deleteUser(userId);
@@ -1653,13 +1305,10 @@ export async function deleteUserFromBackend(userId, token = '') {
 }
 
 /**
- * Delete job application directly from backend REST API and Firebase
+ * Delete job application from MongoDB (ithunt) via REST API
  */
 export async function deleteJobApplicationFromBackend(id) {
   if (!id) return { success: false };
-  try {
-    await deleteFromFirebaseCloud('job_applications', id);
-  } catch (e) {}
   try {
     await API.deleteJobApplication(id);
   } catch (e) {}
@@ -1667,13 +1316,10 @@ export async function deleteJobApplicationFromBackend(id) {
 }
 
 /**
- * Delete event RSVP directly from backend REST API and Firebase
+ * Delete event RSVP from MongoDB (ithunt) via REST API
  */
 export async function deleteRsvpFromBackend(id) {
   if (!id) return { success: false };
-  try {
-    await deleteFromFirebaseCloud('rsvps', id);
-  } catch (e) {}
   try {
     await API.deleteRsvp(id);
   } catch (e) {}
@@ -1681,13 +1327,10 @@ export async function deleteRsvpFromBackend(id) {
 }
 
 /**
- * Delete student review directly from backend REST API and Firebase
+ * Delete student review from MongoDB (ithunt) via REST API
  */
 export async function deleteReviewFromBackend(id) {
   if (!id) return { success: false };
-  try {
-    await deleteFromFirebaseCloud('reviews', id);
-  } catch (e) {}
   try {
     await API.deleteReview(id);
   } catch (e) {}
