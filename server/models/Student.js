@@ -23,6 +23,21 @@ const StudentSchema = new mongoose.Schema({
   attendance: { type: Number, default: 94 },
   cgpa: { type: String, default: '8.8 / 10' },
   marks: { type: Array, default: [] },
-}, { timestamps: true });
+  password: { type: String },
+  admissionConfirmed: { type: Boolean, default: false }
+}, { timestamps: true, strict: false });
+
+StudentSchema.pre('validate', function() {
+  if (!this.name && this.fullName) this.name = this.fullName;
+  if (!this.name && this.candidateName) this.name = this.candidateName;
+  if (!this.fullName && this.name) this.fullName = this.name;
+  if (!this.enrollmentNumber && this.registrationNo) this.enrollmentNumber = this.registrationNo;
+  if (!this.registrationNo && this.enrollmentNumber) this.registrationNo = this.enrollmentNumber;
+  if (!this.phone && this.mobile) this.phone = this.mobile;
+  if (!this.mobile && this.phone) this.mobile = this.phone;
+  if (!this.course && this.track) this.course = this.track;
+  if (!this.course) this.course = 'Software Engineering';
+  if (!this.enrollmentNumber) this.enrollmentNumber = `ITH-2026-STU${Math.floor(1000 + Math.random() * 9000)}`;
+});
 
 export const Student = mongoose.models.Student || mongoose.model('Student', StudentSchema);
