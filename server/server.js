@@ -47,6 +47,28 @@ app.use((req, res, next) => {
   next();
 });
 
+let isInitialized = false;
+
+export async function ensureDbConnected() {
+  if (isInitialized) return;
+  try {
+    await connectMongo();
+    isInitialized = true;
+  } catch (err) {
+    console.warn('Database initialization caught gracefully:', err.message);
+  }
+}
+
+// Auto-initialize DB on all incoming requests (crucial for serverless cold starts)
+app.use(async (req, res, next) => {
+  if (!isInitialized) {
+    try {
+      await ensureDbConnected();
+    } catch (_) {}
+  }
+  next();
+});
+
 // Health Check Endpoints
 const healthHandler = (req, res) => {
   res.json({
@@ -150,23 +172,7 @@ process.on('uncaughtException', (err) => {
   console.error('! Uncaught Exception (handled safely):', err?.message || err);
 });
 
-let isInitialized = false;
 
-export async function ensureDbConnected() {
-  if (isInitialized) return;
-  await connectMongo();
-  isInitialized = true;
-}
-
-// Ensure DB connected on serverless invocations
-app.use(async (req, res, next) => {
-  if (!isInitialized) {
-    try {
-      await ensureDbConnected();
-    } catch (_) {}
-  }
-  next();
-});
 
 // Initialize Databases and Start Server (Local / Standalone VM mode)
 async function startServer() {
