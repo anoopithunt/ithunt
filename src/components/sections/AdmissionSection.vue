@@ -202,26 +202,6 @@
           >
             <span>{{ isGeneratingPdf ? (content.ui?.generatingPdfLabel || '⏳ Generating PDF...') : (content.ui?.downloadVerifiedPdfBtn || '📄 Download Verified Admission Slip (PDF)') }}</span>
           </button>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
-            <button 
-              class="btn-primary" 
-              style="justify-content: center; background: linear-gradient(135deg, #25D366, #128C7E); border-color: #25D366; color: #ffffff;"
-              @click="sendWhatsAppNotification(lastSubmittedAdmission)"
-              title="Send Confirmation Pass on WhatsApp"
-            >
-              <span>💬 WhatsApp Pass</span>
-            </button>
-
-            <button 
-              class="btn-secondary" 
-              style="justify-content: center; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;"
-              @click="sendDeviceSmsNotification(lastSubmittedAdmission)"
-              title="Send Confirmation via Device SMS"
-            >
-              <span>📱 Mobile SMS</span>
-            </button>
-          </div>
         </div>
       </div>
     </div>
@@ -230,7 +210,6 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { sendWhatsAppNotification, sendDeviceSmsNotification } from '../../utils/smsNotifier.js';
 
 const props = defineProps({
   content: {

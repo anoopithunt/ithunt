@@ -123,10 +123,15 @@ router.post('/', async (req, res) => {
  */
 router.patch('/:id/status', async (req, res) => {
   try {
-    const { status } = req.body;
-    if (!status) return res.status(400).json({ success: false, message: 'Status is required' });
+    const { status, feeStatus } = req.body || {};
+    const updates = {};
+    if (status) updates.status = status;
+    if (feeStatus) updates.feeStatus = feeStatus;
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ success: false, message: 'Status or feeStatus is required' });
+    }
 
-    const updated = await dbAdapter.update('admissions', req.params.id, { status });
+    const updated = await dbAdapter.update('admissions', req.params.id, updates);
     res.json({ success: true, data: updated, message: 'Status updated' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

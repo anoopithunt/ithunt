@@ -459,7 +459,7 @@ export const API = {
   getAdmissions: () => apiRequest('/admissions'),
   getAdmission: (id) => apiRequest(`/admissions/${id}`),
   applyAdmission: (admissionData) => apiRequest('/admissions', { method: 'POST', body: JSON.stringify(admissionData) }),
-  updateAdmissionStatus: (id, status) => apiRequest(`/admissions/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  updateAdmissionStatus: (id, status, feeStatus) => apiRequest(`/admissions/${id}/status`, { method: 'PATCH', body: JSON.stringify(typeof status === 'object' ? status : { status, ...(feeStatus ? { feeStatus } : {}) }) }),
   deleteAdmission: (id) => apiRequest(`/admissions/${id}`, { method: 'DELETE' }),
 
   // NIELIT Project Submissions
@@ -483,13 +483,14 @@ export const API = {
   // Events & RSVPs
   getEvents: () => apiRequest('/events/rsvps'),
   submitRsvp: (rsvpData) => apiRequest('/events/rsvp', { method: 'POST', body: JSON.stringify(rsvpData) }),
+  deleteRsvp: (id) => apiRequest(`/events/rsvps/${id}`, { method: 'DELETE' }),
 
   // Reviews
   getReviews: () => apiRequest('/reviews'),
   getAdminReviews: () => apiRequest('/reviews/admin'),
   submitReview: (reviewData) => apiRequest('/reviews', { method: 'POST', body: JSON.stringify(reviewData) }),
   approveReview: (id) => apiRequest(`/reviews/admin/${id}/approve`, { method: 'PATCH' }),
-  deleteReview: (id) => apiRequest(`/reviews/admin/${id}`, { method: 'DELETE' }),
+  deleteReview: (id) => apiRequest(`/reviews/${id}`, { method: 'DELETE' }),
 
   // Fees Ledger
   getFees: () => apiRequest('/fees'),
@@ -875,6 +876,7 @@ export async function fetchJobApplicationsFromBackend() {
  */
 export async function submitReviewToBackend(data) {
   const docId = data.id || `REV-${Date.now()}`;
+  const reviewComment = (data.comment || data.reviewText || data.review || data.feedback || '').trim() || 'Excellent training at IT HUNT!';
   const payload = {
     ...data,
     id: docId,
@@ -882,7 +884,8 @@ export async function submitReviewToBackend(data) {
     role: data.role || data.course || 'Alumni / Student',
     course: data.course || 'Full Stack Development',
     rating: Number(data.rating) || 5,
-    reviewText: data.review || data.reviewText || data.feedback || 'Excellent training at IT HUNT!',
+    reviewText: reviewComment,
+    comment: reviewComment,
     avatar: data.avatar || 'img/ithunt.webp',
     createdAt: data.createdAt || new Date().toISOString()
   };
@@ -1887,6 +1890,48 @@ export async function deleteUserFromBackend(userId, token = '') {
   return { success: true, localOnly: true };
 }
 
+/**
+ * Delete job application directly from backend REST API and Firebase
+ */
+export async function deleteJobApplicationFromBackend(id) {
+  if (!id) return { success: false };
+  try {
+    await deleteFromFirebaseCloud('job_applications', id);
+  } catch (e) {}
+  try {
+    await API.deleteJobApplication(id);
+  } catch (e) {}
+  return { success: true };
+}
+
+/**
+ * Delete event RSVP directly from backend REST API and Firebase
+ */
+export async function deleteRsvpFromBackend(id) {
+  if (!id) return { success: false };
+  try {
+    await deleteFromFirebaseCloud('rsvps', id);
+  } catch (e) {}
+  try {
+    await API.deleteRsvp(id);
+  } catch (e) {}
+  return { success: true };
+}
+
+/**
+ * Delete student review directly from backend REST API and Firebase
+ */
+export async function deleteReviewFromBackend(id) {
+  if (!id) return { success: false };
+  try {
+    await deleteFromFirebaseCloud('reviews', id);
+  } catch (e) {}
+  try {
+    await API.deleteReview(id);
+  } catch (e) {}
+  return { success: true };
+}
+
 export default {
   apiRequest,
   API,
@@ -1898,8 +1943,11 @@ export default {
   submitJobApplicationToBackend,
   saveJobApplicationRecord,
   fetchJobApplicationsFromBackend,
+  deleteJobApplicationFromBackend,
   submitReviewToBackend,
+  saveReviewRecord,
   fetchReviewsFromBackend,
+  deleteReviewFromBackend,
   submitNielitProjectToBackend,
   saveNielitProjectRecord,
   fetchNielitProjectsFromBackend,
@@ -1909,6 +1957,7 @@ export default {
   submitRsvpToBackend,
   saveRsvpRecord,
   fetchRsvpsFromBackend,
+  deleteRsvpFromBackend,
   registerStudentWithBackend,
   registerStudentUser,
   saveStudentAccount,

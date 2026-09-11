@@ -94,4 +94,16 @@ router.post('/rsvp', async (req, res) => {
   }
 });
 
+/**
+ * DELETE /api/events/rsvps/:id
+ */
+router.delete('/rsvps/:id', async (req, res) => {
+  try {
+    await dbAdapter.delete('event_rsvps', req.params.id);
+    res.json({ success: true, message: `RSVP ${req.params.id} deleted` });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 export default router;

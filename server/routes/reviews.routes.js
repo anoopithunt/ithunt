@@ -75,9 +75,18 @@ router.patch('/admin/:id/approve', async (req, res) => {
 });
 
 /**
- * DELETE /api/reviews/admin/:id
+ * DELETE /api/reviews/admin/:id or /api/reviews/:id
  */
 router.delete('/admin/:id', async (req, res) => {
+  try {
+    await dbAdapter.delete('reviews', req.params.id);
+    res.json({ success: true, message: `Review ${req.params.id} deleted.` });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.delete('/:id', async (req, res) => {
   try {
     await dbAdapter.delete('reviews', req.params.id);
     res.json({ success: true, message: `Review ${req.params.id} deleted.` });
