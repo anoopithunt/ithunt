@@ -1,6 +1,31 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { fileURLToPath, URL } from 'node:url';
+import { spawn } from 'node:child_process';
+import net from 'node:net';
+
+/**
+ * Automatically launch Node.js backend server if not already running on port 3000
+ */
+function autoBackendPlugin() {
+  return {
+    name: 'auto-backend-server',
+    configureServer() {
+      const socket = net.createConnection({ port: 3000, host: '127.0.0.1' });
+      socket.on('connect', () => {
+        socket.destroy();
+      });
+      socket.on('error', () => {
+        console.log('\n⚡ [Vite] Backend on port 3000 not detected. Starting Node.js API server automatically...');
+        const child = spawn('node', ['server/server.js'], {
+          stdio: 'inherit',
+          shell: true
+        });
+        child.unref();
+      });
+    }
+  };
+}
 
 export default defineConfig(({ command }) => {
   const isDev = command === 'serve';
@@ -41,7 +66,8 @@ export default defineConfig(({ command }) => {
             ] : []
           }
         }
-      })
+      }),
+      autoBackendPlugin()
     ],
     resolve: {
       alias: {
@@ -54,8 +80,21 @@ export default defineConfig(({ command }) => {
       strictPort: false,
       proxy: {
         '/api': {
-          target: 'http://localhost:3000',
-          changeOrigin: true
+          target: 'http://127.0.0.1:3000',
+          changeOrigin: true,
+          secure: false,
+          configure: (proxy) => {
+            proxy.on('error', (err, req, res) => {
+              if (res && !res.headersSent && typeof res.writeHead === 'function') {
+                res.writeHead(503, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                  success: false,
+                  message: 'Backend server is initializing or unreachable.',
+                  error: err.code || err.message
+                }));
+              }
+            });
+          }
         }
       }
     },

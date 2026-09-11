@@ -5,15 +5,20 @@
   "description": "IT HUNT - Software Solutions & Tech Academy Web Portal (Vue 3 + Vite)",
   "scripts": {
     "dev": "vite --host",
+    "server": "node server/server.js",
+    "server:dev": "node --watch server/server.js",
     "build": "vite build",
     "preview": "vite preview",
     "test": "node -e \"console.log('✓ All tests passed!')\""
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.4.2",
     "firebase": "^12.18.0",
     "firebase-admin": "^14.3.0",
     "jspdf": "^4.2.1",
+    "mongoose": "^9.10.0",
     "vue": "^3.4.21"
   },
   "devDependencies": {
