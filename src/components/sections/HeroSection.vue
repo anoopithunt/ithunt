@@ -39,7 +39,7 @@
                 <div class="terminal-dot" style="background: #f59e0b;"></div>
                 <div class="terminal-dot" style="background: #10b981;"></div>
               </div>
-              <div class="terminal-title">{{ content.hero?.codeSnippetHeader }}</div>
+              <div class="terminal-title" :title="content.hero?.codeSnippetHeader">{{ content.hero?.codeSnippetHeader }}</div>
             </div>
             <div class="code-terminal-body">
               <div v-for="(line, idx) in (content.hero?.codeSnippetLines || [])" :key="idx" class="code-line">

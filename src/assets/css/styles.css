@@ -1086,6 +1086,7 @@ body.light-theme .code-terminal-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.75rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   min-width: 0;
 }
@@ -1105,7 +1106,7 @@ body.light-theme .code-terminal-card {
 
 .terminal-title {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: clamp(0.72rem, 1.15vw, 0.85rem);
   color: #94a3b8;
   letter-spacing: 0.3px;
   display: flex;
@@ -1114,7 +1115,8 @@ body.light-theme .code-terminal-card {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 260px;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .code-terminal-body {
@@ -7306,6 +7308,15 @@ body.light-theme input[type="date"]::-webkit-calendar-picker-indicator {
     max-width: 100% !important;
   }
 
+  .code-terminal-header {
+    padding: 0.75rem 1rem !important;
+  }
+
+  .terminal-title {
+    font-size: 0.76rem !important;
+    max-width: 100% !important;
+  }
+
   .code-terminal-body {
     font-size: 0.78rem !important;
     padding: 1rem 0.85rem !important;
@@ -7458,6 +7469,26 @@ body.light-theme input[type="date"]::-webkit-calendar-picker-indicator {
     overflow: hidden !important;
     contain: inline-size;
     width: 100% !important;
+  }
+
+  .code-terminal-header {
+    padding: 0.65rem 0.75rem !important;
+    gap: 0.5rem !important;
+  }
+
+  .terminal-dots {
+    gap: 5px !important;
+  }
+
+  .terminal-dot {
+    width: 10px !important;
+    height: 10px !important;
+  }
+
+  .terminal-title {
+    font-size: 0.68rem !important;
+    letter-spacing: 0px !important;
+    max-width: 100% !important;
   }
 
   .code-terminal-body {
@@ -7686,6 +7717,11 @@ body.light-theme input[type="date"]::-webkit-calendar-picker-indicator {
 @media (max-width: 360px) {
   .container {
     padding: 0 0.65rem !important;
+  }
+
+  .terminal-title {
+    font-size: 0.6rem !important;
+    letter-spacing: -0.2px !important;
   }
 
   .hero-title {
