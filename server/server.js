@@ -3,7 +3,7 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
-import { connectMongo, initFirebaseAdmin, isMongoConnected, isFirebaseConnected, getMongoDbName, isAtlas } from './config/db.js';
+import { connectMongo, isMongoConnected, getMongoDbName, isAtlas } from './config/db.js';
 
 // Import Route Handlers
 import authRoutes from './routes/auth.routes.js';
@@ -57,10 +57,9 @@ const healthHandler = (req, res) => {
     uptime: `${Math.floor(process.uptime())}s`,
     database: {
       name: getMongoDbName(),
-      mongoConnected: isMongoConnected(),
-      firebaseConnected: isFirebaseConnected(),
+      connected: isMongoConnected(),
       type: isAtlas() ? 'MongoDB Atlas Cloud' : 'MongoDB',
-      mode: isMongoConnected() ? (isAtlas() ? 'MongoDB Atlas Cloud' : 'MongoDB (MERN Stack)') : (isFirebaseConnected() ? 'Firebase Cloud' : 'Universal Hybrid Adapter')
+      mode: isMongoConnected() ? (isAtlas() ? 'MongoDB Atlas Cloud' : 'MongoDB (MERN Stack)') : 'Standby'
     },
     endpoints: [
       '/api/admissions',
@@ -155,7 +154,6 @@ let isInitialized = false;
 
 export async function ensureDbConnected() {
   if (isInitialized) return;
-  initFirebaseAdmin();
   await connectMongo();
   isInitialized = true;
 }
@@ -183,7 +181,6 @@ async function startServer() {
     console.log(`  🌐 URL: http://localhost:${PORT}`);
     console.log(`  📡 Health: http://localhost:${PORT}/api/health`);
     console.log(`  🗄️  Database: ${getMongoDbName()} [${dbType}: ${isMongoConnected() ? 'CONNECTED' : 'STANDBY'}]`);
-    console.log(`  🔥 Firebase: ${isFirebaseConnected() ? 'CONNECTED' : 'STANDBY'}`);
     console.log(`=============================================================\n`);
   });
 }

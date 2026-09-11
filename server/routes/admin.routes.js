@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { dbAdapter, MODELS } from '../services/dbAdapter.js';
-import { isMongoConnected, isFirebaseConnected } from '../config/db.js';
+import { isMongoConnected } from '../config/db.js';
 
 const router = Router();
 
@@ -55,37 +55,14 @@ router.get('/stats', async (req, res) => {
         totalRevenue: `₹${totalRevenue.toLocaleString('en-IN')}`,
         systemStatus: {
           database: {
-            mongo: isMongoConnected(),
-            firebase: isFirebaseConnected(),
-            mode: isMongoConnected() ? 'MongoDB Connected' : (isFirebaseConnected() ? 'Firebase Cloud Connected' : 'Hybrid Local Mode')
+            connected: isMongoConnected(),
+            name: 'ithunt',
+            engine: 'MongoDB'
           },
           uptime: process.uptime(),
           timestamp: new Date().toISOString()
         }
       }
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-/**
- * POST /api/admin/firebase/sync-all
- */
-router.post('/firebase/sync-all', async (req, res) => {
-  try {
-    const collections = Object.keys(MODELS);
-    const summary = {};
-
-    for (const col of collections) {
-      const records = await dbAdapter.find(col);
-      summary[col] = records.length;
-    }
-
-    res.json({
-      success: true,
-      message: 'Database collections analyzed and synchronized',
-      data: summary
     });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

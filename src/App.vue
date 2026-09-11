@@ -454,7 +454,6 @@ import {
   loginStudentUser, 
   saveStudentAccount,
   updateStudentProfile,
-  setupRealtimeFirebaseListeners,
   submitReviewToBackend
 } from './utils/apiClient.js';
 
@@ -610,7 +609,7 @@ const handleStudentLogout = () => {
   showToast('You have been logged out of the Student Portal.', 'info');
 };
 
-// Live registries synced 100% dynamically with live database API & Firebase Cloud
+// Live registries synced 100% dynamically with live MongoDB database (ithunt)
 const liveAdmissionsList = ref([]);
 const liveJobApplicationsList = ref([]);
 const liveRsvpsList = ref([]);
@@ -1034,12 +1033,12 @@ const handleDirectAdmission = async (newAdm) => {
   // 2. Persist student account for Student Portal login
   saveStudentAccount(newAdm);
 
-  // 3. Persist directly to Firebase Firestore, Realtime DB & REST API backend
+  // 3. Persist directly to MongoDB database & REST API backend
   try {
     await saveAdmissionRecord(newAdm);
-    console.log('✓ Admin direct admission saved to Firebase Firestore & Users collection:', newAdm.registrationNo);
+    console.log('✓ Admin direct admission saved to MongoDB database (ithunt):', newAdm.registrationNo);
   } catch (err) {
-    console.warn('Firebase save warning (Direct Admission):', err.message);
+    console.warn('Database save warning (Direct Admission):', err.message);
   }
 
   triggerConfetti();
@@ -1286,26 +1285,6 @@ onMounted(() => {
   };
   loadInitialData();
 
-  // Attach Real-time Firebase Firestore / Realtime DB Live Listeners
-  try {
-    unsubscribeRealtime = setupRealtimeFirebaseListeners({
-      onAdmissions: (data) => { if (Array.isArray(data)) liveAdmissionsList.value = data; },
-      onStudents: (data) => { if (Array.isArray(data)) liveStudentsList.value = data; },
-      onNielitProjects: (data) => { if (Array.isArray(data)) liveNielitProjectsList.value = data; },
-      onJobApplications: (data) => { if (Array.isArray(data)) liveJobApplicationsList.value = data; },
-      onRsvps: (data) => { if (Array.isArray(data)) liveRsvpsList.value = data; },
-      onReviews: (data) => { if (Array.isArray(data)) liveReviewsList.value = data; },
-      onInternships: (data) => { if (Array.isArray(data)) liveInternshipsList.value = data; },
-      onFees: (data) => { if (Array.isArray(data)) liveFeesList.value = data; },
-      onCertificates: (data) => { if (Array.isArray(data)) liveCertificatesList.value = data; },
-      onProjects: (data) => { if (Array.isArray(data)) liveProjectsList.value = data; },
-      onContactInquiries: (data) => { if (Array.isArray(data)) liveContactInquiriesList.value = data; },
-      onUsers: (data) => { if (Array.isArray(data)) liveUsersList.value = data; }
-    });
-  } catch (e) {
-    console.warn('Realtime Firebase listeners initialization notice:', e);
-  }
-
   // Initialize SEO Metadata for active view
   updateSeoMetadata(activeTab.value);
 
@@ -1335,13 +1314,8 @@ onMounted(() => {
   });
 });
 
-let unsubscribeRealtime = null;
-
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
   if (revealObserver) revealObserver.disconnect();
-  if (unsubscribeRealtime) {
-    try { unsubscribeRealtime(); } catch (e) {}
-  }
 });
 </script>

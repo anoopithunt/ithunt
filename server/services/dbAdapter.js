@@ -1,4 +1,4 @@
-import { isMongoConnected, isFirebaseConnected, getFirestore } from '../config/db.js';
+import { isMongoConnected } from '../config/db.js';
 import { User } from '../models/User.js';
 import { Admission } from '../models/Admission.js';
 import { Student } from '../models/Student.js';
@@ -51,38 +51,7 @@ const DEFAULT_ADMIN = {
 };
 memoryStore.get('users').set('admin@ithunt.com', DEFAULT_ADMIN);
 
-/**
- * Sync record to Firebase Firestore if connected
- */
-async function syncToFirebase(collectionName, docId, data) {
-  if (!isFirebaseConnected()) return;
-  const db = getFirestore();
-  if (!db) return;
 
-  try {
-    const cleanId = String(docId).replace(/\//g, '_');
-    const cleanData = JSON.parse(JSON.stringify(data));
-    await db.collection(collectionName).doc(cleanId).set(cleanData, { merge: true });
-  } catch (err) {
-    console.warn(`Firebase Admin sync notice (${collectionName}/${docId}):`, err.message);
-  }
-}
-
-/**
- * Delete record from Firebase Firestore if connected
- */
-async function deleteFromFirebase(collectionName, docId) {
-  if (!isFirebaseConnected()) return;
-  const db = getFirestore();
-  if (!db) return;
-
-  try {
-    const cleanId = String(docId).replace(/\//g, '_');
-    await db.collection(collectionName).doc(cleanId).delete();
-  } catch (err) {
-    console.warn(`Firebase Admin delete notice (${collectionName}/${docId}):`, err.message);
-  }
-}
 
 export const dbAdapter = {
   /**
@@ -101,22 +70,7 @@ export const dbAdapter = {
       }
     }
 
-    // 2. Try Firebase if connected and Mongo wasn't used
-    if (isFirebaseConnected()) {
-      const db = getFirestore();
-      if (db) {
-        try {
-          const snapshot = await db.collection(collectionName).get();
-          if (!snapshot.empty) {
-            const records = [];
-            snapshot.forEach(d => records.push({ id: d.id, ...d.data() }));
-            return records;
-          }
-        } catch (_) {}
-      }
-    }
-
-    // 3. Fallback to memory store
+    // 2. Fallback to memory store
     const store = memoryStore.get(collectionName) || new Map();
     let records = Array.from(store.values());
 
@@ -258,10 +212,7 @@ export const dbAdapter = {
       }
     }
 
-    // 2. Mirror to Firebase Firestore
-    await syncToFirebase(collectionName, cleanId, payload);
-
-    // 3. Save to memory store
+    // 2. Save to memory store as backup
     const store = memoryStore.get(collectionName) || new Map();
     store.set(cleanId, payload);
     if (payload.email) store.set(payload.email.toLowerCase(), payload);
@@ -303,8 +254,6 @@ export const dbAdapter = {
     const existing = await this.findById(collectionName, id) || {};
     const merged = { ...existing, ...updates, updatedAt: new Date().toISOString() };
 
-    await syncToFirebase(collectionName, id, merged);
-
     const store = memoryStore.get(collectionName) || new Map();
     store.set(id, merged);
     if (merged.id && merged.id !== id) store.set(merged.id, merged);
@@ -337,8 +286,6 @@ export const dbAdapter = {
         console.warn(`MongoDB delete notice on ${collectionName}:`, err.message);
       }
     }
-
-    await deleteFromFirebase(collectionName, id);
 
     const store = memoryStore.get(collectionName) || new Map();
     store.delete(id);

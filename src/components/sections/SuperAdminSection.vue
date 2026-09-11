@@ -1013,7 +1013,8 @@
               <span class="config-val">5500 (Active)</span>
             </div>
             <div class="config-row">
-              <span class="config-val">Direct Firebase Cloud Mode ✅</span>
+              <span class="config-key">DATABASE:</span>
+              <span class="config-val" style="color: #10b981; font-weight: 700;">MongoDB (ithunt) ✅</span>
             </div>
             <div class="config-row">
               <span class="config-key">ACCREDITATION:</span>
@@ -1761,10 +1762,10 @@ const deleteNielitProject = async (p) => {
   // 2. Emit delete to parent App.vue
   emit('delete-nielit-project', typeof p === 'object' ? p : { id: targetId, registrationNo: targetId });
 
-  // 3. Delete from Firebase Cloud & REST API backend
+  // 3. Delete from Database & REST API backend
   try {
     await deleteNielitProjectFromBackend(targetId);
-    emailActionMsg.value = `✓ NIELIT project form (${targetId}) removed successfully from Firebase Database & API.`;
+    emailActionMsg.value = `✓ NIELIT project form (${targetId}) removed successfully from Database & API.`;
   } catch (err) {
     try {
       await API.deleteProject(targetId);
@@ -1814,7 +1815,7 @@ const deleteAdmission = async (adm) => {
   // 2. Emit delete to parent App.vue
   emit('delete-admission', typeof adm === 'object' ? adm : { id: idToDelete, registrationNo: idToDelete });
 
-  // 3. Delete directly from connected database (Firebase Firestore & REST API)
+  // 3. Delete directly from connected database (MongoDB & REST API)
   try {
     await deleteAdmissionFromBackend(adm);
     emailActionMsg.value = `✓ Candidate record ${idToDelete} removed successfully from Database & API.`;
