@@ -145,15 +145,30 @@ process.on('uncaughtException', (err) => {
   console.error('! Uncaught Exception (handled safely):', err?.message || err);
 });
 
-// Initialize Databases and Start Server
+let isInitialized = false;
+
+export async function ensureDbConnected() {
+  if (isInitialized) return;
+  initFirebaseAdmin();
+  await connectMongo();
+  isInitialized = true;
+}
+
+// Ensure DB connected on serverless invocations
+app.use(async (req, res, next) => {
+  if (!isInitialized) {
+    try {
+      await ensureDbConnected();
+    } catch (_) {}
+  }
+  next();
+});
+
+// Initialize Databases and Start Server (Local / Standalone VM mode)
 async function startServer() {
   console.log('🚀 Initializing IT HUNT Node.js Backend Server...');
 
-  // Initialize Firebase Admin
-  initFirebaseAdmin();
-
-  // Connect MongoDB
-  await connectMongo();
+  await ensureDbConnected();
 
   app.listen(PORT, '0.0.0.0', () => {
     const dbType = isAtlas() ? 'MongoDB Atlas Cloud' : 'MongoDB';
@@ -167,9 +182,11 @@ async function startServer() {
   });
 }
 
-startServer().catch(err => {
-  console.error('Fatal error starting server:', err);
-  process.exit(1);
-});
+if (!process.env.VERCEL) {
+  startServer().catch(err => {
+    console.error('Fatal error starting server:', err);
+    process.exit(1);
+  });
+}
 
 export default app;
