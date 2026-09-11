@@ -31,6 +31,8 @@
     { "src": "/contact", "dest": "/api?path=contact" },
     { "src": "/admin/(.*)", "dest": "/api?path=admin/$1" },
     { "src": "/admin", "dest": "/api?path=admin" },
+    { "src": "/courses/(.*)", "dest": "/api?path=courses/$1" },
+    { "src": "/courses", "dest": "/api?path=courses" },
     { "src": "/health", "dest": "/api?path=api/health" },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/index.html" }
