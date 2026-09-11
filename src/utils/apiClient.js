@@ -13,9 +13,8 @@ const RAW_API_URL = (
 
 const IS_LOCAL_DEV = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
-// Direct Firebase Cloud Mode: All data operations go through Firebase SDK (Firestore + Realtime DB)
-// Only uses REST API if VITE_API_URL is explicitly set to a running backend server URL
-const API_BASE_URL = RAW_API_URL ? RAW_API_URL.replace(/\/+$/, '') : '';
+// Connected REST API & Database Endpoint (defaults to /api which proxies to port 3000)
+export const API_BASE_URL = (RAW_API_URL || '/api').replace(/\/+$/, '');
 
 let memoryToken = null;
 
@@ -415,19 +414,23 @@ export async function apiRequest(endpoint, options = {}) {
     ...options.headers
   };
 
-  if (!API_BASE_URL) {
-    return { success: false, reason: 'No REST API configured. Operating in Direct Cloud Firebase Mode.' };
-  }
-
-  const url = endpoint.startsWith('http') 
-    ? endpoint 
-    : `${API_BASE_URL}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+  const baseUrl = (API_BASE_URL || '/api').replace(/\/+$/, '');
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const url = endpoint.startsWith('http') ? endpoint : `${baseUrl}${cleanEndpoint}`;
 
   try {
-    const response = await fetch(url, {
-      ...options,
-      headers
-    });
+    let response;
+    try {
+      response = await fetch(url, { ...options, headers });
+    } catch (netErr) {
+      // If relative URL failed on localhost, retry directly against port 3000
+      if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+        const directUrl = `http://localhost:3000${cleanEndpoint.startsWith('/api') ? cleanEndpoint : '/api' + cleanEndpoint}`;
+        response = await fetch(directUrl, { ...options, headers });
+      } else {
+        throw netErr;
+      }
+    }
 
     const data = await response.json().catch(() => ({ success: response.ok }));
     if (!response.ok && !data.success) {
@@ -581,11 +584,15 @@ export async function submitAdmissionToBackend(data) {
 
   try {
     const res = await API.applyAdmission(payload);
+    if (!res || res.success === false) {
+      throw new Error(res?.error || res?.message || 'Failed to submit admission to API backend');
+    }
+    const admissionData = res.admission || res.data?.admission || res.data || res;
     return {
       success: true,
       data: res,
-      admission: res?.admission || res,
-      registrationSlip: res?.registrationSlip
+      admission: admissionData,
+      registrationSlip: res.registrationSlip || res.data?.registrationSlip
     };
   } catch (error) {
     console.warn('API Error submitting admission:', error.message);
@@ -597,7 +604,7 @@ export async function submitAdmissionToBackend(data) {
 }
 
 /**
- * Save admission record (Unified API wrapper with connected database persistence)
+ * Save admission record (Unified API wrapper with connected database persistence to MongoDB)
  */
 export async function saveAdmissionRecord(data) {
   if (!data) return { success: false, error: 'No form data provided' };
@@ -619,6 +626,7 @@ export async function saveAdmissionRecord(data) {
     createdAt: data.createdAt || new Date().toISOString()
   };
 
+  // 1. Primary save to connected Node.js & MongoDB Backend
   let res = null;
   try {
     res = await submitAdmissionToBackend(payload);
@@ -626,23 +634,24 @@ export async function saveAdmissionRecord(data) {
     console.warn('Backend REST admission submit notice:', e.message);
   }
 
-  const returnedAdm = (res && res.success) ? (res.admission || res.data?.admission || payload) : payload;
-  const finalRegNo = returnedAdm.registrationNumber || returnedAdm.registrationNo || payload.registrationNo || payload.id || `ITH-${Math.floor(100000 + Math.random() * 900000)}`;
+  const backendAdm = (res && res.success && res.admission) ? res.admission : null;
+  const finalRegNo = backendAdm?.registrationNo || backendAdm?.registrationNumber || payload.registrationNo || payload.registrationNumber || payload.id || `ITH-${Math.floor(100000 + Math.random() * 900000)}`;
   const finalRecord = {
     ...payload,
+    ...(backendAdm || {}),
     id: finalRegNo,
     registrationNo: finalRegNo,
     registrationNumber: finalRegNo,
-    status: returnedAdm.status || payload.status || 'Confirmed'
+    status: backendAdm?.status || payload.status || 'Confirmed'
   };
 
   const cleanId = String(finalRegNo).replace(/\//g, '_');
   const cleanEmail = normEmail ? normEmail.replace(/[@.]/g, '_') : null;
 
-  // 1. Save directly to Firebase Cloud Firestore (admissions collection) using registration ID
-  await saveToFirebaseCloud('admissions', cleanId, finalRecord);
+  // 2. Non-blocking mirror to Firebase Cloud Firestore if active
+  saveToFirebaseCloud('admissions', cleanId, finalRecord).catch(() => {});
 
-  // 2. Save directly to students collection in Firebase Cloud
+  // 3. Mirror student record
   const studentDoc = {
     ...normalizeStudent({
       ...finalRecord,
@@ -658,9 +667,9 @@ export async function saveAdmissionRecord(data) {
     mobile: finalRecord.mobile,
     status: 'Confirmed'
   };
-  await saveToFirebaseCloud('students', cleanId, studentDoc);
+  saveToFirebaseCloud('students', cleanId, studentDoc).catch(() => {});
 
-  // 3. Save directly to users collection in Firebase Cloud for student login
+  // 4. Mirror student user login account
   if (cleanEmail) {
     const userDoc = {
       id: cleanEmail,
@@ -677,10 +686,10 @@ export async function saveAdmissionRecord(data) {
       status: 'Confirmed',
       createdAt: new Date().toISOString()
     };
-    await saveToFirebaseCloud('users', cleanEmail, userDoc);
+    saveToFirebaseCloud('users', cleanEmail, userDoc).catch(() => {});
   }
 
-  // 4. Ensure Student Portal User Account exists in users collection
+  // 5. Ensure Student Portal User Account exists in local storage
   if (finalRecord.email) {
     saveStudentAccount(finalRecord);
   }
@@ -689,43 +698,46 @@ export async function saveAdmissionRecord(data) {
     success: true,
     id: finalRecord.registrationNo,
     record: finalRecord,
-    data: res?.data || { admission: finalRecord }
+    admission: finalRecord,
+    data: res?.data || { admission: finalRecord },
+    registrationSlip: res?.registrationSlip
   };
 }
 
 /**
- * Fetch all stored Admissions directly from Firebase Cloud Firestore & REST backend (NO CACHE)
+ * Fetch all stored Admissions directly from REST backend (MongoDB ithunt) & Cloud (NO CACHE)
  */
 export async function fetchAdmissionsFromBackend() {
   let list = [];
 
-  // 1. Fetch live records directly from Firebase Cloud Firestore
+  // 1. Primary: Fetch live records directly from REST API (MongoDB database 'ithunt')
+  try {
+    const data = await API.getAdmissions();
+    const rawList = Array.isArray(data?.admissions) 
+      ? data.admissions 
+      : (Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []));
+
+    if (rawList.length > 0) {
+      list = rawList;
+    }
+  } catch (e) {
+    console.warn('Notice loading admissions from REST API:', e.message);
+  }
+
+  // 2. Secondary: Merge with Firebase Cloud Firestore if any remote records exist
   try {
     const fbRecords = await fetchFromFirebaseCloud('admissions');
-    if (fbRecords.length > 0) {
-      list = fbRecords;
+    if (fbRecords && fbRecords.length > 0) {
+      const map = new Map();
+      list.forEach(a => map.set(String(a.registrationNo || a.id), a));
+      fbRecords.forEach(a => {
+        const key = String(a.registrationNo || a.id);
+        if (!map.has(key)) map.set(key, a);
+      });
+      list = Array.from(map.values());
     }
   } catch (e) {
     console.warn('Notice loading admissions from Firebase Cloud:', e.message);
-  }
-
-  // 2. Merge with REST API if configured
-  if (API_BASE_URL) {
-    try {
-      const data = await API.getAdmissions();
-      const rawList = Array.isArray(data?.admissions) 
-        ? data.admissions 
-        : (Array.isArray(data) ? data : []);
-
-      if (rawList.length > 0) {
-        const map = new Map();
-        list.forEach(a => map.set(String(a.registrationNo || a.id), a));
-        rawList.forEach(a => map.set(String(a.registrationNo || a.id), { ...map.get(String(a.registrationNo || a.id)), ...a }));
-        list = Array.from(map.values());
-      }
-    } catch (e) {
-      console.warn('Notice loading admissions from REST API:', e.message);
-    }
   }
 
   // Deduplicate records directly from database

@@ -202,8 +202,30 @@ export const dbAdapter = {
       try {
         const created = await Model.create(payload);
         payload._id = created._id;
+        console.log(`✓ Saved record to MongoDB collection "${collectionName}" (${cleanId})`);
       } catch (err) {
-        console.warn(`MongoDB create notice on ${collectionName}:`, err.message);
+        if (err.code === 11000) {
+          try {
+            const filter = {
+              $or: [
+                { id: cleanId },
+                { registrationNo: cleanId },
+                { registrationNumber: cleanId },
+                { enrollmentNumber: cleanId },
+                ...(payload.email ? [{ email: payload.email.toLowerCase() }] : [])
+              ]
+            };
+            const updated = await Model.findOneAndUpdate(filter, payload, { new: true });
+            if (updated) {
+              payload._id = updated._id;
+              console.log(`✓ Updated existing record in MongoDB collection "${collectionName}" (${cleanId})`);
+            }
+          } catch (updateErr) {
+            console.warn(`MongoDB upsert notice on ${collectionName}:`, updateErr.message);
+          }
+        } else {
+          console.warn(`MongoDB create notice on ${collectionName}:`, err.message);
+        }
       }
     }
 
