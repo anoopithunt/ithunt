@@ -81,6 +81,7 @@ const healthHandler = (req, res) => {
 
 app.get('/api/health', healthHandler);
 app.get('/health', healthHandler);
+app.get('/api', healthHandler);
 app.get('/', (req, res) => {
   res.json({
     message: 'IT HUNT MERN & AI Backend API Server',
