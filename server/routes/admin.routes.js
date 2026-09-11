@@ -92,4 +92,20 @@ router.post('/firebase/sync-all', async (req, res) => {
   }
 });
 
+/**
+ * GET /api/admin/users
+ */
+router.get('/users', async (req, res) => {
+  try {
+    const list = await dbAdapter.find('users');
+    const safeUsers = list.map(u => {
+      const { password, ...rest } = u;
+      return rest;
+    });
+    res.json({ success: true, data: safeUsers, users: safeUsers });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 export default router;
