@@ -11,6 +11,7 @@
     "db:start": "mkdir -p ~/.mongodb/data ~/.mongodb/log && mongod --dbpath ~/.mongodb/data --logpath ~/.mongodb/log/mongo.log --port 27017 --bind_ip 127.0.0.1",
     "db:status": "lsof -iTCP:27017 -sTCP:LISTEN",
     "db:verify": "node server/verify-db.js",
+    "db:test": "node server/test-all-tables.js",
     "pdf:api": "node server/generate-api-pdf.js",
     "build": "vite build",
     "preview": "vite preview",

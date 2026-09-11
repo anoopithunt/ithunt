@@ -29,9 +29,9 @@ router.get('/:id', async (req, res) => {
 });
 
 /**
- * POST /api/projects/submit
+ * POST /api/projects or POST /api/projects/submit
  */
-router.post('/submit', async (req, res) => {
+const submitProjectHandler = async (req, res) => {
   try {
     const body = req.body || {};
     const id = `PRJ-${Date.now()}`;
@@ -57,7 +57,10 @@ router.post('/submit', async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
-});
+};
+
+router.post('/submit', submitProjectHandler);
+router.post('/', submitProjectHandler);
 
 /**
  * PUT /api/projects/:id
