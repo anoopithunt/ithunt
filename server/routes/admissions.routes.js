@@ -36,7 +36,9 @@ router.post('/', async (req, res) => {
     const body = req.body || {};
     const regNo = body.registrationNo || body.registrationNumber || `ITH-${Math.floor(100000 + Math.random() * 900000)}`;
     const candidateName = body.candidateName || body.fullName || 'Candidate';
-    const email = (body.email || '').toLowerCase().trim();
+    const email = (body.email || `${regNo.toLowerCase()}@ithunt.com`).toLowerCase().trim();
+    const phone = body.phone || body.mobile || '+91 9795771806';
+    const mobile = body.mobile || body.phone || phone;
 
     const admissionRecord = {
       ...body,
@@ -46,10 +48,12 @@ router.post('/', async (req, res) => {
       candidateName,
       fullName: candidateName,
       email,
+      phone,
+      mobile,
       course: body.course || body.track || "NIELIT 'A' Level Diploma",
-      status: body.status || 'Confirmed',
-      feeStatus: body.feeStatus || 'Verified & Paid',
-      amountPaid: body.amountPaid || '₹5,000',
+      status: body.status || 'Pending Verification',
+      feeStatus: body.feeStatus || 'Pending Verification',
+      amountPaid: body.amountPaid || '₹0',
       date: body.date || new Date().toLocaleDateString('en-GB'),
       time: body.time || new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
       createdAt: new Date().toISOString()
@@ -65,8 +69,8 @@ router.post('/', async (req, res) => {
       name: candidateName,
       fullName: candidateName,
       email,
-      phone: body.phone || body.mobile || '',
-      mobile: body.phone || body.mobile || '',
+      phone,
+      mobile,
       course: admissionRecord.course,
       batch: '2026',
       academicStatus: 'ACTIVE',
@@ -85,6 +89,7 @@ router.post('/', async (req, res) => {
         id: email,
         name: candidateName,
         email,
+        phone,
         password: body.password || 'Ithunt@123',
         role: 'student',
         registrationNo: regNo,

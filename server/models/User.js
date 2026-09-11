@@ -13,7 +13,15 @@ const UserSchema = new mongoose.Schema({
   verified: { type: Boolean, default: true },
   status: { type: String, default: 'ACTIVE' },
   avatar: { type: String, default: '' },
-}, { timestamps: true });
+}, { timestamps: true, strict: false });
+
+UserSchema.pre('validate', function() {
+  if (!this.name && this.fullName) this.name = this.fullName;
+  if (!this.name && this.candidateName) this.name = this.candidateName;
+  if (!this.userId && this.registrationNo) this.userId = this.registrationNo;
+  if (!this.userId && this.enrollmentNumber) this.userId = this.enrollmentNumber;
+  if (!this.password) this.password = 'Ithunt@123';
+});
 
 UserSchema.pre('save', async function () {
   if (!this.isModified('password')) return;
