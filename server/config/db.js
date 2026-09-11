@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 let mongoConnected = false;
 let isAtlasConnection = false;
+let lastMongoError = null;
 
 const ATLAS_PRODUCTION_URI = 'mongodb+srv://anoopmishrapitz_db_user:IthuntPass2026@cluster0.oo3akne.mongodb.net/ithunt?retryWrites=true&w=majority';
 
@@ -26,16 +27,18 @@ export async function connectMongo() {
     mongoose.set('strictQuery', false);
     await mongoose.connect(rawUri, {
       dbName: 'ithunt',
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 30000,
+      serverSelectionTimeoutMS: 8000,
+      socketTimeoutMS: 45000,
       maxPoolSize: 10
     });
     mongoConnected = true;
+    lastMongoError = null;
     const dbName = mongoose.connection?.name || 'ithunt';
     const typeLabel = isAtlasConnection ? 'MongoDB Atlas Cloud' : 'Local MongoDB';
     console.log(`✓ ${typeLabel} Connected: ${dbName}`);
   } catch (error) {
     mongoConnected = false;
+    lastMongoError = error.message;
     const typeLabel = isAtlasConnection ? 'MongoDB Atlas Cloud' : 'MongoDB';
     console.warn(`! ${typeLabel} notice (ithunt): ${error.message}.`);
   }
@@ -47,6 +50,7 @@ export async function connectMongo() {
 
   mongoose.connection.on('reconnected', () => {
     mongoConnected = true;
+    lastMongoError = null;
     const dbName = mongoose.connection?.name || 'ithunt';
     console.log(`✓ MongoDB reconnected: ${dbName}`);
   });
@@ -59,9 +63,10 @@ export function initFirebaseAdmin() {
   return { connected: false };
 }
 
-export const isMongoConnected = () => mongoConnected;
+export const isMongoConnected = () => mongoConnected && mongoose.connection.readyState === 1;
 export const isFirebaseConnected = () => false;
 export const isAtlas = () => isAtlasConnection;
+export const getLastMongoError = () => lastMongoError;
 export const getMongoDbName = () => (mongoConnected && mongoose.connection?.name) || 'ithunt';
 export const getFirestoreDb = () => null;
 export const getRealtimeDb = () => null;
