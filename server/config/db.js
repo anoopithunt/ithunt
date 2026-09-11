@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 let mongoConnected = false;
 let isAtlasConnection = false;
 
+const ATLAS_PRODUCTION_URI = 'mongodb+srv://anoopmishrapitz_db_user:IthuntPass2026@cluster0.oo3akne.mongodb.net/ithunt?retryWrites=true&w=majority';
+
 /**
  * Connect to MongoDB using Mongoose (Supports local MongoDB & MongoDB Atlas Cloud)
  */
@@ -11,27 +13,26 @@ export async function connectMongo() {
     return true;
   }
 
-  const rawUri = (process.env.MONGODB_ATLAS_URI || process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/ithunt').trim();
-  isAtlasConnection = rawUri.startsWith('mongodb+srv://') || rawUri.includes('.mongodb.net');
-
-  // In cloud/serverless environments (Vercel), don't attempt to connect to localhost:27017
-  const isLocalHost = rawUri.includes('127.0.0.1') || rawUri.includes('localhost');
-  if (process.env.VERCEL && isLocalHost) {
-    console.warn('! Running on Vercel with local MongoDB URI. Configure MONGODB_ATLAS_URI or MONGODB_URI in Vercel settings for cloud database. Operating with resilient store.');
-    mongoConnected = false;
-    return false;
+  let rawUri = (process.env.MONGODB_ATLAS_URI || process.env.MONGODB_URI || '').trim();
+  
+  // In cloud/serverless environments (Vercel) or when no local URI specified, use Atlas Cloud
+  if (!rawUri || (process.env.VERCEL && (rawUri.includes('127.0.0.1') || rawUri.includes('localhost')))) {
+    rawUri = ATLAS_PRODUCTION_URI;
   }
+
+  isAtlasConnection = rawUri.startsWith('mongodb+srv://') || rawUri.includes('.mongodb.net');
 
   try {
     mongoose.set('strictQuery', false);
     await mongoose.connect(rawUri, {
       dbName: 'ithunt',
-      serverSelectionTimeoutMS: 4000,
-      socketTimeoutMS: 20000,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 30000,
+      maxPoolSize: 10
     });
     mongoConnected = true;
     const dbName = mongoose.connection?.name || 'ithunt';
-    const typeLabel = isAtlasConnection ? 'MongoDB Atlas Cloud' : 'MongoDB';
+    const typeLabel = isAtlasConnection ? 'MongoDB Atlas Cloud' : 'Local MongoDB';
     console.log(`✓ ${typeLabel} Connected: ${dbName}`);
   } catch (error) {
     mongoConnected = false;
