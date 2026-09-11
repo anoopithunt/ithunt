@@ -276,8 +276,10 @@ export const API = {
   getAdmissions: () => apiRequest('/admissions'),
   getAdmission: (id) => apiRequest(`/admissions/${id}`),
   applyAdmission: (admissionData) => apiRequest('/admissions', { method: 'POST', body: JSON.stringify(admissionData) }),
+  confirmAdmission: (id, payload = {}) => apiRequest(`/admissions/${id}/confirm`, { method: 'POST', body: JSON.stringify(payload) }),
   updateAdmissionStatus: (id, status, feeStatus) => apiRequest(`/admissions/${id}/status`, { method: 'PATCH', body: JSON.stringify(typeof status === 'object' ? status : { status, ...(feeStatus ? { feeStatus } : {}) }) }),
   deleteAdmission: (id) => apiRequest(`/admissions/${id}`, { method: 'DELETE' }),
+  resetStudentPassword: (id, newPassword) => apiRequest(`/students/${id}/reset-password`, { method: 'POST', body: JSON.stringify({ newPassword }) }),
 
   // NIELIT Project Submissions
   getNielitProjects: () => apiRequest('/nielit-projects'),
@@ -531,6 +533,49 @@ export async function deleteAdmissionFromBackend(adm) {
   }
 
   return { success: true };
+}
+
+/**
+ * Confirm admission and auto-generate student login credentials
+ */
+export async function confirmAdmissionInBackend(adm, creds = {}) {
+  if (!adm) return { success: false, error: 'No admission record provided' };
+  const targetId = typeof adm === 'object' ? (adm.registrationNo || adm.id) : adm;
+  
+  try {
+    const res = await API.confirmAdmission(targetId, creds);
+    if (res && res.success) {
+      // Sync to local student account
+      if (res.data?.credentials || res.credentials) {
+        const c = res.data?.credentials || res.credentials;
+        saveStudentAccount({
+          ...(typeof adm === 'object' ? adm : {}),
+          userId: c.userId,
+          enrollmentNumber: c.userId,
+          password: c.password,
+          registrationNo: targetId,
+          status: 'Confirmed'
+        });
+      }
+      return res;
+    }
+    return res || { success: false, error: 'Failed to confirm admission' };
+  } catch (err) {
+    console.warn('API error confirming admission:', err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Reset student password in backend
+ */
+export async function resetStudentPasswordInBackend(studentId, newPassword) {
+  try {
+    return await API.resetStudentPassword(studentId, newPassword);
+  } catch (err) {
+    console.warn('API error resetting student password:', err.message);
+    return { success: false, error: err.message };
+  }
 }
 
 /**
@@ -1343,6 +1388,8 @@ export default {
   ensureAuthToken,
   submitAdmissionToBackend,
   saveAdmissionRecord,
+  confirmAdmissionInBackend,
+  resetStudentPasswordInBackend,
   fetchAdmissionsFromBackend,
   deleteAdmissionFromBackend,
   submitJobApplicationToBackend,

@@ -203,11 +203,11 @@ Admission Status      : Confirmed & Active ✓
 ==================================================
      STUDENT PORTAL LOGIN ACCESS CREDENTIALS
 ==================================================
-Portal Access URL     : https://ithunt.org
-Student User ID       : ${email}
-Default Password      : Ithunt@123
+Portal Access URL     : https://ithunt.vercel.app/#login
+Student User ID       : ${adm.userId || adm.enrollmentNumber || adm.registrationNo || email}
+Student Password      : ${adm.password || 'Ithunt@123'}
 
-(You can sign in to your Student Dashboard using your Email & Default Password and change your password anytime.)
+(You can sign in to your Student Dashboard using your User ID / Email and your Password, and can update your password anytime.)
 
 ==================================================
            DAY 1 ONBOARDING INSTRUCTIONS
@@ -222,7 +222,7 @@ Default Password      : Ithunt@123
 For any academic queries or technical support, contact us:
 📞 Phone    : +91 9795771806 / +91 8299544315
 📧 Email    : softtechithunt@gmail.com
-🌐 Website  : https://ithunt.org
+🌐 Website  : https://ithunt.vercel.app
 
 Warm regards,
 Academic Admissions Directorate
@@ -230,6 +230,42 @@ IT HUNT Software Solutions & Tech Academy
 (ISO 9001:2015 Accredited Institution)`;
 
   return { subject, body, to: email, regNo, candName, course };
+}
+
+/**
+ * Generate Direct WhatsApp Share URL with Credentials for Confirmed Student
+ */
+export function getStudentAdmissionWhatsAppUrl(adm) {
+  if (!adm) return '';
+  const candName = adm.candidateName || adm.fullName || 'Student';
+  const regNo = adm.registrationNo || adm.id || 'ITH-2026';
+  const course = adm.course || adm.track || 'Software Engineering';
+  const userId = adm.userId || adm.enrollmentNumber || adm.registrationNo || adm.email || regNo;
+  const password = adm.password || 'Ithunt@123';
+  const rawMobile = (adm.mobile || adm.phone || '').replace(/\D/g, '');
+  const cleanMobile = rawMobile.length === 10 ? `91${rawMobile}` : rawMobile;
+
+  const msg = `🎓 *IT HUNT Academy - Admission Confirmed!*
+
+Dear *${candName}*,
+Congratulations! Your admission application has been officially APPROVED & CONFIRMED by the SuperAdmin Directorate.
+
+📚 *Enrolled Program:* ${course}
+📋 *Registration No:* ${regNo}
+
+🔐 *YOUR STUDENT PORTAL LOGIN CREDENTIALS:*
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+👤 *User ID:* ${userId}
+🔑 *Password:* ${password}
+🌐 *Login Portal:* https://ithunt.vercel.app/#login
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Please log in to the Student Portal to track your course syllabus, class schedule, and access learning resources.
+
+📍 *Campus:* IT HUNT Software Studio, Dahiyawa Holagarh, Prayagraj, UP
+📞 *Helpline:* +91 9795771806`;
+
+  return `https://api.whatsapp.com/send?phone=${cleanMobile}&text=${encodeURIComponent(msg)}`;
 }
 
 /**

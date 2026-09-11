@@ -179,6 +179,7 @@
           @download-slip="downloadCustomAdmissionSlip"
           @download-nielit-pdf="downloadNielitProjectPdfDoc"
           @add-admission="handleDirectAdmission"
+          @confirm-admission="handleConfirmAdmission"
           @delete-admission="handleDeleteAdmission"
           @delete-student="handleDeleteStudent"
           @update-nielit-project="handleUpdateNielitProject"
@@ -938,8 +939,8 @@ const submitAdmission = async (formData) => {
     password: studentPassword,
     district: formData.district || 'PRAYAGRAJ',
     address: formData.address || '',
-    status: 'Confirmed',
-    feeStatus: 'Verified & Paid',
+    status: formData.status || 'Pending Verification',
+    feeStatus: formData.feeStatus || 'Pending Verification',
     role: 'student'
   };
 
@@ -958,10 +959,8 @@ const submitAdmission = async (formData) => {
       liveAdmissionsList.value.unshift(newAdmissionRecord);
     }
 
-    saveStudentAccount(newAdmissionRecord);
-
     modalTitle.value = '🎉 Admission Application Submitted Successfully!';
-    modalBody.value = `Congratulations ${newAdmissionRecord.candidateName}! Your student admission for "${newAdmissionRecord.course}" has been successfully submitted and saved to the database.\n\n📋 Registration No: ${finalRegNo}\n🔑 Student Portal Username: ${newAdmissionRecord.email}\n🔒 Default Password: ${studentPassword}`;
+    modalBody.value = `Congratulations ${newAdmissionRecord.candidateName}! Your admission application for "${newAdmissionRecord.course}" has been successfully submitted to IT HUNT.\n\n📋 Registration ID: ${finalRegNo}\n⏳ Status: Pending SuperAdmin Confirmation\n\nOur SuperAdmin will review and confirm your admission. Once confirmed, your unique Student User ID & Password will be automatically generated and activated for your portal login.`;
     showModal.value = true;
     triggerConfetti();
   } else {
@@ -1042,7 +1041,55 @@ const handleDirectAdmission = async (newAdm) => {
   }
 
   triggerConfetti();
-  showToast(`Direct admission registered and saved to database! Student User ID: ${newAdm.email} | Default Password: Ithunt@123`, 'success', 6000);
+  showToast(`Direct admission registered and saved to database! Student User ID: ${newAdm.userId || newAdm.email} | Password: ${newAdm.password || 'Ithunt@123'}`, 'success', 6000);
+};
+
+const handleConfirmAdmission = (confirmedData) => {
+  if (!confirmedData) return;
+  const targetId = confirmedData.registrationNo || confirmedData.id;
+  const idx = liveAdmissionsList.value.findIndex(a => (a.registrationNo === targetId) || (a.id === targetId));
+  if (idx !== -1) {
+    liveAdmissionsList.value[idx] = { 
+      ...liveAdmissionsList.value[idx], 
+      ...confirmedData, 
+      status: 'Confirmed', 
+      admissionConfirmed: true 
+    };
+  } else {
+    liveAdmissionsList.value.unshift({ 
+      ...confirmedData, 
+      status: 'Confirmed', 
+      admissionConfirmed: true 
+    });
+  }
+
+  // Sync to liveStudentsList
+  const finalUserId = confirmedData.userId || targetId;
+  const sIdx = liveStudentsList.value.findIndex(s => s.userId === finalUserId || s.id === finalUserId || s.registrationNo === targetId);
+  if (sIdx !== -1) {
+    liveStudentsList.value[sIdx] = { 
+      ...liveStudentsList.value[sIdx], 
+      ...confirmedData, 
+      academicStatus: 'ACTIVE', 
+      status: 'ACTIVE' 
+    };
+  } else {
+    liveStudentsList.value.unshift({
+      id: finalUserId,
+      userId: finalUserId,
+      enrollmentNumber: finalUserId,
+      registrationNo: targetId,
+      name: confirmedData.candidateName || confirmedData.fullName || 'Student',
+      email: confirmedData.email,
+      mobile: confirmedData.mobile,
+      course: confirmedData.course,
+      academicStatus: 'ACTIVE',
+      status: 'ACTIVE'
+    });
+  }
+
+  triggerConfetti();
+  showToast(`Admission Confirmed! Student User ID: ${finalUserId} | Password: ${confirmedData.password}`, 'success', 6000);
 };
 
 const handleDeleteAdmission = async (adm) => {

@@ -256,13 +256,38 @@
 
                 <!-- Actions -->
                 <td style="text-align: right;">
-                  <div style="display: flex; justify-content: flex-end; gap: 0.4rem;">
+                  <div style="display: flex; justify-content: flex-end; gap: 0.4rem; flex-wrap: wrap;">
                     <button 
                       class="admin-icon-btn" 
                       title="View Student Profile"
                       @click="selectedStudentDetail = stu; showStudentDetailModal = true;"
                     >
-                      👁️ View
+                      👁️ Profile
+                    </button>
+                    <button 
+                      class="admin-icon-btn" 
+                      title="View Student Portal Login Credentials"
+                      style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);"
+                      @click="openCredentialsModal(stu)"
+                    >
+                      🔐 Credentials
+                    </button>
+                    <button 
+                      v-if="stu.phone || stu.mobile"
+                      class="admin-icon-btn" 
+                      title="Share Login Credentials via WhatsApp"
+                      style="color: #22c55e; border-color: rgba(34, 197, 94, 0.4);"
+                      @click="shareCredentialsOnWhatsApp(stu)"
+                    >
+                      📲 WhatsApp
+                    </button>
+                    <button 
+                      class="admin-icon-btn" 
+                      title="Reset Student Login Password"
+                      style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.4);"
+                      @click="openResetPasswordModal(stu)"
+                    >
+                      🔑 Reset Pass
                     </button>
                     <button 
                       class="admin-icon-btn" 
@@ -311,10 +336,10 @@
 
           <!-- Status filter -->
           <select v-model="admissionStatusFilter" class="form-control admin-select-filter">
-            <option value="all">All Statuses</option>
-            <option value="Confirmed">Confirmed</option>
+            <option value="all">All Registrations ({{ admissionsList.length }})</option>
+            <option value="Pending Verification">⏳ Pending Review ({{ pendingAdmissionsCount }})</option>
+            <option value="Confirmed">✅ Confirmed Admissions ({{ confirmedAdmissionsCount }})</option>
             <option value="Verified">Verified</option>
-            <option value="Pending Verification">Pending</option>
           </select>
 
           <!-- Enroll New Candidate Button -->
@@ -328,6 +353,42 @@
         </div>
       </div>
 
+      <!-- Quick Filter Pills Strip -->
+      <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap;">
+        <button 
+          type="button"
+          class="admin-tab-btn" 
+          :class="{ active: admissionStatusFilter === 'all' }"
+          @click="admissionStatusFilter = 'all'"
+          style="padding: 0.35rem 0.85rem; font-size: 0.8rem; border-radius: 999px;"
+        >
+          📋 All Registrations ({{ admissionsList.length }})
+        </button>
+        <button 
+          type="button"
+          class="admin-tab-btn" 
+          :class="{ active: admissionStatusFilter === 'Pending Verification' || admissionStatusFilter === 'Pending Confirmation' }"
+          @click="admissionStatusFilter = 'Pending Verification'"
+          style="padding: 0.35rem 0.85rem; font-size: 0.8rem; border-radius: 999px; border-color: rgba(245, 158, 11, 0.5);"
+          :style="pendingAdmissionsCount > 0 ? { color: '#f59e0b', fontWeight: '800', background: 'rgba(245, 158, 11, 0.12)' } : {}"
+        >
+          ⏳ Pending Review ({{ pendingAdmissionsCount }})
+          <span v-if="pendingAdmissionsCount > 0" style="margin-left: 6px; padding: 2px 7px; border-radius: 999px; background: #f59e0b; color: #000; font-size: 0.68rem; font-weight: 900;">
+            Action Needed
+          </span>
+        </button>
+        <button 
+          type="button"
+          class="admin-tab-btn" 
+          :class="{ active: admissionStatusFilter === 'Confirmed' }"
+          @click="admissionStatusFilter = 'Confirmed'"
+          style="padding: 0.35rem 0.85rem; font-size: 0.8rem; border-radius: 999px; border-color: rgba(16, 185, 129, 0.5);"
+          :style="{ color: '#10b981' }"
+        >
+          ✅ Confirmed Students & Active Logins ({{ confirmedAdmissionsCount }})
+        </button>
+      </div>
+
       <!-- Action Feedback Banner -->
       <div v-if="emailActionMsg" style="margin-bottom: 1.25rem; padding: 0.85rem 1.25rem; background: rgba(249, 115, 22, 0.15); border: 1px solid rgba(249, 115, 22, 0.4); border-radius: var(--radius-md); color: var(--color-ai-orange); font-weight: 700; font-size: 0.9rem;">
         {{ emailActionMsg }}
@@ -339,33 +400,47 @@
           <table class="admin-data-table">
             <thead>
               <tr>
-                <th>Reg. ID</th>
+                <th>Reg. / Student ID</th>
                 <th>Candidate Name</th>
                 <th>Father's Name</th>
                 <th>Mobile & Email</th>
                 <th>Enrolled Program / Track</th>
                 <th>Date & Time</th>
-                <th>Status</th>
+                <th>Admission Status</th>
                 <th style="text-align: right;">Official Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="adm in filteredAdmissions" :key="adm.registrationNo">
+              <tr v-for="adm in filteredAdmissions" :key="adm.registrationNo || adm.id">
                 <td>
-                  <span class="admin-reg-pill">{{ adm.registrationNo }}</span>
+                  <span class="admin-reg-pill">{{ adm.registrationNo || adm.id }}</span>
+                  <div v-if="adm.userId || adm.enrollmentNumber" style="font-size: 0.72rem; font-family: var(--font-mono); color: #38bdf8; margin-top: 4px; font-weight: 700;">
+                    🆔 {{ adm.userId || adm.enrollmentNumber }}
+                  </div>
+                  <div v-if="adm.password" style="font-size: 0.72rem; font-family: var(--font-mono); color: #34d399; margin-top: 2px; display: flex; align-items: center; gap: 4px;">
+                    <span>🔑 {{ showPasswordFor[adm.registrationNo || adm.id] ? adm.password : '••••••••' }}</span>
+                    <button 
+                      type="button" 
+                      @click="togglePassword(adm.registrationNo || adm.id)" 
+                      style="background: none; border: none; cursor: pointer; font-size: 0.75rem; padding: 0;" 
+                      :title="showPasswordFor[adm.registrationNo || adm.id] ? 'Hide Password' : 'Show Password'"
+                    >
+                      {{ showPasswordFor[adm.registrationNo || adm.id] ? '👁️' : '🙈' }}
+                    </button>
+                  </div>
                 </td>
                 <td>
-                  <div style="font-weight: 800; color: var(--text-main);">{{ adm.candidateName }}</div>
-                  <div style="font-size: 0.75rem; color: var(--text-dim);">{{ adm.gender }} | DOB: {{ adm.dob }}</div>
+                  <div style="font-weight: 800; color: var(--text-main);">{{ adm.candidateName || adm.fullName }}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-dim);">{{ adm.gender || '—' }} | DOB: {{ adm.dob || '—' }}</div>
                 </td>
-                <td>{{ adm.fatherName }}</td>
+                <td>{{ adm.fatherName || '—' }}</td>
                 <td>
-                  <div>📞 {{ adm.mobile }}</div>
-                  <div style="font-size: 0.75rem; color: var(--color-ai-cyan);">{{ adm.email }}</div>
+                  <div>📞 {{ adm.mobile || adm.phone || '—' }}</div>
+                  <div style="font-size: 0.75rem; color: var(--color-ai-cyan);">{{ adm.email || '—' }}</div>
                 </td>
                 <td>
                   <span class="admin-track-pill">{{ adm.course }}</span>
-                  <div style="font-size: 0.725rem; color: var(--text-dim); margin-top: 2px;">📍 {{ adm.district }}, UP</div>
+                  <div style="font-size: 0.725rem; color: var(--text-dim); margin-top: 2px;">📍 {{ adm.district || 'Prayagraj' }}, UP</div>
                 </td>
                 <td style="font-size: 0.8rem; font-family: var(--font-mono); white-space: nowrap;">
                   <div>📅 {{ adm.date }}</div>
@@ -375,28 +450,74 @@
                   <span 
                     class="admin-status-chip"
                     :class="{
-                      'status-confirmed': adm.status === 'Confirmed' || adm.status === 'Admission Form Sent',
+                      'status-confirmed': adm.status === 'Confirmed' || adm.admissionConfirmed,
                       'status-verified': adm.status === 'Verified',
-                      'status-pending': adm.status === 'Pending Verification'
+                      'status-pending': adm.status === 'Pending Verification' || (!adm.status && !adm.admissionConfirmed)
                     }"
                     @click="cycleAdmissionStatus(adm)"
                     :title="'Click to toggle status'"
                   >
-                    {{ adm.status || 'Confirmed' }}
+                    {{ adm.status || (adm.admissionConfirmed ? 'Confirmed' : 'Pending Verification') }}
                   </span>
-                  <div style="font-size: 0.7rem; font-weight: 700; margin-top: 4px;" :style="{ color: (adm.feeStatus && adm.feeStatus.includes('Paid')) ? '#10b981' : '#f59e0b' }">
+                  <div v-if="adm.status === 'Confirmed' || adm.admissionConfirmed" style="font-size: 0.7rem; color: #10b981; font-weight: 700; margin-top: 3px;">
+                    ● Login Active
+                  </div>
+                  <div v-else style="font-size: 0.7rem; color: #f59e0b; font-weight: 700; margin-top: 3px;">
+                    ● Pending Review
+                  </div>
+                  <div style="font-size: 0.7rem; font-weight: 700; margin-top: 3px;" :style="{ color: (adm.feeStatus && adm.feeStatus.includes('Paid')) ? '#10b981' : '#f59e0b' }">
                     💳 {{ adm.feeStatus || 'Fee Pending' }}
                   </div>
                 </td>
                 <td style="text-align: right;">
                   <div class="admin-row-actions">
+                    <!-- 1-Click Confirm & Auto-Generate Credentials for Pending Registrations -->
+                    <button 
+                      v-if="adm.status !== 'Confirmed' && !adm.admissionConfirmed"
+                      class="btn-primary" 
+                      @click="handleConfirmAdmissionAndGenerateCredentials(adm)" 
+                      title="Confirm candidate admission, generate User ID & Password, and activate student login"
+                      style="padding: 0.35rem 0.75rem; font-size: 0.78rem; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-color: #10b981; color: #fff; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);"
+                    >
+                      ⚡ Confirm & Generate
+                    </button>
+
+                    <!-- Confirmed Candidate Actions: Credentials, WhatsApp, Reset Password -->
+                    <button 
+                      v-if="adm.status === 'Confirmed' || adm.admissionConfirmed"
+                      class="admin-icon-btn" 
+                      @click="openCredentialsModal(adm)" 
+                      title="View Generated Student User ID & Password"
+                      style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);"
+                    >
+                      🔐 Credentials
+                    </button>
+                    <button 
+                      v-if="(adm.status === 'Confirmed' || adm.admissionConfirmed) && (adm.mobile || adm.phone)"
+                      class="admin-icon-btn" 
+                      @click="shareCredentialsOnWhatsApp(adm)" 
+                      title="Send Credentials to Student WhatsApp"
+                      style="color: #22c55e; border-color: rgba(34, 197, 94, 0.4);"
+                    >
+                      📲 WhatsApp
+                    </button>
+                    <button 
+                      v-if="adm.status === 'Confirmed' || adm.admissionConfirmed"
+                      class="admin-icon-btn" 
+                      @click="openResetPasswordModal(adm)" 
+                      title="Reset Student Login Password"
+                      style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.4);"
+                    >
+                      🔑 Reset Pass
+                    </button>
+
                     <button 
                       class="admin-icon-btn" 
                       @click="openAdmissionEmailModal(adm)" 
                       title="Open Official Admission Confirmation Letter Dispatch Modal"
                       style="color: var(--color-ai-orange); border-color: rgba(249, 115, 22, 0.4);"
                     >
-                      📩 Admission Email
+                      📩 Email
                     </button>
                     <button 
                       class="admin-icon-btn" 
@@ -404,7 +525,7 @@
                       title="Confirm Fee Payment and Email Official JPG Image Receipt to Student"
                       style="color: #34d399; border-color: rgba(52, 211, 153, 0.4);"
                     >
-                      💳 Confirm Fee & JPG Receipt
+                      💳 JPG Receipt
                     </button>
                     <button 
                       class="admin-icon-btn" 
@@ -981,7 +1102,18 @@
                 </td>
                 <td style="font-family: var(--font-mono); font-size: 0.8rem;">{{ user.createdAt }}</td>
                 <td style="text-align: right;">
-                  <button v-if="user.role !== 'admin'" class="admin-icon-btn" @click="handleDeleteUser(user)" style="color: #ef4444;" title="Delete User">🗑️</button>
+                  <div style="display: flex; justify-content: flex-end; gap: 0.4rem;">
+                    <button 
+                      v-if="user.role !== 'admin'" 
+                      class="admin-icon-btn" 
+                      @click="openResetPasswordModal(user)" 
+                      style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.4);" 
+                      title="Reset User Password"
+                    >
+                      🔑 Reset Pass
+                    </button>
+                    <button v-if="user.role !== 'admin'" class="admin-icon-btn" @click="handleDeleteUser(user)" style="color: #ef4444;" title="Delete User">🗑️</button>
+                  </div>
                 </td>
               </tr>
               <tr v-if="usersList.length === 0">
@@ -1314,6 +1446,218 @@
         </div>
       </div>
     </div>
+
+    <!-- Confirmed Credentials Modal (1-Click WhatsApp, Copy & Share) -->
+    <div class="modal-overlay" v-if="showConfirmedCredentialsModal && confirmedStudentData" @click.self="showConfirmedCredentialsModal = false">
+      <div class="modal-card" style="max-width: 620px; text-align: left; border: 1px solid rgba(16, 185, 129, 0.4); box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(16, 185, 129, 0.2);">
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #10b981 0%, #059669 100%); display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+              ✅
+            </div>
+            <div>
+              <h3 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #10b981;">
+                Admission Confirmed & Login Generated!
+              </h3>
+              <p style="margin: 0.2rem 0 0 0; font-size: 0.8rem; color: var(--text-muted);">
+                Student account is active in MongoDB. Credentials ready to share with student.
+              </p>
+            </div>
+          </div>
+          <button class="modal-close-btn" @click="showConfirmedCredentialsModal = false">✕</button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <!-- Student Particulars Card -->
+          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md); padding: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 0.85rem;">
+            <div>
+              <span style="color: var(--text-muted); font-size: 0.72rem; display: block; text-transform: uppercase;">Student Name</span>
+              <strong style="color: var(--text-main); font-size: 0.95rem;">{{ confirmedStudentData.candidateName || confirmedStudentData.fullName }}</strong>
+            </div>
+            <div>
+              <span style="color: var(--text-muted); font-size: 0.72rem; display: block; text-transform: uppercase;">Registration Ref</span>
+              <strong style="color: var(--color-ai-yellow); font-family: var(--font-mono);">{{ confirmedStudentData.registrationNo || confirmedStudentData.id }}</strong>
+            </div>
+            <div>
+              <span style="color: var(--text-muted); font-size: 0.72rem; display: block; text-transform: uppercase;">Contact Mobile</span>
+              <strong style="color: var(--text-main); font-family: var(--font-mono);">📞 {{ confirmedStudentData.mobile || confirmedStudentData.phone || '—' }}</strong>
+            </div>
+            <div>
+              <span style="color: var(--text-muted); font-size: 0.72rem; display: block; text-transform: uppercase;">Email Address</span>
+              <strong style="color: var(--color-ai-cyan);">✉️ {{ confirmedStudentData.email || '—' }}</strong>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <span style="color: var(--text-muted); font-size: 0.72rem; display: block; text-transform: uppercase;">Enrolled Program</span>
+              <strong style="color: var(--color-ai-orange);">🎓 {{ confirmedStudentData.course }}</strong>
+            </div>
+          </div>
+
+          <!-- Credentials Highlight Box -->
+          <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(56, 189, 248, 0.08) 100%); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-md); padding: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+              <span style="font-size: 0.75rem; font-weight: 800; color: #10b981; text-transform: uppercase; letter-spacing: 0.05em;">
+                🔐 OFFICIAL STUDENT PORTAL CREDENTIALS
+              </span>
+              <span style="font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 999px; background: rgba(16, 185, 129, 0.2); color: #10b981; font-weight: 700;">
+                ● ACTIVE IN SYSTEM
+              </span>
+            </div>
+
+            <!-- User ID Row -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0.85rem; background: rgba(0,0,0,0.4); border-radius: var(--radius-sm); margin-bottom: 0.5rem;">
+              <div>
+                <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">Student User ID:</span>
+                <span style="font-family: var(--font-mono); font-weight: 800; font-size: 1.05rem; color: #38bdf8;">
+                  {{ confirmedStudentData.userId || confirmedStudentData.enrollmentNumber }}
+                </span>
+              </div>
+              <button 
+                class="btn-secondary" 
+                style="padding: 0.3rem 0.7rem; font-size: 0.75rem;" 
+                @click="copyText(confirmedStudentData.userId || confirmedStudentData.enrollmentNumber, 'User ID')"
+              >
+                📋 Copy ID
+              </button>
+            </div>
+
+            <!-- Password Row -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0.85rem; background: rgba(0,0,0,0.4); border-radius: var(--radius-sm); margin-bottom: 0.5rem;">
+              <div>
+                <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">Login Password:</span>
+                <span style="font-family: var(--font-mono); font-weight: 800; font-size: 1.05rem; color: #34d399;">
+                  {{ showModalPassword ? confirmedStudentData.password : '••••••••••••' }}
+                </span>
+              </div>
+              <div style="display: flex; gap: 0.4rem;">
+                <button 
+                  class="btn-secondary" 
+                  style="padding: 0.3rem 0.6rem; font-size: 0.75rem;" 
+                  @click="showModalPassword = !showModalPassword"
+                >
+                  {{ showModalPassword ? '🙈 Hide' : '👁️ Show' }}
+                </button>
+                <button 
+                  class="btn-secondary" 
+                  style="padding: 0.3rem 0.7rem; font-size: 0.75rem;" 
+                  @click="copyText(confirmedStudentData.password, 'Password')"
+                >
+                  📋 Copy
+                </button>
+              </div>
+            </div>
+
+            <!-- Portal Login Link Row -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0.85rem; background: rgba(0,0,0,0.4); border-radius: var(--radius-sm);">
+              <div>
+                <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">Portal Login URL:</span>
+                <span style="font-family: var(--font-mono); font-size: 0.8rem; color: #cbd5e1;">
+                  https://ithunt.vercel.app/#login
+                </span>
+              </div>
+              <button 
+                class="btn-secondary" 
+                style="padding: 0.3rem 0.7rem; font-size: 0.75rem;" 
+                @click="copyText('https://ithunt.vercel.app/#login', 'Login URL')"
+              >
+                📋 Copy URL
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: flex-end; margin-top: 1.25rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.08);">
+          <button 
+            class="btn-primary" 
+            style="background: #22c55e; border-color: #22c55e; font-weight: 700;" 
+            @click="shareCredentialsOnWhatsApp(confirmedStudentData)"
+            title="Open WhatsApp with pre-filled candidate credentials"
+          >
+            <span>📲 Send to WhatsApp</span>
+          </button>
+          <button 
+            class="btn-secondary" 
+            @click="openAdmissionEmailModal(confirmedStudentData)"
+            title="Dispatch official admission confirmation email"
+          >
+            <span>✉️ Send Official Email</span>
+          </button>
+          <button 
+            class="btn-secondary" 
+            @click="copyCredentialsText(confirmedStudentData)"
+          >
+            <span>📋 Copy All Details</span>
+          </button>
+          <button 
+            class="btn-secondary" 
+            @click="openResetPasswordModal(confirmedStudentData)"
+            title="Change or reset password"
+          >
+            <span>🔑 Reset Password</span>
+          </button>
+          <button 
+            class="btn-secondary" 
+            @click="showConfirmedCredentialsModal = false"
+          >
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SuperAdmin Reset Password Modal -->
+    <div class="modal-overlay" v-if="showResetPasswordModal && resetStudentTarget" @click.self="showResetPasswordModal = false">
+      <div class="modal-card" style="max-width: 480px; text-align: left;">
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+          <div>
+            <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: #f59e0b;">
+              🔑 Reset Student Password
+            </h3>
+            <p style="margin: 0.2rem 0 0 0; font-size: 0.8rem; color: var(--text-muted);">
+              Update login password for {{ resetStudentTarget.candidateName || resetStudentTarget.name || 'Student' }}
+            </p>
+          </div>
+          <button class="modal-close-btn" @click="showResetPasswordModal = false">✕</button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div style="background: rgba(15, 23, 42, 0.6); border-radius: var(--radius-sm); padding: 0.85rem; font-size: 0.85rem;">
+            <div><strong style="color: var(--text-muted);">Target Student:</strong> {{ resetStudentTarget.candidateName || resetStudentTarget.name }}</div>
+            <div><strong style="color: var(--text-muted);">User ID:</strong> <span style="font-family: var(--font-mono); color: #38bdf8;">{{ resetStudentTarget.userId || resetStudentTarget.enrollmentNumber || resetStudentTarget.id }}</span></div>
+            <div><strong style="color: var(--text-muted);">Email:</strong> {{ resetStudentTarget.email }}</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">New Password <span class="req">*</span></label>
+            <div style="display: flex; gap: 0.5rem;">
+              <input 
+                type="text" 
+                v-model="newPasswordInput" 
+                required 
+                class="form-control" 
+                style="font-family: var(--font-mono); font-weight: 700; color: #10b981;"
+                placeholder="Enter new password"
+              >
+              <button 
+                type="button" 
+                class="btn-secondary" 
+                style="white-space: nowrap; padding: 0.5rem 0.75rem;" 
+                @click="newPasswordInput = 'ITH@' + Math.floor(1000 + Math.random() * 9000)"
+              >
+                🎲 Random
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.25rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.08);">
+          <button class="btn-secondary" @click="showResetPasswordModal = false">Cancel</button>
+          <button class="btn-primary" style="background: #f59e0b; border-color: #f59e0b;" @click="handleSaveResetPassword">
+            <span>Save & Apply New Password 💾</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -1324,11 +1668,14 @@ import {
   sendFeeReceiptJpgEmail,
   getStudentAdmissionGmailUrl,
   getStudentAdmissionMailtoUrl,
-  getStudentAdmissionEmailContent
+  getStudentAdmissionEmailContent,
+  getStudentAdmissionWhatsAppUrl
 } from '../../utils/emailNotifier.js';
 import { generateFeeReceiptJpgBlob } from '../../utils/jpgReceiptGenerator.js';
 import { 
   API, 
+  confirmAdmissionInBackend,
+  resetStudentPasswordInBackend,
   deleteAdmissionFromBackend, 
   deleteUserFromBackend, 
   updateNielitProjectInBackend, 
@@ -1403,12 +1750,139 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['logout', 'download-slip', 'download-nielit-pdf', 'add-admission', 'delete-admission', 'update-nielit-project', 'delete-nielit-project', 'delete-student']);
+const emit = defineEmits(['logout', 'download-slip', 'download-nielit-pdf', 'add-admission', 'confirm-admission', 'delete-admission', 'update-nielit-project', 'delete-nielit-project', 'delete-student']);
 
 const emailActionMsg = ref('');
 const showAdmissionEmailModal = ref(false);
 const selectedAdmissionForEmail = ref(null);
 const emailLetterPreview = ref('');
+
+// Confirmed Credentials Modal State
+const showConfirmedCredentialsModal = ref(false);
+const confirmedStudentData = ref(null);
+const showModalPassword = ref(true);
+
+// Reset Password Modal State
+const showResetPasswordModal = ref(false);
+const resetStudentTarget = ref(null);
+const newPasswordInput = ref('');
+
+// Password Visibility toggle map for table rows
+const showPasswordFor = ref({});
+const togglePassword = (key) => {
+  if (!key) return;
+  showPasswordFor.value[key] = !showPasswordFor.value[key];
+};
+
+const copyText = async (text, label = 'Text') => {
+  if (!text) return;
+  try {
+    await navigator.clipboard.writeText(String(text));
+    emailActionMsg.value = `✓ Copied ${label} to clipboard!`;
+  } catch (e) {
+    prompt(`Copy ${label}:`, String(text));
+  }
+  setTimeout(() => { emailActionMsg.value = ''; }, 3000);
+};
+
+const copyCredentialsText = async (data) => {
+  if (!data) return;
+  const text = `🎓 IT HUNT Academy - Official Student Portal Login Credentials
+Candidate Name  : ${data.candidateName || data.fullName || data.name || 'Student'}
+Registration ID : ${data.registrationNo || data.id}
+Enrolled Program: ${data.course}
+
+🔐 STUDENT LOGIN CREDENTIALS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+👤 Student User ID : ${data.userId || data.enrollmentNumber || data.registrationNo}
+🔑 Login Password  : ${data.password || 'Ithunt@123'}
+🌐 Portal Login URL: https://ithunt.vercel.app/#login
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Please sign in and keep your credentials confidential.`;
+
+  await copyText(text, 'Full Credentials');
+};
+
+const shareCredentialsOnWhatsApp = (data) => {
+  if (!data) return;
+  const url = getStudentAdmissionWhatsAppUrl(data);
+  if (url) {
+    window.open(url, '_blank', 'noopener,noreferrer');
+    emailActionMsg.value = `✓ Opened WhatsApp with credentials for ${data.candidateName || data.name || 'Student'}`;
+    setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+  } else {
+    alert('Candidate record has no valid mobile number for WhatsApp.');
+  }
+};
+
+const openCredentialsModal = (adm) => {
+  if (!adm) return;
+  confirmedStudentData.value = {
+    ...adm,
+    userId: adm.userId || adm.enrollmentNumber || adm.registrationNo || adm.id,
+    password: adm.password || 'Ithunt@123',
+    candidateName: adm.candidateName || adm.fullName || 'Student',
+    course: adm.course,
+    mobile: adm.mobile || adm.phone,
+    email: adm.email,
+    registrationNo: adm.registrationNo || adm.id,
+    loginUrl: 'https://ithunt.vercel.app/#login'
+  };
+  showModalPassword.value = true;
+  showConfirmedCredentialsModal.value = true;
+};
+
+const openResetPasswordModal = (item) => {
+  if (!item) return;
+  resetStudentTarget.value = item;
+  newPasswordInput.value = `ITH@${Math.floor(1000 + Math.random() * 9000)}`;
+  showResetPasswordModal.value = true;
+};
+
+const handleSaveResetPassword = async () => {
+  if (!resetStudentTarget.value || !newPasswordInput.value.trim()) return;
+  const target = resetStudentTarget.value;
+  const targetId = target.userId || target.id || target.registrationNo;
+  const newPass = newPasswordInput.value.trim();
+
+  emailActionMsg.value = `Updating password for ${target.candidateName || target.name || 'Student'}...`;
+
+  try {
+    await resetStudentPasswordInBackend(targetId, newPass);
+    target.password = newPass;
+
+    // Sync in admissionsList
+    const aIdx = admissionsList.value.findIndex(a => a.userId === targetId || a.registrationNo === targetId || a.id === targetId);
+    if (aIdx !== -1) {
+      admissionsList.value[aIdx].password = newPass;
+    }
+    // Sync in studentsList
+    const sIdx = studentsList.value.findIndex(s => s.userId === targetId || s.id === targetId || s.registrationNo === targetId);
+    if (sIdx !== -1) {
+      studentsList.value[sIdx].password = newPass;
+    }
+    // Sync in usersList
+    const uIdx = usersList.value.findIndex(u => u.userId === targetId || u.id === targetId || u.email === target.email);
+    if (uIdx !== -1) {
+      usersList.value[uIdx].password = newPass;
+    }
+
+    emailActionMsg.value = `✓ Password reset to "${newPass}" for ${target.candidateName || target.name || 'Student'}!`;
+    showResetPasswordModal.value = false;
+  } catch (err) {
+    alert('Failed to reset password: ' + err.message);
+  }
+  setTimeout(() => { emailActionMsg.value = ''; }, 5000);
+};
+
+const pendingAdmissionsCount = computed(() => {
+  return admissionsList.value.filter(a => a.status === 'Pending Verification' || a.status === 'Pending Confirmation' || (!a.status && !a.admissionConfirmed)).length;
+});
+
+const confirmedAdmissionsCount = computed(() => {
+  return admissionsList.value.filter(a => a.status === 'Confirmed' || a.admissionConfirmed).length;
+});
 
 const openAdmissionEmailModal = (adm) => {
   if (!adm || !adm.email) {
@@ -1627,15 +2101,27 @@ watch(() => props.allUsers, (val) => {
 
 const filteredAdmissions = computed(() => {
   return admissionsList.value.filter(adm => {
-    const matchStatus = admissionStatusFilter.value === 'all' || adm.status === admissionStatusFilter.value;
+    let matchStatus = true;
+    if (admissionStatusFilter.value === 'Confirmed') {
+      matchStatus = adm.status === 'Confirmed' || adm.admissionConfirmed === true;
+    } else if (admissionStatusFilter.value === 'Pending Verification' || admissionStatusFilter.value === 'Pending Confirmation') {
+      matchStatus = adm.status === 'Pending Verification' || adm.status === 'Pending Confirmation' || (!adm.status && !adm.admissionConfirmed);
+    } else if (admissionStatusFilter.value !== 'all') {
+      matchStatus = adm.status === admissionStatusFilter.value;
+    }
+
     const query = admissionSearch.value.trim().toLowerCase();
     if (!query) return matchStatus;
 
     const matchQuery = 
       (adm.candidateName && adm.candidateName.toLowerCase().includes(query)) ||
+      (adm.fullName && adm.fullName.toLowerCase().includes(query)) ||
       (adm.fatherName && adm.fatherName.toLowerCase().includes(query)) ||
       (adm.registrationNo && adm.registrationNo.toLowerCase().includes(query)) ||
+      (adm.userId && adm.userId.toLowerCase().includes(query)) ||
+      (adm.email && adm.email.toLowerCase().includes(query)) ||
       (adm.mobile && adm.mobile.includes(query)) ||
+      (adm.phone && adm.phone.includes(query)) ||
       (adm.course && adm.course.toLowerCase().includes(query)) ||
       (adm.district && adm.district.toLowerCase().includes(query));
 
@@ -1799,6 +2285,121 @@ const cycleAdmissionStatus = async (adm) => {
   }
 };
 
+const handleConfirmAdmissionAndGenerateCredentials = async (adm) => {
+  if (!adm) return;
+  const targetId = adm.registrationNo || adm.id;
+  const candidateName = adm.candidateName || adm.fullName || 'Student';
+
+  const cleanId = String(targetId || '').replace(/^ITH-?/i, '');
+  const suffix = cleanId && cleanId.length >= 3 ? cleanId.slice(-4) : Math.floor(1000 + Math.random() * 9000);
+  const generatedUserId = adm.userId || adm.enrollmentNumber || `ITH-2026-STU${suffix}`;
+  const generatedPassword = (adm.password && adm.password !== 'Ithunt@123') ? adm.password : `ITH@${Math.floor(1000 + Math.random() * 9000)}`;
+
+  emailActionMsg.value = `Confirming admission and generating login for ${candidateName}...`;
+
+  try {
+    await confirmAdmissionInBackend(adm, {
+      userId: generatedUserId,
+      password: generatedPassword,
+      feeStatus: adm.feeStatus || 'Verified & Paid',
+      confirmedBy: props.adminUser?.name || 'SuperAdmin'
+    });
+
+    adm.status = 'Confirmed';
+    adm.admissionConfirmed = true;
+    adm.userId = generatedUserId;
+    adm.enrollmentNumber = generatedUserId;
+    adm.password = generatedPassword;
+    adm.confirmedAt = new Date().toISOString();
+    adm.admissionConfirmedDate = new Date().toLocaleDateString('en-GB');
+    adm.admissionConfirmedTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+    // Sync in admissionsList
+    const idx = admissionsList.value.findIndex(a => a.registrationNo === targetId || a.id === targetId);
+    if (idx !== -1) {
+      admissionsList.value[idx] = { ...admissionsList.value[idx], ...adm };
+    }
+
+    // Sync in studentsList
+    const sIdx = studentsList.value.findIndex(s => s.userId === generatedUserId || s.id === generatedUserId || s.registrationNo === targetId);
+    if (sIdx !== -1) {
+      studentsList.value[sIdx] = {
+        ...studentsList.value[sIdx],
+        id: generatedUserId,
+        userId: generatedUserId,
+        enrollmentNumber: generatedUserId,
+        password: generatedPassword,
+        status: 'ACTIVE',
+        academicStatus: 'ACTIVE',
+        admissionConfirmed: true
+      };
+    } else {
+      studentsList.value.unshift({
+        id: generatedUserId,
+        userId: generatedUserId,
+        enrollmentNumber: generatedUserId,
+        registrationNo: targetId,
+        password: generatedPassword,
+        name: candidateName,
+        fullName: candidateName,
+        course: adm.course,
+        email: adm.email,
+        mobile: adm.mobile || adm.phone,
+        status: 'ACTIVE',
+        academicStatus: 'ACTIVE',
+        admissionConfirmed: true,
+        batch: '2026'
+      });
+    }
+
+    // Sync in usersList
+    const uIdx = usersList.value.findIndex(u => u.userId === generatedUserId || u.id === generatedUserId || u.email === adm.email);
+    if (uIdx !== -1) {
+      usersList.value[uIdx] = {
+        ...usersList.value[uIdx],
+        id: generatedUserId,
+        userId: generatedUserId,
+        password: generatedPassword,
+        verified: true,
+        status: 'ACTIVE'
+      };
+    } else {
+      usersList.value.unshift({
+        id: generatedUserId,
+        userId: generatedUserId,
+        email: adm.email,
+        name: candidateName,
+        password: generatedPassword,
+        role: 'student',
+        verified: true,
+        status: 'ACTIVE'
+      });
+    }
+
+    emit('confirm-admission', { ...adm, userId: generatedUserId, password: generatedPassword });
+
+    confirmedStudentData.value = {
+      ...adm,
+      userId: generatedUserId,
+      password: generatedPassword,
+      candidateName,
+      course: adm.course,
+      mobile: adm.mobile || adm.phone,
+      email: adm.email,
+      registrationNo: targetId,
+      loginUrl: 'https://ithunt.vercel.app/#login'
+    };
+    showModalPassword.value = true;
+    showConfirmedCredentialsModal.value = true;
+    emailActionMsg.value = `✓ Admission Confirmed! Student User ID: ${generatedUserId} | Password: ${generatedPassword}`;
+  } catch (err) {
+    console.warn('Admission confirm error:', err.message);
+    emailActionMsg.value = `⚠️ Error confirming admission: ${err.message}`;
+  }
+
+  setTimeout(() => { emailActionMsg.value = ''; }, 6000);
+};
+
 const deleteAdmission = async (adm) => {
   const idToDelete = typeof adm === 'object' ? (adm.registrationNo || adm.id) : adm;
   const candidateName = typeof adm === 'object' ? (adm.candidateName || adm.name || 'Candidate') : 'Candidate';
@@ -1902,40 +2503,105 @@ const openQuickAdmissionModal = () => {
   showQuickAdmissionModal.value = true;
 };
 
-const handleCreateDirectAdmission = () => {
+const handleCreateDirectAdmission = async () => {
   const regId = 'ITH-' + Math.floor(100000 + Math.random() * 900000);
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
   const studentEmail = (quickForm.value.email || '').trim();
+  const candidateName = (quickForm.value.candidateName || '').trim();
+  const studentMobile = (quickForm.value.mobile || '').trim();
+  const studentCourse = quickForm.value.course;
+
+  const suffix = Math.floor(1000 + Math.random() * 9000);
+  const generatedUserId = `ITH-2026-STU${suffix}`;
+  const generatedPassword = `ITH@${Math.floor(1000 + Math.random() * 9000)}`;
+
   const newAdm = {
     id: regId,
     registrationNo: regId,
     registrationNumber: regId,
     date: dateStr,
     time: timeStr,
-    candidateName: (quickForm.value.candidateName || '').trim(),
-    fullName: (quickForm.value.candidateName || '').trim(),
+    candidateName,
+    fullName: candidateName,
     fatherName: (quickForm.value.fatherName || '').trim(),
     motherName: 'Not Specified',
     dob: '2003-01-01',
     gender: 'Male',
-    course: quickForm.value.course,
-    track: quickForm.value.course,
-    mobile: (quickForm.value.mobile || '').trim(),
-    phone: (quickForm.value.mobile || '').trim(),
+    course: studentCourse,
+    track: studentCourse,
+    mobile: studentMobile,
+    phone: studentMobile,
     email: studentEmail,
-    userId: studentEmail,
-    password: 'Ithunt@123',
+    userId: generatedUserId,
+    password: generatedPassword,
+    enrollmentNumber: generatedUserId,
     district: 'PRAYAGRAJ',
     address: 'Holagarh Studio, Prayagraj',
-    status: 'Confirmed'
+    status: 'Confirmed',
+    admissionConfirmed: true,
+    feeStatus: 'Verified & Paid',
+    confirmedAt: now.toISOString()
   };
 
   admissionsList.value.unshift(newAdm);
   emit('add-admission', newAdm);
+
+  // Sync into studentsList
+  studentsList.value.unshift({
+    id: generatedUserId,
+    userId: generatedUserId,
+    enrollmentNumber: generatedUserId,
+    registrationNo: regId,
+    password: generatedPassword,
+    name: candidateName,
+    fullName: candidateName,
+    course: studentCourse,
+    email: studentEmail,
+    mobile: studentMobile,
+    status: 'ACTIVE',
+    academicStatus: 'ACTIVE',
+    admissionConfirmed: true,
+    batch: '2026'
+  });
+
+  // Sync into usersList
+  usersList.value.unshift({
+    id: generatedUserId,
+    userId: generatedUserId,
+    email: studentEmail,
+    name: candidateName,
+    password: generatedPassword,
+    role: 'student',
+    verified: true,
+    status: 'ACTIVE'
+  });
+
+  try {
+    await confirmAdmissionInBackend(newAdm, {
+      userId: generatedUserId,
+      password: generatedPassword,
+      feeStatus: 'Verified & Paid',
+      confirmedBy: props.adminUser?.name || 'SuperAdmin'
+    });
+  } catch (err) {
+    console.warn('Direct admission backend confirm error:', err.message);
+  }
+
   showQuickAdmissionModal.value = false;
+
+  confirmedStudentData.value = {
+    ...newAdm,
+    userId: generatedUserId,
+    password: generatedPassword,
+    loginUrl: 'https://ithunt.vercel.app/#login'
+  };
+  showModalPassword.value = true;
+  showConfirmedCredentialsModal.value = true;
+  emailActionMsg.value = `✓ Direct Candidate Enrolled! User ID: ${generatedUserId} | Password: ${generatedPassword}`;
+  setTimeout(() => { emailActionMsg.value = ''; }, 6000);
 };
 
 const exportDataToJson = () => {
