@@ -23,6 +23,16 @@
       </div>
 
       <div class="admin-quick-actions">
+        <button 
+          class="btn-secondary admin-action-btn" 
+          @click="refreshAllData" 
+          :disabled="isRefreshing" 
+          title="Refresh All Database Registrations & Realtime Student Records"
+          style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;"
+        >
+          <span :style="isRefreshing ? 'display: inline-block; animation: spin 1s linear infinite;' : ''">🔄</span>
+          <span>{{ isRefreshing ? 'Syncing...' : 'Refresh Data' }}</span>
+        </button>
         <button class="btn-secondary admin-action-btn" @click="exportDataToJson" title="Export Complete Database Backup">
           <span>📥 Backup (JSON)</span>
         </button>
@@ -35,15 +45,42 @@
       </div>
     </div>
 
+    <!-- PENDING REGISTRATIONS ACTION BANNER (Visible whenever candidates submit forms) -->
+    <div 
+      v-if="pendingAdmissionsCount > 0" 
+      style="margin-bottom: 2rem; padding: 1.15rem 1.75rem; background: linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(234, 88, 12, 0.15) 100%); border: 1.5px solid rgba(245, 158, 11, 0.5); border-radius: var(--radius-lg); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; cursor: pointer; box-shadow: 0 8px 25px rgba(245, 158, 11, 0.2);"
+      @click="currentTab = 'admissions'; admissionStatusFilter = 'Pending Verification'"
+      title="Click to view and confirm pending registrations"
+    >
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <span style="font-size: 2rem;">🔔</span>
+        <div>
+          <div style="font-weight: 800; font-size: 1.05rem; color: #f59e0b; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <span>{{ pendingAdmissionsCount }} New Candidate Registration(s) Awaiting SuperAdmin Review!</span>
+            <span style="padding: 2px 9px; border-radius: 999px; background: #f59e0b; color: #000; font-size: 0.72rem; font-weight: 900;">ACTION REQUIRED</span>
+          </div>
+          <div style="font-size: 0.85rem; color: #cbd5e1; margin-top: 3px;">
+            Candidate applications submitted via website. Click here to review candidate details and 1-click confirm their admissions with auto-generated Student User ID & Password.
+          </div>
+        </div>
+      </div>
+      <button 
+        class="btn-primary" 
+        style="background: #f59e0b; border-color: #f59e0b; color: #000; font-weight: 800; font-size: 0.85rem; padding: 0.5rem 1.25rem; white-space: nowrap;"
+      >
+        <span>Review Registrations ({{ pendingAdmissionsCount }}) ➔</span>
+      </button>
+    </div>
+
     <!-- 2. HIGH-LEVEL EXECUTIVE METRIC STATS -->
     <div class="superadmin-stats-grid anim-stagger-2">
       <!-- Database Students List -->
       <div class="admin-stat-card">
         <div class="admin-stat-icon-box primary-glow">🎓</div>
         <div class="admin-stat-content">
-          <div class="admin-stat-val text-gradient">{{ studentsList.length }}</div>
-          <div class="admin-stat-lbl">Database Students</div>
-          <div class="admin-stat-trend">⚡ GET /api/students</div>
+          <div class="admin-stat-val text-gradient">{{ unifiedStudentsList.length }}</div>
+          <div class="admin-stat-lbl">Database Students & Registrations</div>
+          <div class="admin-stat-trend">⚡ {{ confirmedAdmissionsCount }} Confirmed • {{ pendingAdmissionsCount }} Pending</div>
         </div>
       </div>
 
@@ -119,8 +156,13 @@
       >
         <span>{{ tab.icon }}</span>
         <span>{{ tab.label }}</span>
-        <span class="tab-badge-counter" v-if="tab.id === 'students'">{{ studentsList.length }}</span>
-        <span class="tab-badge-counter" v-else-if="tab.id === 'admissions'">{{ admissionsList.length }}</span>
+        <span class="tab-badge-counter" v-if="tab.id === 'students'">{{ unifiedStudentsList.length }}</span>
+        <span class="tab-badge-counter" v-else-if="tab.id === 'admissions'">
+          {{ admissionsList.length }}
+          <span v-if="pendingAdmissionsCount > 0" style="background: #f59e0b; color: #000; padding: 1px 6px; border-radius: 999px; font-weight: 900; margin-left: 4px; font-size: 0.7rem;">
+            {{ pendingAdmissionsCount }} new
+          </span>
+        </span>
         <span class="tab-badge-counter" v-else-if="tab.id === 'nielit'">{{ nielitProjectsList.length }}</span>
         <span class="tab-badge-counter" v-else-if="tab.id === 'careers'">{{ jobApplicationsList.length }}</span>
         <span class="tab-badge-counter" v-else-if="tab.id === 'events'">{{ rsvpsList.length }}</span>
@@ -142,7 +184,7 @@
         <div>
           <h3 class="panel-title">🎓 Students Directory & Master Academic List</h3>
           <p class="panel-subtitle">
-            Connected Cloud Database (Firestore & Realtime DB) | Total Registered: <strong style="color: var(--color-ai-orange);">{{ studentsList.length }}</strong>
+            Connected Database | Total Enrolled & Candidates: <strong style="color: var(--color-ai-orange);">{{ unifiedStudentsList.length }}</strong>
           </p>
         </div>
 
@@ -177,8 +219,9 @@
 
           <!-- Status Filter -->
           <select v-model="studentStatusFilter" class="form-control admin-select-filter" style="min-width: 130px;">
-            <option value="all">All Statuses</option>
-            <option value="ACTIVE">ACTIVE ✓</option>
+            <option value="all">All Statuses ({{ unifiedStudentsList.length }})</option>
+            <option value="ACTIVE">ACTIVE ✓ ({{ confirmedAdmissionsCount }})</option>
+            <option value="PENDING_REVIEW">PENDING REVIEW ⏳ ({{ pendingAdmissionsCount }})</option>
             <option value="GRADUATED">GRADUATED 🎓</option>
             <option value="INACTIVE">INACTIVE ⏸️</option>
           </select>
@@ -204,9 +247,23 @@
               <tr v-for="stu in filteredStudents" :key="stu.id || stu.enrollmentNumber">
                 <!-- Enrollment No -->
                 <td>
-                  <span class="reg-no-code" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); font-weight: 700;">
-                    {{ stu.enrollmentNumber || 'ITH-2026-STU001' }}
+                  <span 
+                    class="reg-no-code" 
+                    :style="{
+                      background: (stu.admissionConfirmed || stu.status === 'Confirmed') ? 'rgba(56, 189, 248, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                      color: (stu.admissionConfirmed || stu.status === 'Confirmed') ? '#38bdf8' : '#f59e0b',
+                      border: (stu.admissionConfirmed || stu.status === 'Confirmed') ? '1px solid rgba(56, 189, 248, 0.3)' : '1px solid rgba(245, 158, 11, 0.4)',
+                      fontWeight: '700'
+                    }"
+                  >
+                    {{ stu.enrollmentNumber || stu.registrationNo || 'ITH-2026-STU001' }}
                   </span>
+                  <div v-if="!stu.admissionConfirmed && stu.status !== 'Confirmed'" style="font-size: 0.68rem; color: #f59e0b; font-weight: 800; margin-top: 3px;">
+                    ⏳ Pending Review
+                  </div>
+                  <div v-else-if="stu.userId" style="font-size: 0.7rem; font-family: var(--font-mono); color: #38bdf8; margin-top: 2px;">
+                    🆔 {{ stu.userId }}
+                  </div>
                 </td>
 
                 <!-- Student Particulars -->
@@ -240,12 +297,12 @@
                   <span 
                     class="status-pill"
                     :style="{
-                      background: (stu.academicStatus === 'ACTIVE' || stu.status === 'ACTIVE') ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                      color: (stu.academicStatus === 'ACTIVE' || stu.status === 'ACTIVE') ? '#10b981' : '#ef4444',
-                      borderColor: (stu.academicStatus === 'ACTIVE' || stu.status === 'ACTIVE') ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'
+                      background: (stu.academicStatus === 'ACTIVE' || stu.status === 'ACTIVE' || stu.admissionConfirmed) ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                      color: (stu.academicStatus === 'ACTIVE' || stu.status === 'ACTIVE' || stu.admissionConfirmed) ? '#10b981' : '#f59e0b',
+                      borderColor: (stu.academicStatus === 'ACTIVE' || stu.status === 'ACTIVE' || stu.admissionConfirmed) ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.4)'
                     }"
                   >
-                    ● {{ stu.academicStatus || stu.status || 'ACTIVE' }}
+                    ● {{ (stu.academicStatus === 'ACTIVE' || stu.status === 'ACTIVE' || stu.admissionConfirmed) ? (stu.academicStatus || 'ACTIVE') : 'Pending Review' }}
                   </span>
                 </td>
 
@@ -257,6 +314,17 @@
                 <!-- Actions -->
                 <td style="text-align: right;">
                   <div style="display: flex; justify-content: flex-end; gap: 0.4rem; flex-wrap: wrap;">
+                    <!-- If pending candidate: prominent 1-click Confirm & Generate Login -->
+                    <button 
+                      v-if="!stu.admissionConfirmed && stu.status !== 'Confirmed'"
+                      class="btn-primary" 
+                      @click="handleConfirmAdmissionAndGenerateCredentials(stu.originalAdmission || stu)"
+                      title="Confirm candidate admission and automatically generate Student User ID & Password"
+                      style="padding: 0.35rem 0.75rem; font-size: 0.78rem; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-color: #10b981; color: #fff; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);"
+                    >
+                      ⚡ Confirm & Generate
+                    </button>
+
                     <button 
                       class="admin-icon-btn" 
                       title="View Student Profile"
@@ -265,6 +333,7 @@
                       👁️ Profile
                     </button>
                     <button 
+                      v-if="stu.admissionConfirmed || stu.status === 'Confirmed'"
                       class="admin-icon-btn" 
                       title="View Student Portal Login Credentials"
                       style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);"
@@ -273,7 +342,7 @@
                       🔐 Credentials
                     </button>
                     <button 
-                      v-if="stu.phone || stu.mobile"
+                      v-if="(stu.admissionConfirmed || stu.status === 'Confirmed') && (stu.phone || stu.mobile)"
                       class="admin-icon-btn" 
                       title="Share Login Credentials via WhatsApp"
                       style="color: #22c55e; border-color: rgba(34, 197, 94, 0.4);"
@@ -282,6 +351,7 @@
                       📲 WhatsApp
                     </button>
                     <button 
+                      v-if="stu.admissionConfirmed || stu.status === 'Confirmed'"
                       class="admin-icon-btn" 
                       title="Reset Student Login Password"
                       style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.4);"
@@ -1662,7 +1732,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { 
   sendStudentAdmissionEmail, 
   sendFeeReceiptJpgEmail,
@@ -1674,6 +1744,9 @@ import {
 import { generateFeeReceiptJpgBlob } from '../../utils/jpgReceiptGenerator.js';
 import { 
   API, 
+  fetchAdmissionsFromBackend,
+  fetchStudentsFromBackend,
+  fetchUsersFromBackend,
   confirmAdmissionInBackend,
   resetStudentPasswordInBackend,
   deleteAdmissionFromBackend, 
@@ -1750,7 +1823,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['logout', 'download-slip', 'download-nielit-pdf', 'add-admission', 'confirm-admission', 'delete-admission', 'update-nielit-project', 'delete-nielit-project', 'delete-student']);
+const emit = defineEmits(['logout', 'download-slip', 'download-nielit-pdf', 'add-admission', 'confirm-admission', 'delete-admission', 'update-nielit-project', 'delete-nielit-project', 'delete-student', 'refresh-data']);
 
 const emailActionMsg = ref('');
 const showAdmissionEmailModal = ref(false);
@@ -2037,19 +2110,92 @@ watch(() => props.allStudents, (val) => {
   studentsList.value = val || [];
 }, { immediate: true, deep: true });
 
+// Unified student list that combines both confirmed students and pending candidate registrations
+const unifiedStudentsList = computed(() => {
+  const map = new Map();
+
+  // 1. Add all admissions first (including pending registrations)
+  admissionsList.value.forEach(adm => {
+    const key = String(adm.registrationNo || adm.id || adm.userId || adm.email || '').trim();
+    if (!key) return;
+    map.set(key, {
+      id: adm.userId || adm.registrationNo || adm.id,
+      userId: adm.userId || adm.enrollmentNumber || adm.registrationNo,
+      enrollmentNumber: adm.enrollmentNumber || adm.userId || adm.registrationNo,
+      registrationNo: adm.registrationNo || adm.id,
+      name: adm.candidateName || adm.fullName || 'Candidate',
+      fullName: adm.fullName || adm.candidateName || 'Candidate',
+      candidateName: adm.candidateName || adm.fullName || 'Candidate',
+      email: adm.email || '',
+      phone: adm.phone || adm.mobile || '',
+      mobile: adm.mobile || adm.phone || '',
+      course: adm.course || 'Software Engineering',
+      batch: adm.batch || '2026',
+      academicStatus: (adm.status === 'Confirmed' || adm.admissionConfirmed) ? 'ACTIVE' : 'PENDING_REVIEW',
+      status: adm.status || (adm.admissionConfirmed ? 'Confirmed' : 'Pending Verification'),
+      admissionConfirmed: !!(adm.status === 'Confirmed' || adm.admissionConfirmed),
+      password: adm.password || '',
+      gender: adm.gender || 'Male',
+      dob: adm.dob || '—',
+      address: adm.address || adm.district || 'Prayagraj, UP',
+      date: adm.date,
+      time: adm.time,
+      createdAt: adm.date ? `${adm.date} ${adm.time || ''}` : (adm.createdAt || 'Recent'),
+      createdAtFormatted: adm.date || 'Recent',
+      isAdmissionRecord: true,
+      originalAdmission: adm
+    });
+  });
+
+  // 2. Overlay / merge official students records
+  studentsList.value.forEach(stu => {
+    const key = String(stu.enrollmentNumber || stu.registrationNo || stu.userId || stu.id || stu.email || '').trim();
+    if (!key) return;
+    const existing = map.get(key) || {};
+    map.set(key, {
+      ...existing,
+      ...stu,
+      id: stu.id || existing.id,
+      userId: stu.userId || existing.userId || stu.id,
+      enrollmentNumber: stu.enrollmentNumber || existing.enrollmentNumber || stu.id,
+      name: stu.name || stu.fullName || existing.name || 'Student',
+      email: stu.email || existing.email || '',
+      mobile: stu.mobile || stu.phone || existing.mobile || '',
+      phone: stu.phone || stu.mobile || existing.phone || '',
+      course: stu.course || existing.course || 'Software Engineering',
+      academicStatus: stu.academicStatus || existing.academicStatus || 'ACTIVE',
+      status: stu.status || existing.status || 'ACTIVE',
+      admissionConfirmed: stu.admissionConfirmed !== undefined ? stu.admissionConfirmed : (existing.admissionConfirmed !== undefined ? existing.admissionConfirmed : true),
+      password: stu.password || existing.password || ''
+    });
+  });
+
+  return Array.from(map.values());
+});
+
 const filteredStudents = computed(() => {
-  return studentsList.value.filter(stu => {
+  return unifiedStudentsList.value.filter(stu => {
     const search = studentSearch.value.toLowerCase().trim();
     const matchesSearch = !search || 
       (stu.name && stu.name.toLowerCase().includes(search)) ||
       (stu.enrollmentNumber && stu.enrollmentNumber.toLowerCase().includes(search)) ||
+      (stu.registrationNo && stu.registrationNo.toLowerCase().includes(search)) ||
+      (stu.userId && stu.userId.toLowerCase().includes(search)) ||
       (stu.email && stu.email.toLowerCase().includes(search)) ||
       (stu.phone && stu.phone.includes(search)) ||
+      (stu.mobile && stu.mobile.includes(search)) ||
       (stu.course && stu.course.toLowerCase().includes(search));
 
     const matchesCourse = studentCourseFilter.value === 'all' || stu.course === studentCourseFilter.value;
     const matchesBatch = studentBatchFilter.value === 'all' || stu.batch === studentBatchFilter.value;
-    const matchesStatus = studentStatusFilter.value === 'all' || stu.academicStatus === studentStatusFilter.value || stu.status === studentStatusFilter.value;
+    let matchesStatus = true;
+    if (studentStatusFilter.value === 'ACTIVE') {
+      matchesStatus = stu.academicStatus === 'ACTIVE' || stu.status === 'ACTIVE' || stu.admissionConfirmed;
+    } else if (studentStatusFilter.value === 'PENDING_REVIEW') {
+      matchesStatus = stu.academicStatus === 'PENDING_REVIEW' || stu.status === 'Pending Verification' || !stu.admissionConfirmed;
+    } else if (studentStatusFilter.value !== 'all') {
+      matchesStatus = stu.academicStatus === studentStatusFilter.value || stu.status === studentStatusFilter.value;
+    }
 
     return matchesSearch && matchesCourse && matchesBatch && matchesStatus;
   });
@@ -2628,8 +2774,42 @@ const onAvatarError = (event) => {
   event.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=60';
 };
 
+let refreshTimer = null;
+const isRefreshing = ref(false);
+const lastRefreshedTime = ref('');
+
+const refreshAllData = async () => {
+  isRefreshing.value = true;
+  try {
+    emit('refresh-data');
+    const [adms, stus, usrs] = await Promise.all([
+      fetchAdmissionsFromBackend(),
+      fetchStudentsFromBackend(),
+      fetchUsersFromBackend()
+    ]);
+    if (adms && adms.length > 0) admissionsList.value = adms;
+    if (stus && stus.length > 0) studentsList.value = stus;
+    if (usrs && usrs.length > 0) usersList.value = usrs;
+    lastRefreshedTime.value = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  } catch (err) {
+    console.warn('SuperAdmin refresh notice:', err.message);
+  } finally {
+    isRefreshing.value = false;
+  }
+};
+
 onMounted(() => {
   sessionTime.value = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  refreshAllData();
+
+  // Live polling every 12 seconds so SuperAdmin gets new candidate registrations in real-time
+  refreshTimer = setInterval(() => {
+    refreshAllData();
+  }, 12000);
+});
+
+onUnmounted(() => {
+  if (refreshTimer) clearInterval(refreshTimer);
 });
 </script>
 
