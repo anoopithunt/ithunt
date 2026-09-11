@@ -3,7 +3,7 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
-import { connectMongo, isMongoConnected, getMongoDbName, isAtlas } from './config/db.js';
+import { connectMongo, isMongoConnected, getMongoDbName, isAtlas, getLastMongoError } from './config/db.js';
 
 // Import Route Handlers
 import authRoutes from './routes/auth.routes.js';
@@ -47,13 +47,10 @@ app.use((req, res, next) => {
   next();
 });
 
-let isInitialized = false;
-
 export async function ensureDbConnected() {
-  if (isInitialized) return;
+  if (isMongoConnected()) return;
   try {
     await connectMongo();
-    isInitialized = true;
   } catch (err) {
     console.warn('Database initialization caught gracefully:', err.message);
   }
@@ -61,7 +58,7 @@ export async function ensureDbConnected() {
 
 // Auto-initialize DB on all incoming requests (crucial for serverless cold starts)
 app.use(async (req, res, next) => {
-  if (!isInitialized) {
+  if (!isMongoConnected()) {
     try {
       await ensureDbConnected();
     } catch (_) {}
@@ -74,14 +71,15 @@ const healthHandler = (req, res) => {
   res.json({
     status: 'ONLINE',
     service: 'IT HUNT Backend API Engine',
-    version: '2.0.0',
+    version: '2.1.0-atlas',
     timestamp: new Date().toISOString(),
     uptime: `${Math.floor(process.uptime())}s`,
     database: {
       name: getMongoDbName(),
       connected: isMongoConnected(),
       type: isAtlas() ? 'MongoDB Atlas Cloud' : 'MongoDB',
-      mode: isMongoConnected() ? (isAtlas() ? 'MongoDB Atlas Cloud' : 'MongoDB (MERN Stack)') : 'Standby'
+      mode: isMongoConnected() ? (isAtlas() ? 'MongoDB Atlas Cloud' : 'MongoDB (MERN Stack)') : 'Standby',
+      lastError: getLastMongoError()
     },
     endpoints: [
       '/api/admissions',
