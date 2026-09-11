@@ -175,6 +175,7 @@
           :allContactInquiries="liveContactInquiriesList"
           :allReviews="liveReviewsList"
           :allUsers="liveUsersList"
+          @refresh-data="loadInitialData"
           @logout="handleAdminLogout"
           @download-slip="downloadCustomAdmissionSlip"
           @download-nielit-pdf="downloadNielitProjectPdfDoc"
@@ -998,11 +999,12 @@ const handleLoginAsStudent = (admission) => {
   showToast(`Welcome ${currentStudent.candidateName}! Logged into Student Dashboard.`, 'success');
 };
 
-const handleLoginSuccess = (user) => {
+const handleLoginSuccess = async (user) => {
   isAdminLoggedIn.value = true;
   adminUser.value = user;
   activeTab.value = 'superadmin';
   triggerConfetti();
+  await loadInitialData();
 };
 
 const handleAdminLogout = () => {
@@ -1356,7 +1358,10 @@ onMounted(() => {
     });
   };
   initReveal();
-  watch(activeTab, () => {
+  watch(activeTab, (newTab) => {
+    if (newTab === 'superadmin') {
+      loadInitialData();
+    }
     setTimeout(initReveal, 300);
   });
 });

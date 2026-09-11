@@ -19,13 +19,14 @@ let memoryToken = null;
 // Normalization Helpers for Clean Data Models Across UI
 // ==============================================================================
 export const normalizeAdmission = (a) => ({
+  ...a,
   id: a.id || a.registrationNumber || a.registrationNo || `ADM-${Date.now()}`,
   registrationNo: a.registrationNumber || a.registrationNo || a.id || `ITH-${Math.floor(100000 + Math.random() * 900000)}`,
-  candidateName: a.fullName || a.candidateName || a.name || 'Candidate',
+  candidateName: a.candidateName || a.fullName || a.name || 'Candidate',
   fullName: a.fullName || a.candidateName || a.name || 'Candidate',
   fatherName: a.fatherName || '—',
   motherName: a.motherName || '—',
-  mobile: a.phone || a.mobile || '',
+  mobile: a.mobile || a.phone || '',
   phone: a.phone || a.mobile || '',
   email: a.email || '',
   course: a.course || a.track || "NIELIT 'A' Level Diploma",
@@ -33,35 +34,42 @@ export const normalizeAdmission = (a) => ({
   district: a.district || a.city || 'Prayagraj',
   gender: a.gender || 'Male',
   dob: a.dob || '2004-01-01',
-  date: a.createdAt ? new Date(a.createdAt).toLocaleDateString('en-GB') : (a.date || new Date().toLocaleDateString('en-GB')),
-  time: a.createdAt ? new Date(a.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : (a.time || '10:00 AM'),
-  status: (a.status === 'PROVISIONALLY ADMITTED' || !a.status) ? 'Confirmed' : a.status,
-  feeStatus: a.feeStatus || 'Verified & Paid',
-  amountPaid: a.amountPaid || '₹5,000'
+  date: a.date || (a.createdAt ? new Date(a.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')),
+  time: a.time || (a.createdAt ? new Date(a.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '10:00 AM'),
+  status: a.status || (a.admissionConfirmed ? 'Confirmed' : 'Pending Verification'),
+  feeStatus: a.feeStatus || 'Pending Verification',
+  amountPaid: a.amountPaid || '₹5,000',
+  userId: a.userId || (a.admissionConfirmed ? (a.enrollmentNumber || a.registrationNo) : ''),
+  enrollmentNumber: a.enrollmentNumber || a.userId || a.registrationNo,
+  password: a.password || '',
+  admissionConfirmed: !!(a.admissionConfirmed || a.status === 'Confirmed')
 });
 
 export const normalizeStudent = (s) => ({
+  ...s,
   id: s.id || s.userId || `STU-${Date.now()}`,
   userId: s.userId || s.id,
-  enrollmentNumber: s.enrollmentNumber || s.registrationNo || `ITH-2026-STU${Math.floor(1000 + Math.random() * 9000)}`,
+  enrollmentNumber: s.enrollmentNumber || s.registrationNo || (s.userId && s.userId.startsWith('ITH-') ? s.userId : `ITH-2026-STU${Math.floor(1000 + Math.random() * 9000)}`),
   name: s.name || s.fullName || s.candidateName || 'Student',
-  fullName: s.name || s.fullName || s.candidateName || 'Student',
-  candidateName: s.name || s.fullName || s.candidateName || 'Student',
+  fullName: s.fullName || s.name || s.candidateName || 'Student',
+  candidateName: s.candidateName || s.fullName || s.name || 'Student',
   email: s.email || '',
   phone: s.phone || s.mobile || '',
-  mobile: s.phone || s.mobile || '',
+  mobile: s.mobile || s.phone || '',
   course: s.course || 'MERN Stack Developer',
   batch: s.batch || '2026',
-  academicStatus: s.academicStatus || s.status || 'ACTIVE',
-  status: s.academicStatus || s.status || 'ACTIVE',
+  academicStatus: s.academicStatus || s.status || (s.admissionConfirmed ? 'ACTIVE' : 'PENDING_REVIEW'),
+  status: s.status || s.academicStatus || (s.admissionConfirmed ? 'ACTIVE' : 'PENDING_REVIEW'),
+  admissionConfirmed: !!(s.admissionConfirmed || s.status === 'Confirmed' || s.academicStatus === 'ACTIVE'),
+  password: s.password || '',
   gender: s.gender || 'Male',
   dob: s.dob || '2004-01-01',
   address: s.address || 'Holagarh, Prayagraj',
   guardianName: s.guardianName || '—',
   guardianPhone: s.guardianPhone || '—',
   bio: s.bio || '',
-  createdAt: s.createdAt ? new Date(s.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'),
-  createdAtFormatted: s.createdAt ? new Date(s.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Recent'
+  createdAt: s.createdAt ? (String(s.createdAt).includes('/') ? s.createdAt : new Date(s.createdAt).toLocaleDateString('en-GB')) : new Date().toLocaleDateString('en-GB'),
+  createdAtFormatted: s.createdAt ? (String(s.createdAt).includes('/') ? s.createdAt : new Date(s.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })) : 'Recent'
 });
 
 export const normalizeNielitProject = (p) => ({
@@ -462,10 +470,50 @@ export async function saveAdmissionRecord(data) {
     id: finalRegNo,
     registrationNo: finalRegNo,
     registrationNumber: finalRegNo,
-    status: backendAdm?.status || payload.status || 'Confirmed'
+    status: backendAdm?.status || payload.status || 'Pending Verification'
   };
 
-  // Backend already creates student + user records via POST /api/admissions
+  // Ensure persistent local storage cache for reliable multi-tab / offline availability
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      const currentList = JSON.parse(localStorage.getItem('ithunt_all_admissions') || '[]');
+      const idx = currentList.findIndex(a => a.registrationNo === finalRecord.registrationNo || a.email === finalRecord.email);
+      if (idx !== -1) {
+        currentList[idx] = { ...currentList[idx], ...finalRecord };
+      } else {
+        currentList.unshift(finalRecord);
+      }
+      localStorage.setItem('ithunt_all_admissions', JSON.stringify(currentList));
+
+      // Also persist student record
+      const studentObj = {
+        id: finalRecord.userId || finalRecord.registrationNo,
+        userId: finalRecord.userId || finalRecord.email,
+        enrollmentNumber: finalRecord.enrollmentNumber || finalRecord.registrationNo,
+        registrationNo: finalRecord.registrationNo,
+        name: finalRecord.candidateName || finalRecord.fullName,
+        fullName: finalRecord.candidateName || finalRecord.fullName,
+        email: finalRecord.email,
+        phone: finalRecord.phone || finalRecord.mobile,
+        mobile: finalRecord.mobile || finalRecord.phone,
+        course: finalRecord.course,
+        batch: '2026',
+        academicStatus: finalRecord.status === 'Confirmed' ? 'ACTIVE' : 'PENDING_REVIEW',
+        status: finalRecord.status === 'Confirmed' ? 'ACTIVE' : 'PENDING_REVIEW',
+        admissionConfirmed: finalRecord.status === 'Confirmed',
+        password: finalRecord.password || '',
+        createdAt: finalRecord.createdAt || new Date().toISOString()
+      };
+      const currentStudents = JSON.parse(localStorage.getItem('ithunt_all_students') || '[]');
+      const sIdx = currentStudents.findIndex(s => s.registrationNo === studentObj.registrationNo || s.email === studentObj.email);
+      if (sIdx !== -1) {
+        currentStudents[sIdx] = { ...currentStudents[sIdx], ...studentObj };
+      } else {
+        currentStudents.unshift(studentObj);
+      }
+      localStorage.setItem('ithunt_all_students', JSON.stringify(currentStudents));
+    } catch (e) {}
+  }
 
   // 5. Ensure Student Portal User Account exists in local storage
   if (finalRecord.email) {
@@ -488,6 +536,17 @@ export async function saveAdmissionRecord(data) {
 export async function fetchAdmissionsFromBackend() {
   let list = [];
 
+  // 1. Check local storage cache first
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      const cached = JSON.parse(localStorage.getItem('ithunt_all_admissions') || '[]');
+      if (Array.isArray(cached) && cached.length > 0) {
+        list = [...cached];
+      }
+    } catch (e) {}
+  }
+
+  // 2. Fetch from connected REST API / MongoDB
   try {
     const data = await API.getAdmissions();
     const rawList = Array.isArray(data?.admissions) 
@@ -495,7 +554,16 @@ export async function fetchAdmissionsFromBackend() {
       : (Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []));
 
     if (rawList.length > 0) {
-      list = rawList;
+      const mergedMap = new Map();
+      list.forEach(a => {
+        const k = String(a.registrationNo || a.registrationNumber || a.id || a.email || '').trim();
+        if (k) mergedMap.set(k, a);
+      });
+      rawList.forEach(a => {
+        const k = String(a.registrationNo || a.registrationNumber || a.id || a.email || '').trim();
+        if (k) mergedMap.set(k, { ...(mergedMap.get(k) || {}), ...a });
+      });
+      list = Array.from(mergedMap.values());
     }
   } catch (e) {
     console.warn('Notice loading admissions from REST API:', e.message);
@@ -504,11 +572,20 @@ export async function fetchAdmissionsFromBackend() {
   // Deduplicate records
   const uniqueMap = new Map();
   list.forEach(a => {
-    const reg = String(a.registrationNo || a.registrationNumber || a.id || '').trim();
+    const reg = String(a.registrationNo || a.registrationNumber || a.id || a.email || '').trim();
     if (reg) uniqueMap.set(reg, a);
   });
 
-  return Array.from(uniqueMap.values()).map(normalizeAdmission);
+  const normalized = Array.from(uniqueMap.values()).map(normalizeAdmission);
+
+  // Sync back to local storage
+  if (typeof window !== 'undefined' && window.localStorage && normalized.length > 0) {
+    try {
+      localStorage.setItem('ithunt_all_admissions', JSON.stringify(normalized));
+    } catch (e) {}
+  }
+
+  return normalized;
 }
 
 /**
@@ -865,6 +942,17 @@ export async function fetchRsvpsFromBackend() {
 export async function fetchStudentsFromBackend(filters = {}) {
   let list = [];
 
+  // 1. Check local storage cache
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      const cached = JSON.parse(localStorage.getItem('ithunt_all_students') || '[]');
+      if (Array.isArray(cached) && cached.length > 0) {
+        list = [...cached];
+      }
+    } catch (e) {}
+  }
+
+  // 2. Fetch from connected REST API / MongoDB
   try {
     const queryObj = {};
     if (filters.course) queryObj.course = filters.course;
@@ -877,12 +965,20 @@ export async function fetchStudentsFromBackend(filters = {}) {
       : (Array.isArray(data) ? data : []);
 
     if (rawList.length > 0) {
-      list = rawList;
+      const mergedMap = new Map();
+      list.forEach(s => {
+        const k = String(s.enrollmentNumber || s.registrationNo || s.userId || s.id || s.email || '').trim();
+        if (k) mergedMap.set(k, s);
+      });
+      rawList.forEach(s => {
+        const k = String(s.enrollmentNumber || s.registrationNo || s.userId || s.id || s.email || '').trim();
+        if (k) mergedMap.set(k, { ...(mergedMap.get(k) || {}), ...s });
+      });
+      list = Array.from(mergedMap.values());
     }
   } catch (e) {
     console.warn('Notice loading students from REST API:', e.message);
   }
-
 
   // Deduplicate students directly from database
   const uniqueMap = new Map();
@@ -891,7 +987,16 @@ export async function fetchStudentsFromBackend(filters = {}) {
     if (k) uniqueMap.set(k, s);
   });
 
-  return Array.from(uniqueMap.values()).map(normalizeStudent);
+  const normalized = Array.from(uniqueMap.values()).map(normalizeStudent);
+
+  // Sync back to local storage
+  if (typeof window !== 'undefined' && window.localStorage && normalized.length > 0) {
+    try {
+      localStorage.setItem('ithunt_all_students', JSON.stringify(normalized));
+    } catch (e) {}
+  }
+
+  return normalized;
 }
 
 /**
@@ -900,6 +1005,15 @@ export async function fetchStudentsFromBackend(filters = {}) {
 export async function deleteStudentFromBackend(student) {
   if (!student) return { success: false };
   const targetId = typeof student === 'object' ? (student.id || student.userId || student.enrollmentNumber || student.registrationNo) : student;
+
+  // Also remove from local storage cache
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      const cached = JSON.parse(localStorage.getItem('ithunt_all_students') || '[]');
+      const filtered = cached.filter(s => s.id !== targetId && s.userId !== targetId && s.enrollmentNumber !== targetId && s.registrationNo !== targetId);
+      localStorage.setItem('ithunt_all_students', JSON.stringify(filtered));
+    } catch (e) {}
+  }
 
   try {
     await API.deleteStudent(targetId);
