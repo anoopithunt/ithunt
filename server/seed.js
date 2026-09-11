@@ -14,6 +14,8 @@ import { Certificate } from './models/Certificate.js';
 import { Project } from './models/Project.js';
 import { ContactInquiry } from './models/ContactInquiry.js';
 import { EventRsvp } from './models/EventRsvp.js';
+import { Course } from './models/Course.js';
+import { Event } from './models/Event.js';
 import bcrypt from 'bcryptjs';
 
 const MONGODB_URI = (process.env.MONGODB_ATLAS_URI || process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/ithunt').trim();
@@ -668,6 +670,254 @@ export async function seedDatabase() {
     ];
     for (const r of rsvpsData) {
       await EventRsvp.findOneAndUpdate({ email: r.email }, r, { upsert: true, new: true });
+    }
+
+    // 11. SEED COURSES CATALOG
+    console.log('📚 Seeding Accredited Courses & Degree Programs...');
+    const coursesData = [
+      {
+        code: 'O-LEVEL',
+        title: 'NIELIT "O" Level Diploma',
+        category: 'NIELIT Accredited',
+        duration: '1 Year (2 Semesters)',
+        fee: '₹18,000',
+        badge: 'Govt. Recognized',
+        description: 'Foundation diploma equivalent to PGDCA. Covers IT Tools, Web Designing, Python Programming, and Internet of Things (IoT).',
+        syllabus: [
+          'M1-R5: Information Technology Tools and Network Basics',
+          'M2-R5: Web Designing & Publishing',
+          'M3-R5: Programming and Problem Solving through Python',
+          'M4-R5: Internet of Things and its Applications',
+          'PR1: Practical Assessment',
+          'PJ1: Project Work'
+        ],
+        eligibility: '10+2 or ITI Certificate',
+        certificate: 'NIELIT (Ministry of Electronics & IT, Govt. of India)',
+        status: 'ACTIVE'
+      },
+      {
+        code: 'A-LEVEL',
+        title: 'NIELIT "A" Level Advanced Diploma',
+        category: 'NIELIT Accredited',
+        duration: '1 Year (2 Semesters)',
+        fee: '₹28,000',
+        badge: 'Advance Graduate Diploma',
+        description: 'Advanced IT engineering diploma covering Data Structures, Computer Networks, Database Management, and Software Engineering.',
+        syllabus: [
+          'A1-R5: Information Technology Tools and Network Basics',
+          'A2-R5: Web Designing & Publishing',
+          'A3-R5: Programming and Problem Solving through Python',
+          'A4-R5: Internet of Things and its Applications',
+          'A5-R5: Data Structures through Object Oriented Programming Language',
+          'A6-R5: Computer Organization and Operating Systems',
+          'A7-R5: Databases and SQL Technologies',
+          'A8-R5: Systems Software and Software Engineering'
+        ],
+        eligibility: 'O Level / Graduate / Polytechnic Diploma',
+        certificate: 'NIELIT (Govt. of India Recognized)',
+        status: 'ACTIVE'
+      },
+      {
+        code: 'BCA-MCA-SUBHARTI',
+        title: 'Subharti University Degree Courses (BCA / MCA)',
+        category: 'University Degree',
+        duration: '3 Years (BCA) / 2 Years (MCA)',
+        fee: '₹32,000/Yr',
+        badge: 'UGC & AICTE Approved',
+        description: 'Comprehensive degree courses in computer applications run via Distance & Regular education approved by UGC, AICTE, and DEC joint committee.',
+        syllabus: [
+          'Computer Architecture & Digital Electronics',
+          'Object Oriented Programming in Java and C++',
+          'Operating Systems & System Architecture',
+          'Database Management Systems & Cloud Architecture',
+          'Web Technologies & Enterprise Development'
+        ],
+        eligibility: '10+2 (for BCA) / Graduation (for MCA)',
+        certificate: 'Swami Vivekanand Subharti University (UGC Approved)',
+        status: 'ACTIVE'
+      },
+      {
+        code: 'MERN-FULLSTACK',
+        title: 'Full Stack MERN Web Engineering (React 19, Node.js & MongoDB)',
+        category: 'Software Engineering',
+        duration: '6 Months (3-Mo Bootcamp + 3-Mo Production Internship)',
+        fee: '₹25,000',
+        badge: 'Flagship Job-Ready Track',
+        description: 'Production software engineering track covering modern HTML5/CSS3, JavaScript ES2025, React 19, Node.js, Express, MongoDB Atlas, REST APIs, and Cloud Deployment.',
+        syllabus: [
+          'Advanced JavaScript ES6+ & TypeScript Essentials',
+          'React 19 Architecture, Hooks & Modern State Management',
+          'Node.js & Express RESTful Microservices',
+          'MongoDB Atlas Aggregation, Indexing & Mongoose Models',
+          'Docker, Vercel CI/CD & Production Deployment'
+        ],
+        eligibility: 'Pursuing / Completed B.Tech, BCA, MCA, B.Sc, or Diploma',
+        certificate: 'IT HUNT Production Software Engineer Certificate + Corporate LOR',
+        status: 'ACTIVE'
+      },
+      {
+        code: 'MOBILE-APP-DEV',
+        title: 'Mobile App Engineering (Flutter, Dart & iOS/Android Native)',
+        category: 'Software Engineering',
+        duration: '6 Months',
+        fee: '₹25,000',
+        badge: 'High Demand',
+        description: 'Comprehensive cross-platform and native mobile app development program using Flutter, Dart, Swift iOS, and Firebase cloud integrations.',
+        syllabus: [
+          'Dart Language & Reactive UI Paradigms',
+          'Flutter State Management (Riverpod & Bloc)',
+          'Firebase Authentication & Cloud Firestore',
+          'Native iOS/Android Bridge & App Store / Play Store Release'
+        ],
+        eligibility: 'Basic Programming Knowledge',
+        certificate: 'IT HUNT Mobile Software Engineer Certificate & Experience Letter',
+        status: 'ACTIVE'
+      },
+      {
+        code: 'PYTHON-AI-ML',
+        title: 'Python Programming, Data Science & Machine Learning / AI',
+        category: 'Artificial Intelligence',
+        duration: '6 Months',
+        fee: '₹24,000',
+        badge: 'AI / ML Era',
+        description: 'Practical AI engineering course covering Python programming, NumPy, Pandas, Scikit-learn, PyTorch, Deep Learning, and Generative AI Agents.',
+        syllabus: [
+          'Python Core, OOP & Advanced Algorithms',
+          'Data Analysis & Visualization with NumPy and Pandas',
+          'Supervised & Unsupervised Machine Learning Models',
+          'Generative AI Agents, Prompt Engineering & API Orchestration'
+        ],
+        eligibility: '10+2 / Mathematics or Computer Background',
+        certificate: 'IT HUNT Certified AI & Data Science Specialist',
+        status: 'ACTIVE'
+      },
+      {
+        code: 'TALLY-PRIME',
+        title: 'Tally Prime ERP & Advanced Financial Accounting with GST',
+        category: 'Accounting & Finance',
+        duration: '3 Months',
+        fee: '₹6,500',
+        badge: 'Job Oriented',
+        description: 'Industry accounting course covering Tally Prime, GST filing, e-Way bills, payroll management, TDS, balance sheets, and inventory control.',
+        syllabus: [
+          'Double Entry Accounting Principles & Journal Entries',
+          'Tally Prime Company Setup, Ledgers & Groups',
+          'GST Invoicing, e-Way Bills & Tax Computation',
+          'Payroll Management, TDS, and Audit Balance Sheets'
+        ],
+        eligibility: '10th / 12th / Commerce or Any Stream',
+        certificate: 'IT HUNT Authorized Financial Accountant Certificate',
+        status: 'ACTIVE'
+      },
+      {
+        code: 'CCC',
+        title: 'NIELIT Course on Computer Concepts (CCC)',
+        category: 'Govt. Certification',
+        duration: '3 Months (80 Hours)',
+        fee: '₹3,500',
+        badge: 'Govt. Job Essential',
+        description: 'Mandatory government exam certification covering computer basics, LibreOffice/MS Office, Windows, Internet, Digital Financial Services, and Cyber Security.',
+        syllabus: [
+          'Introduction to Computers, Hardware & Operating Systems',
+          'Word Processing & Spreadsheet Analysis (LibreOffice / MS Office)',
+          'Presentations & Web Browsing Protocols',
+          'Digital Financial Services, Net Banking & Cyber Safety'
+        ],
+        eligibility: 'Open to All (No Minimum Educational Requirement)',
+        certificate: 'NIELIT Govt. of India Certificate',
+        status: 'ACTIVE'
+      }
+    ];
+    for (const c of coursesData) {
+      await Course.findOneAndUpdate({ code: c.code }, c, { upsert: true, new: true });
+    }
+
+    // 12. SEED EVENTS CATALOG
+    console.log('🎪 Seeding Flagship Events, Hackathons & Workshops Catalog...');
+    const eventsCatalogData = [
+      {
+        slug: 'hackathon-2026',
+        title: 'Prayagraj Grand TechFest & 24-Hour Code Hackathon',
+        subtitle: 'Inter-college software engineering challenge solving real-world AI, Web & Mobile problems.',
+        category: 'Hackathon',
+        date: 'Aug 12 - 13, 2026',
+        time: '09:00 AM (24-Hour Non-Stop Sprint)',
+        venue: 'IT HUNT Main Innovation Hub & Lab 1, Holagarh, Prayagraj',
+        mode: 'Offline Campus Lab',
+        banner: 'img/event_hackathon.webp',
+        speakers: ['Mr. Lakshman Singh Chauhan (Director)', 'Er. Anup Mishra (Software Architect)'],
+        highlights: [
+          '₹75,000 Cash Prize Pool',
+          '48 Competing Developer Teams',
+          'Corporate LOR & Direct Hiring by IT HUNT Studio'
+        ],
+        seatsTotal: 150,
+        seatsBooked: 132,
+        status: 'COMPLETED'
+      },
+      {
+        slug: 'autumn-hackathon-2026',
+        title: 'Prayagraj Grand Web & AI Hackathon (Autumn Edition)',
+        subtitle: '24-hour sprint to build full-stack web platforms, AI agents, and mobile apps.',
+        category: 'Hackathon',
+        date: 'September 24 - 25, 2026',
+        time: '09:00 AM - Next Day 09:00 AM',
+        venue: 'IT HUNT Innovation Arena & Lab 1, Holagarh, Prayagraj',
+        mode: 'Hybrid (Offline + Live Stream)',
+        banner: 'img/event_hackathon.webp',
+        speakers: ['Mr. Lakshman Singh Chauhan (Director, IT HUNT)', 'Er. Anup Mishra (Lead Software Architect)'],
+        highlights: [
+          '₹75,000 Total Cash Prize Pool',
+          'Free High-Speed Lab Workstations & Cloud GPUs',
+          'Verified Corporate Recommendation Letters (LOR)'
+        ],
+        seatsTotal: 100,
+        seatsBooked: 62,
+        status: 'UPCOMING'
+      },
+      {
+        slug: 'cybersecurity-masterclass-2026',
+        title: 'Enterprise Cybersecurity & Ethical Hacking Masterclass',
+        subtitle: 'Live offensive and defensive security lab with hands-on penetration testing.',
+        category: 'Workshop',
+        date: 'October 10, 2026',
+        time: '10:00 AM - 04:00 PM',
+        venue: 'Cyber Defense Wing, IT HUNT Holagarh',
+        mode: 'In-Person Lab Practical',
+        banner: 'img/event_workshop.webp',
+        speakers: ['Senior Cyber Security Faculty & Guest Ethical Hackers'],
+        highlights: [
+          'Hands-on Penetration Testing & Web Vulnerability Lab',
+          'Wireshark, Burp Suite & Kali Linux Real-World Exercises',
+          'Official Cyber Defense Workshop Certificate'
+        ],
+        seatsTotal: 60,
+        seatsBooked: 48,
+        status: 'UPCOMING'
+      },
+      {
+        slug: 'annual-convocation-2026',
+        title: 'Annual Convocation & Tech Achievement Ceremony 2026',
+        subtitle: 'Honoring graduating batches in NIELIT O/A Level, MERN Stack, and Mobile Engineering.',
+        category: 'Convocation',
+        date: 'November 15, 2026',
+        time: '11:00 AM - 03:30 PM',
+        venue: 'IT HUNT Auditorium, Holagarh, Prayagraj',
+        mode: 'In-Person Ceremony',
+        banner: 'img/event_convocation.webp',
+        speakers: ['Distinguished Academic Patrons & Industry Leaders'],
+        highlights: [
+          'Distribution of NIELIT & ISO Diplomas',
+          'Award of Excellence for Top Interns',
+          'Alumni Networking Session & High Tea'
+        ],
+        seatsTotal: 250,
+        seatsBooked: 180,
+        status: 'UPCOMING'
+      }
+    ];
+    for (const e of eventsCatalogData) {
+      await Event.findOneAndUpdate({ slug: e.slug }, e, { upsert: true, new: true });
     }
 
     console.log('\n=============================================================');

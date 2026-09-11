@@ -19,6 +19,7 @@ import certificatesRoutes from './routes/certificates.routes.js';
 import projectsRoutes from './routes/projects.routes.js';
 import contactRoutes from './routes/contact.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import coursesRoutes from './routes/courses.routes.js';
 
 const app = express();
 const PORT = process.env.BACKEND_PORT || process.env.PORT || 3000;
@@ -64,6 +65,8 @@ const healthHandler = (req, res) => {
     endpoints: [
       '/api/admissions',
       '/api/students',
+      '/api/courses',
+      '/api/events',
       '/api/nielit-projects',
       '/api/careers/applications',
       '/api/internships/applications',
@@ -104,6 +107,7 @@ app.use('/api/certificates', certificatesRoutes);
 app.use('/api/projects', projectsRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/courses', coursesRoutes);
 
 // Dual Mount Route Aliases (Direct Root without /api prefix for flexibility)
 app.use('/auth', authRoutes);
@@ -119,6 +123,7 @@ app.use('/certificates', certificatesRoutes);
 app.use('/projects', projectsRoutes);
 app.use('/contact', contactRoutes);
 app.use('/admin', adminRoutes);
+app.use('/courses', coursesRoutes);
 
 // 404 Catch-all
 app.use((req, res) => {

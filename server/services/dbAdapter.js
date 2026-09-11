@@ -11,14 +11,18 @@ import { Certificate } from '../models/Certificate.js';
 import { Project } from '../models/Project.js';
 import { ContactInquiry } from '../models/ContactInquiry.js';
 import { EventRsvp } from '../models/EventRsvp.js';
+import { Course } from '../models/Course.js';
+import { Event } from '../models/Event.js';
 import fs from 'fs';
 import path from 'path';
 
-// Model map
+// Model map (All 14 IT HUNT database collections)
 export const MODELS = {
   users: User,
   admissions: Admission,
   students: Student,
+  courses: Course,
+  events_catalog: Event,
   nielit_projects: NielitProject,
   job_applications: JobApplication,
   internships: Internship,
