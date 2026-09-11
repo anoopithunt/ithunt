@@ -4,21 +4,24 @@ import { dbAdapter } from '../services/dbAdapter.js';
 const router = Router();
 
 /**
- * GET /api/careers/applications
+ * GET /api/careers or /api/careers/applications
  */
-router.get('/applications', async (req, res) => {
+const getApplicationsHandler = async (req, res) => {
   try {
     const list = await dbAdapter.find('job_applications');
     res.json({ success: true, data: list, applications: list });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
-});
+};
+
+router.get('/applications', getApplicationsHandler);
+router.get('/', getApplicationsHandler);
 
 /**
- * POST /api/careers/apply
+ * POST /api/careers or /api/careers/apply
  */
-router.post('/apply', async (req, res) => {
+const applyCareerHandler = async (req, res) => {
   try {
     const body = req.body || {};
     const id = `JOB-${Date.now()}`;
@@ -45,7 +48,10 @@ router.post('/apply', async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
-});
+};
+
+router.post('/apply', applyCareerHandler);
+router.post('/', applyCareerHandler);
 
 /**
  * PATCH /api/careers/applications/:id/status

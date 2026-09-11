@@ -201,6 +201,31 @@ export const dbAdapter = {
       createdAt: data.createdAt || new Date().toISOString()
     };
 
+    // Automatic field normalization for strict Mongoose schemas
+    if (collectionName === 'students') {
+      payload.enrollmentNumber = payload.enrollmentNumber || payload.registrationNo || cleanId;
+      payload.registrationNo = payload.registrationNo || payload.enrollmentNumber || cleanId;
+      payload.name = payload.name || payload.fullName || payload.candidateName || 'Student';
+      payload.course = payload.course || payload.program || 'Software Engineering';
+      payload.email = payload.email || `${cleanId.toLowerCase()}@ithunt.com`;
+    } else if (collectionName === 'nielit_projects') {
+      payload.registrationNo = payload.registrationNo || payload.nielitRegNo || cleanId;
+      payload.studentName = payload.studentName || payload.candidateName || payload.name || 'Candidate';
+      payload.projectTitle = payload.projectTitle || payload.title || 'NIELIT Practical Project';
+      payload.mobile = payload.mobile || payload.phone || '+91 9795771806';
+    } else if (collectionName === 'admissions') {
+      payload.registrationNo = payload.registrationNo || cleanId;
+      payload.fullName = payload.fullName || payload.candidateName || payload.name || 'Candidate';
+      payload.phone = payload.phone || payload.mobile || '+91 9795771806';
+      payload.course = payload.course || payload.program || 'Software Engineering';
+      payload.email = payload.email || `${cleanId.toLowerCase()}@ithunt.com`;
+    } else if (collectionName === 'users') {
+      payload.userId = payload.userId || cleanId;
+      payload.name = payload.name || payload.fullName || 'User';
+      payload.email = (payload.email || `${cleanId.toLowerCase()}@ithunt.com`).toLowerCase();
+      payload.password = payload.password || 'Ithunt@123';
+    }
+
     // 1. Save to MongoDB
     if (isMongoConnected() && Model) {
       try {

@@ -4,21 +4,24 @@ import { dbAdapter } from '../services/dbAdapter.js';
 const router = Router();
 
 /**
- * GET /api/internships/applications
+ * GET /api/internships or /api/internships/applications
  */
-router.get('/applications', async (req, res) => {
+const getInternshipsHandler = async (req, res) => {
   try {
     const list = await dbAdapter.find('internships');
     res.json({ success: true, data: list, applications: list });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
-});
+};
+
+router.get('/applications', getInternshipsHandler);
+router.get('/', getInternshipsHandler);
 
 /**
- * POST /api/internships/apply
+ * POST /api/internships or /api/internships/apply
  */
-router.post('/apply', async (req, res) => {
+const applyInternshipHandler = async (req, res) => {
   try {
     const body = req.body || {};
     const id = `INT-${Date.now()}`;
@@ -45,7 +48,10 @@ router.post('/apply', async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
-});
+};
+
+router.post('/apply', applyInternshipHandler);
+router.post('/', applyInternshipHandler);
 
 /**
  * PUT /api/internships/applications/:id/status

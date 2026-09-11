@@ -33,9 +33,9 @@ router.get('/student/:studentId', async (req, res) => {
 });
 
 /**
- * POST /api/fees/record
+ * POST /api/fees or POST /api/fees/record
  */
-router.post('/record', async (req, res) => {
+const recordFeeHandler = async (req, res) => {
   try {
     const body = req.body || {};
     const receiptNo = body.receiptNo || body.receiptNumber || `REC-${Math.floor(10000 + Math.random() * 90000)}`;
@@ -64,6 +64,9 @@ router.post('/record', async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
-});
+};
+
+router.post('/record', recordFeeHandler);
+router.post('/', recordFeeHandler);
 
 export default router;
