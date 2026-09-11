@@ -3,7 +3,7 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
-import { connectMongo, initFirebaseAdmin, isMongoConnected, isFirebaseConnected } from './config/db.js';
+import { connectMongo, initFirebaseAdmin, isMongoConnected, isFirebaseConnected, getMongoDbName, isAtlas } from './config/db.js';
 
 // Import Route Handlers
 import authRoutes from './routes/auth.routes.js';
@@ -55,9 +55,11 @@ const healthHandler = (req, res) => {
     timestamp: new Date().toISOString(),
     uptime: `${Math.floor(process.uptime())}s`,
     database: {
+      name: getMongoDbName(),
       mongoConnected: isMongoConnected(),
       firebaseConnected: isFirebaseConnected(),
-      mode: isMongoConnected() ? 'MongoDB (MERN Stack)' : (isFirebaseConnected() ? 'Firebase Cloud' : 'Universal Hybrid Adapter')
+      type: isAtlas() ? 'MongoDB Atlas Cloud' : 'MongoDB',
+      mode: isMongoConnected() ? (isAtlas() ? 'MongoDB Atlas Cloud' : 'MongoDB (MERN Stack)') : (isFirebaseConnected() ? 'Firebase Cloud' : 'Universal Hybrid Adapter')
     },
     endpoints: [
       '/api/admissions',
@@ -154,11 +156,12 @@ async function startServer() {
   await connectMongo();
 
   app.listen(PORT, '0.0.0.0', () => {
+    const dbType = isAtlas() ? 'MongoDB Atlas Cloud' : 'MongoDB';
     console.log(`\n=============================================================`);
     console.log(`  🚀 IT HUNT Node.js API Server is Live!`);
-    console.log(`  🌐 URL: http://localhost:${PORT} (0.0.0.0:${PORT})`);
+    console.log(`  🌐 URL: http://localhost:${PORT}`);
     console.log(`  📡 Health: http://localhost:${PORT}/api/health`);
-    console.log(`  🗄️  MongoDB: ${isMongoConnected() ? 'CONNECTED' : 'STANDBY (Using Hybrid Adapter)'}`);
+    console.log(`  🗄️  Database: ${getMongoDbName()} [${dbType}: ${isMongoConnected() ? 'CONNECTED' : 'STANDBY'}]`);
     console.log(`  🔥 Firebase: ${isFirebaseConnected() ? 'CONNECTED' : 'STANDBY'}`);
     console.log(`=============================================================\n`);
   });

@@ -10,22 +10,30 @@ let firebaseConnected = false;
 let firestoreDb = null;
 let realtimeDb = null;
 
+let isAtlasConnection = false;
+
 /**
- * Connect to MongoDB using Mongoose
+ * Connect to MongoDB using Mongoose (Supports local MongoDB & MongoDB Atlas Cloud)
  */
 export async function connectMongo() {
-  const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/ithunt';
+  const rawUri = (process.env.MONGODB_ATLAS_URI || process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/ithunt').trim();
+  isAtlasConnection = rawUri.startsWith('mongodb+srv://') || rawUri.includes('.mongodb.net');
+
   try {
     mongoose.set('strictQuery', false);
-    await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: 4000,
+    await mongoose.connect(rawUri, {
+      dbName: 'ithunt',
+      serverSelectionTimeoutMS: 8000,
       socketTimeoutMS: 45000,
     });
     mongoConnected = true;
-    console.log(`✓ MongoDB Connected successfully: ${uri.replace(/\/\/.*@/, '//***@')}`);
+    const dbName = mongoose.connection?.name || 'ithunt';
+    const typeLabel = isAtlasConnection ? 'MongoDB Atlas Cloud' : 'MongoDB';
+    console.log(`✓ ${typeLabel} Connected: ${dbName}`);
   } catch (error) {
     mongoConnected = false;
-    console.warn(`! MongoDB notice (${uri}): ${error.message}. (Server will continue operating with hybrid fallback)`);
+    const typeLabel = isAtlasConnection ? 'MongoDB Atlas Cloud' : 'MongoDB';
+    console.warn(`! ${typeLabel} notice (ithunt): ${error.message}. (Operating in hybrid mode)`);
   }
 
   mongoose.connection.on('disconnected', () => {
@@ -35,7 +43,8 @@ export async function connectMongo() {
 
   mongoose.connection.on('reconnected', () => {
     mongoConnected = true;
-    console.log('✓ MongoDB reconnected');
+    const dbName = mongoose.connection?.name || 'ithunt';
+    console.log(`✓ MongoDB reconnected: ${dbName}`);
   });
 
   return mongoConnected;
@@ -100,6 +109,8 @@ export function initFirebaseAdmin() {
 
 export const isMongoConnected = () => mongoConnected;
 export const isFirebaseConnected = () => firebaseConnected;
+export const isAtlas = () => isAtlasConnection;
+export const getMongoDbName = () => (mongoConnected && mongoose.connection?.name) || 'ithunt';
 export const getFirestoreDb = () => firestoreDb;
 export const getRealtimeDb = () => realtimeDb;
 // Alias for backward compatibility
