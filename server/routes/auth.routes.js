@@ -122,7 +122,7 @@ router.post('/login', async (req, res) => {
 router.get('/users', verifyToken, requireAdmin, async (req, res) => {
   try {
     const users = await dbAdapter.find('users');
-    let sanitized = users.map(u => ({
+    const sanitized = users.map(u => ({
       id: u.id || u._id,
       name: u.name,
       email: u.email,
@@ -131,17 +131,6 @@ router.get('/users', verifyToken, requireAdmin, async (req, res) => {
       verified: u.verified,
       createdAt: u.createdAt
     }));
-    if (sanitized.length === 0) {
-      sanitized = [{
-        id: 'usr-admin-default',
-        name: 'IT HUNT Super Admin',
-        email: 'admin@ithunt.com',
-        role: 'superadmin',
-        phone: '+91 9795771806',
-        verified: true,
-        createdAt: new Date().toISOString()
-      }];
-    }
     res.json({ success: true, data: sanitized });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

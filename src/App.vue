@@ -1284,6 +1284,8 @@ onMounted(() => {
   // Clear any legacy stale data caches from localStorage so UI displays 100% directly from database
   if (typeof window !== 'undefined' && window.localStorage) {
     const STALE_DATA_KEYS = [
+      'ithunt_all_admissions',
+      'ithunt_all_students',
       'ithunt_admissions',
       'ithunt_students',
       'ithunt_student_accounts',
