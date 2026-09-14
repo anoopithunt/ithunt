@@ -1,4 +1,4 @@
-import { isMongoConnected, getSecondaryDb } from '../config/db.js';
+import { isMongoConnected, connectMongo } from '../config/db.js';
 import { User } from '../models/User.js';
 import { Admission } from '../models/Admission.js';
 import { Student } from '../models/Student.js';
@@ -13,10 +13,8 @@ import { ContactInquiry } from '../models/ContactInquiry.js';
 import { EventRsvp } from '../models/EventRsvp.js';
 import { Course } from '../models/Course.js';
 import { Event } from '../models/Event.js';
-import fs from 'fs';
-import path from 'path';
 
-// Model map (All 14 IT HUNT database collections)
+// Model map (All 14 IT HUNT database collections in MongoDB Atlas)
 export const MODELS = {
   users: User,
   admissions: Admission,
@@ -34,159 +32,74 @@ export const MODELS = {
   event_rsvps: EventRsvp,
 };
 
-// In-memory fallback storage
-const memoryStore = new Map();
-Object.keys(MODELS).forEach(k => memoryStore.set(k, new Map()));
-
-// Seed default admin
-const DEFAULT_ADMIN = {
-  id: 'usr-admin-default',
-  name: 'IT HUNT Super Admin',
-  email: 'admin@ithunt.com',
-  password: 'admin@ithunt2026',
-  role: 'superadmin',
-  verified: true,
-  status: 'ACTIVE',
-  createdAt: new Date().toISOString()
-};
-memoryStore.get('users')?.set(DEFAULT_ADMIN.id, { ...DEFAULT_ADMIN });
-// Replicate operations to secondary database for 100% parity across Local MongoDB & Atlas Cloud
-async function replicateToSecondaryDb(collectionName, action, payload = {}, id = null) {
-  const secDb = getSecondaryDb();
-  if (!secDb) return;
-
-  try {
-    const rawColName = collectionName.replace(/_/g, '').toLowerCase();
-    const targetCol = secDb.collection(rawColName);
-
-    if (action === 'create' || action === 'update') {
-      const cleanId = id || payload?.id || payload?.registrationNo || payload?.code || payload?._id?.toString();
-      const filter = {
-        $or: [
-          ...(cleanId ? [{ id: cleanId }, { code: cleanId }, { registrationNo: cleanId }, { registrationNumber: cleanId }, { enrollmentNumber: cleanId }] : []),
-          ...(payload?.email ? [{ email: payload.email.toLowerCase() }] : [])
-        ]
-      };
-      if (filter.$or.length > 0) {
-        await targetCol.updateOne(filter, { $set: payload }, { upsert: true });
-      } else {
-        await targetCol.insertOne(payload);
-      }
-    } else if (action === 'delete') {
-      await targetCol.deleteMany({
-        $or: [
-          { id: id },
-          { code: id },
-          { slug: id },
-          { registrationNo: id },
-          { registrationNumber: id },
-          { enrollmentNumber: id },
-          { email: (id || '').toLowerCase() }
-        ]
-      });
-    }
-  } catch (err) {
-    // Non-blocking background sync notice
+async function ensureConnection() {
+  if (!isMongoConnected()) {
+    await connectMongo();
   }
 }
 
 export const dbAdapter = {
   /**
-   * Find records with optional query filter
+   * Find records with optional query filter (100% Direct from MongoDB Atlas)
    */
   async find(collectionName, query = {}) {
+    await ensureConnection();
     const Model = MODELS[collectionName];
+    if (!Model) return [];
 
-    // 1. Try MongoDB if connected
-    if (isMongoConnected() && Model) {
-      try {
-        const results = await Model.find(query).sort({ createdAt: -1 }).lean();
-        return results.map(r => ({ ...r, id: r._id?.toString() || r.id || r.registrationNo }));
-      } catch (err) {
-        console.warn(`MongoDB find error on ${collectionName}, falling back:`, err.message);
-      }
-    }
-
-    // 2. Fallback to memory store
-    const store = memoryStore.get(collectionName) || new Map();
-    let records = Array.from(store.values());
-
-    // Basic in-memory filtering
-    if (Object.keys(query).length > 0) {
-      records = records.filter(item => {
-        return Object.entries(query).every(([k, v]) => {
-          if (v === undefined || v === null) return true;
-          return String(item[k] || '').toLowerCase() === String(v).toLowerCase();
-        });
-      });
-    }
-
-    return records;
+    const results = await Model.find(query).sort({ createdAt: -1 }).lean();
+    return results.map(r => ({ ...r, id: r._id?.toString() || r.id || r.registrationNo }));
   },
 
   /**
-   * Find single record by query
+   * Find single record by query (100% Direct from MongoDB Atlas)
    */
   async findOne(collectionName, query) {
+    await ensureConnection();
     const Model = MODELS[collectionName];
+    if (!Model) return null;
 
-    if (isMongoConnected() && Model) {
-      try {
-        const doc = await Model.findOne(query).lean();
-        if (doc) return { ...doc, id: doc._id?.toString() || doc.id };
-      } catch (_) {}
-    }
-
-    const records = await this.find(collectionName, query);
-    return records[0] || null;
+    const doc = await Model.findOne(query).lean();
+    if (doc) return { ...doc, id: doc._id?.toString() || doc.id };
+    return null;
   },
 
   /**
-   * Find record by ID or registration number
+   * Find record by ID or registration number (100% Direct from MongoDB Atlas)
    */
   async findById(collectionName, id) {
+    await ensureConnection();
     const Model = MODELS[collectionName];
+    if (!Model || !id) return null;
 
-    if (isMongoConnected() && Model) {
-      try {
-        if (id.match(/^[0-9a-fA-F]{24}$/)) {
-          const doc = await Model.findById(id).lean();
-          if (doc) return { ...doc, id: doc._id?.toString() || doc.id };
-        }
-        // Also check custom registration fields
-        const altDoc = await Model.findOne({
-          $or: [
-            { id: id },
-            { code: id },
-            { slug: id },
-            { registrationNo: id },
-            { registrationNumber: id },
-            { enrollmentNumber: id },
-            { certNo: id },
-            { email: id.toLowerCase() }
-          ]
-        }).lean();
-        if (altDoc) return { ...altDoc, id: altDoc._id?.toString() || altDoc.id };
-      } catch (_) {}
+    if (String(id).match(/^[0-9a-fA-F]{24}$/)) {
+      const doc = await Model.findById(id).lean();
+      if (doc) return { ...doc, id: doc._id?.toString() || doc.id };
     }
 
-    const store = memoryStore.get(collectionName) || new Map();
-    if (store.has(id)) return store.get(id);
+    // Also check standard identifier fields
+    const altDoc = await Model.findOne({
+      $or: [
+        { id: id },
+        { code: id },
+        { slug: id },
+        { registrationNo: id },
+        { registrationNumber: id },
+        { enrollmentNumber: id },
+        { certNo: id },
+        { email: String(id).toLowerCase() }
+      ]
+    }).lean();
 
-    const all = Array.from(store.values());
-    return all.find(r => 
-      r.id === id || 
-      r.registrationNo === id || 
-      r.enrollmentNumber === id || 
-      r.certNo === id || 
-      r.email === id
-    ) || null;
+    if (altDoc) return { ...altDoc, id: altDoc._id?.toString() || altDoc.id };
+    return null;
   },
 
   /**
-   * Create new record
+   * Create new record (100% Direct to MongoDB Atlas)
    */
   async create(collectionName, data) {
+    await ensureConnection();
     const Model = MODELS[collectionName];
     const cleanId = data.id || data.registrationNo || data.registrationNumber || data.enrollmentNumber || data.certNo || `${collectionName.slice(0, 3).toUpperCase()}-${Date.now()}`;
     const payload = {
@@ -226,145 +139,106 @@ export const dbAdapter = {
       payload.fee = payload.fee || '₹15,000';
     }
 
-    // 1. Save to MongoDB
-    if (isMongoConnected() && Model) {
-      try {
-        const created = await Model.create(payload);
-        payload._id = created._id;
-        console.log(`✓ Saved record to MongoDB collection "${collectionName}" (${cleanId})`);
-      } catch (err) {
-        if (err.code === 11000) {
-          try {
-            const filter = {
-              $or: [
-                { id: cleanId },
-                { registrationNo: cleanId },
-                { registrationNumber: cleanId },
-                { enrollmentNumber: cleanId },
-                ...(payload.email ? [{ email: payload.email.toLowerCase() }] : [])
-              ]
-            };
-            const updated = await Model.findOneAndUpdate(filter, payload, { new: true });
-            if (updated) {
-              payload._id = updated._id;
-              console.log(`✓ Updated existing record in MongoDB collection "${collectionName}" (${cleanId})`);
-            }
-          } catch (updateErr) {
-            console.warn(`MongoDB upsert notice on ${collectionName}:`, updateErr.message);
-          }
-        } else {
-          console.warn(`MongoDB create notice on ${collectionName}:`, err.message);
+    if (!Model) return payload;
+
+    try {
+      const created = await Model.create(payload);
+      payload._id = created._id;
+      console.log(`✓ Saved record to MongoDB Atlas "${collectionName}" (${cleanId})`);
+      return { ...created.toObject(), id: created._id?.toString() || cleanId };
+    } catch (err) {
+      if (err.code === 11000) {
+        const filter = {
+          $or: [
+            { id: cleanId },
+            { registrationNo: cleanId },
+            { registrationNumber: cleanId },
+            { enrollmentNumber: cleanId },
+            ...(payload.email ? [{ email: payload.email.toLowerCase() }] : [])
+          ]
+        };
+        const updated = await Model.findOneAndUpdate(filter, payload, { new: true });
+        if (updated) {
+          console.log(`✓ Upserted record in MongoDB Atlas "${collectionName}" (${cleanId})`);
+          return { ...updated.toObject(), id: updated._id?.toString() || cleanId };
         }
       }
+      throw err;
     }
-
-    // 2. Save to memory store as backup
-    const store = memoryStore.get(collectionName) || new Map();
-    store.set(cleanId, payload);
-    if (payload.email) store.set(payload.email.toLowerCase(), payload);
-
-    // 3. Replicate to secondary database for 100% Local & Atlas parity
-    replicateToSecondaryDb(collectionName, 'create', payload, cleanId).catch(() => {});
-
-    return payload;
   },
 
   /**
-   * Update existing record
+   * Update existing record (100% Direct in MongoDB Atlas)
    */
   async update(collectionName, id, updates) {
+    await ensureConnection();
     const Model = MODELS[collectionName];
+    if (!Model) return updates;
+
     let updatedDoc = null;
+    const filter = String(id).match(/^[0-9a-fA-F]{24}$/)
+      ? { _id: id }
+      : {
+          $or: [
+            { id: id },
+            { code: id },
+            { slug: id },
+            { registrationNo: id },
+            { registrationNumber: id },
+            { enrollmentNumber: id },
+            { certNo: id },
+            { email: String(id).toLowerCase() }
+          ]
+        };
 
-    if (isMongoConnected() && Model) {
-      try {
-        if (id.match(/^[0-9a-fA-F]{24}$/)) {
-          updatedDoc = await Model.findByIdAndUpdate(id, updates, { new: true }).lean();
-        } else {
-          updatedDoc = await Model.findOneAndUpdate(
-            {
-              $or: [
-                { id: id },
-                { code: id },
-                { slug: id },
-                { registrationNo: id },
-                { registrationNumber: id },
-                { enrollmentNumber: id },
-                { certNo: id },
-                { email: id.toLowerCase() }
-              ]
-            },
-            updates,
-            { new: true }
-          ).lean();
-        }
-      } catch (err) {
-        console.warn(`MongoDB update notice on ${collectionName}:`, err.message);
-      }
+    updatedDoc = await Model.findOneAndUpdate(
+      filter,
+      { ...updates, updatedAt: new Date().toISOString() },
+      { new: true }
+    ).lean();
+
+    if (updatedDoc) {
+      return { ...updatedDoc, id: updatedDoc._id?.toString() || id };
     }
-
-    const existing = await this.findById(collectionName, id) || {};
-    const merged = { ...existing, ...updates, updatedAt: new Date().toISOString() };
-
-    const store = memoryStore.get(collectionName) || new Map();
-    store.set(id, merged);
-    if (merged.id && merged.id !== id) store.set(merged.id, merged);
-
-    // Replicate to secondary database for 100% Local & Atlas parity
-    replicateToSecondaryDb(collectionName, 'update', updates, id).catch(() => {});
-
-    return updatedDoc ? { ...updatedDoc, id: updatedDoc._id?.toString() || id } : merged;
+    return { ...updates, id };
   },
 
   /**
-   * Delete record
+   * Delete record (100% Direct from MongoDB Atlas)
    */
   async delete(collectionName, id) {
+    await ensureConnection();
     const Model = MODELS[collectionName];
+    if (!Model) return { success: true };
 
-    if (isMongoConnected() && Model) {
-      try {
-        if (id.match(/^[0-9a-fA-F]{24}$/)) {
-          await Model.findByIdAndDelete(id);
-        } else {
-          await Model.deleteMany({
-            $or: [
-              { id: id },
-              { code: id },
-              { slug: id },
-              { registrationNo: id },
-              { registrationNumber: id },
-              { enrollmentNumber: id },
-              { certNo: id },
-              { email: id.toLowerCase() }
-            ]
-          });
-        }
-      } catch (err) {
-        console.warn(`MongoDB delete notice on ${collectionName}:`, err.message);
-      }
+    if (String(id).match(/^[0-9a-fA-F]{24}$/)) {
+      await Model.findByIdAndDelete(id);
+    } else {
+      await Model.deleteMany({
+        $or: [
+          { id: id },
+          { code: id },
+          { slug: id },
+          { registrationNo: id },
+          { registrationNumber: id },
+          { enrollmentNumber: id },
+          { certNo: id },
+          { email: String(id).toLowerCase() }
+        ]
+      });
     }
 
-    const store = memoryStore.get(collectionName) || new Map();
-    store.delete(id);
-
-    // Replicate to secondary database for 100% Local & Atlas parity
-    replicateToSecondaryDb(collectionName, 'delete', null, id).catch(() => {});
-
+    console.log(`✓ Deleted record from MongoDB Atlas "${collectionName}" (${id})`);
     return { success: true };
   },
 
   /**
-   * Count records in a collection
+   * Count records in a collection (100% Direct from MongoDB Atlas)
    */
   async count(collectionName, query = {}) {
+    await ensureConnection();
     const Model = MODELS[collectionName];
-    if (isMongoConnected() && Model) {
-      try {
-        return await Model.countDocuments(query);
-      } catch (_) {}
-    }
-    const records = await this.find(collectionName, query);
-    return records.length;
+    if (!Model) return 0;
+    return await Model.countDocuments(query);
   }
 };
