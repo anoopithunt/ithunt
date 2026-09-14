@@ -66,29 +66,33 @@ app.use(async (req, res, next) => {
   next();
 });
 
+import mongoose from 'mongoose';
+
 // Health Check Endpoints
 const healthHandler = async (req, res) => {
   let dbErr = null;
-  if (!isMongoConnected()) {
-    try {
-      await ensureDbConnected();
-    } catch (e) {
-      dbErr = e.message;
-    }
+  try {
+    await connectMongo();
+  } catch (e) {
+    dbErr = e.message;
   }
 
   res.json({
     status: 'ONLINE',
     service: 'IT HUNT Backend API Engine',
-    version: '2.2.0-dual-sync',
+    version: '2.2.1-diag',
     timestamp: new Date().toISOString(),
     uptime: `${Math.floor(process.uptime())}s`,
     database: {
       name: getMongoDbName(),
       connected: isMongoConnected(),
+      readyState: mongoose.connection?.readyState,
       type: isAtlas() ? 'MongoDB Atlas Cloud' : 'MongoDB',
       mode: isMongoConnected() ? (isAtlas() ? 'MongoDB Atlas Cloud' : 'MongoDB (MERN Stack)') : 'Standby',
-      lastError: getLastMongoError() || dbErr
+      lastError: getLastMongoError() || dbErr,
+      envVercel: !!process.env.VERCEL,
+      hasAtlasUri: !!process.env.MONGODB_ATLAS_URI,
+      hasMongoUri: !!process.env.MONGODB_URI
     },
     endpoints: [
       '/api/admissions',
