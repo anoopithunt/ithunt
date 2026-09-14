@@ -85,6 +85,51 @@ async function setupBothDatabases() {
     }
   }
 
+  // Create Relational Views for MongoDB Compass (Joins collections visually)
+  const setupRelationViews = async (conn, label) => {
+    if (!conn) return;
+    try {
+      const db = conn.db;
+      await db.command({ drop: 'student_relations_view' }).catch(() => {});
+      await db.createCollection('student_relations_view', {
+        viewOn: 'students',
+        pipeline: [
+          { $lookup: { from: 'admissions', localField: 'registrationNo', foreignField: 'registrationNo', as: 'admissionDetails' } },
+          { $lookup: { from: 'users', localField: 'email', foreignField: 'email', as: 'userAccount' } },
+          { $lookup: { from: 'fees', localField: 'registrationNo', foreignField: 'studentId', as: 'feePayments' } },
+          { $lookup: { from: 'nielitprojects', localField: 'registrationNo', foreignField: 'registrationNo', as: 'nielitProjects' } },
+          { $lookup: { from: 'certificates', localField: 'name', foreignField: 'studentName', as: 'certificates' } }
+        ]
+      });
+
+      await db.command({ drop: 'admission_relations_view' }).catch(() => {});
+      await db.createCollection('admission_relations_view', {
+        viewOn: 'admissions',
+        pipeline: [
+          { $lookup: { from: 'students', localField: 'registrationNo', foreignField: 'registrationNo', as: 'studentProfile' } },
+          { $lookup: { from: 'users', localField: 'email', foreignField: 'email', as: 'loginAccount' } },
+          { $lookup: { from: 'fees', localField: 'registrationNo', foreignField: 'studentId', as: 'feeReceipts' } }
+        ]
+      });
+
+      await db.command({ drop: 'course_enrollments_view' }).catch(() => {});
+      await db.createCollection('course_enrollments_view', {
+        viewOn: 'courses',
+        pipeline: [
+          { $lookup: { from: 'admissions', localField: 'name', foreignField: 'course', as: 'admissions' } },
+          { $lookup: { from: 'students', localField: 'name', foreignField: 'course', as: 'enrolledStudents' } }
+        ]
+      });
+      console.log(`   ✓ Relational views created in ${label}`);
+    } catch (e) {
+      console.warn(`   Notice setting views in ${label}:`, e.message);
+    }
+  };
+
+  console.log('\n4️⃣  Setting up Relational Views for MongoDB Compass (Joins & Lookups)...');
+  await setupRelationViews(localConn, 'Local MongoDB');
+  await setupRelationViews(atlasConn, 'MongoDB Atlas');
+
   // If both were empty, run the full seeder
   const finalLocalCount = localConn ? await localConn.db.collection('admissions').countDocuments().catch(() => 0) : 0;
   const finalAtlasCount = atlasConn ? await atlasConn.db.collection('admissions').countDocuments().catch(() => 0) : 0;
