@@ -53,12 +53,12 @@ function generateApiPdf() {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(203, 213, 225);
-    doc.text('Complete Local & Live Production Endpoints | Database: ithunt (MERN Stack)', margin, 19);
+    doc.text('Complete Local & Live Production Endpoints | Database: ithunt (MongoDB Atlas Cloud)', margin, 19);
 
     // Date & Version
     doc.setFontSize(8);
     doc.setTextColor(253, 186, 116);
-    doc.text('v2.0.0 | ISO 9001:2015 Accredited | Sep 2026', pageWidth - margin, 19, { align: 'right' });
+    doc.text('v2.2.2-atlas | ISO 9001:2015 Accredited | Sep 2026', pageWidth - margin, 19, { align: 'right' });
   }
 
   function drawFooter(current, total) {
@@ -135,10 +135,11 @@ function generateApiPdf() {
     {
       title: '2. Admissions Management',
       routes: [
-        { method: 'GET', path: '/api/admissions', desc: 'Retrieve all candidate online admission applications' },
+        { method: 'GET', path: '/api/admissions', desc: 'Retrieve all candidate online admission applications (Direct Atlas)' },
         { method: 'GET', path: '/api/admissions/:id', desc: 'Retrieve single admission record by Registration Number or ID' },
-        { method: 'POST', path: '/api/admissions', desc: 'Submit new admission (auto-creates records in admissions, students, and users)' },
-        { method: 'PATCH', path: '/api/admissions/:id/status', desc: 'Update candidate admission status (Confirmed / Pending / Verified)' },
+        { method: 'POST', path: '/api/admissions', desc: 'Submit new admission (auto-generates official registration slip)' },
+        { method: 'POST', path: '/api/admissions/:id/confirm', desc: 'SuperAdmin confirms admission; auto-generates student login creds (userId & pass)' },
+        { method: 'PATCH', path: '/api/admissions/:id', desc: 'Update candidate admission status (Confirmed / Pending / Verified)' },
         { method: 'DELETE', path: '/api/admissions/:id', desc: 'Delete admission application from database' }
       ]
     },
@@ -148,7 +149,7 @@ function generateApiPdf() {
         { method: 'GET', path: '/api/students', desc: 'List enrolled students with optional filters (?course=&batch=&status=)' },
         { method: 'GET', path: '/api/students/:id', desc: 'Get student academic details by enrollment number or ID' },
         { method: 'POST', path: '/api/students/register', desc: 'Direct student registration into academic roster' },
-        { method: 'PUT', path: '/api/students/:id', desc: 'Update student academic details and profile information' },
+        { method: 'PATCH', path: '/api/students/:id', desc: 'Update student academic details and profile information' },
         { method: 'DELETE', path: '/api/students/:id', desc: 'Remove student profile from roster' }
       ]
     },
@@ -157,13 +158,22 @@ function generateApiPdf() {
       routes: [
         { method: 'POST', path: '/api/auth/login', desc: 'Authenticate student or admin; returns JWT bearer token' },
         { method: 'GET', path: '/api/auth/me', desc: 'Get currently authenticated user details from token' },
-        { method: 'GET', path: '/api/auth/users', desc: 'List all registered portal accounts (Requires Admin token)' },
-        { method: 'PUT', path: '/api/auth/users/:id', desc: 'Update user account role, credentials, and profile' },
-        { method: 'DELETE', path: '/api/auth/users/:id', desc: 'Delete user account' }
+        { method: 'GET', path: '/api/auth/users', desc: 'List all registered portal accounts (Requires SuperAdmin token)' },
+        { method: 'DELETE', path: '/api/auth/users/:id', desc: 'Delete user account from MongoDB Atlas' }
       ]
     },
     {
-      title: "5. NIELIT 'O' & 'A' Level Projects",
+      title: '5. Official Accredited Courses Catalog',
+      routes: [
+        { method: 'GET', path: '/api/courses', desc: 'Retrieve all 8 official accredited curriculum tracks with modules & fees' },
+        { method: 'GET', path: '/api/courses/:id', desc: 'Get specific course curriculum details by code or slug' },
+        { method: 'POST', path: '/api/courses', desc: 'Add new academic course track' },
+        { method: 'PUT', path: '/api/courses/:id', desc: 'Update course particulars, syllabus, or fee structure' },
+        { method: 'DELETE', path: '/api/courses/:id', desc: 'Delete course track' }
+      ]
+    },
+    {
+      title: "6. NIELIT 'O' & 'A' Level Projects",
       routes: [
         { method: 'GET', path: '/api/nielit-projects', desc: 'List all NIELIT project guide applications and payment UTRs' },
         { method: 'GET', path: '/api/nielit-projects/:id', desc: 'Get single NIELIT project guide submission' },
@@ -173,42 +183,39 @@ function generateApiPdf() {
       ]
     },
     {
-      title: '6. Careers & Faculty Hiring',
+      title: '7. Careers & Faculty Hiring',
       routes: [
         { method: 'GET', path: '/api/careers/applications', desc: 'List faculty and instructor job applications' },
-        { method: 'POST', path: '/api/careers/apply', desc: 'Submit instructor or faculty employment application' },
-        { method: 'PATCH', path: '/api/careers/applications/:id/status', desc: 'Update applicant status (Shortlisted / Interviewed / Hired)' },
+        { method: 'POST', path: '/api/careers/applications', desc: 'Submit instructor or faculty employment application' },
         { method: 'DELETE', path: '/api/careers/applications/:id', desc: 'Delete job application' }
       ]
     },
     {
-      title: '7. Internships (3-Month & 6-Month)',
+      title: '8. Internships (3-Month & 6-Month)',
       routes: [
         { method: 'GET', path: '/api/internships/applications', desc: 'List student software internship applications' },
-        { method: 'POST', path: '/api/internships/apply', desc: 'Apply for software engineering internship' },
-        { method: 'PATCH', path: '/api/internships/applications/:id/status', desc: 'Update internship progress or completion status' },
+        { method: 'POST', path: '/api/internships/applications', desc: 'Apply for software engineering internship' },
         { method: 'DELETE', path: '/api/internships/applications/:id', desc: 'Remove internship application' }
       ]
     },
     {
-      title: '8. Event RSVPs (Campus Summits & Hackathons)',
+      title: '9. Event RSVPs (Campus Summits & Hackathons)',
       routes: [
         { method: 'GET', path: '/api/events/rsvps', desc: 'List attendees registered for tech summits and hackathons' },
-        { method: 'POST', path: '/api/events/rsvp', desc: 'Register attendance / RSVP for upcoming tech event' },
+        { method: 'POST', path: '/api/events/rsvps', desc: 'Register attendance / RSVP for upcoming tech event' },
         { method: 'DELETE', path: '/api/events/rsvps/:id', desc: 'Cancel event reservation' }
       ]
     },
     {
-      title: '9. Student Reviews & Ratings',
+      title: '10. Student Reviews & Ratings',
       routes: [
         { method: 'GET', path: '/api/reviews', desc: 'List approved student reviews and star ratings' },
         { method: 'POST', path: '/api/reviews', desc: 'Submit student review and feedback' },
-        { method: 'PATCH', path: '/api/reviews/:id/approve', desc: 'Admin approval for public display' },
         { method: 'DELETE', path: '/api/reviews/:id', desc: 'Delete review' }
       ]
     },
     {
-      title: '10. Fees Ledger & Receipts',
+      title: '11. Fees Ledger & Receipts',
       routes: [
         { method: 'GET', path: '/api/fees', desc: 'View complete financial fee transactions ledger' },
         { method: 'GET', path: '/api/fees/:id', desc: 'Retrieve fee receipt details by receipt number' },
@@ -217,7 +224,7 @@ function generateApiPdf() {
       ]
     },
     {
-      title: '11. Certificates & Public Verification',
+      title: '12. Certificates & Public Verification',
       routes: [
         { method: 'GET', path: '/api/certificates', desc: 'List verified student certificates' },
         { method: 'GET', path: '/api/certificates/verify/:certNo', desc: 'Public certificate verification registry' },
@@ -226,7 +233,7 @@ function generateApiPdf() {
       ]
     },
     {
-      title: '12. Student Capstone Projects',
+      title: '13. Student Capstone Projects',
       routes: [
         { method: 'GET', path: '/api/projects', desc: 'List capstone projects and live GitHub demo repositories' },
         { method: 'POST', path: '/api/projects', desc: 'Submit student project showcase' },
@@ -234,12 +241,11 @@ function generateApiPdf() {
       ]
     },
     {
-      title: '13. Contact Inquiries & Admin Analytics',
+      title: '14. Contact Inquiries & Admin Analytics',
       routes: [
         { method: 'GET', path: '/api/contact', desc: 'List customer course inquiries' },
         { method: 'POST', path: '/api/contact', desc: 'Submit public course inquiry message' },
-        { method: 'GET', path: '/api/admin/stats', desc: 'Real-time aggregated counts across all 12 MongoDB collections' },
-        { method: 'POST', path: '/api/admin/firebase/sync-all', desc: 'Trigger 2-way cloud synchronization' }
+        { method: 'GET', path: '/api/admin/stats', desc: 'Real-time aggregated live counts across all 14 Atlas collections' }
       ]
     }
   ];

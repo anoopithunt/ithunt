@@ -885,27 +885,40 @@ The actual production API should be configured through environment variables bef
 
 ---
 
-# 🔌 API Configuration
+# 🔌 REST API & Database Architecture
 
-The frontend/server configuration currently supports these endpoint variables:
+The IT HUNT platform is powered by a high-performance Express REST API connected directly to **MongoDB Atlas Cloud** (`cluster0.oo3akne.mongodb.net/ithunt`).
 
-```env
-API_BASE_URL=
-ADMISSION_API_ENDPOINT=
-JOB_APPLICATION_API_ENDPOINT=
-REVIEWS_API_ENDPOINT=
-```
+📖 **Detailed Documentation**:
+* 📑 **Markdown Specification**: [`API_DOCUMENTATION.md`](./API_DOCUMENTATION.md)
+* 📄 **Official PDF Directory**: [`IT_HUNT_API_Documentation.pdf`](./public/IT_HUNT_API_Documentation.pdf)
 
-Default development values are:
+### API Base Environments
+
+| Environment | URL | Port / Host |
+| :--- | :--- | :--- |
+| **Live Production** | `https://ithunt.vercel.app/api` | Vercel Serverless Cloud Edge |
+| **Local Direct Backend** | `http://localhost:3000/api` | Direct Express Node.js Server |
+| **Local Vite Proxy** | `http://localhost:5500/api` | Vite Dev Server Reverse Proxy |
+
+### Primary Live API Endpoints
 
 ```text
-http://localhost:5500/api
-http://localhost:5500/api/admission
-http://localhost:5500/api/careers/apply
-http://localhost:5500/api/reviews
+GET    /api/health                     # Real-time health & Atlas Cloud DB state
+POST   /api/auth/login                 # SuperAdmin & Student authentication (JWT)
+GET    /api/auth/me                    # Current user profile
+GET    /api/auth/users                 # SuperAdmin user directory
+GET    /api/admissions                 # Retrieve active online admissions
+POST   /api/admissions                 # Submit candidate admission application
+POST   /api/admissions/:id/confirm     # Confirm admission & auto-generate student login
+GET    /api/students                   # Enrolled student directory
+GET    /api/courses                    # 8 accredited curriculum tracks
+POST   /api/events/rsvps               # Free tech summit & hackathon passes
+POST   /api/careers/applications       # Faculty & developer hiring applications
+POST   /api/nielit-projects            # NIELIT O/A Level practical guide submissions
+POST   /api/contact                    # Public course inquiry form
+GET    /api/admin/stats                # Live metrics across all 14 Atlas collections
 ```
-
-These values are configuration targets; the repository itself is primarily the portal/frontend plus its Node.js serving layer rather than a complete implementation of those external business APIs.
 
 ---
 
