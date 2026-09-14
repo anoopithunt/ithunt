@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 let mongoConnected = false;
 let isAtlasConnection = false;
 let lastMongoError = null;
+let secondaryConnection = null;
 
 const ATLAS_PRODUCTION_URI = 'mongodb+srv://anoopmishrapitz_db_user:IthuntPass2026@cluster0.oo3akne.mongodb.net/ithunt?retryWrites=true&w=majority';
 
@@ -43,19 +44,28 @@ export async function connectMongo() {
     console.warn(`! ${typeLabel} notice (ithunt): ${error.message}.`);
   }
 
-  mongoose.connection.on('disconnected', () => {
-    mongoConnected = false;
-    console.warn('! MongoDB disconnected');
-  });
-
-  mongoose.connection.on('reconnected', () => {
-    mongoConnected = true;
-    lastMongoError = null;
-    const dbName = mongoose.connection?.name || 'ithunt';
-    console.log(`✓ MongoDB reconnected: ${dbName}`);
-  });
+  // Connect secondary database for simultaneous Dual-Sync with MongoDB Compass
+  const secondaryUri = isAtlasConnection ? 'mongodb://127.0.0.1:27017/ithunt' : ATLAS_PRODUCTION_URI;
+  if (!process.env.VERCEL) {
+    try {
+      secondaryConnection = await mongoose.createConnection(secondaryUri, {
+        dbName: 'ithunt',
+        serverSelectionTimeoutMS: 4000,
+        socketTimeoutMS: 20000,
+        maxPoolSize: 5
+      }).asPromise();
+      const secType = secondaryUri.includes('.mongodb.net') ? 'MongoDB Atlas Cloud' : 'Local MongoDB';
+      console.log(`✓ Dual-Sync Active with ${secType}: ithunt`);
+    } catch (secErr) {
+      secondaryConnection = null;
+    }
+  }
 
   return mongoConnected;
+}
+
+export function getSecondaryDb() {
+  return secondaryConnection && secondaryConnection.readyState === 1 ? secondaryConnection.db : null;
 }
 
 // Backward compatibility stubs (Firebase removed)

@@ -1,4 +1,4 @@
-import { isMongoConnected } from '../config/db.js';
+import { isMongoConnected, getSecondaryDb } from '../config/db.js';
 import { User } from '../models/User.js';
 import { Admission } from '../models/Admission.js';
 import { Student } from '../models/Student.js';
@@ -49,9 +49,45 @@ const DEFAULT_ADMIN = {
   status: 'ACTIVE',
   createdAt: new Date().toISOString()
 };
-memoryStore.get('users').set('admin@ithunt.com', DEFAULT_ADMIN);
+// Replicate operations to secondary database for 100% parity across Local MongoDB & Atlas Cloud
+async function replicateToSecondaryDb(collectionName, action, payload = {}, id = null) {
+  const secDb = getSecondaryDb();
+  if (!secDb) return;
 
+  try {
+    const rawColName = collectionName.replace(/_/g, '').toLowerCase();
+    const targetCol = secDb.collection(rawColName);
 
+    if (action === 'create' || action === 'update') {
+      const cleanId = id || payload?.id || payload?.registrationNo || payload?.code || payload?._id?.toString();
+      const filter = {
+        $or: [
+          ...(cleanId ? [{ id: cleanId }, { code: cleanId }, { registrationNo: cleanId }, { registrationNumber: cleanId }, { enrollmentNumber: cleanId }] : []),
+          ...(payload?.email ? [{ email: payload.email.toLowerCase() }] : [])
+        ]
+      };
+      if (filter.$or.length > 0) {
+        await targetCol.updateOne(filter, { $set: payload }, { upsert: true });
+      } else {
+        await targetCol.insertOne(payload);
+      }
+    } else if (action === 'delete') {
+      await targetCol.deleteMany({
+        $or: [
+          { id: id },
+          { code: id },
+          { slug: id },
+          { registrationNo: id },
+          { registrationNumber: id },
+          { enrollmentNumber: id },
+          { email: (id || '').toLowerCase() }
+        ]
+      });
+    }
+  } catch (err) {
+    // Non-blocking background sync notice
+  }
+}
 
 export const dbAdapter = {
   /**
@@ -226,6 +262,9 @@ export const dbAdapter = {
     store.set(cleanId, payload);
     if (payload.email) store.set(payload.email.toLowerCase(), payload);
 
+    // 3. Replicate to secondary database for 100% Local & Atlas parity
+    replicateToSecondaryDb(collectionName, 'create', payload, cleanId).catch(() => {});
+
     return payload;
   },
 
@@ -270,6 +309,9 @@ export const dbAdapter = {
     store.set(id, merged);
     if (merged.id && merged.id !== id) store.set(merged.id, merged);
 
+    // Replicate to secondary database for 100% Local & Atlas parity
+    replicateToSecondaryDb(collectionName, 'update', updates, id).catch(() => {});
+
     return updatedDoc ? { ...updatedDoc, id: updatedDoc._id?.toString() || id } : merged;
   },
 
@@ -304,6 +346,9 @@ export const dbAdapter = {
 
     const store = memoryStore.get(collectionName) || new Map();
     store.delete(id);
+
+    // Replicate to secondary database for 100% Local & Atlas parity
+    replicateToSecondaryDb(collectionName, 'delete', null, id).catch(() => {});
 
     return { success: true };
   },

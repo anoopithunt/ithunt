@@ -12,6 +12,7 @@
     "db:status": "lsof -iTCP:27017 -sTCP:LISTEN",
     "db:verify": "node server/verify-db.js",
     "db:setup": "node server/setup-both-dbs.js",
+    "db:clean": "node server/cleanup-dbs.js",
     "db:test": "node server/test-all-tables.js",
     "pdf:api": "node server/generate-api-pdf.js",
     "build": "vite build",
