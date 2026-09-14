@@ -178,6 +178,12 @@ export const dbAdapter = {
       payload.name = payload.name || payload.fullName || 'User';
       payload.email = (payload.email || `${cleanId.toLowerCase()}@ithunt.com`).toLowerCase();
       payload.password = payload.password || 'Ithunt@123';
+    } else if (collectionName === 'courses') {
+      payload.code = payload.code || cleanId;
+      payload.title = payload.title || payload.name || 'Software Course';
+      payload.name = payload.name || payload.title || 'Software Course';
+      payload.duration = payload.duration || '6 Months';
+      payload.fee = payload.fee || '₹15,000';
     }
 
     // 1. Save to MongoDB

@@ -68,7 +68,7 @@
               <label class="form-label">{{ content.admissionSection?.fields?.course || 'Target Program' }} <span class="req">*</span></label>
               <select v-model="form.course" class="form-control" required>
                 <optgroup 
-                  v-for="grp in (content.admissionSection?.courseOptgroups || [])" 
+                  v-for="grp in dynamicCourseOptgroups" 
                   :key="grp.label" 
                   :label="grp.label"
                 >
@@ -227,10 +227,49 @@ const props = defineProps({
   isGeneratingPdf: {
     type: Boolean,
     default: false
+  },
+  courses: {
+    type: Array,
+    default: () => []
   }
 });
 
 const emit = defineEmits(['submit-admission', 'download-pdf', 'login-as-student', 'go-to-login']);
+
+const dynamicCourseOptgroups = computed(() => {
+  if (props.courses && props.courses.length > 0) {
+    const categoryMap = new Map();
+    props.courses.forEach(c => {
+      const cat = c.category || c.categoryName || 'Certified Software & IT Programs';
+      const title = c.title || c.name || c.code;
+      if (!categoryMap.has(cat)) {
+        categoryMap.set(cat, []);
+      }
+      if (!categoryMap.get(cat).includes(title)) {
+        categoryMap.get(cat).push(title);
+      }
+    });
+
+    const groups = [];
+    categoryMap.forEach((options, cat) => {
+      let icon = '📚';
+      const lower = cat.toLowerCase();
+      if (lower.includes('software') || lower.includes('mern') || lower.includes('internship') || lower.includes('mobile')) icon = '🚀';
+      else if (lower.includes('ai') || lower.includes('machine') || lower.includes('intelligence')) icon = '🤖';
+      else if (lower.includes('nielit') || lower.includes('diploma') || lower.includes('level')) icon = '🏛️';
+      else if (lower.includes('degree') || lower.includes('university') || lower.includes('bca') || lower.includes('mca')) icon = '🎓';
+      else if (lower.includes('tally') || lower.includes('account') || lower.includes('finance')) icon = '📊';
+      else if (lower.includes('govt') || lower.includes('ccc')) icon = '📜';
+
+      groups.push({
+        label: `${icon} ${cat} (${options.length})`,
+        options
+      });
+    });
+    return groups;
+  }
+  return props.content.admissionSection?.courseOptgroups || [];
+});
 
 const isSubmitting = ref(false);
 const showAdmPassword = ref(false);

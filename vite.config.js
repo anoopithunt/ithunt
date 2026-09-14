@@ -96,7 +96,7 @@ export default defineConfig(({ command }) => {
             });
           }
         },
-        '^/(students|admissions|auth|careers|internships|events|reviews|fees|certificates|projects|contact|admin|health)': {
+        '^/(courses|students|admissions|auth|careers|internships|events|reviews|fees|certificates|projects|contact|admin|health)': {
           target: 'http://127.0.0.1:3000',
           changeOrigin: true,
           secure: false,

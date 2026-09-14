@@ -50,4 +50,28 @@ router.post('/', async (req, res) => {
   }
 });
 
+/**
+ * PUT /api/courses/:id
+ */
+router.put('/:id', async (req, res) => {
+  try {
+    const updated = await dbAdapter.update('courses', req.params.id, req.body);
+    res.json({ success: true, message: 'Course updated successfully', data: updated });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * DELETE /api/courses/:id
+ */
+router.delete('/:id', async (req, res) => {
+  try {
+    await dbAdapter.delete('courses', req.params.id);
+    res.json({ success: true, message: `Course ${req.params.id} deleted successfully.` });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 export default router;

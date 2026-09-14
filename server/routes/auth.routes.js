@@ -10,12 +10,13 @@ const router = Router();
  */
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body || {};
-    if (!email || !password) {
-      return res.status(400).json({ success: false, message: 'Email and password are required.' });
+    const identifier = req.body?.email || req.body?.username || req.body?.userId || req.body?.loginId;
+    const password = req.body?.password;
+    if (!identifier || !password) {
+      return res.status(400).json({ success: false, message: 'Email/User ID and password are required.' });
     }
 
-    const normEmail = email.toLowerCase().trim();
+    const normEmail = String(identifier).toLowerCase().trim();
 
     // 1. Check Default Super Admin credentials
     if (
