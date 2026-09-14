@@ -119,6 +119,9 @@ export const dbAdapter = {
         // Also check custom registration fields
         const altDoc = await Model.findOne({
           $or: [
+            { id: id },
+            { code: id },
+            { slug: id },
             { registrationNo: id },
             { registrationNumber: id },
             { enrollmentNumber: id },
@@ -241,6 +244,9 @@ export const dbAdapter = {
           updatedDoc = await Model.findOneAndUpdate(
             {
               $or: [
+                { id: id },
+                { code: id },
+                { slug: id },
                 { registrationNo: id },
                 { registrationNumber: id },
                 { enrollmentNumber: id },
@@ -280,6 +286,9 @@ export const dbAdapter = {
         } else {
           await Model.deleteMany({
             $or: [
+              { id: id },
+              { code: id },
+              { slug: id },
               { registrationNo: id },
               { registrationNumber: id },
               { enrollmentNumber: id },
