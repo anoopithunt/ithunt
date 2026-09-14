@@ -9,7 +9,7 @@ const router = Router();
  */
 router.get('/stats', async (req, res) => {
   try {
-    const [
+    const [ 
       studentsCount,
       admissionsCount,
       nielitCount,
