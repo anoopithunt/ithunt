@@ -213,11 +213,12 @@ router.delete('/:id', async (req, res) => {
  */
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body || {};
-    if (!email) {
+    const identifier = req.body?.email || req.body?.userId || req.body?.username || req.body?.identifier || req.body?.loginId;
+    const password = req.body?.password;
+    if (!identifier) {
       return res.status(400).json({ success: false, message: 'User ID, Email, or Registration Number is required' });
     }
-    const norm = email.toLowerCase().trim();
+    const norm = String(identifier).toLowerCase().trim();
     const inputPass = (password || '').trim();
 
     // 1. Check students collection

@@ -94,6 +94,24 @@ export const normalizeNielitProject = (p) => ({
   paymentRemark: p.paymentRemark || 'Paid'
 });
 
+export const normalizeCourse = (c) => ({
+  ...c,
+  id: c.id || c.code || c._id || `CRS-${Date.now()}`,
+  code: c.code || c.slug || c.id || 'PROGRAM',
+  title: c.title || c.name || 'Software Engineering Course',
+  name: c.name || c.title || 'Software Engineering Course',
+  category: c.category || c.categoryName || 'Software Engineering',
+  categoryName: c.categoryName || c.category || 'Software Engineering',
+  duration: c.duration || '6 Months',
+  fee: c.fee || c.amount || '₹15,000',
+  badge: c.badge || 'Popular',
+  description: c.description || 'Comprehensive industry-aligned software engineering diploma.',
+  certification: c.certification || c.certificate || 'ISO 9001:2015 & Govt. Recognized',
+  certificate: c.certificate || c.certification || 'ISO 9001:2015 & Govt. Recognized',
+  image: c.image || 'img/code.jpg',
+  status: c.status || 'ACTIVE'
+});
+
 export const normalizeJobApplication = (j) => ({
   id: j.id || `JOB-${Date.now()}`,
   name: j.name || j.fullName || 'Applicant',
@@ -217,14 +235,16 @@ export const normalizeUser = (u) => ({
  * Standard Core API Request Handler with automatic Auth header attachment & response unwrapping
  */
 export async function apiRequest(endpoint, options = {}) {
-  let token = localStorage.getItem('token') || 
-              localStorage.getItem('authToken') || 
-              localStorage.getItem('adminToken') || 
-              (() => {
-                try {
-                  return JSON.parse(sessionStorage.getItem('ithunt_superadmin_auth') || '{}').token;
-                } catch (e) { return null; }
-              })();
+  let token = (typeof localStorage !== 'undefined') ? (
+    localStorage.getItem('token') || 
+    localStorage.getItem('authToken') || 
+    localStorage.getItem('adminToken')
+  ) : null;
+  if (!token && typeof sessionStorage !== 'undefined') {
+    try {
+      token = JSON.parse(sessionStorage.getItem('ithunt_superadmin_auth') || '{}').token;
+    } catch (e) { token = null; }
+  }
 
   if (!token && memoryToken) token = memoryToken;
 
@@ -250,7 +270,7 @@ export async function apiRequest(endpoint, options = {}) {
     } catch (netErr) {
       // If relative URL failed on localhost, retry directly against port 3000
       if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-        const directUrl = `http://localhost:3000${cleanEndpoint.startsWith('/api') ? cleanEndpoint : '/api' + cleanEndpoint}`;
+        const directUrl = `http://127.0.0.1:3000${cleanEndpoint.startsWith('/api') ? cleanEndpoint : '/api' + cleanEndpoint}`;
         response = await fetch(directUrl, { ...options, headers });
       } else {
         throw netErr;
@@ -283,6 +303,13 @@ export const API = {
   // Admissions
   getAdmissions: () => apiRequest('/admissions'),
   getAdmission: (id) => apiRequest(`/admissions/${id}`),
+
+  // Courses
+  getCourses: () => apiRequest('/courses'),
+  getCourse: (id) => apiRequest(`/courses/${id}`),
+  saveCourse: (data) => apiRequest('/courses', { method: 'POST', body: JSON.stringify(data) }),
+  updateCourse: (id, data) => apiRequest(`/courses/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteCourse: (id) => apiRequest(`/courses/${id}`, { method: 'DELETE' }),
   applyAdmission: (admissionData) => apiRequest('/admissions', { method: 'POST', body: JSON.stringify(admissionData) }),
   confirmAdmission: (id, payload = {}) => apiRequest(`/admissions/${id}/confirm`, { method: 'POST', body: JSON.stringify(payload) }),
   updateAdmissionStatus: (id, status, feeStatus) => apiRequest(`/admissions/${id}/status`, { method: 'PATCH', body: JSON.stringify(typeof status === 'object' ? status : { status, ...(feeStatus ? { feeStatus } : {}) }) }),
@@ -1496,6 +1523,60 @@ export async function deleteReviewFromBackend(id) {
   return { success: true };
 }
 
+/**
+ * Fetch all Courses from MongoDB Backend (ithunt)
+ */
+export async function fetchCoursesFromBackend() {
+  let list = [];
+  try {
+    const data = await API.getCourses();
+    const raw = Array.isArray(data?.courses) ? data.courses : (Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []));
+    if (raw.length > 0) list = raw;
+  } catch (e) {
+    console.warn('Notice loading courses from API:', e.message);
+  }
+  if (list.length === 0 && CONTENT_DATA?.coursesSection?.coursesList) {
+    list = CONTENT_DATA.coursesSection.coursesList;
+  }
+  return list.map(normalizeCourse);
+}
+
+/**
+ * Save / Register new Course to MongoDB Backend
+ */
+export async function saveCourseToBackend(courseData) {
+  try {
+    const res = await API.saveCourse(courseData);
+    return { success: true, data: res };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+}
+
+/**
+ * Update Course in MongoDB Backend
+ */
+export async function updateCourseInBackend(id, courseData) {
+  try {
+    const res = await API.updateCourse(id, courseData);
+    return { success: true, data: res };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+}
+
+/**
+ * Delete Course from MongoDB Backend
+ */
+export async function deleteCourseFromBackend(id) {
+  try {
+    const res = await API.deleteCourse(id);
+    return { success: true, data: res };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+}
+
 export default {
   apiRequest,
   API,
@@ -1534,5 +1615,9 @@ export default {
   updateStudentProfile,
   loginUserWithBackend,
   fetchAdminStatsFromBackend,
-  deleteUserFromBackend
+  deleteUserFromBackend,
+  fetchCoursesFromBackend,
+  saveCourseToBackend,
+  updateCourseInBackend,
+  deleteCourseFromBackend
 };

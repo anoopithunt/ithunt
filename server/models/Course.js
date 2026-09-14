@@ -12,6 +12,13 @@ const CourseSchema = new mongoose.Schema({
   eligibility: { type: String, default: '10+2 / Graduate / Diploma' },
   certificate: { type: String, default: 'ISO 9001:2015 & Govt. Recognized' },
   status: { type: String, default: 'ACTIVE' },
-}, { timestamps: true });
+}, { timestamps: true, strict: false });
+
+CourseSchema.pre('validate', function() {
+  if (!this.title && this.name) this.title = this.name;
+  if (!this.name && this.title) this.name = this.title;
+  if (!this.code && this.slug) this.code = this.slug;
+  if (!this.code) this.code = `COURSE-${Date.now()}`;
+});
 
 export const Course = mongoose.models.Course || mongoose.model('Course', CourseSchema);

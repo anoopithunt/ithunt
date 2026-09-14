@@ -148,7 +148,7 @@
     <!-- 3. INTERACTIVE NAVIGATION TABS -->
     <div class="admin-tabs-nav-bar anim-stagger-2">
       <button 
-        v-for="tab in (content.superAdminData?.superAdminUI?.tabs || defaultTabs)"
+        v-for="tab in defaultTabs"
         :key="tab.id"
         class="admin-nav-tab-btn"
         :class="{ active: currentTab === tab.id }"
@@ -163,6 +163,7 @@
             {{ pendingAdmissionsCount }} new
           </span>
         </span>
+        <span class="tab-badge-counter" v-else-if="tab.id === 'courses'">{{ coursesList.length }}</span>
         <span class="tab-badge-counter" v-else-if="tab.id === 'nielit'">{{ nielitProjectsList.length }}</span>
         <span class="tab-badge-counter" v-else-if="tab.id === 'careers'">{{ jobApplicationsList.length }}</span>
         <span class="tab-badge-counter" v-else-if="tab.id === 'events'">{{ rsvpsList.length }}</span>
@@ -620,6 +621,101 @@
                   <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔍</div>
                   <div>No candidate admissions found matching your criteria.</div>
                 </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: COURSES & ACADEMIC PROGRAMS -->
+    <div v-else-if="currentTab === 'courses'" class="admin-tab-panel anim-stagger-3">
+      <div class="panel-header-controls">
+        <div>
+          <h3 class="panel-title">📚 Courses & Academic Programs Directory</h3>
+          <p class="panel-subtitle">Manage live curriculum programs, fees, certifications, and student enrollments stored in MongoDB.</p>
+        </div>
+        <button class="btn-primary" @click="openAddCourseModal" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">
+          <span>+ Add New Program / Course 🚀</span>
+        </button>
+      </div>
+
+      <!-- Quick stats for courses -->
+      <div class="admin-stats-grid anim-stagger-2" style="margin-bottom: 1.5rem;">
+        <div class="admin-stat-card">
+          <div class="stat-icon" style="background: rgba(249, 115, 22, 0.15); color: #f97316;">📚</div>
+          <div class="stat-meta">
+            <span class="stat-value">{{ coursesList.length }}</span>
+            <span class="stat-label">Active Database Programs</span>
+          </div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="stat-icon" style="background: rgba(52, 211, 153, 0.15); color: #34d399;">🎓</div>
+          <div class="stat-meta">
+            <span class="stat-value">{{ unifiedStudentsList.length }}</span>
+            <span class="stat-label">Total Student Enrollments</span>
+          </div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="stat-icon" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">🗄️</div>
+          <div class="stat-meta">
+            <span class="stat-value">MongoDB</span>
+            <span class="stat-label">Database Storage Engine</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-table-card">
+        <div class="table-responsive">
+          <table class="admin-data-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Program / Course Title</th>
+                <th>Category</th>
+                <th>Duration</th>
+                <th>Program Fee</th>
+                <th>Enrolled Candidates</th>
+                <th>Certification</th>
+                <th>Status</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="course in coursesList" :key="course.id || course.code">
+                <td><span class="admin-reg-pill">{{ course.code }}</span></td>
+                <td>
+                  <div style="font-weight: 800; color: var(--text-main);">{{ course.title || course.name }}</div>
+                  <span v-if="course.badge" class="badge badge-warning" style="font-size: 0.65rem; margin-top: 0.25rem;">{{ course.badge }}</span>
+                </td>
+                <td style="color: var(--color-ai-cyan);">{{ course.category || course.categoryName || 'Software Engineering' }}</td>
+                <td style="font-family: var(--font-mono); font-size: 0.85rem;">⏱️ {{ course.duration }}</td>
+                <td style="font-weight: 800; color: #10b981; font-family: var(--font-mono);">{{ course.fee || '₹15,000' }}</td>
+                <td>
+                  <span class="badge badge-primary" style="font-size: 0.75rem;">
+                    {{ getCourseEnrollmentCount(course.title || course.name) }} Students
+                  </span>
+                </td>
+                <td style="font-size: 0.8rem; color: var(--text-muted);">{{ course.certification || course.certificate || 'Govt. Recognized' }}</td>
+                <td>
+                  <span class="admin-status-chip status-confirmed">{{ course.status || 'ACTIVE' }}</span>
+                </td>
+                <td style="text-align: right;">
+                  <div style="display: flex; gap: 0.4rem; justify-content: flex-end;">
+                    <button class="admin-icon-btn" @click="filterAdmissionsByCourse(course.title || course.name)" title="View Enrolled Students">
+                      👥
+                    </button>
+                    <button class="admin-icon-btn" @click="openEditCourseModal(course)" title="Edit Course Details">
+                      ✏️
+                    </button>
+                    <button class="admin-icon-btn" @click="deleteCourseItem(course)" style="color: #ef4444;" title="Delete Course">
+                      🗑️
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="coursesList.length === 0">
+                <td colspan="9" style="text-align: center; padding: 2rem; color: var(--text-dim);">No courses found in MongoDB. Click "+ Add New Program" to create one.</td>
               </tr>
             </tbody>
           </table>
@@ -1266,6 +1362,94 @@
       </div>
     </div>
 
+    <!-- Add / Edit Course Program Modal -->
+    <div class="modal-overlay" v-if="showAddCourseModal" @click.self="showAddCourseModal = false">
+      <div class="modal-card" style="max-width: 720px;">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>📚</span> {{ isEditingCourse ? 'Edit Course / Academic Program' : 'Add New Course / Program to Database' }}
+          </div>
+          <button class="modal-close-btn" @click="showAddCourseModal = false">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 1.5rem;">
+          <form @submit.prevent="handleSaveCourse">
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label class="form-label">Program / Course Title <span class="req">*</span></label>
+                <input type="text" v-model="newCourseForm.title" required class="form-control" placeholder="e.g. Full Stack MERN Web Engineering">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Course Code / Identifier <span class="req">*</span></label>
+                <input type="text" v-model="newCourseForm.code" required class="form-control" placeholder="e.g. MERN-FULLSTACK" :disabled="isEditingCourse">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Category <span class="req">*</span></label>
+                <select v-model="newCourseForm.category" class="form-control" required>
+                  <option value="Software Engineering">Software Engineering</option>
+                  <option value="Mobile Development">Mobile App Engineering</option>
+                  <option value="Artificial Intelligence">Artificial Intelligence & Data</option>
+                  <option value="NIELIT Accredited">NIELIT Accredited Diploma</option>
+                  <option value="University Degree">University Degree (BCA/MCA)</option>
+                  <option value="Accounting & Finance">Accounting & Finance (Tally/GST)</option>
+                  <option value="Govt. Certification">Govt. Certification (CCC/Basic)</option>
+                  <option value="Digital Marketing">Digital Marketing & Growth</option>
+                  <option value="Cybersecurity">Cybersecurity & Cloud</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Duration <span class="req">*</span></label>
+                <input type="text" v-model="newCourseForm.duration" required class="form-control" placeholder="e.g. 6 Months / 1 Year">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Program Fee <span class="req">*</span></label>
+                <input type="text" v-model="newCourseForm.fee" required class="form-control" placeholder="e.g. ₹25,000">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Promotional Badge</label>
+                <input type="text" v-model="newCourseForm.badge" class="form-control" placeholder="e.g. Flagship Job-Ready, Popular, New">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Eligibility Criteria</label>
+                <input type="text" v-model="newCourseForm.eligibility" class="form-control" placeholder="e.g. 10+2 / BCA / B.Tech / Graduate">
+              </div>
+
+              <div class="form-group full-width">
+                <label class="form-label">Certification Awarded</label>
+                <input type="text" v-model="newCourseForm.certificate" class="form-control" placeholder="e.g. ISO 9001:2015 Recognized Certificate & Corporate LOR">
+              </div>
+
+              <div class="form-group full-width">
+                <label class="form-label">Program Description / Overview</label>
+                <textarea v-model="newCourseForm.description" class="form-control" rows="3" placeholder="Brief description of the curriculum, technologies covered, and real-world outcomes..."></textarea>
+              </div>
+            </div>
+
+            <div class="credentials-info-notice" style="margin-top: 1.25rem; padding: 0.85rem 1.15rem; background: rgba(56, 189, 248, 0.08); border: 1px dashed rgba(56, 189, 248, 0.35); border-radius: var(--radius-md); font-size: 0.825rem;">
+              <div style="font-weight: 800; color: var(--color-ai-cyan); margin-bottom: 0.25rem;">
+                🗄️ Connected to MongoDB <code>courses</code> Collection
+              </div>
+              <div style="color: var(--text-muted);">
+                Saving this program will immediately update the database, making it available across public courses list, admission dropdown, and student portal.
+              </div>
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+              <button type="button" class="btn-secondary" @click="showAddCourseModal = false">Cancel</button>
+              <button type="submit" class="btn-primary">
+                <span>{{ isEditingCourse ? 'Update Course in Database 💾' : 'Save Course to Database 🚀' }}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <!-- Quick Admission Modal -->
     <div class="modal-overlay" v-if="showQuickAdmissionModal" @click.self="showQuickAdmissionModal = false">
       <div class="modal-card" style="max-width: 650px;">
@@ -1295,12 +1479,12 @@
               <div class="form-group full-width">
                 <label class="form-label">Target Program / Track <span class="req">*</span></label>
                 <select v-model="quickForm.course" class="form-control" required>
-                  <option>Web Development (MERN Stack & Cloud Architecture)</option>
-                  <option>iOS Native App Development (Swift & SwiftUI)</option>
-                  <option>Android App Engineering (Kotlin & Jetpack Compose)</option>
-                  <option>Python Programming, Generative AI & Data Analytics</option>
-                  <option>Full-Funnel Digital Marketing & Growth Hacking</option>
-                  <option>NIELIT 'O' Level Diploma</option>
+                  <option v-for="c in coursesList" :key="c.id || c.code" :value="c.title || c.name">
+                    {{ c.title || c.name }} ({{ c.code }}) - {{ c.fee || '₹15,000' }}
+                  </option>
+                  <option v-if="coursesList.length === 0" value="Web Development (MERN Stack & Cloud Architecture)">
+                    Web Development (MERN Stack & Cloud Architecture)
+                  </option>
                 </select>
               </div>
             </div>
@@ -1820,10 +2004,14 @@ const props = defineProps({
   allUsers: {
     type: Array,
     default: () => []
+  },
+  allCourses: {
+    type: Array,
+    default: () => []
   }
 });
 
-const emit = defineEmits(['logout', 'download-slip', 'download-nielit-pdf', 'add-admission', 'confirm-admission', 'delete-admission', 'update-nielit-project', 'delete-nielit-project', 'delete-student', 'refresh-data']);
+const emit = defineEmits(['logout', 'download-slip', 'download-nielit-pdf', 'add-admission', 'confirm-admission', 'delete-admission', 'update-nielit-project', 'delete-nielit-project', 'delete-student', 'add-course', 'update-course', 'delete-course', 'refresh-data']);
 
 const emailActionMsg = ref('');
 const showAdmissionEmailModal = ref(false);
@@ -2080,6 +2268,7 @@ const quickForm = ref({
 const defaultTabs = [
   { id: 'students', label: '🎓 Students Directory', icon: '🎓' },
   { id: 'admissions', label: '📝 Admissions Registry', icon: '📝' },
+  { id: 'courses', label: '📚 Courses & Programs', icon: '📚' },
   { id: 'nielit', label: '📜 NIELIT Submissions', icon: '📜' },
   { id: 'internships', label: '🚀 Internship Tracks', icon: '🚀' },
   { id: 'events', label: '🎪 Event VIP Passes', icon: '🎪' },
@@ -2105,6 +2294,101 @@ const projectsList = ref([]);
 const contactInquiriesList = ref([]);
 const reviewsList = ref([]);
 const usersList = ref([]);
+const coursesList = ref([]);
+
+watch(() => props.allCourses, (val) => {
+  coursesList.value = (val && val.length > 0) ? val : (props.content.coursesSection?.coursesList || []);
+}, { immediate: true, deep: true });
+
+const showAddCourseModal = ref(false);
+const isEditingCourse = ref(false);
+const editingCourseId = ref(null);
+const newCourseForm = ref({
+  title: '',
+  code: '',
+  category: 'Software Engineering',
+  duration: '6 Months',
+  fee: '₹15,000',
+  eligibility: '10+2 / BCA / Graduate / Diploma',
+  certificate: 'ISO 9001:2015 & Govt. Recognized',
+  badge: 'Popular',
+  description: ''
+});
+
+const openAddCourseModal = () => {
+  isEditingCourse.value = false;
+  editingCourseId.value = null;
+  newCourseForm.value = {
+    title: '',
+    code: '',
+    category: 'Software Engineering',
+    duration: '6 Months',
+    fee: '₹15,000',
+    eligibility: '10+2 / BCA / Graduate / Diploma',
+    certificate: 'ISO 9001:2015 & Govt. Recognized',
+    badge: 'Popular',
+    description: ''
+  };
+  showAddCourseModal.value = true;
+};
+
+const openEditCourseModal = (course) => {
+  isEditingCourse.value = true;
+  editingCourseId.value = course.id || course.code;
+  newCourseForm.value = {
+    title: course.title || course.name || '',
+    code: course.code || course.slug || '',
+    category: course.category || course.categoryName || 'Software Engineering',
+    duration: course.duration || '6 Months',
+    fee: course.fee || '₹15,000',
+    eligibility: course.eligibility || '10+2 / BCA / Graduate / Diploma',
+    certificate: course.certificate || course.certification || 'ISO 9001:2015 & Govt. Recognized',
+    badge: course.badge || '',
+    description: course.description || ''
+  };
+  showAddCourseModal.value = true;
+};
+
+const handleSaveCourse = () => {
+  if (!newCourseForm.value.title || !newCourseForm.value.code) {
+    alert('Please enter Course Title and Course Code.');
+    return;
+  }
+  if (isEditingCourse.value && editingCourseId.value) {
+    emit('update-course', editingCourseId.value, { ...newCourseForm.value });
+  } else {
+    emit('add-course', { ...newCourseForm.value });
+  }
+  showAddCourseModal.value = false;
+  newCourseForm.value = {
+    title: '',
+    code: '',
+    category: 'Software Engineering',
+    duration: '6 Months',
+    fee: '₹15,000',
+    eligibility: '10+2 / BCA / Graduate / Diploma',
+    certificate: 'ISO 9001:2015 & Govt. Recognized',
+    badge: 'Popular',
+    description: ''
+  };
+};
+
+const deleteCourseItem = (course) => {
+  if (confirm(`Are you sure you want to delete course "${course.title || course.name}" from MongoDB database?`)) {
+    emit('delete-course', course.id || course.code);
+  }
+};
+
+const getCourseEnrollmentCount = (courseName) => {
+  if (!courseName) return 0;
+  const target = courseName.toLowerCase().trim();
+  return unifiedStudentsList.value.filter(s => (s.course || '').toLowerCase().includes(target)).length;
+};
+
+const filterAdmissionsByCourse = (courseName) => {
+  currentTab.value = 'admissions';
+  admissionSearch.value = courseName;
+};
 
 watch(() => props.allStudents, (val) => {
   studentsList.value = val || [];

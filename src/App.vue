@@ -104,6 +104,7 @@
           v-else-if="activeTab === 'courses'" 
           key="courses"
           :content="content" 
+          :courses="liveCoursesList"
           @apply-course="applyForCourse" 
         />
 
@@ -138,6 +139,7 @@
           v-else-if="activeTab === 'admission'" 
           key="admission"
           :content="content" 
+          :courses="liveCoursesList"
           :form="form" 
           :lastSubmittedAdmission="lastSubmittedAdmission" 
           :isGeneratingPdf="isGeneratingPdf" 
@@ -163,6 +165,7 @@
           key="superadmin"
           :content="content" 
           :adminUser="adminUser"
+          :allCourses="liveCoursesList"
           :allAdmissions="liveAdmissionsList"
           :allJobApplications="liveJobApplicationsList"
           :allRsvps="liveRsvpsList"
@@ -183,6 +186,9 @@
           @confirm-admission="handleConfirmAdmission"
           @delete-admission="handleDeleteAdmission"
           @delete-student="handleDeleteStudent"
+          @add-course="handleAddCourse"
+          @update-course="handleUpdateCourse"
+          @delete-course="handleDeleteCourse"
           @update-nielit-project="handleUpdateNielitProject"
           @delete-nielit-project="handleDeleteNielitProject"
           @set-tab="setTab" 
@@ -452,6 +458,10 @@ import {
   deleteStudentFromBackend,
   deleteUserFromBackend,
   deleteAdmissionFromBackend,
+  fetchCoursesFromBackend,
+  saveCourseToBackend,
+  updateCourseInBackend,
+  deleteCourseFromBackend,
   registerStudentUser, 
   loginStudentUser, 
   saveStudentAccount,
@@ -624,6 +634,37 @@ const liveProjectsList = ref([]);
 const liveContactInquiriesList = ref([]);
 const liveReviewsList = ref([]);
 const liveUsersList = ref([]);
+const liveCoursesList = ref([]);
+
+const handleAddCourse = async (courseData) => {
+  const res = await saveCourseToBackend(courseData);
+  if (res.success) {
+    const saved = res.data?.data || res.data || courseData;
+    liveCoursesList.value.unshift(saved);
+    showToast(`Course "${saved.title || saved.name}" added and saved to MongoDB!`, 'success');
+  } else {
+    showToast(`Error saving course: ${res.error}`, 'error');
+  }
+};
+
+const handleUpdateCourse = async (id, courseData) => {
+  const res = await updateCourseInBackend(id, courseData);
+  if (res.success) {
+    const idx = liveCoursesList.value.findIndex(c => c.id === id || c.code === id);
+    if (idx !== -1) {
+      liveCoursesList.value[idx] = { ...liveCoursesList.value[idx], ...courseData };
+    }
+    showToast(`Course updated in database!`, 'success');
+  } else {
+    showToast(`Error updating course: ${res.error}`, 'error');
+  }
+};
+
+const handleDeleteCourse = async (id) => {
+  await deleteCourseFromBackend(id);
+  liveCoursesList.value = liveCoursesList.value.filter(c => c.id !== id && c.code !== id);
+  showToast('Course removed from database.', 'info');
+};
 
 const handleDeleteStudent = async (student) => {
   const idToDelete = student.id || student.userId;
@@ -1300,7 +1341,7 @@ onMounted(() => {
     try {
       const [
         admissions, jobs, rsvps, nielitProjects, students,
-        internships, fees, certificates, projects, contactInquiries, reviews, users
+        internships, fees, certificates, projects, contactInquiries, reviews, users, courses
       ] = await Promise.all([
         fetchAdmissionsFromBackend(),
         fetchJobApplicationsFromBackend(),
@@ -1313,7 +1354,8 @@ onMounted(() => {
         fetchProjectsFromBackend(),
         fetchContactInquiriesFromBackend(),
         fetchReviewsFromBackend(),
-        fetchUsersFromBackend()
+        fetchUsersFromBackend(),
+        fetchCoursesFromBackend()
       ]);
 
       liveAdmissionsList.value = admissions || [];
@@ -1328,6 +1370,7 @@ onMounted(() => {
       liveContactInquiriesList.value = contactInquiries || [];
       liveReviewsList.value = reviews || [];
       liveUsersList.value = users || [];
+      liveCoursesList.value = courses || [];
     } catch (e) {
       console.warn('Notice loading initial records from REST API:', e);
     }

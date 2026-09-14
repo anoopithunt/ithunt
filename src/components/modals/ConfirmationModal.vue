@@ -116,6 +116,8 @@
 </template>
 
 <script setup>
+import { getStudentAdmissionGmailUrl } from '../../utils/emailNotifier.js';
+
 defineProps({
   isOpen: {
     type: Boolean,
