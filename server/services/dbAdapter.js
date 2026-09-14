@@ -49,6 +49,7 @@ const DEFAULT_ADMIN = {
   status: 'ACTIVE',
   createdAt: new Date().toISOString()
 };
+memoryStore.get('users')?.set(DEFAULT_ADMIN.id, { ...DEFAULT_ADMIN });
 // Replicate operations to secondary database for 100% parity across Local MongoDB & Atlas Cloud
 async function replicateToSecondaryDb(collectionName, action, payload = {}, id = null) {
   const secDb = getSecondaryDb();
