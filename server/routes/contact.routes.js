@@ -34,7 +34,7 @@ router.post('/', async (req, res) => {
       subject: body.subject || 'Course Enquiry',
       message: body.message || '',
       status: 'New',
-      createdAt: new Date().toLocaleDateString('en-GB')
+      createdAt: new Date().toISOString()
     };
 
     const saved = await dbAdapter.create('contact', record);
