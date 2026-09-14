@@ -3,7 +3,7 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
-import { connectMongo, isMongoConnected, getMongoDbName, isAtlas, getLastMongoError } from './config/db.js';
+import { connectMongo, isMongoConnected, getMongoDbName, isAtlas, getLastMongoError, getActiveMaskedUri } from './config/db.js';
 
 // Import Route Handlers
 import authRoutes from './routes/auth.routes.js';
@@ -80,7 +80,7 @@ const healthHandler = async (req, res) => {
   res.json({
     status: 'ONLINE',
     service: 'IT HUNT Backend API Engine',
-    version: '2.2.1-diag',
+    version: '2.2.2-atlas',
     timestamp: new Date().toISOString(),
     uptime: `${Math.floor(process.uptime())}s`,
     database: {
@@ -89,10 +89,12 @@ const healthHandler = async (req, res) => {
       readyState: mongoose.connection?.readyState,
       type: isAtlas() ? 'MongoDB Atlas Cloud' : 'MongoDB',
       mode: isMongoConnected() ? (isAtlas() ? 'MongoDB Atlas Cloud' : 'MongoDB (MERN Stack)') : 'Standby',
+      activeUri: getActiveMaskedUri(),
       lastError: getLastMongoError() || dbErr,
       envVercel: !!process.env.VERCEL,
       hasAtlasUri: !!process.env.MONGODB_ATLAS_URI,
-      hasMongoUri: !!process.env.MONGODB_URI
+      hasMongoUri: !!process.env.MONGODB_URI,
+      vercelEnvRawMasked: process.env.MONGODB_ATLAS_URI ? process.env.MONGODB_ATLAS_URI.replace(/:([^:@]+)@/, ':****@') : null
     },
     endpoints: [
       '/api/admissions',

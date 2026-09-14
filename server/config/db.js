@@ -8,25 +8,44 @@ if (!cached) {
 let isAtlasConnection = false;
 let lastMongoError = null;
 let secondaryConnection = null;
+let lastAttemptTime = 0;
+let activeMaskedUri = null;
 
 const ATLAS_PRODUCTION_URI = 'mongodb+srv://anoopmishrapitz_db_user:IthuntPass2026@cluster0.oo3akne.mongodb.net/ithunt?retryWrites=true&w=majority';
+
+function maskUri(uri) {
+  if (!uri) return 'none';
+  return uri.replace(/:([^:@]+)@/, ':****@');
+}
 
 /**
  * Connect to MongoDB using Mongoose (Supports local MongoDB & MongoDB Atlas Cloud)
  */
 export async function connectMongo() {
   if (mongoose.connection?.readyState === 1) {
+    lastMongoError = null;
     return true;
   }
 
+  // If a connection promise is already in flight, await it
   if (cached.promise) {
     try {
       await cached.promise;
-      if (mongoose.connection?.readyState === 1) return true;
+      if (mongoose.connection?.readyState === 1) {
+        lastMongoError = null;
+        return true;
+      }
     } catch (e) {
-      cached.promise = null;
+      // Handled in initiator
     }
   }
+
+  // Rate-limit connection retries to prevent hammering on serverless cold starts
+  const now = Date.now();
+  if (lastMongoError && (now - lastAttemptTime < 6000)) {
+    return false;
+  }
+  lastAttemptTime = now;
 
   let rawUri = (process.env.MONGODB_ATLAS_URI || process.env.MONGODB_URI || '').trim();
   
@@ -35,13 +54,20 @@ export async function connectMongo() {
     rawUri = ATLAS_PRODUCTION_URI;
   }
 
+  // If running on Vercel and rawUri looks outdated or doesn't match cluster0, prioritize current Atlas URI
+  if (process.env.VERCEL && (!rawUri.includes('cluster0.oo3akne.mongodb.net') || !rawUri.includes('anoopmishrapitz_db_user'))) {
+    rawUri = ATLAS_PRODUCTION_URI;
+  }
+
   isAtlasConnection = rawUri.startsWith('mongodb+srv://') || rawUri.includes('.mongodb.net');
+  activeMaskedUri = maskUri(rawUri);
 
   try {
     mongoose.set('strictQuery', false);
     cached.promise = mongoose.connect(rawUri, {
       dbName: 'ithunt',
       serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 5000,
       socketTimeoutMS: 30000,
       maxPoolSize: 10,
       bufferCommands: false
@@ -92,6 +118,7 @@ export const isFirebaseConnected = () => false;
 export const isAtlas = () => isAtlasConnection;
 export const getLastMongoError = () => lastMongoError;
 export const getMongoDbName = () => (mongoose.connection?.readyState === 1 && mongoose.connection?.name) || 'ithunt';
+export const getActiveMaskedUri = () => activeMaskedUri || maskUri(process.env.MONGODB_ATLAS_URI || ATLAS_PRODUCTION_URI);
 export const getFirestoreDb = () => null;
 export const getRealtimeDb = () => null;
 export const getFirestore = () => null;
