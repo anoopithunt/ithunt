@@ -3568,11 +3568,11 @@ const handlePreviewCertificate = (cert) => {
   showCertPreviewModal.value = true;
 };
 
-const handleDownloadCertPdf = (cert) => {
+const handleDownloadCertPdf = async (cert) => {
   if (cert.type === 'experience') {
-    generateExperienceCertificatePdf(cert);
+    await generateExperienceCertificatePdf(cert);
   } else {
-    generateCourseCertificatePdf(cert);
+    await generateCourseCertificatePdf(cert);
   }
 };
 
