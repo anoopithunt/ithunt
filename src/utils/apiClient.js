@@ -541,7 +541,6 @@ export async function fetchAdmissionsFromBackend() {
     return [];
   }
 }
-}
 
 /**
  * Delete admission record from MongoDB (ithunt) via REST API
