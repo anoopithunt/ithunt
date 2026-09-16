@@ -74,7 +74,7 @@ export function generateNielitPdfBuffer(data) {
       const utr       = data.utrNumber         || data.utrNo          || 'N/A';
       const acHolder  = data.accountHolderName || name;
       const amount    = data.amount            || '1000';
-      const remark    = data.paymentRemark     || 'Paid';
+      const remark    = 'Paid';
       const address   = data.address           || 'N/A';
       const district  = data.district          || 'N/A';
       const state     = data.state             || 'Uttar Pradesh';
@@ -241,7 +241,7 @@ export function generateNielitPdfBuffer(data) {
 
 // ── Email body helpers ────────────────────────────────────────────────────────
 function adminBody(d, regNo, level, title, payDate, utr) {
-  return `New NIELIT Project submitted on ithunt.vercel.app
+  return `New NIELIT Project submitted on ithunt
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 NIELIT PROJECT SUBMISSION DETAILS
