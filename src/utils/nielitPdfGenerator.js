@@ -72,7 +72,7 @@ export function createNielitProjectPdfDoc(data) {
     const utrNumber = data.utrNumber || 'CHD550W1FMSF1B';
     const accountHolderName = data.accountHolderName || data.candidateName || 'Anup Kumar';
     const amount = data.amount || '1000';
-    const remark = data.paymentRemark || 'Paid';
+    const remark = 'Paid';
 
     // =========================================================================
     // PAGE 1: ANNEXURE – II (PERFORMA FOR A / B / C Level PROJECT CERTIFICATE)

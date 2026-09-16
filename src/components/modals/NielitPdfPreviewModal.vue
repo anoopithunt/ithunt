@@ -435,7 +435,7 @@ const renderPage4 = () => {
   const paymentDate = formatNielitDate(d.paymentDate || '25-Mar-2026');
   const utrNumber = d.utrNumber || 'CHD550W1FMSF1B';
   const accountHolderName = d.accountHolderName || candName;
-  const remark = d.paymentRemark || 'Paid';
+  const remark = 'Paid';
 
   ctx.fillStyle = '#000000';
   ctx.lineWidth = 1.5;
