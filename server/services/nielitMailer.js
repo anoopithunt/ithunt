@@ -412,7 +412,7 @@ function adminHtml(d, regNo, level, title, payDate, utr) {
 }
 
 // ── SENDER 1: nodemailer Gmail SMTP ──────────────────────────────────────────
-async function sendViaSmtp(to, subject, text, attachments, html = null) {
+async function sendViaSmtp(to, subject, text, attachments, html = null, fromAddress = null, replyTo = null) {
   const { user, pass } = getSmtpCredentials();
   if (!user || !pass) throw new Error('Missing SMTP credentials');
 
@@ -424,8 +424,9 @@ async function sendViaSmtp(to, subject, text, attachments, html = null) {
   });
   await transporter.verify();
   return await transporter.sendMail({
-    from: `"${FROM_NAME}" <${user}>`,
+    from: fromAddress || `"${FROM_NAME}" <${user}>`,
     to,
+    replyTo: replyTo || (fromAddress ? fromAddress : user),
     subject,
     text,
     ...(html ? { html } : {}),
@@ -434,7 +435,7 @@ async function sendViaSmtp(to, subject, text, attachments, html = null) {
 }
 
 // ── SENDER 2: Resend API ──────────────────────────────────────────────────────
-async function sendViaResend(to, subject, text, pdfBuffer, filename) {
+async function sendViaResend(to, subject, text, pdfBuffer, filename, fromAddress = null, replyTo = null) {
   const resendKey = (process.env.RESEND_API_KEY || '').trim();
   const { Resend } = await import('resend');
   const resend = new Resend(resendKey);
@@ -442,8 +443,9 @@ async function sendViaResend(to, subject, text, pdfBuffer, filename) {
     ? [{ filename, content: pdfBuffer }]
     : [];
   const result = await resend.emails.send({
-    from: `${FROM_NAME} <onboarding@resend.dev>`,
+    from: fromAddress || `${FROM_NAME} <onboarding@resend.dev>`,
     to,
+    reply_to: replyTo,
     subject,
     text,
     attachments
@@ -488,28 +490,38 @@ export async function sendNielitProjectEmail(projectRecord) {
   // ── Try Gmail SMTP ─────────────────────────────────────────────────────────
   if (smtpUser && smtpPass) {
     try {
-      // 1. ALWAYS send student confirmation with PDF attachment to candidate email!
+      // 1. Send student confirmation with PDF attachment to candidate email
+      // From: IT HUNT Academy, To: Candidate Email
       if (stuEmail && stuEmail.includes('@')) {
         await sendViaSmtp(
           stuEmail,
           stuSubject,
           studentBody(projectRecord, regNo, level, title, payDate, utr),
           attachments,
-          studentHtml(projectRecord, regNo, level, title, payDate, utr)
+          studentHtml(projectRecord, regNo, level, title, payDate, utr),
+          `"${FROM_NAME}" <${smtpUser}>`,
+          process.env.CONTACT_EMAIL || 'softtechithunt@gmail.com'
         );
         console.log(`📧 NIELIT student confirmation sent to candidate: ${stuEmail}`);
       }
 
-      // 2. ALWAYS send official copy with PDF attachment to Admin recipient(s)
+      // 2. Send official copy with PDF attachment to Admin recipient(s)
+      // From: Candidate Name <candidate-email>, To: Admin Email (softtechithunt / anoopmishrapitz)
+      const studentFrom = (stuEmail && stuEmail.includes('@'))
+        ? `"${candName}" <${stuEmail}>`
+        : `"${candName} (via IT HUNT)" <${smtpUser}>`;
+
       for (const adminTo of adminRecipients) {
         await sendViaSmtp(
           adminTo,
           adminSubject,
           adminBody(projectRecord, regNo, level, title, payDate, utr),
           attachments,
-          adminHtml(projectRecord, regNo, level, title, payDate, utr)
+          adminHtml(projectRecord, regNo, level, title, payDate, utr),
+          studentFrom,
+          stuEmail || smtpUser
         );
-        console.log(`📧 NIELIT admin copy sent to: ${adminTo}`);
+        console.log(`📧 NIELIT admin copy sent to: ${adminTo} (From: ${studentFrom})`);
       }
 
       console.log(`✅ NIELIT emails sent via Gmail SMTP (PDF attached: ${!!pdfBuffer})`);
@@ -523,10 +535,30 @@ export async function sendNielitProjectEmail(projectRecord) {
   if (resendKey) {
     try {
       if (stuEmail && stuEmail.includes('@')) {
-        await sendViaResend(stuEmail, stuSubject, studentBody(projectRecord, regNo, level, title, payDate, utr), pdfBuffer, filename);
+        await sendViaResend(
+          stuEmail,
+          stuSubject,
+          studentBody(projectRecord, regNo, level, title, payDate, utr),
+          pdfBuffer,
+          filename,
+          `${FROM_NAME} <onboarding@resend.dev>`,
+          process.env.CONTACT_EMAIL || 'softtechithunt@gmail.com'
+        );
       }
+      const studentFrom = (stuEmail && stuEmail.includes('@'))
+        ? `"${candName}" <${stuEmail}>`
+        : `"${candName} via IT HUNT" <onboarding@resend.dev>`;
+
       for (const adminTo of adminRecipients) {
-        await sendViaResend(adminTo, adminSubject, adminBody(projectRecord, regNo, level, title, payDate, utr), pdfBuffer, filename);
+        await sendViaResend(
+          adminTo,
+          adminSubject,
+          adminBody(projectRecord, regNo, level, title, payDate, utr),
+          pdfBuffer,
+          filename,
+          studentFrom,
+          stuEmail
+        );
       }
       console.log(`✅ NIELIT emails sent via Resend (PDF attached: ${!!pdfBuffer})`);
       return { success: true, method: 'resend', pdfAttached: !!pdfBuffer };
