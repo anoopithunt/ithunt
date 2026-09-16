@@ -506,9 +506,9 @@ export async function sendNielitProjectEmail(projectRecord) {
       }
 
       // 2. Send official copy with PDF attachment to Admin recipient(s)
-      // From: Candidate Name <candidate-email>, To: Admin Email (softtechithunt / anoopmishrapitz)
+      // Display Name includes candidate name and student email: "Candidate Name (email@domain.com)"
       const studentFrom = (stuEmail && stuEmail.includes('@'))
-        ? `"${candName}" <${stuEmail}>`
+        ? `"${candName} (${stuEmail})" <${stuEmail}>`
         : `"${candName} (via IT HUNT)" <${smtpUser}>`;
 
       for (const adminTo of adminRecipients) {
@@ -546,7 +546,7 @@ export async function sendNielitProjectEmail(projectRecord) {
         );
       }
       const studentFrom = (stuEmail && stuEmail.includes('@'))
-        ? `"${candName}" <${stuEmail}>`
+        ? `"${candName} (${stuEmail})" <${stuEmail}>`
         : `"${candName} via IT HUNT" <onboarding@resend.dev>`;
 
       for (const adminTo of adminRecipients) {

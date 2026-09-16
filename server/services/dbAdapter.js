@@ -77,16 +77,26 @@ export const dbAdapter = {
       if (doc) return { ...doc, id: doc._id?.toString() || doc.id };
     }
 
-    // Also check standard identifier fields
+    // Also check standard identifier fields with case-insensitive matching
+    const idRegex = new RegExp(`^${String(id).trim()}$`, 'i');
     const altDoc = await Model.findOne({
       $or: [
         { id: id },
+        { id: idRegex },
         { code: id },
+        { code: idRegex },
         { slug: id },
+        { slug: idRegex },
         { registrationNo: id },
+        { registrationNo: idRegex },
         { registrationNumber: id },
+        { registrationNumber: idRegex },
         { enrollmentNumber: id },
+        { enrollmentNumber: idRegex },
         { certNo: id },
+        { certNo: idRegex },
+        { certificateNumber: id },
+        { certificateNumber: idRegex },
         { email: String(id).toLowerCase() }
       ]
     }).lean();

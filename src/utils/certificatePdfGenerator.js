@@ -1,8 +1,34 @@
 import { jsPDF } from 'jspdf';
+import QRCode from 'qrcode';
 
 /**
- * Procedural pseudo-QR code drawer on jsPDF canvas
- * Draws a realistic, scan-ready style QR code pattern using deterministic bits
+ * Camera-scannable QR code generator for jsPDF
+ */
+async function drawScannableQr(doc, x, y, size, text) {
+  try {
+    const qrDataUrl = await QRCode.toDataURL(text, {
+      errorCorrectionLevel: 'M',
+      margin: 1,
+      width: 320,
+      color: {
+        dark: '#0f172a',
+        light: '#ffffff'
+      }
+    });
+    doc.addImage(qrDataUrl, 'PNG', x, y, size, size);
+
+    // Subtle crisp border around QR
+    doc.setDrawColor(203, 213, 225);
+    doc.setLineWidth(0.3);
+    doc.rect(x, y, size, size, 'S');
+  } catch (err) {
+    console.warn('Scannable QR generation failed, falling back to vector matrix:', err);
+    drawQrMatrix(doc, x, y, size, text);
+  }
+}
+
+/**
+ * Fallback procedural pseudo-QR code drawer on jsPDF canvas
  */
 function drawQrMatrix(doc, x, y, size, text) {
   const cells = 21; // Standard Version 1 QR code 21x21
@@ -112,7 +138,7 @@ function drawOfficialStamp(doc, cx, cy, radius, label1, label2, centerText) {
  * 1. COURSE COMPLETION CERTIFICATE (A4 LANDSCAPE: 297mm x 210mm)
  * =========================================================================
  */
-export function createCourseCertificateDoc(data = {}) {
+export async function createCourseCertificateDoc(data = {}) {
   const doc = new jsPDF({
     orientation: 'landscape',
     unit: 'mm',
@@ -245,7 +271,7 @@ export function createCourseCertificateDoc(data = {}) {
   const qrSize = 25;
   const qrX = margin + 18;
   const qrY = bottomY - 14;
-  drawQrMatrix(doc, qrX, qrY, qrSize, verifyUrl);
+  await drawScannableQr(doc, qrX, qrY, qrSize, verifyUrl);
 
   doc.setFontSize(6.8);
   doc.setFont('helvetica', 'bold');
@@ -318,7 +344,7 @@ export function createCourseCertificateDoc(data = {}) {
  * 2. EXPERIENCE / INTERNSHIP CERTIFICATE (A4 PORTRAIT: 210mm x 297mm)
  * =========================================================================
  */
-export function createExperienceCertificateDoc(data = {}) {
+export async function createExperienceCertificateDoc(data = {}) {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -447,7 +473,7 @@ export function createExperienceCertificateDoc(data = {}) {
   const qrSize = 24;
   const qrX = margin + 4;
   const qrY = curY;
-  drawQrMatrix(doc, qrX, qrY, qrSize, verifyUrl);
+  await drawScannableQr(doc, qrX, qrY, qrSize, verifyUrl);
 
   doc.setFontSize(7.5);
   doc.setFont('helvetica', 'bold');
@@ -500,8 +526,8 @@ export function createExperienceCertificateDoc(data = {}) {
 /**
  * Downloads Course Certificate as PDF file
  */
-export function generateCourseCertificatePdf(data) {
-  const doc = createCourseCertificateDoc(data);
+export async function generateCourseCertificatePdf(data) {
+  const doc = await createCourseCertificateDoc(data);
   const filename = `IT_HUNT_Certificate_${(data.studentName || 'Student').replace(/\s+/g, '_')}_${data.certNo || '2026'}.pdf`;
   doc.save(filename);
 }
@@ -509,16 +535,16 @@ export function generateCourseCertificatePdf(data) {
 /**
  * Gets Course Certificate Blob
  */
-export function getCourseCertificatePdfBlob(data) {
-  const doc = createCourseCertificateDoc(data);
+export async function getCourseCertificatePdfBlob(data) {
+  const doc = await createCourseCertificateDoc(data);
   return doc.output('blob');
 }
 
 /**
  * Downloads Experience Certificate as PDF file
  */
-export function generateExperienceCertificatePdf(data) {
-  const doc = createExperienceCertificateDoc(data);
+export async function generateExperienceCertificatePdf(data) {
+  const doc = await createExperienceCertificateDoc(data);
   const filename = `IT_HUNT_Experience_Letter_${(data.studentName || data.candidateName || 'Candidate').replace(/\s+/g, '_')}_${data.certNo || '2026'}.pdf`;
   doc.save(filename);
 }
@@ -526,7 +552,7 @@ export function generateExperienceCertificatePdf(data) {
 /**
  * Gets Experience Certificate Blob
  */
-export function getExperienceCertificatePdfBlob(data) {
-  const doc = createExperienceCertificateDoc(data);
+export async function getExperienceCertificatePdfBlob(data) {
+  const doc = await createExperienceCertificateDoc(data);
   return doc.output('blob');
 }

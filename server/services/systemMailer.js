@@ -154,7 +154,7 @@ Address  : ${adm.address || 'N/A'}, ${adm.district || ''}
 Timestamp: ${date}`;
 
   const studentFrom = (stuEmail && stuEmail.includes('@'))
-    ? `"${candName}" <${stuEmail}>`
+    ? `"${candName} (${stuEmail})" <${stuEmail}>`
     : `"${candName} (via IT HUNT)" <anoopmishrapitz@gmail.com>`;
 
   for (const adminTo of getAdminRecipients()) {
@@ -213,7 +213,7 @@ Message:
 ${message}`;
 
   const inquirerFrom = (email && email.includes('@'))
-    ? `"${name}" <${email}>`
+    ? `"${name} (${email})" <${email}>`
     : `"${name} (via IT HUNT)" <anoopmishrapitz@gmail.com>`;
 
   for (const adminTo of getAdminRecipients()) {

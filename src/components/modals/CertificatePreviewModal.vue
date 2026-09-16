@@ -79,16 +79,13 @@
 
               <!-- Bottom Row: QR, Stamp & Signatures -->
               <div class="cert-bottom-row">
-                <!-- QR Code Box -->
-                <div class="cert-qr-box">
-                  <div class="qr-placeholder">
-                    <div class="qr-pattern-grid">
-                      <div class="qr-finder tl"></div>
-                      <div class="qr-finder tr"></div>
-                      <div class="qr-finder bl"></div>
-                    </div>
+                <!-- QR Code Box (Real Scannable QR Code) -->
+                <div class="cert-qr-box" @click="handleOpenVerifyUrl" title="Click to verify online in browser" style="cursor: pointer;">
+                  <div class="qr-real-wrapper">
+                    <img v-if="qrCodeDataUrl" :src="qrCodeDataUrl" alt="Scan to Verify Certificate" class="cert-qr-real-img" />
+                    <div v-else class="qr-loading-box">Generating...</div>
                   </div>
-                  <div class="qr-label">SCAN TO VERIFY</div>
+                  <div class="qr-label">SCAN TO VERIFY 🔍</div>
                   <div class="qr-id">ID: {{ certData.certNo }}</div>
                 </div>
 
@@ -194,12 +191,9 @@
             <div class="exp-bottom-section">
               <!-- QR Verification Box -->
               <div class="exp-qr-container">
-                <div class="exp-qr-box">
-                  <div class="qr-pattern-grid">
-                    <div class="qr-finder tl"></div>
-                    <div class="qr-finder tr"></div>
-                    <div class="qr-finder bl"></div>
-                  </div>
+                <div class="exp-qr-box" @click="handleOpenVerifyUrl" title="Click to verify online in browser" style="cursor: pointer;">
+                  <img v-if="qrCodeDataUrl" :src="qrCodeDataUrl" alt="Scan to Verify Experience Certificate" class="exp-qr-real-img" />
+                  <div v-else class="qr-loading-box">Generating...</div>
                 </div>
                 <div class="exp-qr-info">
                   <div class="exp-qr-title">OFFICIAL VERIFICATION QR</div>
@@ -257,7 +251,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import QRCode from 'qrcode';
 import { generateCourseCertificatePdf, generateExperienceCertificatePdf } from '../../utils/certificatePdfGenerator.js';
 
 const props = defineProps({
@@ -270,12 +265,48 @@ const props = defineProps({
 defineEmits(['close']);
 
 const copied = ref(false);
+const qrCodeDataUrl = ref('');
 
-const handleDownloadPdf = () => {
+const getVerifyUrl = () => {
+  const certId = props.certData?.certNo || props.certData?.certificateNumber || 'ITH-CERT-2026';
+  if (props.certData?.verificationUrl) {
+    return props.certData.verificationUrl;
+  }
+  const base = (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.origin)
+    ? window.location.origin
+    : 'https://ithunt.vercel.app';
+  return `${base}/api/certificates/verify/${certId}`;
+};
+
+const updateQrCode = async () => {
+  const url = getVerifyUrl();
+  try {
+    qrCodeDataUrl.value = await QRCode.toDataURL(url, {
+      errorCorrectionLevel: 'M',
+      margin: 1,
+      width: 256,
+      color: {
+        dark: '#0f172a',
+        light: '#ffffff'
+      }
+    });
+  } catch (err) {
+    console.error('Failed to generate QR code in modal:', err);
+  }
+};
+
+watch(() => props.certData, updateQrCode, { immediate: true, deep: true });
+
+const handleOpenVerifyUrl = () => {
+  const url = getVerifyUrl();
+  window.open(url, '_blank');
+};
+
+const handleDownloadPdf = async () => {
   if (props.certData.type === 'experience') {
-    generateExperienceCertificatePdf(props.certData);
+    await generateExperienceCertificatePdf(props.certData);
   } else {
-    generateCourseCertificatePdf(props.certData);
+    await generateCourseCertificatePdf(props.certData);
   }
 };
 
@@ -284,7 +315,7 @@ const handlePrint = () => {
 };
 
 const copyVerificationUrl = async () => {
-  const url = props.certData.verificationUrl || `https://ithunt.vercel.app/api/certificates/verify/${props.certData.certNo}`;
+  const url = getVerifyUrl();
   try {
     await navigator.clipboard.writeText(url);
     copied.value = true;
@@ -613,36 +644,43 @@ const copyVerificationUrl = async () => {
 .cert-qr-box {
   text-align: center;
   width: 110px;
+  transition: transform 0.2s ease;
 }
 
-.qr-placeholder {
+.cert-qr-box:hover {
+  transform: scale(1.05);
+}
+
+.qr-real-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 4px;
+}
+
+.cert-qr-real-img {
   width: 72px;
   height: 72px;
+  display: block;
+  border-radius: 4px;
   background: #ffffff;
-  border: 1px solid #cbd5e1;
-  margin: 0 auto 4px;
+  padding: 3px;
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.qr-loading-box {
+  width: 72px;
+  height: 72px;
+  background: #f8fafc;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
+  font-size: 0.6rem;
+  color: #94a3b8;
+  border: 1px dashed #cbd5e1;
+  border-radius: 4px;
 }
-
-.qr-pattern-grid {
-  width: 60px;
-  height: 60px;
-  position: relative;
-}
-
-.qr-finder {
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  border: 4px solid #0f172a;
-}
-
-.qr-finder.tl { top: 0; left: 0; }
-.qr-finder.tr { top: 0; right: 0; }
-.qr-finder.bl { bottom: 0; left: 0; }
 
 .qr-label {
   font-size: 0.6rem;
@@ -873,12 +911,29 @@ const copyVerificationUrl = async () => {
 }
 
 .exp-qr-box {
-  width: 64px;
-  height: 64px;
+  width: 68px;
+  height: 68px;
   background: #ffffff;
-  border: 1px solid #cbd5e1;
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  border-radius: 4px;
   position: relative;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s ease;
+}
+
+.exp-qr-box:hover {
+  transform: scale(1.05);
+}
+
+.exp-qr-real-img {
+  width: 64px;
+  height: 64px;
+  display: block;
+  border-radius: 3px;
 }
 
 .exp-qr-title {
