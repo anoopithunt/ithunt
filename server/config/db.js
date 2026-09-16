@@ -42,7 +42,7 @@ export async function connectMongo() {
 
   // Rate-limit connection retries to prevent hammering on serverless cold starts
   const now = Date.now();
-  if (lastMongoError && (now - lastAttemptTime < 6000)) {
+  if (lastMongoError && (now - lastAttemptTime < 1000)) {
     return false;
   }
   lastAttemptTime = now;

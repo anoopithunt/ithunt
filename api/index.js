@@ -1,4 +1,29 @@
 import app, { ensureDbConnected } from '../server/server.js';
+import mongoose from 'mongoose';
+
+/**
+ * Wait for a given number of milliseconds
+ */
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Attempt DB connection with retries — essential for Vercel cold starts
+ * where the first attempt may time out before the route handler fires.
+ */
+async function ensureDbConnectedWithRetry(maxAttempts = 3, delayMs = 500) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      await ensureDbConnected();
+      if (mongoose.connection?.readyState === 1) return true;
+    } catch (err) {
+      console.warn(`[DB] Connection attempt ${attempt}/${maxAttempts} failed: ${err?.message}`);
+    }
+    if (attempt < maxAttempts) await sleep(delayMs);
+  }
+  return mongoose.connection?.readyState === 1;
+}
 
 /**
  * Vercel Serverless Function Handler for IT HUNT Backend
@@ -25,10 +50,18 @@ export default async function handler(req, res) {
       }
     }
 
-    try {
-      await ensureDbConnected();
-    } catch (dbErr) {
-      console.warn('Database initialization notice in serverless handler:', dbErr?.message);
+    // Ensure DB is connected before handing off to Express routes.
+    // bufferCommands=false means Mongoose will throw immediately if not connected.
+    const isHealthPath = req.url.includes('/health') || req.url === '/' || req.url === '/api';
+    const dbReady = await ensureDbConnectedWithRetry(3, 500);
+
+    if (!dbReady && !isHealthPath) {
+      console.error('[DB] MongoDB not connected after retries — returning 503');
+      return res.status(503).json({
+        success: false,
+        message: 'Database is initializing. Please retry in a moment.',
+        retryAfter: 3
+      });
     }
 
     return app(req, res);
