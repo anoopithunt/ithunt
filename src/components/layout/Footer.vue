@@ -38,6 +38,7 @@
           <li><a href="#" @click.prevent="$emit('set-tab', 'careers')">💼 Careers & Faculty Openings</a></li>
           <li><a href="#" @click.prevent="$emit('set-tab', 'reviews')">⭐ Reviews & Feedback</a></li>
           <li><a href="#" @click.prevent="$emit('set-tab', 'admission')">Admission Portal</a></li>
+          <li><a href="/api/certificates/verify" target="_blank" style="color: #38bdf8; font-weight: 600;">🔍 Verify Certificate (QR Registry)</a></li>
           <li><a href="#" @click.prevent="$emit('set-tab', 'login')">🔐 SuperAdmin Console</a></li>
         </ul>
       </div>
