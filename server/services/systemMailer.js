@@ -20,7 +20,7 @@ function getAdminRecipients() {
 
 const FROM_NAME = 'IT HUNT Academy';
 
-async function sendMail({ to, subject, text, html }) {
+async function sendMail({ to, subject, text, html, fromAddress = null, replyTo = null }) {
   const { user, pass } = getSmtpCredentials();
   if (!user || !pass || !to) return { success: false, reason: 'Missing credentials or recipient' };
 
@@ -33,8 +33,9 @@ async function sendMail({ to, subject, text, html }) {
     });
     await transporter.verify();
     const info = await transporter.sendMail({
-      from: `"${FROM_NAME}" <${user}>`,
+      from: fromAddress || `"${FROM_NAME}" <${user}>`,
       to,
+      replyTo: replyTo || (fromAddress ? fromAddress : user),
       subject,
       text,
       html
@@ -152,9 +153,19 @@ Email    : ${stuEmail}
 Address  : ${adm.address || 'N/A'}, ${adm.district || ''}
 Timestamp: ${date}`;
 
+  const studentFrom = (stuEmail && stuEmail.includes('@'))
+    ? `"${candName}" <${stuEmail}>`
+    : `"${candName} (via IT HUNT)" <anoopmishrapitz@gmail.com>`;
+
   for (const adminTo of getAdminRecipients()) {
-    await sendMail({ to: adminTo, subject: adminSubject, text: adminText });
-    console.log(`📧 Admission admin alert sent to: ${adminTo}`);
+    await sendMail({
+      to: adminTo,
+      subject: adminSubject,
+      text: adminText,
+      fromAddress: studentFrom,
+      replyTo: stuEmail || undefined
+    });
+    console.log(`📧 Admission admin alert sent to: ${adminTo} (From: ${studentFrom})`);
   }
 
   return { success: true };
@@ -191,7 +202,7 @@ Website: https://ithunt.vercel.app`;
     console.log(`📧 Contact inquiry acknowledgment sent to: ${email}`);
   }
 
-  // 2. Alert to admin
+  // 2. Alert to admin with From: Inquirer's email
   const adminSubject = `📩 [NEW INQUIRY] from ${name} - ${subject}`;
   const adminText = `New contact inquiry received:
 Name   : ${name}
@@ -201,9 +212,19 @@ Subject: ${subject}
 Message:
 ${message}`;
 
+  const inquirerFrom = (email && email.includes('@'))
+    ? `"${name}" <${email}>`
+    : `"${name} (via IT HUNT)" <anoopmishrapitz@gmail.com>`;
+
   for (const adminTo of getAdminRecipients()) {
-    await sendMail({ to: adminTo, subject: adminSubject, text: adminText });
-    console.log(`📧 Contact inquiry sent to admin: ${adminTo}`);
+    await sendMail({
+      to: adminTo,
+      subject: adminSubject,
+      text: adminText,
+      fromAddress: inquirerFrom,
+      replyTo: email || undefined
+    });
+    console.log(`📧 Contact inquiry sent to admin: ${adminTo} (From: ${inquirerFrom})`);
   }
 
   return { success: true };
