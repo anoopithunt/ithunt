@@ -161,33 +161,40 @@ export function generateNielitPdfBuffer(data) {
       doc.font('Helvetica').fontSize(9).text('(Self attested copy of the qualification of the guide/Supervisor to be attached)');
 
       // Fee table
-      doc.moveDown(1);
-      doc.fontSize(10).font('Helvetica').text('Fees Details: -');
+      doc.moveDown(1.5);
+      doc.fontSize(10).font('Helvetica-Bold').text('Fees Details: -');
       doc.moveDown(0.5);
-      const tX = M, tY = doc.y, tW = CW, rH = 20;
-      const cols = [55, 85, tW - 140];
-      const hdrs = ['Payment Date', 'UTR Number', 'Account Holder Name'];
-      const vals  = [payDate, utr, acHolder];
-      doc.rect(tX, tY, tW, rH).stroke();
-      let cx = tX;
-      hdrs.forEach((h, i) => {
-        doc.font('Helvetica-Bold').fontSize(9).text(h, cx + 3, tY + 6, { width: cols[i] - 6 });
-        cx += cols[i];
-        if (i < hdrs.length - 1) doc.moveTo(cx, tY).lineTo(cx, tY + rH * 2).stroke();
-      });
+
+      const tX = M, tY = doc.y, tW = CW, rH = 26;
+      const col1 = 140;
+      const col2 = 180;
+      const col3 = tW - col1 - col2;
       const dY = tY + rH;
-      doc.rect(tX, dY, tW, rH).stroke();
-      cx = tX;
-      vals.forEach((v, i) => {
-        doc.font('Helvetica').fontSize(9).text(String(v), cx + 3, dY + 6, { width: cols[i] - 6, ellipsis: true });
-        cx += cols[i];
-      });
+
+      // Table grid lines
+      doc.lineWidth(0.5).strokeColor('#000000');
+      doc.rect(tX, tY, tW, rH * 2).stroke();
+      doc.moveTo(tX, dY).lineTo(tX + tW, dY).stroke();
+      doc.moveTo(tX + col1, tY).lineTo(tX + col1, tY + rH * 2).stroke();
+      doc.moveTo(tX + col1 + col2, tY).lineTo(tX + col1 + col2, tY + rH * 2).stroke();
+
+      // Table headers
+      doc.font('Helvetica-Bold').fontSize(9.5);
+      doc.text('Payment Date', tX + 8, tY + 8, { width: col1 - 16, lineBreak: false });
+      doc.text('UTR Number', tX + col1 + 8, tY + 8, { width: col2 - 16, lineBreak: false });
+      doc.text('Account Holder Name', tX + col1 + col2 + 8, tY + 8, { width: col3 - 16, lineBreak: false });
+
+      // Table data row
+      doc.font('Helvetica').fontSize(9.5);
+      doc.text(String(payDate || '—'), tX + 8, dY + 8, { width: col1 - 16, lineBreak: false });
+      doc.text(String(utr || '—'), tX + col1 + 8, dY + 8, { width: col2 - 16, lineBreak: false, ellipsis: true });
+      doc.text(String(acHolder || '—'), tX + col1 + col2 + 8, dY + 8, { width: col3 - 16, lineBreak: false, ellipsis: true });
 
       // ── PAGE 4: Landscape fee table ─────────────────────────────────────
       doc.addPage({ size: 'A4', layout: 'landscape', margin: 40 });
       const lW = doc.page.width, lM = 40, lCW = lW - lM * 2;
-      const colPt  = [34, 71, 147, 42, 51, 96, 136, 125, 54];
-      const candW  = colPt.slice(0,4).reduce((a,b) => a+b, 0);
+      const colPt  = [35, 75, 145, 45, 55, 95, 140, 125, lCW - (35 + 75 + 145 + 45 + 55 + 95 + 140 + 125)];
+      const candW  = colPt.slice(0, 4).reduce((a, b) => a + b, 0);
       const payW   = lCW - candW;
       const rH4    = 24;
       const totalH = rH4 * 5;
@@ -208,10 +215,10 @@ export function generateNielitPdfBuffer(data) {
       doc.moveTo(lM, r3Y + rH4).lineTo(lM + lCW, r3Y + rH4).stroke();
 
       const r4Y = r3Y + rH4;
-      const colHdrs = ['S. No.','Regn. No.','Name of Cand.','Level','Amount','Transaction Date','Transaction No/UTR','Payment Sender Name','Remark'];
+      const colHdrs = ['S. No.', 'Regn. No.', 'Name of Cand.', 'Level', 'Amount', 'Transaction Date', 'Transaction No/UTR', 'Payment Sender Name', 'Remark'];
       let cx4 = lM;
       colHdrs.forEach((h, i) => {
-        doc.font('Helvetica-Bold').fontSize(8).text(h, cx4 + 2, r4Y + 8, { width: colPt[i] - 4, align: 'center' });
+        doc.font('Helvetica-Bold').fontSize(8).text(h, cx4 + 2, r4Y + 8, { width: colPt[i] - 4, align: 'center', lineBreak: false });
         if (i > 0) doc.moveTo(cx4, r4Y).lineTo(cx4, r4Y + rH4 * 2).stroke();
         cx4 += colPt[i];
       });
@@ -221,7 +228,7 @@ export function generateNielitPdfBuffer(data) {
       const colVals = ['1.', regNo, `Mr. ${name}`, level, `₹${amount}`, payDate, utr, acHolder, remark];
       let cx5 = lM;
       colVals.forEach((v, i) => {
-        doc.font('Helvetica').fontSize(8).text(String(v), cx5 + 2, r5Y + 8, { width: colPt[i] - 4, align: 'center', ellipsis: true });
+        doc.font('Helvetica').fontSize(8).text(String(v), cx5 + 2, r5Y + 8, { width: colPt[i] - 4, align: 'center', lineBreak: false, ellipsis: true });
         cx5 += colPt[i];
       });
 
