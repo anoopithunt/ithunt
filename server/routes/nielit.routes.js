@@ -30,6 +30,7 @@ router.get('/:id', async (req, res) => {
 
 /**
  * POST /api/nielit-projects
+ * Saves record to DB, then asynchronously generates 4-page PDF and emails it.
  */
 router.post('/', async (req, res) => {
   try {
@@ -59,12 +60,26 @@ router.post('/', async (req, res) => {
     };
 
     const saved = await dbAdapter.create('nielit_projects', record);
+
+    // Respond immediately — email + PDF sends in background (non-blocking)
     res.status(201).json({
       success: true,
       message: 'NIELIT project submitted successfully',
       data: saved,
       project: saved
     });
+
+    // Fire-and-forget: generate 4-page PDF and send email to admin + student
+    import('../services/nielitMailer.js').then(({ sendNielitProjectEmail }) => {
+      sendNielitProjectEmail(record).then(result => {
+        console.log(`[NIELIT Email] method=${result.method || 'unknown'} | PDF attached=${result.pdfAttached}`);
+      }).catch(err => {
+        console.warn('[NIELIT Email] Send failed:', err.message);
+      });
+    }).catch(err => {
+      console.warn('[NIELIT Email] Mailer import failed:', err.message);
+    });
+
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
