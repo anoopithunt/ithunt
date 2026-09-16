@@ -70,6 +70,16 @@
           <span>🔐 Login</span>
         </button>
 
+        <a 
+          href="/api/certificates/verify"
+          target="_blank"
+          class="theme-toggle-btn nav-action-desktop" 
+          style="width: auto; padding: 0.45rem 1rem; border-radius: var(--radius-full); font-size: 0.82rem; font-weight: 700; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;"
+          title="Verify IT HUNT Certificate or Experience Letter via Central QR Registry"
+        >
+          <span>🔍 Verify Credential</span>
+        </a>
+
         <!-- Mobile Drawer Toggle -->
         <button 
           class="mobile-toggle-btn" 
