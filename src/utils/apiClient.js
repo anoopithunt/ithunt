@@ -729,26 +729,53 @@ export async function fetchReviewsFromBackend() {
  * Submit NIELIT Project to backend REST API
  */
 export async function submitNielitProjectToBackend(data) {
+  const regId = String(data.nielitRegNo || data.registrationNo || data.regNo || data.id || `ITH-${Date.now()}`).trim();
+  const candName = String(data.candidateName || data.studentName || data.name || 'Candidate').trim();
+  const rawLevel = String(data.nielitLevel || data.level || 'O').trim();
+  const levelCode = rawLevel.replace(/\s*Level/i, '').trim() || 'O';
+
   const payload = {
     ...data,
-    studentName: data.candidateName || data.studentName || data.name || 'Candidate',
-    candidateName: data.candidateName || data.studentName || data.name || 'Candidate',
-    name: data.candidateName || data.studentName || data.name || 'Candidate',
-    regNo: data.registrationNo || data.nielitRegNo || data.regNo || `ITH-${Date.now()}`,
-    registrationNo: data.registrationNo || data.nielitRegNo || data.regNo || `ITH-${Date.now()}`,
-    nielitRegNo: data.nielitRegNo || data.registrationNo || data.regNo || `ITH-${Date.now()}`,
+    id: regId,
+    regNo: regId,
+    registrationNo: regId,
+    nielitRegNo: regId,
+    studentName: candName,
+    candidateName: candName,
+    name: candName,
+    level: `${levelCode} Level`,
+    nielitLevel: levelCode,
+    fatherName: data.fatherName || '—',
+    email: data.email || '',
+    mobile: data.mobile || data.phone || '',
+    address: data.address || '',
+    district: data.district || 'Prayagraj',
+    state: data.state || 'Uttar Pradesh',
+    pin: data.pin || '212503',
     projectTitle: data.projectTitle || data.title || 'MERN Stack Web Application',
-    level: data.level || 'O Level (IT)',
-    guideName: data.guideName || 'Lakshman Singh Chauhan',
+    guideName: data.guideName || 'Er. Sushil Kumar',
+    guideQualification: data.guideQualification || 'MCA (Computer Science)',
+    guideDesignation: data.guideDesignation || 'Sr. Laravel & Cloud Developer',
+    guidePlace: data.guidePlace || 'Prayagraj',
+    guideAddress: data.guideAddress || 'Holagarh, Prayagraj, UP',
+    projectDate: data.projectDate || data.date || '',
+    amount: String(data.amount || data.feePaid || '1000').replace(/[^0-9]/g, '') || '1000',
+    feePaid: data.feePaid || (data.amount ? `₹${data.amount}` : '₹1,000'),
+    paymentDate: data.paymentDate || data.date || '',
+    utrNumber: data.utrNumber || data.utrNo || '',
+    utrNo: data.utrNo || data.utrNumber || '',
+    accountHolderName: data.accountHolderName || candName,
+    paymentRemark: 'Paid',
     githubRepo: data.githubRepo || '',
     status: data.status || 'Submitted'
   };
 
   try {
-    return await API.submitNielitProject(payload);
+    const res = await API.submitNielitProject(payload);
+    return res;
   } catch (error) {
     console.warn('Notice submitting NIELIT project:', error.message);
-    return { success: true, localOnly: true };
+    return { success: false, error: error.message, localOnly: true };
   }
 }
 
@@ -767,7 +794,7 @@ export async function saveNielitProjectRecord(data) {
   };
 
   const apiRes = await submitNielitProjectToBackend(payload);
-  return { success: true, id: docId, data: payload, record: payload, ...apiRes };
+  return { success: apiRes?.success !== false, id: docId, data: payload, record: payload, ...apiRes };
 }
 
 /**

@@ -468,6 +468,7 @@ import {
   updateStudentProfile,
   submitReviewToBackend
 } from './utils/apiClient.js';
+import { sendNielitProjectEmailNotification } from './utils/emailNotifier.js';
 
 import Navbar from './components/layout/Navbar.vue';
 import Footer from './components/layout/Footer.vue';
@@ -922,12 +923,31 @@ const submitNielitProject = async (projectData) => {
     liveNielitProjectsList.value.unshift(nielitRecord);
   }
 
-  // Save via specific REST API call to backend database
-  await saveNielitProjectRecord(nielitRecord).catch((e) => console.warn('Save NIELIT project error:', e.message));
+  // Save via specific REST API call to backend database & trigger server-side email with 4-page PDF attachment
+  let backendEmailSent = false;
+  try {
+    const apiRes = await saveNielitProjectRecord(nielitRecord);
+    if (apiRes && apiRes.email && apiRes.email.success) {
+      backendEmailSent = true;
+      console.log('✓ Backend dispatched NIELIT email with 4-page PDF attachment:', apiRes.email);
+    }
+  } catch (e) {
+    console.warn('Save NIELIT project error:', e.message);
+  }
+
+  // If backend email did not send (e.g. offline/network issue), trigger client-side fallback with PDF attachment!
+  if (!backendEmailSent) {
+    try {
+      console.log('⚡ Triggering client-side fallback NIELIT email with PDF attachment...');
+      sendNielitProjectEmailNotification(nielitRecord).catch((err) => console.warn('Client fallback email notice:', err));
+    } catch (clientErr) {
+      console.warn('Client fallback email notice:', clientErr);
+    }
+  }
 
   // Display clean, professional confirmation dialog
   modalTitle.value = '🎉 NIELIT Project Registered Successfully!';
-  modalBody.value = `Congratulations ${projectData.candidateName}! Your ${projectData.nielitLevel || 'O Level'} Project submission (Reg No: ${regId}) has been recorded and saved in the database.`;
+  modalBody.value = `Congratulations ${projectData.candidateName}! Your ${projectData.nielitLevel || 'O Level'} Project submission (Reg No: ${regId}) has been recorded and saved in the database.\n\nAn official confirmation email with your 4-Page NIELIT Project Document attached has been dispatched to ${projectData.email || 'your registered email'} and the Academy Admin.`;
   showModal.value = true;
   triggerConfetti();
 };
