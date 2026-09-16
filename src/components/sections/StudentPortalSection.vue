@@ -3066,4 +3066,59 @@ const handleLogout = () => {
   color: #94a3b8;
   margin-top: 0.2rem;
 }
+
+/* ==========================================================================
+   Student Portal Responsive Media Queries
+   ========================================================================== */
+@media (max-width: 900px) {
+  .student-welcome-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.25rem 1.5rem;
+    gap: 1.25rem;
+  }
+  .student-banner-actions {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0.5rem;
+  }
+  .id-card-btn, .student-logout-btn {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+  }
+  .overview-kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .student-welcome-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  .student-welcome-name {
+    font-size: 1.35rem;
+  }
+  .student-welcome-meta {
+    font-size: 0.78rem;
+  }
+  .overview-kpi-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .dash-nav-btn {
+    padding: 0.5rem 0.85rem;
+    font-size: 0.78rem;
+  }
+  .form-grid-3 {
+    grid-template-columns: 1fr;
+  }
+  .id-card-body {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
 </style>

@@ -184,14 +184,27 @@ export const normalizeFee = (f) => ({
 });
 
 export const normalizeCertificate = (c) => ({
-  id: c.id || `CERT-${Date.now()}`,
+  id: c.id || c._id || `CERT-${Date.now()}`,
   certNo: c.certificateNumber || c.certNo || `ITH-CERT-${Math.floor(10000 + Math.random() * 90000)}`,
   certificateNumber: c.certificateNumber || c.certNo || '',
+  type: c.type || (String(c.certNo || c.certificateNumber || '').includes('-EXP-') ? 'experience' : 'course'),
   studentName: c.studentName || c.candidateName || 'Engineer',
-  course: c.courseName || c.course || c.program || 'Software Engineering',
-  grade: c.grade || 'A+',
+  candidateName: c.studentName || c.candidateName || 'Engineer',
+  course: c.courseName || c.course || c.program || (c.type === 'experience' ? (c.role || 'Software Engineering Internship') : 'Full Stack Software Engineering'),
+  courseName: c.courseName || c.course || c.program || '',
+  role: c.role || c.designation || (c.type === 'experience' ? 'Full Stack Developer Intern' : ''),
+  designation: c.designation || c.role || '',
+  department: c.department || 'Software Solutions & Cloud Services',
+  duration: c.duration || '6 Months',
+  startDate: c.startDate || '',
+  endDate: c.endDate || '',
+  technologies: c.technologies || c.techStack || 'React.js, Node.js, Express, MongoDB, Cloud Solutions',
+  performance: c.performance || 'Outstanding',
+  grade: c.grade || (c.type === 'experience' ? 'Grade A (Outstanding)' : 'A+'),
+  authorizedSignatory: c.authorizedSignatory || 'Er. Lakshman Singh Chauhan',
   issueDate: c.issueDate ? (String(c.issueDate).includes('/') ? c.issueDate : new Date(c.issueDate).toLocaleDateString('en-GB')) : new Date().toLocaleDateString('en-GB'),
-  status: c.status === 'VERIFIED_ACTIVE' ? 'Verified & Active' : (c.status || 'Verified & Issued')
+  status: c.status === 'VERIFIED_ACTIVE' ? 'Verified & Active' : (c.status || 'Verified & Issued'),
+  verificationUrl: c.verificationUrl || `https://ithunt.vercel.app/api/certificates/verify/${c.certNo || c.certificateNumber || ''}`
 });
 
 export const normalizeProject = (p) => ({

@@ -43,31 +43,53 @@ router.get('/verify/:certNo', async (req, res) => {
 });
 
 /**
- * POST /api/certificates
+ * POST /api/certificates (Issue New Certificate / Experience Certificate - Admin Only)
  */
 router.post('/', async (req, res) => {
   try {
     const body = req.body || {};
-    const certNo = body.certNo || body.certificateNumber || `ITH-CERT-${Math.floor(10000 + Math.random() * 90000)}`;
+    const type = body.type === 'experience' ? 'experience' : 'course';
+    const year = new Date().getFullYear();
+    const prefix = type === 'experience' ? 'ITH-EXP' : 'ITH-CERT';
+    const randNum = Math.floor(1000 + Math.random() * 9000);
+    const certNo = body.certNo || body.certificateNumber || `${prefix}-${year}-${randNum}`;
+
+    const studentName = (body.studentName || body.candidateName || 'Engineer').trim();
+    const course = (body.course || body.courseName || (type === 'experience' ? (body.role || 'Software Engineering Internship') : 'Full Stack Software Engineering')).trim();
+    const issueDate = body.issueDate || new Date().toLocaleDateString('en-GB');
 
     const record = {
       ...body,
       id: certNo,
       certNo,
       certificateNumber: certNo,
-      studentName: body.studentName || body.candidateName || 'Engineer',
-      course: body.course || body.courseName || body.program || 'Software Engineering',
-      grade: body.grade || 'A+',
-      issueDate: body.issueDate || new Date().toLocaleDateString('en-GB'),
+      type,
+      studentName,
+      candidateName: studentName,
+      course,
+      courseName: course,
+      role: body.role || body.designation || (type === 'experience' ? 'Full Stack Developer Intern' : ''),
+      designation: body.designation || body.role || '',
+      department: body.department || 'Software Solutions & Cloud Services',
+      duration: body.duration || '6 Months',
+      startDate: body.startDate || '',
+      endDate: body.endDate || '',
+      technologies: body.technologies || 'React.js, Node.js, Express, MongoDB, Git, Cloud Solutions',
+      performance: body.performance || 'Outstanding',
+      grade: body.grade || (type === 'experience' ? 'Grade A (Outstanding)' : 'A+'),
+      authorizedSignatory: body.authorizedSignatory || 'Er. Lakshman Singh Chauhan',
+      issueDate,
       status: 'Verified & Active',
+      verificationUrl: `https://ithunt.vercel.app/api/certificates/verify/${certNo}`,
       createdAt: new Date().toISOString()
     };
 
     const saved = await dbAdapter.create('certificates', record);
     res.status(201).json({
       success: true,
-      message: 'Certificate issued successfully',
-      data: saved
+      message: type === 'experience' ? 'Experience certificate generated successfully' : 'Course certificate issued successfully',
+      data: saved,
+      certificate: saved
     });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
