@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { dbAdapter } from '../services/dbAdapter.js';
+import { sendAdmissionNotificationEmail } from '../services/systemMailer.js';
 
 const router = Router();
 
@@ -109,6 +110,19 @@ router.post('/', async (req, res) => {
       status: admissionRecord.status
     };
 
+    // Await admission notification email dispatch to student and admin
+    let emailSent = false;
+    try {
+      await sendAdmissionNotificationEmail({
+        ...admissionRecord,
+        userId: email,
+        password: body.password || 'Ithunt@123'
+      });
+      emailSent = true;
+    } catch (mailErr) {
+      console.warn('[Admissions] Email dispatch error:', mailErr.message);
+    }
+
     res.status(201).json({
       success: true,
       message: 'Admission registered successfully',
@@ -117,7 +131,8 @@ router.post('/', async (req, res) => {
         registrationSlip
       },
       admission: saved,
-      registrationSlip
+      registrationSlip,
+      emailSent
     });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

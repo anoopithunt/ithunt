@@ -14,8 +14,8 @@ import PDFDocument from 'pdfkit';
 
 // ── Helpers to get fresh, sanitized credentials & recipients ──────────────────
 function getSmtpCredentials() {
-  const user = (process.env.SMTP_USER || process.env.GMAIL_USER || process.env.CONTACT_EMAIL || '').trim();
-  const rawPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD || process.env.GMAIL_PASS || '';
+  const user = (process.env.SMTP_USER || process.env.GMAIL_USER || process.env.CONTACT_EMAIL || 'anoopmishrapitz@gmail.com').trim();
+  const rawPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD || process.env.GMAIL_PASS || 'jbyadbnincvvwqwx';
   const pass = rawPass.replace(/\s+/g, '');
   return { user, pass };
 }
@@ -24,7 +24,9 @@ function getAdminRecipients() {
   const list = [
     process.env.ADMIN_EMAIL,
     process.env.CONTACT_EMAIL || 'softtechithunt@gmail.com',
-    process.env.SMTP_USER
+    process.env.SMTP_USER || 'anoopmishrapitz@gmail.com',
+    'softtechithunt@gmail.com',
+    'anoopmishrapitz@gmail.com'
   ].filter(Boolean).map(e => e.trim().toLowerCase());
   return Array.from(new Set(list));
 }
@@ -62,7 +64,8 @@ export function generateNielitPdfBuffer(data) {
       const name      = (data.candidateName || data.studentName || 'Candidate').toUpperCase();
       const father    = data.fatherName        || 'N/A';
       const regNo     = data.nielitRegNo       || data.registrationNo || 'N/A';
-      const level     = data.nielitLevel       || data.level          || 'A';
+      const rawLevel  = String(data.nielitLevel || data.level || 'O').trim();
+      const level     = rawLevel.replace(/\s*Level/i, '').trim() || 'O';
       const title     = data.projectTitle      || 'N/A';
       const guide     = data.guideName         || 'N/A';
       const guideQual = data.guideQualification|| 'MCA';
@@ -297,8 +300,118 @@ Warm regards,
 IT HUNT Software Solutions & Tech Academy`;
 }
 
+function studentHtml(d, regNo, level, title, payDate, utr) {
+  const candName = d.candidateName || d.studentName || 'Candidate';
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #0d1117; color: #e6edf3; margin: 0; padding: 20px; }
+    .container { max-width: 620px; margin: 0 auto; background: #161b22; border: 1px solid #30363d; border-radius: 12px; overflow: hidden; }
+    .header { background: linear-gradient(135deg, #1f242c 0%, #0d1117 100%); padding: 24px; text-align: center; border-bottom: 2px solid #f97316; }
+    .header h1 { margin: 0; color: #f97316; font-size: 24px; font-weight: 700; letter-spacing: 0.5px; }
+    .header p { margin: 6px 0 0 0; color: #8b949e; font-size: 13px; }
+    .content { padding: 24px; line-height: 1.6; }
+    .card { background: #0d1117; border: 1px solid #21262d; border-radius: 8px; padding: 16px; margin: 16px 0; }
+    .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #21262d; font-size: 14px; }
+    .row:last-child { border-bottom: none; }
+    .label { color: #8b949e; font-weight: 500; }
+    .val { color: #f0f6fc; font-weight: 600; text-align: right; }
+    .badge { display: inline-block; background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid #22c55e; border-radius: 4px; padding: 2px 8px; font-size: 12px; font-weight: 600; }
+    .attach-notice { background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.3); border-radius: 8px; padding: 14px; margin: 20px 0; color: #fdba74; font-size: 13px; }
+    .footer { padding: 18px 24px; background: #0d1117; border-top: 1px solid #21262d; font-size: 12px; color: #8b949e; text-align: center; }
+    .footer a { color: #58a6ff; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>IT HUNT Tech Academy</h1>
+      <p>Official NIELIT Project & Thesis Directorate • ISO 9001:2015 Accredited</p>
+    </div>
+    <div class="content">
+      <h2 style="color: #f0f6fc; margin-top: 0; font-size: 18px;">Dear ${candName},</h2>
+      <p style="color: #c9d1d9;">Your official <strong>NIELIT '${level}' Level Project submission</strong> has been recorded and verified.</p>
+      
+      <div class="card">
+        <div class="row"><span class="label">Candidate Name:</span><span class="val">${candName}</span></div>
+        <div class="row"><span class="label">NIELIT Reg No:</span><span class="val" style="color: #f97316; font-family: monospace;">${regNo}</span></div>
+        <div class="row"><span class="label">Exam Level:</span><span class="val">${level} Level</span></div>
+        <div class="row"><span class="label">Project Title:</span><span class="val">${title}</span></div>
+        <div class="row"><span class="label">Project Guide:</span><span class="val">${d.guideName || 'Er. Sushil Kumar'}</span></div>
+        <div class="row"><span class="label">Payment UTR / Ref:</span><span class="val" style="font-family: monospace;">${utr}</span></div>
+        <div class="row"><span class="label">Fee Paid:</span><span class="val">₹${d.amount || '1,000'}</span></div>
+        <div class="row"><span class="label">Payment Status:</span><span class="val"><span class="badge">Paid ✓</span></span></div>
+      </div>
+
+      <div class="attach-notice">
+        📎 <strong>Attached Official Document:</strong> Your complete <strong>4-Page NIELIT Project Document</strong> (Annexure II, III, Guide Certificate & Verified Payment Receipt) is attached to this email as a PDF. Please download and keep it for your academic records and submission.
+      </div>
+
+      <p style="color: #8b949e; font-size: 13px;">For any academic assistance, you may contact the Institute helpline at <strong>+91 9795771806</strong> or reply directly to this email.</p>
+    </div>
+    <div class="footer">
+      <p style="margin: 0 0 6px 0;"><strong>IT HUNT Software Solutions & Tech Academy</strong></p>
+      <p style="margin: 0;">📍 Dahiyawa Holagarh, Prayagraj (Allahabad), UP | 🌐 <a href="https://ithunt.vercel.app">ithunt.vercel.app</a></p>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+function adminHtml(d, regNo, level, title, payDate, utr) {
+  const candName = d.candidateName || d.studentName || 'Candidate';
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #0d1117; color: #e6edf3; margin: 0; padding: 20px; }
+    .container { max-width: 620px; margin: 0 auto; background: #161b22; border: 1px solid #30363d; border-radius: 12px; overflow: hidden; }
+    .header { background: #1c1917; padding: 20px 24px; border-bottom: 2px solid #ea580c; }
+    .badge-admin { background: #ea580c; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+    .content { padding: 24px; line-height: 1.6; }
+    .card { background: #0d1117; border: 1px solid #21262d; border-radius: 8px; padding: 16px; margin: 16px 0; }
+    .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #21262d; font-size: 14px; }
+    .row:last-child { border-bottom: none; }
+    .label { color: #8b949e; }
+    .val { color: #f0f6fc; font-weight: 600; text-align: right; }
+    .attach-box { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 12px; margin-top: 16px; font-size: 13px; color: #93c5fd; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <span class="badge-admin">SuperAdmin Notice</span>
+      <h2 style="color: #f0f6fc; margin: 8px 0 0 0; font-size: 18px;">New NIELIT Student Project Form Submitted</h2>
+    </div>
+    <div class="content">
+      <div class="card">
+        <div class="row"><span class="label">Candidate Name:</span><span class="val">${candName}</span></div>
+        <div class="row"><span class="label">Father's Name:</span><span class="val">${d.fatherName || 'N/A'}</span></div>
+        <div class="row"><span class="label">NIELIT Reg No:</span><span class="val" style="color: #f97316;">${regNo}</span></div>
+        <div class="row"><span class="label">Level:</span><span class="val">${level} Level</span></div>
+        <div class="row"><span class="label">Project Title:</span><span class="val">${title}</span></div>
+        <div class="row"><span class="label">Guide / Supervisor:</span><span class="val">${d.guideName || 'Er. Sushil Kumar'}</span></div>
+        <div class="row"><span class="label">Mobile:</span><span class="val">${d.mobile || 'N/A'}</span></div>
+        <div class="row"><span class="label">Email:</span><span class="val">${d.email || 'N/A'}</span></div>
+        <div class="row"><span class="label">Address:</span><span class="val">${d.address || 'N/A'}, ${d.district || ''}</span></div>
+        <div class="row"><span class="label">UTR / Transaction:</span><span class="val">${utr}</span></div>
+        <div class="row"><span class="label">Fee Paid:</span><span class="val">₹${d.amount || '1000'} (Paid)</span></div>
+        <div class="row"><span class="label">Sender Name:</span><span class="val">${d.accountHolderName || candName}</span></div>
+      </div>
+      <div class="attach-box">
+        📎 <strong>Attachment:</strong> 4-Page NIELIT Project PDF document has been compiled and attached.
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
 // ── SENDER 1: nodemailer Gmail SMTP ──────────────────────────────────────────
-async function sendViaSmtp(to, subject, text, attachments) {
+async function sendViaSmtp(to, subject, text, attachments, html = null) {
   const { user, pass } = getSmtpCredentials();
   if (!user || !pass) throw new Error('Missing SMTP credentials');
 
@@ -314,6 +427,7 @@ async function sendViaSmtp(to, subject, text, attachments) {
     to,
     subject,
     text,
+    ...(html ? { html } : {}),
     attachments
   });
 }
@@ -342,7 +456,8 @@ export async function sendNielitProjectEmail(projectRecord) {
   if (!projectRecord) return { success: false, error: 'No project record' };
 
   const regNo    = projectRecord.nielitRegNo || projectRecord.registrationNo || 'N/A';
-  const level    = projectRecord.nielitLevel || projectRecord.level || 'A';
+  const rawLevel = String(projectRecord.nielitLevel || projectRecord.level || 'O').trim();
+  const level    = rawLevel.replace(/\s*Level/i, '').trim() || 'O';
   const title    = projectRecord.projectTitle || 'N/A';
   const utr      = projectRecord.utrNumber   || projectRecord.utrNo || 'N/A';
   const payDate  = fmtDate(projectRecord.paymentDate);
@@ -372,16 +487,30 @@ export async function sendNielitProjectEmail(projectRecord) {
   // ── Try Gmail SMTP ─────────────────────────────────────────────────────────
   if (smtpUser && smtpPass) {
     try {
-      // Send to Admin recipient(s)
+      // 1. ALWAYS send student confirmation with PDF attachment to candidate email!
+      if (stuEmail && stuEmail.includes('@')) {
+        await sendViaSmtp(
+          stuEmail,
+          stuSubject,
+          studentBody(projectRecord, regNo, level, title, payDate, utr),
+          attachments,
+          studentHtml(projectRecord, regNo, level, title, payDate, utr)
+        );
+        console.log(`📧 NIELIT student confirmation sent to candidate: ${stuEmail}`);
+      }
+
+      // 2. ALWAYS send official copy with PDF attachment to Admin recipient(s)
       for (const adminTo of adminRecipients) {
-        await sendViaSmtp(adminTo, adminSubject, adminBody(projectRecord, regNo, level, title, payDate, utr), attachments);
+        await sendViaSmtp(
+          adminTo,
+          adminSubject,
+          adminBody(projectRecord, regNo, level, title, payDate, utr),
+          attachments,
+          adminHtml(projectRecord, regNo, level, title, payDate, utr)
+        );
         console.log(`📧 NIELIT admin copy sent to: ${adminTo}`);
       }
-      // Send to Student if email provided and not already in admin list
-      if (stuEmail && stuEmail.includes('@') && !adminRecipients.includes(stuEmail.toLowerCase())) {
-        await sendViaSmtp(stuEmail, stuSubject, studentBody(projectRecord, regNo, level, title, payDate, utr), attachments);
-        console.log(`📧 NIELIT student confirmation sent to: ${stuEmail}`);
-      }
+
       console.log(`✅ NIELIT emails sent via Gmail SMTP (PDF attached: ${!!pdfBuffer})`);
       return { success: true, method: 'smtp', pdfAttached: !!pdfBuffer };
     } catch (smtpErr) {
@@ -392,11 +521,11 @@ export async function sendNielitProjectEmail(projectRecord) {
   // ── Try Resend API ─────────────────────────────────────────────────────────
   if (resendKey) {
     try {
+      if (stuEmail && stuEmail.includes('@')) {
+        await sendViaResend(stuEmail, stuSubject, studentBody(projectRecord, regNo, level, title, payDate, utr), pdfBuffer, filename);
+      }
       for (const adminTo of adminRecipients) {
         await sendViaResend(adminTo, adminSubject, adminBody(projectRecord, regNo, level, title, payDate, utr), pdfBuffer, filename);
-      }
-      if (stuEmail && stuEmail.includes('@') && !adminRecipients.includes(stuEmail.toLowerCase())) {
-        await sendViaResend(stuEmail, stuSubject, studentBody(projectRecord, regNo, level, title, payDate, utr), pdfBuffer, filename);
       }
       console.log(`✅ NIELIT emails sent via Resend (PDF attached: ${!!pdfBuffer})`);
       return { success: true, method: 'resend', pdfAttached: !!pdfBuffer };

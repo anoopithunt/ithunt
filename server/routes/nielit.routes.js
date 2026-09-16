@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { dbAdapter } from '../services/dbAdapter.js';
+import { sendNielitProjectEmail } from '../services/nielitMailer.js';
 
 const router = Router();
 
@@ -30,13 +31,16 @@ router.get('/:id', async (req, res) => {
 
 /**
  * POST /api/nielit-projects
- * Saves record to DB, then asynchronously generates 4-page PDF and emails it.
+ * Saves record to DB, generates 4-page PDF and emails it with attachment.
  */
 router.post('/', async (req, res) => {
   try {
     const body = req.body || {};
-    const regNo = body.nielitRegNo || body.registrationNo || body.regNo || `NIELIT-${Date.now()}`;
-    const studentName = body.studentName || body.candidateName || body.fullName || 'Candidate';
+    const regNo = String(body.nielitRegNo || body.registrationNo || body.regNo || `NIELIT-${Date.now()}`).trim();
+    const studentName = (body.studentName || body.candidateName || body.fullName || 'Candidate').trim();
+    const rawLevel = String(body.nielitLevel || body.level || 'O').trim();
+    const cleanLevelCode = rawLevel.replace(/\s*Level/i, '').trim() || 'O';
+    const cleanLevel = `${cleanLevelCode} Level`;
 
     const record = {
       ...body,
@@ -45,42 +49,63 @@ router.post('/', async (req, res) => {
       nielitRegNo: regNo,
       studentName,
       candidateName: studentName,
-      level: body.level || body.nielitLevel || 'O Level',
+      fatherName: body.fatherName || '—',
+      email: (body.email || '').trim(),
+      mobile: body.mobile || body.phone || '+91 9795771806',
+      level: cleanLevel,
+      nielitLevel: cleanLevelCode,
       projectTitle: body.projectTitle || body.title || 'MERN Stack Web Development',
       guideName: body.guideName || 'Mr. Sushil Kumar',
       guideQualification: body.guideQualification || 'MCA (Computer Science)',
       guideDesignation: body.guideDesignation || 'Laravel/NodeJS Developer',
+      guidePlace: body.guidePlace || 'Prayagraj',
+      guideAddress: body.guideAddress || 'Holagarh, Prayagraj, UP',
       status: body.status || 'Submitted',
-      feePaid: body.feePaid || body.amount || '₹1,000',
+      feePaid: body.feePaid || (body.amount ? `₹${body.amount}` : '₹1,000'),
+      amount: String(body.amount || body.feePaid || '1000').replace(/[^0-9]/g, '') || '1000',
       utrNo: body.utrNo || body.utrNumber || 'UPI/Verified',
+      utrNumber: body.utrNumber || body.utrNo || 'UPI/Verified',
       accountHolderName: body.accountHolderName || studentName,
-      paymentRemark: body.paymentRemark || 'Paid',
+      paymentRemark: 'Paid',
+      projectDate: body.projectDate || body.date || new Date().toISOString(),
+      paymentDate: body.paymentDate || body.date || new Date().toISOString(),
+      address: body.address || 'Holagarh',
+      district: body.district || 'Prayagraj',
+      state: body.state || 'Uttar Pradesh',
+      pin: body.pin || '212503',
       date: body.date || new Date().toLocaleDateString('en-GB'),
       createdAt: new Date().toISOString()
     };
 
-    const saved = await dbAdapter.create('nielit_projects', record);
+    let saved = null;
+    try {
+      saved = await dbAdapter.create('nielit_projects', record);
+    } catch (dbErr) {
+      console.warn('[NIELIT] DB persistence error, attempting upsert:', dbErr.message);
+      saved = await dbAdapter.update('nielit_projects', regNo, record).catch(() => record);
+    }
 
-    // Respond immediately — email + PDF sends in background (non-blocking)
+    // Await email dispatch with 4-page PDF attachment BEFORE closing HTTP response!
+    // This is required so Vercel Serverless and Node processes don't freeze/halt the SMTP connection.
+    let emailResult = null;
+    try {
+      emailResult = await sendNielitProjectEmail(record);
+      console.log(`[NIELIT Email] Sent result: method=${emailResult?.method} | PDF attached=${emailResult?.pdfAttached}`);
+    } catch (mailErr) {
+      console.warn('[NIELIT Email] Mail dispatch failed:', mailErr.message);
+      emailResult = { success: false, error: mailErr.message };
+    }
+
     res.status(201).json({
       success: true,
       message: 'NIELIT project submitted successfully',
-      data: saved,
-      project: saved
-    });
-
-    // Fire-and-forget: generate 4-page PDF and send email to admin + student
-    import('../services/nielitMailer.js').then(({ sendNielitProjectEmail }) => {
-      sendNielitProjectEmail(record).then(result => {
-        console.log(`[NIELIT Email] method=${result.method || 'unknown'} | PDF attached=${result.pdfAttached}`);
-      }).catch(err => {
-        console.warn('[NIELIT Email] Send failed:', err.message);
-      });
-    }).catch(err => {
-      console.warn('[NIELIT Email] Mailer import failed:', err.message);
+      data: saved || record,
+      project: saved || record,
+      email: emailResult
     });
 
   } catch (error) {
+    console.error('[NIELIT] Submission failed:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });

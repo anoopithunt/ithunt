@@ -16,11 +16,20 @@ const NielitProjectSchema = new mongoose.Schema({
   guideQualification: { type: String, default: 'MCA (Computer Science)' },
   guideDesignation: { type: String, default: 'Laravel/NodeJS Developer' },
   status: { type: String, default: 'Submitted' },
-  feePaid: { type: String, default: '₹1,000' },
   utrNo: { type: String, default: 'UPI/Verified' },
+  utrNumber: { type: String, default: 'UPI/Verified' },
   accountHolderName: { type: String, default: '' },
   paymentRemark: { type: String, default: 'Paid' },
+  amount: { type: String, default: '1000' },
+  projectDate: { type: String },
+  paymentDate: { type: String },
+  address: { type: String, default: 'Holagarh' },
+  district: { type: String, default: 'Prayagraj' },
+  state: { type: String, default: 'Uttar Pradesh' },
+  pin: { type: String, default: '212503' },
+  guidePlace: { type: String, default: 'Prayagraj' },
+  guideAddress: { type: String, default: 'Holagarh, Prayagraj, UP' },
   date: { type: String },
-}, { timestamps: true });
+}, { timestamps: true, strict: false });
 
 export const NielitProject = mongoose.models.NielitProject || mongoose.model('NielitProject', NielitProjectSchema);

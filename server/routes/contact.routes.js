@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { dbAdapter } from '../services/dbAdapter.js';
+import { sendContactNotificationEmail } from '../services/systemMailer.js';
 
 const router = Router();
 
@@ -38,6 +39,14 @@ router.post('/', async (req, res) => {
     };
 
     const saved = await dbAdapter.create('contact', record);
+
+    // Send email notification to inquirer & admin
+    try {
+      await sendContactNotificationEmail(record);
+    } catch (mailErr) {
+      console.warn('[Contact] Email dispatch error:', mailErr.message);
+    }
+
     res.status(201).json({
       success: true,
       message: 'Inquiry received successfully',
