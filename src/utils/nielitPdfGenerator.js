@@ -71,7 +71,7 @@ export function createNielitProjectPdfDoc(data) {
     const paymentDate = formatNielitDate(data.paymentDate || '25-Mar-2026');
     const utrNumber = data.utrNumber || 'CHD550W1FMSF1B';
     const accountHolderName = data.accountHolderName || data.candidateName || 'Anup Kumar';
-    const amount = data.amount || '1000';
+    const amount = String(data.amount || '1000').replace(/[^0-9]/g, '') || '1000';
     const remark = 'Paid';
 
     // =========================================================================

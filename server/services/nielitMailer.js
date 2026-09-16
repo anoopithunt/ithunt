@@ -228,7 +228,8 @@ export function generateNielitPdfBuffer(data) {
       doc.moveTo(lM, r4Y + rH4).lineTo(lM + lCW, r4Y + rH4).stroke();
 
       const r5Y = r4Y + rH4;
-      const colVals = ['1.', regNo, `Mr. ${name}`, level, `₹${amount}`, payDate, utr, acHolder, remark];
+      const cleanAmount = String(amount).replace(/[^0-9]/g, '') || '1000';
+      const colVals = ['1.', regNo, `Mr. ${name}`, level, cleanAmount, payDate, utr, acHolder, remark];
       let cx5 = lM;
       colVals.forEach((v, i) => {
         doc.font('Helvetica').fontSize(8).text(String(v), cx5 + 2, r5Y + 8, { width: colPt[i] - 4, align: 'center', lineBreak: false, ellipsis: true });
