@@ -8443,3 +8443,209 @@ body.light-theme .toast-item {
     font-size: 0.6rem;
   }
 }
+
+/* ==========================================================================
+   Full Project Universal Responsive Enhancements
+   ========================================================================== */
+
+/* 1. Global Viewport Overflow Protection */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+#app {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* 2. Fluid Media Safety */
+img, video, iframe, canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 3. Universal Smooth Touch Scrollable Table Container */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  position: relative;
+}
+
+.table-responsive::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4);
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: rgba(249, 115, 22, 0.4);
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: rgba(249, 115, 22, 0.7);
+}
+
+/* Ensure data tables maintain legible column widths on mobile */
+.admin-data-table {
+  min-width: 750px;
+}
+
+/* 4. Tablets & Small Laptops (<= 1024px) */
+@media (max-width: 1024px) {
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2rem;
+  }
+  
+  .leadership-spotlight-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admission-container {
+    grid-template-columns: 1fr !important;
+  }
+
+  .rating-summary-card {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+/* 5. Mobile Landscape & Tablets (<= 768px) */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .section {
+    padding: 3rem 0;
+  }
+
+  .section-title {
+    font-size: 1.75rem !important;
+  }
+
+  .section-subtitle {
+    font-size: 0.9rem !important;
+  }
+
+  .hero-main-title {
+    font-size: 2.2rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .hero-cta-group {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.75rem;
+  }
+
+  .hero-cta-group .btn-primary,
+  .hero-cta-group .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+
+  .courses-grid,
+  .internship-tracks-grid,
+  .events-grid,
+  .alumni-cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+  }
+
+  .form-grid-2,
+  .form-grid-3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Universal Modal Card on Mobile */
+  .modal-card {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    margin: 1rem auto !important;
+    padding: 1.25rem !important;
+    max-height: 92vh !important;
+    overflow-y: auto !important;
+  }
+
+  .modal-actions-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .modal-actions-group button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* 6. Mobile Portrait Phones (<= 480px) */
+@media (max-width: 480px) {
+  .hero-main-title {
+    font-size: 1.85rem !important;
+  }
+
+  .hero-highlights-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .stat-card-inner {
+    padding: 0.85rem 1rem !important;
+  }
+
+  .brand-title {
+    font-size: 1.15rem !important;
+  }
+
+  .brand-tagline {
+    font-size: 0.65rem !important;
+  }
+
+  .cta-btn-header {
+    display: none !important;
+  }
+}
+
+/* 7. Extra Small Displays (<= 360px) */
+@media (max-width: 360px) {
+  .hero-main-title {
+    font-size: 1.6rem !important;
+  }
+
+  .section-title {
+    font-size: 1.45rem !important;
+  }
+
+  .btn-primary, .btn-secondary {
+    padding: 0.6rem 1rem !important;
+    font-size: 0.8rem !important;
+  }
+}
+

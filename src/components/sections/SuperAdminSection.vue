@@ -334,6 +334,15 @@
                       👁️ Profile
                     </button>
                     <button 
+                      type="button"
+                      class="admin-icon-btn" 
+                      title="Issue Official Course Completion Certificate"
+                      style="color: var(--color-ai-yellow); border-color: rgba(250, 204, 21, 0.4);"
+                      @click="openIssueCourseCertModalForStudent(stu)"
+                    >
+                      🏅 Issue Cert
+                    </button>
+                    <button 
                       v-if="stu.admissionConfirmed || stu.status === 'Confirmed'"
                       class="admin-icon-btn" 
                       title="View Student Portal Login Credentials"
@@ -898,6 +907,18 @@
                 </span>
               </div>
             </div>
+
+            <div style="margin-top: 1.25rem; padding-top: 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: flex-end;">
+              <button 
+                type="button" 
+                class="admin-icon-btn" 
+                style="color: #34d399; border-color: rgba(52, 211, 153, 0.4); font-size: 0.8rem; padding: 0.4rem 0.85rem;"
+                @click="openIssueExpCertModal({ role: track.title + ' Intern', track: track.title, duration: track.duration })"
+                title="Issue Experience Certificate for this Internship Track"
+              >
+                💼 Issue {{ track.title }} Exp Letter
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1099,8 +1120,68 @@
     <div v-else-if="currentTab === 'certificates'" class="admin-tab-panel anim-stagger-3">
       <div class="panel-header-controls">
         <div>
-          <h3 class="panel-title">🏅 Verified Graduate Certificates & Diplomas</h3>
-          <p class="panel-subtitle">Official ISO 9001:2015 accredited course completion credentials and grades.</p>
+          <h3 class="panel-title">🏅 Verified Graduate Certificates & Experience Letters</h3>
+          <p class="panel-subtitle">Official ISO 9001:2015 accredited course completion credentials and corporate experience certificates.</p>
+        </div>
+
+        <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center;">
+          <button 
+            type="button"
+            class="btn-primary" 
+            style="background: linear-gradient(135deg, #ea580c, #f97316); border-color: #ea580c; box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35); font-weight: 800; font-size: 0.85rem;"
+            @click="openIssueCourseCertModal()"
+          >
+            <span>🎓 + Issue Course Certificate</span>
+          </button>
+          <button 
+            type="button"
+            class="btn-primary" 
+            style="background: linear-gradient(135deg, #10b981, #059669); border-color: #10b981; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35); font-weight: 800; font-size: 0.85rem;"
+            @click="openIssueExpCertModal()"
+          >
+            <span>💼 + Issue Experience Certificate</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters Ribbon -->
+      <div class="panel-filter-group" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div class="events-search-box" style="margin: 0; min-width: 280px; flex: 1;">
+          <span class="events-search-icon">🔍</span>
+          <input 
+            type="text" 
+            v-model="certSearch" 
+            class="events-search-input" 
+            placeholder="Search by Student Name, Cert ID, Course, Role..."
+          >
+          <button v-if="certSearch" class="events-search-clear" @click="certSearch = ''">✕</button>
+        </div>
+
+        <div style="display: flex; gap: 0.4rem; background: rgba(0,0,0,0.3); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border-cyber); flex-wrap: wrap;">
+          <button 
+            type="button"
+            class="admin-icon-btn" 
+            :style="{ background: certFilter === 'all' ? 'var(--color-ai-orange)' : 'transparent', color: certFilter === 'all' ? '#fff' : 'var(--text-muted)' }"
+            @click="certFilter = 'all'"
+          >
+            All ({{ filteredCertificates.length }})
+          </button>
+          <button 
+            type="button"
+            class="admin-icon-btn" 
+            :style="{ background: certFilter === 'course' ? 'var(--color-ai-orange)' : 'transparent', color: certFilter === 'course' ? '#fff' : 'var(--text-muted)' }"
+            @click="certFilter = 'course'"
+          >
+            🎓 Course ({{ certificatesList.filter(c => c.type !== 'experience').length }})
+          </button>
+          <button 
+            type="button"
+            class="admin-icon-btn" 
+            :style="{ background: certFilter === 'experience' ? '#10b981' : 'transparent', color: certFilter === 'experience' ? '#fff' : 'var(--text-muted)' }"
+            @click="certFilter = 'experience'"
+          >
+            💼 Experience ({{ certificatesList.filter(c => c.type === 'experience').length }})
+          </button>
         </div>
       </div>
 
@@ -1110,26 +1191,87 @@
             <thead>
               <tr>
                 <th>Certificate ID</th>
-                <th>Graduate Name</th>
-                <th>Course / Track</th>
-                <th>Awarded Grade</th>
+                <th>Candidate / Graduate</th>
+                <th>Type & Program / Role</th>
+                <th>Tenure / Duration</th>
+                <th>Grade / Appraisal</th>
                 <th>Issue Date</th>
                 <th>Status</th>
+                <th style="text-align: right;">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="cert in certificatesList" :key="cert.id">
-                <td><span class="admin-reg-pill">{{ cert.certNo }}</span></td>
-                <td style="font-weight: 800; color: var(--text-main);">{{ cert.studentName }}</td>
-                <td style="color: var(--color-ai-cyan);">{{ cert.course }}</td>
-                <td><span class="exp-badge-required" style="font-size: 0.75rem; background: rgba(250, 204, 21, 0.15); color: #facc15; border-color: rgba(250, 204, 21, 0.3);">{{ cert.grade }}</span></td>
+              <tr v-for="cert in filteredCertificates" :key="cert.id || cert.certNo">
+                <td>
+                  <span class="admin-reg-pill" style="display: inline-flex; align-items: center; gap: 4px;">
+                    <span>{{ cert.type === 'experience' ? '💼' : '🎓' }}</span>
+                    <span>{{ cert.certNo }}</span>
+                  </span>
+                </td>
+                <td style="font-weight: 800; color: var(--text-main);">
+                  <div>{{ cert.studentName || cert.candidateName }}</div>
+                  <div style="font-size: 0.725rem; color: var(--text-dim);" v-if="cert.type === 'experience'">{{ cert.department || 'Software Solutions' }}</div>
+                </td>
+                <td>
+                  <div style="font-weight: 700; color: var(--color-ai-cyan);">
+                    {{ cert.type === 'experience' ? (cert.role || cert.designation || cert.course) : cert.course }}
+                  </div>
+                  <span 
+                    style="font-size: 0.7rem; font-weight: 800; padding: 1px 6px; border-radius: 4px; text-transform: uppercase;"
+                    :style="cert.type === 'experience' ? 'background: rgba(16, 185, 129, 0.15); color: #34d399;' : 'background: rgba(249, 115, 22, 0.15); color: #fb923c;'"
+                  >
+                    {{ cert.type === 'experience' ? '💼 Experience Letter' : '🎓 Course Completion' }}
+                  </span>
+                </td>
+                <td style="font-size: 0.85rem; color: var(--text-muted);">
+                  <div>{{ cert.duration || '6 Months' }}</div>
+                  <div v-if="cert.startDate" style="font-size: 0.725rem; color: var(--text-dim);">{{ cert.startDate }} – {{ cert.endDate }}</div>
+                </td>
+                <td>
+                  <span class="exp-badge-required" style="font-size: 0.75rem; background: rgba(250, 204, 21, 0.15); color: #facc15; border-color: rgba(250, 204, 21, 0.3);">
+                    {{ cert.grade || cert.performance || 'Outstanding' }}
+                  </span>
+                </td>
                 <td style="font-family: var(--font-mono); font-size: 0.8rem;">{{ cert.issueDate }}</td>
                 <td>
-                  <span class="admin-status-chip status-confirmed">✓ {{ cert.status || 'Verified & Issued' }}</span>
+                  <span class="admin-status-chip status-confirmed">✓ {{ cert.status || 'Verified & Active' }}</span>
+                </td>
+                <td style="text-align: right;">
+                  <div class="admin-row-actions">
+                    <button 
+                      type="button"
+                      class="admin-icon-btn" 
+                      @click="handlePreviewCertificate(cert)" 
+                      title="Preview Official Certificate"
+                      style="color: var(--color-ai-cyan); border-color: rgba(56, 189, 248, 0.4);"
+                    >
+                      👁️ Preview
+                    </button>
+                    <button 
+                      type="button"
+                      class="admin-icon-btn" 
+                      @click="handleDownloadCertPdf(cert)" 
+                      title="Download Official PDF Document"
+                      style="color: var(--color-ai-yellow); border-color: rgba(250, 204, 21, 0.4);"
+                    >
+                      📜 PDF
+                    </button>
+                    <button 
+                      type="button"
+                      class="admin-icon-btn" 
+                      @click="handleDeleteCertificate(cert)" 
+                      title="Delete Certificate Record"
+                      style="color: #ef4444;"
+                    >
+                      🗑️
+                    </button>
+                  </div>
                 </td>
               </tr>
-              <tr v-if="certificatesList.length === 0">
-                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-dim);">No certificates issued yet.</td>
+              <tr v-if="filteredCertificates.length === 0">
+                <td colspan="8" style="text-align: center; padding: 2.5rem; color: var(--text-dim);">
+                  No certificates found matching criteria. Click "+ Issue Course Certificate" or "+ Issue Experience Certificate" above to generate one!
+                </td>
               </tr>
             </tbody>
           </table>
@@ -1912,6 +2054,175 @@
         </div>
       </div>
     </div>
+
+    <!-- Issue Course Certificate Modal (SuperAdmin Only) -->
+    <div class="modal-overlay" v-if="showCourseCertModal" @click.self="showCourseCertModal = false">
+      <div class="modal-card" style="max-width: 620px; text-align: left;">
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <span style="font-size: 1.5rem;">🎓</span>
+            <div>
+              <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--color-ai-yellow);">
+                Issue Course Completion Certificate
+              </h3>
+              <p style="margin: 0.15rem 0 0 0; font-size: 0.78rem; color: var(--text-muted);">
+                Generate verifiable ISO 9001:2015 accredited course completion diploma
+              </p>
+            </div>
+          </div>
+          <button class="modal-close-btn" @click="showCourseCertModal = false">✕</button>
+        </div>
+
+        <form @submit.prevent="handleSaveCourseCert">
+          <div class="admin-grid-2col" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label class="form-label">Graduate / Candidate Full Name <span class="req">*</span></label>
+              <input type="text" v-model="courseCertForm.studentName" required class="form-control" placeholder="e.g. Aditya Kumar Sharma">
+            </div>
+
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label class="form-label">Course / Program Completed <span class="req">*</span></label>
+              <input type="text" v-model="courseCertForm.course" required class="form-control" placeholder="e.g. Full Stack MERN Stack & Cloud Engineering">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Program Duration <span class="req">*</span></label>
+              <select v-model="courseCertForm.duration" class="form-control" required>
+                <option value="1 Month Fast-Track">1 Month Fast-Track</option>
+                <option value="3 Months Intensive">3 Months Intensive</option>
+                <option value="6 Months Masterclass">6 Months Masterclass</option>
+                <option value="1 Year Advanced Diploma">1 Year Advanced Diploma</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Performance / Grade Awarded <span class="req">*</span></label>
+              <select v-model="courseCertForm.grade" class="form-control" required>
+                <option value="Grade O (Outstanding)">Grade O (Outstanding)</option>
+                <option value="Grade A+ (Distinction)">Grade A+ (Distinction)</option>
+                <option value="Grade A (Excellent)">Grade A (Excellent)</option>
+                <option value="Grade B+ (Good)">Grade B+ (Good)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Date of Issuance <span class="req">*</span></label>
+              <input type="date" v-model="courseCertForm.issueDate" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Certificate Serial ID</label>
+              <input type="text" v-model="courseCertForm.certNo" class="form-control" style="font-family: var(--font-mono); font-weight: 700; color: #fb923c;" placeholder="Auto-generated if blank">
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.6rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 0.85rem; border-top: 1px solid rgba(255,255,255,0.08);">
+            <button type="button" class="btn-secondary" @click="showCourseCertModal = false">Cancel</button>
+            <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #ea580c, #f97316); border-color: #ea580c;">
+              <span>Generate & Register Certificate 🎓</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Issue Experience Certificate Modal (SuperAdmin Only) -->
+    <div class="modal-overlay" v-if="showExpCertModal" @click.self="showExpCertModal = false">
+      <div class="modal-card" style="max-width: 680px; text-align: left;">
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <span style="font-size: 1.5rem;">💼</span>
+            <div>
+              <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: #10b981;">
+                Issue Experience & Internship Certificate
+              </h3>
+              <p style="margin: 0.15rem 0 0 0; font-size: 0.78rem; color: var(--text-muted);">
+                Generate official IT HUNT corporate work experience letter on company letterhead
+              </p>
+            </div>
+          </div>
+          <button class="modal-close-btn" @click="showExpCertModal = false">✕</button>
+        </div>
+
+        <form @submit.prevent="handleSaveExpCert">
+          <div class="admin-grid-2col" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label class="form-label">Candidate / Engineer Name <span class="req">*</span></label>
+              <input type="text" v-model="expCertForm.studentName" required class="form-control" placeholder="e.g. Anup Mishra">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Designation / Role <span class="req">*</span></label>
+              <input type="text" v-model="expCertForm.role" required class="form-control" placeholder="e.g. Full Stack Developer Intern">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Department <span class="req">*</span></label>
+              <input type="text" v-model="expCertForm.department" required class="form-control" placeholder="e.g. Software Solutions & Cloud Architecture">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Tenure Duration <span class="req">*</span></label>
+              <select v-model="expCertForm.duration" class="form-control" required>
+                <option value="3 Months">3 Months</option>
+                <option value="6 Months">6 Months</option>
+                <option value="9 Months">9 Months</option>
+                <option value="1 Year">1 Year</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Performance Appraisal <span class="req">*</span></label>
+              <select v-model="expCertForm.performance" class="form-control" required>
+                <option value="Outstanding and Highly Commended">Outstanding and Highly Commended</option>
+                <option value="Excellent and Commendable">Excellent and Commendable</option>
+                <option value="Very Good and Dedicated">Very Good and Dedicated</option>
+                <option value="Good and Satisfactory">Good and Satisfactory</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Start Date <span class="req">*</span></label>
+              <input type="date" v-model="expCertForm.startDate" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">End Date <span class="req">*</span></label>
+              <input type="date" v-model="expCertForm.endDate" class="form-control" required>
+            </div>
+
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label class="form-label">Tech Stack & Projects Mastered <span class="req">*</span></label>
+              <input type="text" v-model="expCertForm.technologies" required class="form-control" placeholder="e.g. React.js, Node.js, Express, MongoDB, REST APIs, Git & Cloud Hosting">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Date of Issuance <span class="req">*</span></label>
+              <input type="date" v-model="expCertForm.issueDate" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Reference / Certificate ID</label>
+              <input type="text" v-model="expCertForm.certNo" class="form-control" style="font-family: var(--font-mono); font-weight: 700; color: #34d399;" placeholder="Auto-generated if blank">
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.6rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 0.85rem; border-top: 1px solid rgba(255,255,255,0.08);">
+            <button type="button" class="btn-secondary" @click="showExpCertModal = false">Cancel</button>
+            <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); border-color: #10b981;">
+              <span>Generate Experience Letter 💼</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Official Certificate Interactive Preview Modal -->
+    <CertificatePreviewModal 
+      v-if="showCertPreviewModal && selectedCertForPreview"
+      :certData="selectedCertForPreview"
+      @close="showCertPreviewModal = false"
+    />
   </section>
 </template>
 
@@ -1942,6 +2253,11 @@ import {
   deleteRsvpFromBackend,
   deleteReviewFromBackend
 } from '../../utils/apiClient.js';
+import CertificatePreviewModal from '../modals/CertificatePreviewModal.vue';
+import { 
+  generateCourseCertificatePdf, 
+  generateExperienceCertificatePdf 
+} from '../../utils/certificatePdfGenerator.js';
 
 const props = defineProps({
   content: {
@@ -3082,6 +3398,203 @@ const refreshAllData = async () => {
   }
 };
 
+// Certificate Generation & Management State (SuperAdmin Only)
+const showCourseCertModal = ref(false);
+const showExpCertModal = ref(false);
+const showCertPreviewModal = ref(false);
+const selectedCertForPreview = ref(null);
+const certFilter = ref('all');
+const certSearch = ref('');
+
+const courseCertForm = ref({
+  studentName: '',
+  course: 'Full Stack MERN Stack & Cloud Engineering',
+  duration: '6 Months Masterclass',
+  grade: 'Grade A+ (Distinction)',
+  issueDate: new Date().toISOString().split('T')[0],
+  certNo: ''
+});
+
+const expCertForm = ref({
+  studentName: '',
+  role: 'Full Stack Developer Intern',
+  department: 'Software Solutions & Cloud Architecture',
+  duration: '6 Months',
+  startDate: '',
+  endDate: '',
+  technologies: 'React.js, Node.js, Express, MongoDB, REST APIs, Git & Cloud Hosting',
+  performance: 'Outstanding and Highly Commended',
+  issueDate: new Date().toISOString().split('T')[0],
+  certNo: ''
+});
+
+const filteredCertificates = computed(() => {
+  let list = certificatesList.value || [];
+  if (certFilter.value === 'course') {
+    list = list.filter(c => c.type !== 'experience');
+  } else if (certFilter.value === 'experience') {
+    list = list.filter(c => c.type === 'experience');
+  }
+  const q = certSearch.value.trim().toLowerCase();
+  if (!q) return list;
+  return list.filter(c => {
+    const name = (c.studentName || c.candidateName || '').toLowerCase();
+    const id = (c.certNo || c.certificateNumber || '').toLowerCase();
+    const course = (c.course || c.courseName || '').toLowerCase();
+    const role = (c.role || c.designation || '').toLowerCase();
+    return name.includes(q) || id.includes(q) || course.includes(q) || role.includes(q);
+  });
+});
+
+const openIssueCourseCertModal = (prefill = {}) => {
+  courseCertForm.value = {
+    studentName: prefill.name || prefill.candidateName || prefill.studentName || '',
+    course: prefill.course || 'Full Stack MERN Stack & Cloud Engineering',
+    duration: prefill.duration || '6 Months Masterclass',
+    grade: prefill.grade || 'Grade A+ (Distinction)',
+    issueDate: new Date().toISOString().split('T')[0],
+    certNo: `ITH-CERT-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`
+  };
+  showCourseCertModal.value = true;
+};
+
+const openIssueExpCertModal = (prefill = {}) => {
+  const today = new Date();
+  const sixMonthsAgo = new Date();
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+  expCertForm.value = {
+    studentName: prefill.name || prefill.candidateName || prefill.studentName || '',
+    role: prefill.role || prefill.track || 'Full Stack Developer Intern',
+    department: prefill.department || 'Software Solutions & Cloud Architecture',
+    duration: prefill.duration || '6 Months',
+    startDate: prefill.startDate || sixMonthsAgo.toISOString().split('T')[0],
+    endDate: prefill.endDate || today.toISOString().split('T')[0],
+    technologies: prefill.technologies || 'React.js, Node.js, Express, MongoDB, REST APIs, Git & Cloud Hosting',
+    performance: prefill.performance || 'Outstanding and Highly Commended',
+    issueDate: today.toISOString().split('T')[0],
+    certNo: `ITH-EXP-${today.getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`
+  };
+  showExpCertModal.value = true;
+};
+
+const openIssueCourseCertModalForStudent = (stu) => {
+  openIssueCourseCertModal({
+    name: stu.candidateName || stu.fullName || stu.name,
+    course: stu.course,
+    duration: '6 Months Masterclass'
+  });
+};
+
+const handleSaveCourseCert = async () => {
+  const f = courseCertForm.value;
+  const certId = f.certNo || `ITH-CERT-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+  const payload = {
+    type: 'course',
+    certNo: certId,
+    certificateNumber: certId,
+    studentName: f.studentName.trim(),
+    candidateName: f.studentName.trim(),
+    course: f.course.trim(),
+    duration: f.duration,
+    grade: f.grade,
+    issueDate: f.issueDate,
+    status: 'Verified & Active',
+    verificationUrl: `https://ithunt.vercel.app/api/certificates/verify/${certId}`
+  };
+
+  try {
+    const res = await API.issueCertificate(payload);
+    const created = res.data || res.certificate || payload;
+    certificatesList.value.unshift(created);
+    showCourseCertModal.value = false;
+    emailActionMsg.value = `✓ Course Certificate ${certId} issued successfully for ${f.studentName}!`;
+    setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+    selectedCertForPreview.value = created;
+    showCertPreviewModal.value = true;
+  } catch (err) {
+    console.warn('Save certificate error:', err.message);
+    certificatesList.value.unshift(payload);
+    showCourseCertModal.value = false;
+    selectedCertForPreview.value = payload;
+    showCertPreviewModal.value = true;
+  }
+};
+
+const handleSaveExpCert = async () => {
+  const f = expCertForm.value;
+  const certId = f.certNo || `ITH-EXP-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+  const payload = {
+    type: 'experience',
+    certNo: certId,
+    certificateNumber: certId,
+    studentName: f.studentName.trim(),
+    candidateName: f.studentName.trim(),
+    role: f.role.trim(),
+    designation: f.role.trim(),
+    course: f.role.trim(),
+    department: f.department.trim(),
+    duration: f.duration,
+    startDate: f.startDate,
+    endDate: f.endDate,
+    technologies: f.technologies,
+    performance: f.performance,
+    grade: f.performance,
+    issueDate: f.issueDate,
+    status: 'Verified & Active',
+    verificationUrl: `https://ithunt.vercel.app/api/certificates/verify/${certId}`
+  };
+
+  try {
+    const res = await API.issueCertificate(payload);
+    const created = res.data || res.certificate || payload;
+    certificatesList.value.unshift(created);
+    showExpCertModal.value = false;
+    emailActionMsg.value = `✓ Experience Letter ${certId} generated successfully for ${f.studentName}!`;
+    setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+    selectedCertForPreview.value = created;
+    showCertPreviewModal.value = true;
+  } catch (err) {
+    console.warn('Save experience certificate error:', err.message);
+    certificatesList.value.unshift(payload);
+    showExpCertModal.value = false;
+    selectedCertForPreview.value = payload;
+    showCertPreviewModal.value = true;
+  }
+};
+
+const handlePreviewCertificate = (cert) => {
+  selectedCertForPreview.value = cert;
+  showCertPreviewModal.value = true;
+};
+
+const handleDownloadCertPdf = (cert) => {
+  if (cert.type === 'experience') {
+    generateExperienceCertificatePdf(cert);
+  } else {
+    generateCourseCertificatePdf(cert);
+  }
+};
+
+const handleDeleteCertificate = async (cert) => {
+  const id = cert.id || cert._id || cert.certNo;
+  const label = cert.certNo || cert.studentName;
+  if (!confirm(`Are you sure you want to delete certificate ${label}?`)) return;
+
+  const idx = certificatesList.value.findIndex(c => (c.id === id || c.certNo === cert.certNo));
+  if (idx !== -1) {
+    certificatesList.value.splice(idx, 1);
+  }
+
+  try {
+    await API.deleteCertificate(id);
+    emailActionMsg.value = `✓ Certificate ${label} deleted from registry.`;
+  } catch (err) {
+    console.warn('Delete certificate error:', err.message);
+  }
+  setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+};
+
 onMounted(() => {
   sessionTime.value = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   refreshAllData();
@@ -3504,5 +4017,132 @@ body.light-theme .admin-data-table th {
   accent-color: #f97316;
   width: 18px;
   height: 18px;
+}
+
+/* ==========================================================================
+   SuperAdmin Responsive Media Queries
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .superadmin-stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+  .admin-grid-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 860px) {
+  .admin-control-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .admin-quick-actions {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0.5rem;
+  }
+
+  .admin-action-btn, .admin-logout-btn {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+  }
+
+  .panel-header-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .panel-filter-group {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 0.75rem;
+  }
+
+  .events-search-box {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .admin-select-filter {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .superadmin-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-profile-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .admin-user-name {
+    font-size: 1.25rem;
+  }
+
+  .admin-meta-sub {
+    font-size: 0.75rem;
+  }
+
+  .admin-tabs-nav-bar {
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.4rem;
+  }
+
+  .admin-nav-tab-btn {
+    padding: 0.55rem 0.85rem;
+    font-size: 0.78rem;
+    gap: 0.35rem;
+  }
+
+  .tab-badge-counter {
+    padding: 0.1rem 0.35rem;
+    font-size: 0.65rem;
+  }
+
+  .modal-card {
+    width: 95% !important;
+    max-width: 95% !important;
+    margin: 1rem auto !important;
+    padding: 1.25rem !important;
+  }
+
+  .admin-data-table th,
+  .admin-data-table td {
+    padding: 0.75rem 0.65rem;
+    font-size: 0.8rem;
+  }
+
+  .superadmin-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-control-bar {
+    padding: 1rem !important;
+  }
+
+  .admin-quick-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .admin-action-btn, .admin-logout-btn {
+    width: 100%;
+  }
 }
 </style>
