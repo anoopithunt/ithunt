@@ -4933,7 +4933,7 @@ body.light-theme .admin-role-badge {
 }
 
 body.light-theme .admin-nav-tab-btn.active {
-  color: #0f172a !important;
+  color: #000000 !important;
   background: rgba(249, 115, 22, 0.15);
 }
 
@@ -5416,7 +5416,7 @@ body.light-theme .admin-data-table th {
 :global(body.light-theme) .admin-shell,
 .admin-shell.light-theme {
   background: #f4f6fb !important;
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 /* --- SIDEBAR --- */
@@ -5517,7 +5517,7 @@ body.light-theme .admin-data-table th {
 
 :global(body.light-theme) .brand-sub-badge,
 .admin-shell.light-theme .brand-sub-badge {
-  color: #475569 !important;
+  color: #000000 !important;
 }
 
 .sidebar-collapse-btn {
@@ -5540,7 +5540,7 @@ body.light-theme .admin-data-table th {
 .admin-shell.light-theme .sidebar-collapse-btn {
   background: #f1f5f9 !important;
   border-color: #cbd5e1 !important;
-  color: #334155 !important;
+  color: #000000 !important;
 }
 
 .sidebar-collapse-btn:hover {
@@ -5551,7 +5551,7 @@ body.light-theme .admin-data-table th {
 :global(body.light-theme) .sidebar-collapse-btn:hover,
 .admin-shell.light-theme .sidebar-collapse-btn:hover {
   background: #e2e8f0 !important;
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 .sidebar-user-pill {
@@ -5619,7 +5619,7 @@ body.light-theme .admin-data-table th {
 
 :global(body.light-theme) .sidebar-user-name,
 .admin-shell.light-theme .sidebar-user-name {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 .sidebar-user-role {
@@ -5633,7 +5633,7 @@ body.light-theme .admin-data-table th {
 
 :global(body.light-theme) .sidebar-user-role,
 .admin-shell.light-theme .sidebar-user-role {
-  color: #64748b !important;
+  color: #000000 !important;
 }
 
 .sidebar-nav-scroll {
@@ -5664,7 +5664,7 @@ body.light-theme .admin-data-table th {
 
 :global(body.light-theme) .nav-group-label,
 .admin-shell.light-theme .nav-group-label {
-  color: #64748b !important;
+  color: #000000 !important;
 }
 
 .sidebar-nav-item,
@@ -5691,7 +5691,7 @@ body.light-theme .admin-data-table th {
 :global(body.light-theme) .nav-item-btn,
 .admin-shell.light-theme .sidebar-nav-item,
 .admin-shell.light-theme .nav-item-btn {
-  color: #334155 !important;
+  color: #000000 !important;
 }
 
 .sidebar-nav-item:hover,
@@ -5706,7 +5706,7 @@ body.light-theme .admin-data-table th {
 .admin-shell.light-theme .sidebar-nav-item:hover,
 .admin-shell.light-theme .nav-item-btn:hover {
   background: #f1f5f9 !important;
-  color: #0f172a !important;
+  color: #000000 !important;
   border-color: #e2e8f0 !important;
 }
 
@@ -5808,13 +5808,13 @@ body.light-theme .admin-data-table th {
 
 :global(body.light-theme) .sidebar-footer-btn,
 .admin-shell.light-theme .sidebar-footer-btn {
-  color: #334155 !important;
+  color: #000000 !important;
 }
 
 :global(body.light-theme) .sidebar-footer-btn:hover,
 .admin-shell.light-theme .sidebar-footer-btn:hover {
   background: #f1f5f9 !important;
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 .sidebar-footer-btn.logout-btn,
@@ -5899,7 +5899,7 @@ body.light-theme .admin-data-table th {
 .admin-shell.light-theme .admin-mobile-toggle {
   background: #f1f5f9 !important;
   border-color: #cbd5e1 !important;
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 .admin-breadcrumb {
@@ -5934,7 +5934,7 @@ body.light-theme .admin-data-table th {
 
 :global(body.light-theme) .breadcrumb-current,
 .admin-shell.light-theme .breadcrumb-current {
-  color: #0f172a !important;
+  color: #000000 !important;
   font-weight: 800 !important;
 }
 
@@ -5970,7 +5970,7 @@ body.light-theme .admin-data-table th {
 .admin-shell.light-theme .command-search-input {
   background: #f1f5f9 !important;
   border-color: #cbd5e1 !important;
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 .command-search-input:focus {
@@ -6224,7 +6224,7 @@ body.light-theme .admin-data-table th {
 
 :global(body.light-theme) .welcome-title,
 .admin-shell.light-theme .welcome-title {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 .welcome-desc {
@@ -6235,7 +6235,7 @@ body.light-theme .admin-data-table th {
 
 :global(body.light-theme) .welcome-desc,
 .admin-shell.light-theme .welcome-desc {
-  color: #475569 !important;
+  color: #000000 !important;
 }
 
 .welcome-actions-group,
@@ -6472,7 +6472,7 @@ body.light-theme .admin-data-table th {
 
 :global(body.light-theme) .kpi-value,
 .admin-shell.light-theme .kpi-value {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 .kpi-label,
@@ -6488,7 +6488,7 @@ body.light-theme .admin-data-table th {
 :global(body.light-theme) .kpi-card-label,
 .admin-shell.light-theme .kpi-label,
 .admin-shell.light-theme .kpi-card-label {
-  color: #475569 !important;
+  color: #000000 !important;
 }
 
 .kpi-meta,
@@ -6556,7 +6556,7 @@ body.light-theme .admin-data-table th {
 
 :global(body.light-theme) .section-block-title,
 .admin-shell.light-theme .section-block-title {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 .launchpad-grid {
@@ -6617,13 +6617,18 @@ body.light-theme .admin-data-table th {
 
 :global(body.light-theme) .launch-title,
 .admin-shell.light-theme .launch-title {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 .launch-desc {
   font-size: 0.7rem;
   color: #64748b;
   line-height: 1.3;
+}
+
+:global(body.light-theme) .launch-desc,
+.admin-shell.light-theme .launch-desc {
+  color: #000000 !important;
 }
 
 .launch-arrow {
@@ -6679,13 +6684,18 @@ body.light-theme .admin-data-table th {
 
 :global(body.light-theme) .box-card-title,
 .admin-shell.light-theme .box-card-title {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 .box-card-sub {
   font-size: 0.74rem;
   color: #64748b;
   margin-top: 0.15rem;
+}
+
+:global(body.light-theme) .box-card-sub,
+.admin-shell.light-theme .box-card-sub {
+  color: #000000 !important;
 }
 
 .box-card-link {
@@ -6722,13 +6732,18 @@ body.light-theme .admin-data-table th {
 
 :global(body.light-theme) .empty-title,
 .admin-shell.light-theme .empty-title {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 .empty-sub {
   font-size: 0.78rem;
   color: #64748b;
   margin-top: 0.25rem;
+}
+
+:global(body.light-theme) .empty-sub,
+.admin-shell.light-theme .empty-sub {
+  color: #000000 !important;
 }
 
 .queue-list {
@@ -6781,7 +6796,7 @@ body.light-theme .admin-data-table th {
 
 :global(body.light-theme) .queue-item-name,
 .admin-shell.light-theme .queue-item-name {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 .queue-item-meta {
@@ -6796,7 +6811,7 @@ body.light-theme .admin-data-table th {
 
 :global(body.light-theme) .queue-item-meta,
 .admin-shell.light-theme .queue-item-meta {
-  color: #64748b !important;
+  color: #000000 !important;
 }
 
 .queue-reg-pill {
@@ -6850,7 +6865,7 @@ body.light-theme .admin-data-table th {
 .admin-shell.light-theme .queue-icon-btn {
   background: #f1f5f9 !important;
   border-color: #cbd5e1 !important;
-  color: #1e293b !important;
+  color: #000000 !important;
 }
 
 .system-health-list {
@@ -6887,7 +6902,7 @@ body.light-theme .admin-data-table th {
 
 :global(body.light-theme) .health-label,
 .admin-shell.light-theme .health-label {
-  color: #334155 !important;
+  color: #000000 !important;
 }
 
 .health-dot-green {
@@ -6907,7 +6922,7 @@ body.light-theme .admin-data-table th {
 
 :global(body.light-theme) .health-value,
 .admin-shell.light-theme .health-value {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 .quick-jump-chips {
@@ -6930,6 +6945,11 @@ body.light-theme .admin-data-table th {
   font-weight: 700;
 }
 
+:global(body.light-theme) .jump-label,
+.admin-shell.light-theme .jump-label {
+  color: #000000 !important;
+}
+
 .jump-chip {
   padding: 0.25rem 0.6rem;
   border-radius: 999px;
@@ -6946,7 +6966,7 @@ body.light-theme .admin-data-table th {
 .admin-shell.light-theme .jump-chip {
   background: #f1f5f9 !important;
   border: 1px solid #cbd5e1 !important;
-  color: #334155 !important;
+  color: #000000 !important;
 }
 
 .jump-chip:hover {
@@ -6992,7 +7012,7 @@ body.light-theme .admin-data-table th {
 
 :global(body.light-theme) .panel-title,
 .admin-shell.light-theme .panel-title {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 .panel-subtitle {
@@ -7003,7 +7023,7 @@ body.light-theme .admin-data-table th {
 
 :global(body.light-theme) .panel-subtitle,
 .admin-shell.light-theme .panel-subtitle {
-  color: #64748b !important;
+  color: #000000 !important;
 }
 
 .panel-filter-group {
@@ -7047,7 +7067,7 @@ textarea.form-control {
 .admin-shell.light-theme textarea.form-control {
   background: #ffffff !important;
   border-color: #cbd5e1 !important;
-  color: #0f172a !important;
+  color: #000000 !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
 }
 
@@ -7103,7 +7123,7 @@ textarea.form-control {
 :global(body.light-theme) .admin-data-table th,
 .admin-shell.light-theme .admin-data-table th {
   background: #f1f5f9 !important;
-  color: #1e293b !important;
+  color: #000000 !important;
   font-weight: 800 !important;
   border-bottom: 2px solid #cbd5e1 !important;
 }
@@ -7117,7 +7137,7 @@ textarea.form-control {
 
 :global(body.light-theme) .admin-data-table td,
 .admin-shell.light-theme .admin-data-table td {
-  color: #1e293b !important;
+  color: #000000 !important;
   border-bottom: 1px solid #f1f5f9 !important;
 }
 
@@ -7156,7 +7176,7 @@ textarea.form-control {
 
 :global(body.light-theme) .admin-track-pill,
 .admin-shell.light-theme .admin-track-pill {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 .admin-status-chip {
@@ -7173,13 +7193,13 @@ textarea.form-control {
 .admin-shell.light-theme .btn-secondary {
   background: #f1f5f9 !important;
   border: 1px solid #cbd5e1 !important;
-  color: #1e293b !important;
+  color: #000000 !important;
 }
 
 :global(body.light-theme) .btn-secondary:hover,
 .admin-shell.light-theme .btn-secondary:hover {
   background: #e2e8f0 !important;
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 /* ==========================================================================
@@ -7220,7 +7240,7 @@ textarea.form-control {
 .admin-shell.light-theme .modal-card,
 .admin-shell.light-theme .modal-content {
   background: #ffffff !important;
-  color: #0f172a !important;
+  color: #000000 !important;
   border: 1px solid #e2e8f0 !important;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.18) !important;
 }
@@ -7250,7 +7270,7 @@ textarea.form-control {
 :global(body.light-theme) .modal-header h3,
 .admin-shell.light-theme .modal-title,
 .admin-shell.light-theme .modal-header h3 {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 .modal-close-btn {
@@ -7272,7 +7292,7 @@ textarea.form-control {
 .admin-shell.light-theme .modal-close-btn {
   background: #e2e8f0 !important;
   border-color: #cbd5e1 !important;
-  color: #334155 !important;
+  color: #000000 !important;
 }
 
 .modal-footer {
@@ -7303,7 +7323,7 @@ label {
 :global(body.light-theme) label,
 .admin-shell.light-theme .form-label,
 .admin-shell.light-theme label {
-  color: #1e293b !important;
+  color: #000000 !important;
 }
 
 /* Control Center Modal Specific Light Theme */
@@ -7334,13 +7354,13 @@ label {
 .admin-shell.light-theme .preset-badge-btn {
   background: #ffffff !important;
   border: 1px solid #cbd5e1 !important;
-  color: #334155 !important;
+  color: #000000 !important;
 }
 
 :global(body.light-theme) .preset-badge-btn:hover,
 .admin-shell.light-theme .preset-badge-btn:hover {
   background: #f1f5f9 !important;
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 :global(body.light-theme) .toggle-card,
@@ -7357,7 +7377,7 @@ label {
 
 :global(body.light-theme) .toggle-card-title,
 .admin-shell.light-theme .toggle-card-title {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 :global(body.light-theme) .toggle-card.is-active .toggle-card-title,
@@ -7367,14 +7387,14 @@ label {
 
 :global(body.light-theme) .toggle-card-desc,
 .admin-shell.light-theme .toggle-card-desc {
-  color: #64748b !important;
+  color: #000000 !important;
 }
 
 :global(body.light-theme) .status-radio-card,
 .admin-shell.light-theme .status-radio-card {
   background: #ffffff !important;
   border: 1px solid #cbd5e1 !important;
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 :global(body.light-theme) .status-radio-card.is-selected,
