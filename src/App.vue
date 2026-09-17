@@ -39,8 +39,9 @@
       </Transition>
     </div>
 
-    <!-- WhatsApp Floating CTA -->
+    <!-- WhatsApp Floating CTA (Hidden in SuperAdmin console) -->
     <a
+      v-if="activeTab !== 'superadmin'"
       :href="'https://wa.me/' + (content.contact?.whatsapp || '919795771806') + '?text=Hello%20IT%20HUNT%20Team%2C%20I%20want%20to%20know%20more%20about%20your%20internship%20programs.'" 
       target="_blank" 
       rel="noopener noreferrer"
@@ -53,12 +54,13 @@
     </a>
 
 
-    <!-- Navbar Component -->
+    <!-- Navbar Component (Hidden in SuperAdmin mode for dedicated admin experience) -->
     <Navbar 
+      v-if="activeTab !== 'superadmin'"
       :content="content" 
       :activeTab="activeTab" 
       :isDarkMode="isDarkMode" 
-      :studentUser="studentUser"
+      :studentUser="studentUser" 
       :isAdminLoggedIn="isAdminLoggedIn"
       @set-tab="setTab" 
       @toggle-theme="toggleTheme" 
@@ -66,7 +68,7 @@
     />
 
     <!-- Main Dynamic Views with Animated Morph Transition -->
-    <main>
+    <main :class="{ 'superadmin-main-active': activeTab === 'superadmin' }">
       <Transition name="view-morph" mode="out-in">
         <!-- 1. Home Flow -->
         <HeroSection 
@@ -166,6 +168,7 @@
           key="superadmin"
           :content="content" 
           :adminUser="adminUser"
+          :isDarkMode="isDarkMode"
           :allCourses="liveCoursesList"
           :allAdmissions="liveAdmissionsList"
           :allJobApplications="liveJobApplicationsList"
@@ -181,6 +184,7 @@
           :allUsers="liveUsersList"
           @refresh-data="loadInitialData"
           @logout="handleAdminLogout"
+          @toggle-theme="toggleTheme"
           @download-slip="downloadCustomAdmissionSlip"
           @download-nielit-pdf="downloadNielitProjectPdfDoc"
           @add-admission="handleDirectAdmission"
@@ -423,6 +427,7 @@
 
     <!-- Floating Back to Top Action Button -->
     <button 
+      v-if="activeTab !== 'superadmin'"
       class="floating-back-to-top" 
       :class="{ visible: showBackToTop }" 
       @click="scrollToTop" 
