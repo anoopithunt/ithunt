@@ -30,7 +30,7 @@
         </div>
 
         <div class="student-banner-actions">
-          <button class="btn-secondary id-card-btn" @click="showIdCardModal = true" title="View Virtual Student ID Card">
+          <button v-if="showIdCardBtn" class="btn-secondary id-card-btn" @click="showIdCardModal = true" title="View Virtual Student ID Card">
             <span>🪪 View ID Card</span>
           </button>
           <button class="btn-secondary student-logout-btn" @click="handleLogout" title="Sign out of student dashboard">
@@ -39,65 +39,123 @@
         </div>
       </div>
 
-      <!-- 2. Dashboard Sub-Navigation Tabs -->
-      <nav class="dashboard-tab-nav" aria-label="Student Dashboard Sections">
-        <button 
-          v-for="tab in studentTabs" 
-          :key="tab.id"
-          class="dash-nav-btn"
-          :class="{ active: currentTab === tab.id }"
-          @click="currentTab = tab.id"
-        >
-          <span class="dash-tab-icon">{{ tab.icon }}</span>
-          <span class="dash-tab-label">{{ tab.label }}</span>
-          <span v-if="tab.badge" class="dash-tab-badge">{{ tab.badge }}</span>
-        </button>
-      </nav>
+      <!-- Personal SuperAdmin Notice Banner -->
+      <div 
+        v-if="activeNoticeBanner && !isAccountRestricted" 
+        class="student-personal-notice anim-stagger-1"
+        :class="'notice-theme-' + (activeNoticeBanner.type || 'info')"
+      >
+        <div class="notice-icon-box">
+          <span v-if="activeNoticeBanner.type === 'urgent'">🚨</span>
+          <span v-else-if="activeNoticeBanner.type === 'warning'">⚠️</span>
+          <span v-else-if="activeNoticeBanner.type === 'success'">✅</span>
+          <span v-else>📢</span>
+        </div>
+        <div class="notice-content-box">
+          <div class="notice-header-row">
+            <span class="notice-type-tag">{{ (activeNoticeBanner.type || 'NOTICE').toUpperCase() }}</span>
+            <strong class="notice-head-title">{{ activeNoticeBanner.title || 'Official Announcement' }}</strong>
+          </div>
+          <p class="notice-message-text">{{ activeNoticeBanner.message }}</p>
+        </div>
+      </div>
+
+      <!-- Account On Hold / Suspension Screen -->
+      <div v-if="isAccountRestricted" class="account-restricted-card anim-stagger-1">
+        <div class="restricted-icon-wrap">
+          <span v-if="accountRestrictionType === 'SUSPENDED'">🚫</span>
+          <span v-else>⏸️</span>
+        </div>
+        <div class="restricted-badge" :style="{ background: accountRestrictionType === 'SUSPENDED' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.2)', color: accountRestrictionType === 'SUSPENDED' ? '#ef4444' : '#f59e0b' }">
+          {{ accountRestrictionType === 'SUSPENDED' ? 'PORTAL ACCESS REVOKED' : 'ACCOUNT TEMPORARILY ON HOLD' }}
+        </div>
+        <h2 class="restricted-title">
+          {{ accountRestrictionType === 'SUSPENDED' ? 'Student Account Suspended' : 'Student Portal Restricted' }}
+        </h2>
+        <div class="restricted-reason-box">
+          <div class="reason-label">Official Administrative Notice:</div>
+          <p class="reason-text">
+            {{ activeStudent.dashboardControls?.holdReason || activeStudent.holdReason || 'Your dashboard access has been placed on hold by IT HUNT administration. Please visit the admin desk or contact office support to resolve this status.' }}
+          </p>
+        </div>
+        <div class="restricted-contact-actions">
+          <a 
+            href="https://wa.me/919795771806?text=Hello%20IT%20HUNT%20Administration,%20my%20student%20portal%20access%20is%20on%20hold.%20Registration%20No:%20" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            class="btn-primary"
+            style="background: #22c55e; border-color: #22c55e; color: #fff;"
+          >
+            <span>💬 Contact Admin on WhatsApp</span>
+          </a>
+          <button class="btn-secondary" @click="handleLogout">
+            <span>🚪 Logout</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Normal Unrestricted Tabs Section -->
+      <template v-else>
+        <!-- 2. Dashboard Sub-Navigation Tabs -->
+        <nav class="dashboard-tab-nav" aria-label="Student Dashboard Sections">
+          <button 
+            v-for="tab in studentTabs" 
+            :key="tab.id"
+            class="dash-nav-btn"
+            :class="{ active: currentTab === tab.id }"
+            @click="currentTab = tab.id"
+          >
+            <span class="dash-tab-icon">{{ tab.icon }}</span>
+            <span class="dash-tab-label">{{ tab.label }}</span>
+            <span v-if="tab.badge" class="dash-tab-badge">{{ tab.badge }}</span>
+          </button>
+        </nav>
 
       <!-- =============================================================== -->
       <!-- TAB 1: OVERVIEW & ACADEMIC HIGHLIGHTS                           -->
       <!-- =============================================================== -->
       <section v-if="currentTab === 'overview'" class="dash-tab-content">
         <!-- 4 Top KPI Cards -->
+        <!-- Dynamic KPI Cards Grid -->
         <div class="overview-kpi-grid">
           <!-- Card 1: Course -->
-          <div class="kpi-card" @click="currentTab = 'course'">
+          <div class="kpi-card" @click="isTabEnabled('course') ? currentTab = 'course' : null">
             <div class="kpi-icon-wrap" style="background: rgba(249, 115, 22, 0.15); color: var(--color-ai-orange);">
               📚
             </div>
             <div class="kpi-details">
               <div class="kpi-label">Enrolled Program</div>
-              <div class="kpi-val">{{ studentUser.course || 'MERN Stack Web Engineer' }}</div>
-              <div class="kpi-sub" style="color: #10b981;">Progress: 70% Completed →</div>
+              <div class="kpi-val">{{ activeStudent.course || studentUser.course || 'MERN Stack Web Engineer' }}</div>
+              <div class="kpi-sub" style="color: #10b981;">Progress: {{ displayCourseProgress }}% Completed →</div>
             </div>
           </div>
 
           <!-- Card 2: Attendance -->
-          <div class="kpi-card" @click="currentTab = 'attendance'">
+          <div v-if="isTabEnabled('attendance')" class="kpi-card" @click="currentTab = 'attendance'">
             <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
               📋
             </div>
             <div class="kpi-details">
               <div class="kpi-label">Overall Attendance</div>
-              <div class="kpi-val text-gradient">{{ attendanceData.overallPercentage }}%</div>
+              <div class="kpi-val text-gradient">{{ displayAttendanceRate }}</div>
               <div class="kpi-sub" style="color: #10b981;">✓ Eligible for Certification</div>
             </div>
           </div>
 
           <!-- Card 3: Scoreboard / Results -->
-          <div class="kpi-card" @click="currentTab = 'scoreboard'">
+          <div v-if="isTabEnabled('scoreboard')" class="kpi-card" @click="currentTab = 'scoreboard'">
             <div class="kpi-icon-wrap" style="background: rgba(250, 204, 21, 0.15); color: var(--color-ai-yellow);">
               🏆
             </div>
             <div class="kpi-details">
               <div class="kpi-label">Latest Exam Score</div>
-              <div class="kpi-val">94 / 100 <span class="badge-rank">Rank #3</span></div>
-              <div class="kpi-sub" style="color: var(--color-ai-yellow);">Grade A+ (Distinction) →</div>
+              <div class="kpi-val">{{ displayExamScore }} <span class="badge-rank">{{ displayBatchRank }}</span></div>
+              <div class="kpi-sub" style="color: var(--color-ai-yellow);">{{ displayGrade }} →</div>
             </div>
           </div>
 
           <!-- Card 4: Next Public Holiday -->
-          <div class="kpi-card" @click="currentTab = 'calendar'">
+          <div v-if="isTabEnabled('calendar')" class="kpi-card" @click="currentTab = 'calendar'">
             <div class="kpi-icon-wrap" style="background: rgba(6, 182, 212, 0.15); color: var(--color-ai-cyan);">
               📅
             </div>
@@ -111,7 +169,7 @@
           </div>
 
           <!-- Card 5: Certificate & QR Verification -->
-          <div class="kpi-card" @click="currentTab = 'certificates'">
+          <div v-if="isTabEnabled('certificates')" class="kpi-card" @click="currentTab = 'certificates'">
             <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
               🏅
             </div>
@@ -160,16 +218,16 @@
             <div class="schedule-card">
               <div class="schedule-header">
                 <span class="badge-today">TODAY'S LAB SESSION</span>
-                <span class="schedule-time">10:00 AM - 01:00 PM</span>
+                <span class="schedule-time">{{ displayBatchTiming }}</span>
               </div>
               <div class="schedule-topic">
                 <strong>Topic:</strong> Mongoose Aggregation & Pipeline Optimization
               </div>
               <div class="schedule-mentor">
-                <strong>Mentor:</strong> {{ studentUser.mentor || 'Mr. Lakshman Singh Chauhan' }} (Lead Architect)
+                <strong>Mentor:</strong> {{ activeStudent.mentor || studentUser.mentor || 'Mr. Lakshman Singh Chauhan' }} (Lead Architect)
               </div>
               <div class="schedule-room">
-                <strong>Location:</strong> IT HUNT Lab Station 04, Holagarh Campus
+                <strong>Location:</strong> {{ displayLabPc }}, Holagarh Campus
               </div>
             </div>
           </div>
@@ -631,11 +689,11 @@
               </div>
               <div class="meta-pill">
                 <span class="meta-icon">⏰</span>
-                <span>Hours: {{ studentUser.batchTiming || '10:00 AM - 01:00 PM' }}</span>
+                <span>Hours: {{ displayBatchTiming }}</span>
               </div>
               <div class="meta-pill">
                 <span class="meta-icon">📍</span>
-                <span>Station: Workstation #04 (Lab)</span>
+                <span>Station: {{ displayLabPc }}</span>
               </div>
             </div>
 
@@ -643,19 +701,29 @@
             <div class="fee-ledger-box">
               <div class="fee-col">
                 <div class="fee-lbl">Total Program Fee</div>
-                <div class="fee-val">₹{{ (studentUser.totalFee || 15000).toLocaleString() }}</div>
+                <div class="fee-val">{{ displayTotalFee }}</div>
               </div>
               <div class="fee-col">
                 <div class="fee-lbl">Fee Paid to Date</div>
-                <div class="fee-val" style="color: #10b981;">₹{{ (studentUser.paidFee || 15000).toLocaleString() }}</div>
+                <div class="fee-val" style="color: #10b981;">{{ displayFeePaid }}</div>
               </div>
               <div class="fee-col">
                 <div class="fee-lbl">Balance Due</div>
-                <div class="fee-val" style="color: #64748b;">₹{{ (studentUser.balanceFee || 0).toLocaleString() }}</div>
+                <div class="fee-val" style="color: #64748b;">{{ displayFeePending }}</div>
               </div>
               <div class="fee-col fee-status-col">
                 <div class="fee-lbl">Ledger Status</div>
-                <span class="fee-badge-paid">✓ Paid in Full</span>
+                <span 
+                  class="status-pill"
+                  :style="{
+                    background: displayFeeStatus.toLowerCase().includes('paid') ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                    color: displayFeeStatus.toLowerCase().includes('paid') ? '#10b981' : '#f59e0b',
+                    borderColor: displayFeeStatus.toLowerCase().includes('paid') ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)',
+                    fontWeight: '700'
+                  }"
+                >
+                  ✓ {{ displayFeeStatus }}
+                </span>
               </div>
             </div>
           </div>
@@ -1201,6 +1269,7 @@
           </div>
         </div>
       </section>
+      </template>
     </div>
 
     <!-- ================================================================= -->
@@ -1324,8 +1393,8 @@ const emit = defineEmits([
   'go-to-login'
 ]);
 
-// Sub-Navigation Tabs
-const studentTabs = [
+// Sub-Navigation Master Tabs
+const masterStudentTabs = [
   { id: 'overview', label: 'Overview', icon: '📊' },
   { id: 'certificates', label: 'Certificates & QR', icon: '🏅', badge: 'Verified' },
   { id: 'profile', label: 'Student Details', icon: '👤' },
@@ -1335,7 +1404,144 @@ const studentTabs = [
   { id: 'attendance', label: 'Attendance Sheet', icon: '📋' }
 ];
 
+// Reactive Student State with Dynamic Dashboard Controls
+const activeStudent = ref({ ...(props.studentUser || {}) });
+
+const syncLatestStudentProfile = async () => {
+  const targetId = activeStudent.value?.id || activeStudent.value?.registrationNo || activeStudent.value?.userId || activeStudent.value?.enrollmentNumber;
+  if (!targetId) return;
+  try {
+    const res = await API.getStudent(targetId);
+    if (res?.success && (res.data || res.student)) {
+      const fresh = res.data || res.student;
+      activeStudent.value = { ...activeStudent.value, ...fresh };
+      try {
+        localStorage.setItem('ithunt_student_user', JSON.stringify(activeStudent.value));
+      } catch (_) {}
+    }
+  } catch (e) {
+    console.warn('Could not refresh student profile from backend:', e.message);
+  }
+};
+
+// Dynamic Tabs based on SuperAdmin Controls
+const studentTabs = computed(() => {
+  const controls = activeStudent.value?.dashboardControls?.visibleTabs;
+  if (!controls) return masterStudentTabs;
+
+  return masterStudentTabs.filter(tab => {
+    if (tab.id === 'overview') return controls.overview !== false;
+    if (tab.id === 'certificates') return controls.certificates !== false;
+    if (tab.id === 'profile') return true; // Profile is always accessible
+    if (tab.id === 'course') return controls.syllabus !== false;
+    if (tab.id === 'calendar') return controls.holidays !== false;
+    if (tab.id === 'scoreboard') return controls.examScores !== false;
+    if (tab.id === 'attendance') return controls.attendance !== false;
+    return true;
+  });
+});
+
+const isTabEnabled = (tabId) => {
+  return studentTabs.value.some(t => t.id === tabId);
+};
+
 const currentTab = ref('overview');
+
+// Fallback currentTab if hidden by admin
+watch(studentTabs, (tabs) => {
+  if (tabs.length > 0 && !tabs.some(t => t.id === currentTab.value)) {
+    currentTab.value = tabs[0].id;
+  }
+}, { immediate: true });
+
+const showIdCardBtn = computed(() => {
+  return activeStudent.value?.dashboardControls?.visibleTabs?.idCard !== false;
+});
+
+// Personal Notice Banner
+const activeNoticeBanner = computed(() => {
+  const banner = activeStudent.value?.dashboardControls?.noticeBanner;
+  if (banner && banner.enabled && (banner.title || banner.message)) {
+    return banner;
+  }
+  return null;
+});
+
+// Account Status Restriction
+const isAccountRestricted = computed(() => {
+  const status = (
+    activeStudent.value?.dashboardControls?.accountStatus ||
+    activeStudent.value?.accountStatus ||
+    activeStudent.value?.academicStatus ||
+    ''
+  ).toUpperCase();
+  return status === 'ON_HOLD' || status === 'SUSPENDED';
+});
+
+const accountRestrictionType = computed(() => {
+  const status = (
+    activeStudent.value?.dashboardControls?.accountStatus ||
+    activeStudent.value?.accountStatus ||
+    activeStudent.value?.academicStatus ||
+    ''
+  ).toUpperCase();
+  return status === 'SUSPENDED' ? 'SUSPENDED' : 'ON_HOLD';
+});
+
+// Dynamic Academic & Fee Overrides
+const displayAttendanceRate = computed(() => {
+  return activeStudent.value?.dashboardControls?.academicMetrics?.attendanceRate || 
+         (attendanceData?.overallPercentage ? attendanceData.overallPercentage + '%' : '92%');
+});
+
+const displayExamScore = computed(() => {
+  return activeStudent.value?.dashboardControls?.academicMetrics?.examScore || '94 / 100';
+});
+
+const displayBatchRank = computed(() => {
+  return activeStudent.value?.dashboardControls?.academicMetrics?.batchRank || 'Rank #3';
+});
+
+const displayGrade = computed(() => {
+  return activeStudent.value?.dashboardControls?.academicMetrics?.grade || 'Grade A+ (Distinction)';
+});
+
+const displayCourseProgress = computed(() => {
+  const val = activeStudent.value?.dashboardControls?.academicMetrics?.courseProgress;
+  return val !== undefined ? val : 70;
+});
+
+const displayLabPc = computed(() => {
+  return activeStudent.value?.dashboardControls?.academicMetrics?.labPcNumber || 'Workstation #04 (Lab A)';
+});
+
+const displayBatchTiming = computed(() => {
+  return activeStudent.value?.dashboardControls?.academicMetrics?.batchTiming || 
+         activeStudent.value?.batchTiming || 
+         'Morning 10:00 AM - 01:00 PM';
+});
+
+const displayFeeStatus = computed(() => {
+  return activeStudent.value?.dashboardControls?.feeLedger?.feeStatus || 
+         activeStudent.value?.feeStatus || 
+         'Verified & Paid';
+});
+
+const displayTotalFee = computed(() => {
+  return activeStudent.value?.dashboardControls?.feeLedger?.totalFee || 
+         (activeStudent.value?.totalFee ? '₹' + Number(activeStudent.value.totalFee).toLocaleString() : '₹15,000');
+});
+
+const displayFeePaid = computed(() => {
+  return activeStudent.value?.dashboardControls?.feeLedger?.feePaid || 
+         activeStudent.value?.amountPaid || 
+         (activeStudent.value?.paidFee ? '₹' + Number(activeStudent.value.paidFee).toLocaleString() : '₹15,000');
+});
+
+const displayFeePending = computed(() => {
+  return activeStudent.value?.dashboardControls?.feeLedger?.feePending || 
+         (activeStudent.value?.balanceFee ? '₹' + Number(activeStudent.value.balanceFee).toLocaleString() : '₹0');
+});
 const showIdCardModal = ref(false);
 const successMsg = ref('');
 
@@ -1419,9 +1625,13 @@ const loadStudentCertificates = async () => {
   }
 };
 
-watch(() => props.studentUser, () => {
+watch(() => props.studentUser, (newVal) => {
+  if (newVal) {
+    activeStudent.value = { ...activeStudent.value, ...newVal };
+  }
+  syncLatestStudentProfile();
   loadStudentCertificates();
-}, { immediate: true });
+}, { immediate: true, deep: true });
 
 const handlePreviewStudentCert = (cert) => {
   selectedCertForPreview.value = cert;
@@ -3729,5 +3939,162 @@ const handleLogout = () => {
   gap: 0.5rem 1rem;
   font-size: 0.85rem;
   color: #e2e8f0;
+}
+
+/* ==========================================================================
+   Student Portal Notice Banner & Account Hold Styles
+   ========================================================================== */
+.student-personal-notice {
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.notice-icon-box {
+  font-size: 1.8rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.notice-content-box {
+  flex: 1;
+}
+
+.notice-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.notice-type-tag {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+}
+
+.notice-head-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.notice-message-text {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--text-main);
+}
+
+.notice-theme-info {
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(14, 165, 233, 0.4);
+}
+.notice-theme-info .notice-type-tag {
+  background: #0ea5e9;
+  color: #fff;
+}
+
+.notice-theme-warning {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+}
+.notice-theme-warning .notice-type-tag {
+  background: #f59e0b;
+  color: #000;
+}
+
+.notice-theme-urgent {
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.2);
+}
+.notice-theme-urgent .notice-type-tag {
+  background: #ef4444;
+  color: #fff;
+}
+
+.notice-theme-success {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+.notice-theme-success .notice-type-tag {
+  background: #10b981;
+  color: #fff;
+}
+
+/* Account Restricted Screen */
+.account-restricted-card {
+  margin: 2rem auto;
+  max-width: 620px;
+  background: var(--bg-card-glass);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: var(--radius-xl);
+  padding: 3rem 2rem;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(239, 68, 68, 0.15);
+}
+
+.restricted-icon-wrap {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+}
+
+.restricted-badge {
+  display: inline-block;
+  padding: 0.25rem 0.85rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.85rem;
+}
+
+.restricted-title {
+  font-family: var(--font-heading);
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.restricted-reason-box {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1.75rem;
+  text-align: left;
+}
+
+.reason-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+
+.reason-text {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #f1f5f9;
+}
+
+.restricted-contact-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 </style>

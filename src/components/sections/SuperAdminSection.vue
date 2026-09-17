@@ -343,6 +343,15 @@
                       🏅 Issue Cert
                     </button>
                     <button 
+                      type="button"
+                      class="admin-icon-btn" 
+                      title="Control Student Dashboard Features, Modules, Announcements & Access"
+                      style="color: #c084fc; border-color: rgba(192, 132, 252, 0.4); background: rgba(192, 132, 252, 0.1); font-weight: 700;"
+                      @click="openDashboardControlModal(stu)"
+                    >
+                      🎛️ Controls
+                    </button>
+                    <button 
                       v-if="stu.admissionConfirmed || stu.status === 'Confirmed'"
                       class="admin-icon-btn" 
                       title="View Student Portal Login Credentials"
@@ -589,6 +598,16 @@
                       style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.4);"
                     >
                       🔑 Reset Pass
+                    </button>
+                    <button 
+                      v-if="adm.status === 'Confirmed' || adm.admissionConfirmed"
+                      type="button"
+                      class="admin-icon-btn" 
+                      @click="openDashboardControlModal(adm)" 
+                      title="Control Student Dashboard Features, Modules, Announcements & Access"
+                      style="color: #c084fc; border-color: rgba(192, 132, 252, 0.4); background: rgba(192, 132, 252, 0.1); font-weight: 700;"
+                    >
+                      🎛️ Controls
                     </button>
 
                     <button 
@@ -1786,6 +1805,14 @@
           </div>
         </div>
         <div class="modal-footer" style="padding: 1rem 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button 
+            type="button"
+            class="btn-primary" 
+            style="background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%); border-color: #a855f7; color: #fff;" 
+            @click="showStudentDetailModal = false; openDashboardControlModal(selectedStudentDetail)"
+          >
+            🎛️ Configure Dashboard
+          </button>
           <button class="btn-secondary" @click="showStudentDetailModal = false">Close Profile</button>
         </div>
       </div>
@@ -2223,6 +2250,362 @@
       :certData="selectedCertForPreview"
       @close="showCertPreviewModal = false"
     />
+
+    <!-- Student Dashboard Control Center Modal (SuperAdmin Full Control) -->
+    <div class="modal-overlay" v-if="showDashboardControlModal && selectedStudentControl" @click.self="showDashboardControlModal = false">
+      <div class="modal-card control-center-modal" style="max-width: 860px; max-height: 90vh; display: flex; flex-direction: column; padding: 0; overflow: hidden; text-align: left;">
+        
+        <!-- Modal Sticky Header -->
+        <div class="modal-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(15, 23, 42, 0.95); display: flex; justify-content: space-between; align-items: center; z-index: 10;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35);">
+              🎛️
+            </div>
+            <div>
+              <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: #f3e8ff;">
+                Student Dashboard Control Center
+              </h3>
+              <p style="margin: 0.15rem 0 0 0; font-size: 0.78rem; color: var(--text-muted);">
+                Fully customize what this student sees, access permissions, notices & academic indicators
+              </p>
+            </div>
+          </div>
+          <button class="modal-close-btn" @click="showDashboardControlModal = false">✕</button>
+        </div>
+
+        <!-- Student Quick Identity Banner -->
+        <div style="padding: 0.85rem 1.5rem; background: rgba(168, 85, 247, 0.08); border-bottom: 1px solid rgba(168, 85, 247, 0.2); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+          <div>
+            <span style="font-size: 0.72rem; color: #c084fc; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">TARGET STUDENT</span>
+            <div style="font-weight: 800; font-size: 1rem; color: var(--text-main);">
+              {{ selectedStudentControl.name || selectedStudentControl.candidateName || selectedStudentControl.fullName }}
+              <span style="font-size: 0.78rem; font-weight: 600; color: var(--color-ai-orange); margin-left: 0.5rem; font-family: var(--font-mono);">
+                [{{ selectedStudentControl.enrollmentNumber || selectedStudentControl.registrationNo || selectedStudentControl.id }}]
+              </span>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 0.78rem; color: var(--text-muted);">Current Status:</span>
+            <span 
+              class="status-pill"
+              :style="{
+                background: dashboardControlForm.accountStatus === 'ACTIVE' ? 'rgba(16, 185, 129, 0.15)' : dashboardControlForm.accountStatus === 'ON_HOLD' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                color: dashboardControlForm.accountStatus === 'ACTIVE' ? '#10b981' : dashboardControlForm.accountStatus === 'ON_HOLD' ? '#f59e0b' : '#ef4444',
+                borderColor: dashboardControlForm.accountStatus === 'ACTIVE' ? 'rgba(16, 185, 129, 0.3)' : dashboardControlForm.accountStatus === 'ON_HOLD' ? 'rgba(245, 158, 11, 0.3)' : 'rgba(239, 68, 68, 0.3)',
+                fontWeight: '700'
+              }"
+            >
+              ● {{ dashboardControlForm.accountStatus }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Quick Presets Toolbar -->
+        <div style="padding: 0.75rem 1.5rem; background: rgba(0,0,0,0.25); border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+          <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">⚡ Quick Presets:</span>
+          <button type="button" class="preset-badge-btn" @click="applyDashboardPreset('all')">✨ Enable Everything</button>
+          <button type="button" class="preset-badge-btn" @click="applyDashboardPreset('minimal')">📄 Minimal (Overview + Syllabus)</button>
+          <button type="button" class="preset-badge-btn" @click="applyDashboardPreset('exam')">🏆 Exam Season</button>
+          <button type="button" class="preset-badge-btn" @click="applyDashboardPreset('cert')">🏅 Certificate Ready</button>
+          <button type="button" class="preset-badge-btn" @click="applyDashboardPreset('hold')">⏸️ Restrict & Place on Hold</button>
+        </div>
+
+        <!-- Scrollable Modal Body -->
+        <div class="modal-body" style="padding: 1.5rem; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 1.5rem;">
+          
+          <!-- SECTION 1: TAB & FEATURE VISIBILITY -->
+          <div class="control-card-section">
+            <div class="section-badge-title">
+              <span>👁️</span> 1. Student Dashboard Tabs & Features Visibility
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
+              Turn tabs and portal capabilities ON or OFF for this specific student in real-time.
+            </p>
+
+            <div class="toggle-cards-grid">
+              <!-- Tab: Overview -->
+              <label class="toggle-card" :class="{ 'is-active': dashboardControlForm.visibleTabs.overview }">
+                <div class="toggle-card-info">
+                  <div class="toggle-card-title">
+                    <span>📊</span> Main Overview Tab
+                  </div>
+                  <div class="toggle-card-desc">Executive KPIs, summary cards & quick timetable</div>
+                </div>
+                <input type="checkbox" v-model="dashboardControlForm.visibleTabs.overview" class="custom-switch-input">
+              </label>
+
+              <!-- Tab: Certificates & QR -->
+              <label class="toggle-card" :class="{ 'is-active': dashboardControlForm.visibleTabs.certificates }">
+                <div class="toggle-card-info">
+                  <div class="toggle-card-title">
+                    <span>🏅</span> Certificates & QR Verification
+                  </div>
+                  <div class="toggle-card-desc">Verified diplomas, QR code scanner & verification portal</div>
+                </div>
+                <input type="checkbox" v-model="dashboardControlForm.visibleTabs.certificates" class="custom-switch-input">
+              </label>
+
+              <!-- Tab: Exam Scoreboard -->
+              <label class="toggle-card" :class="{ 'is-active': dashboardControlForm.visibleTabs.examScores }">
+                <div class="toggle-card-info">
+                  <div class="toggle-card-title">
+                    <span>🏆</span> Exam Results & Scoreboard
+                  </div>
+                  <div class="toggle-card-desc">Mid-term/final tests, subject marks & batch rank</div>
+                </div>
+                <input type="checkbox" v-model="dashboardControlForm.visibleTabs.examScores" class="custom-switch-input">
+              </label>
+
+              <!-- Tab: Attendance Register -->
+              <label class="toggle-card" :class="{ 'is-active': dashboardControlForm.visibleTabs.attendance }">
+                <div class="toggle-card-info">
+                  <div class="toggle-card-title">
+                    <span>📋</span> Attendance Sheet & Register
+                  </div>
+                  <div class="toggle-card-desc">Daily check-ins, monthly attendance % and leave tracker</div>
+                </div>
+                <input type="checkbox" v-model="dashboardControlForm.visibleTabs.attendance" class="custom-switch-input">
+              </label>
+
+              <!-- Tab: Course Syllabus -->
+              <label class="toggle-card" :class="{ 'is-active': dashboardControlForm.visibleTabs.syllabus }">
+                <div class="toggle-card-info">
+                  <div class="toggle-card-title">
+                    <span>📚</span> Course Syllabus & Modules
+                  </div>
+                  <div class="toggle-card-desc">Modular milestones, lab curriculum and course progress</div>
+                </div>
+                <input type="checkbox" v-model="dashboardControlForm.visibleTabs.syllabus" class="custom-switch-input">
+              </label>
+
+              <!-- Tab: Public Holidays -->
+              <label class="toggle-card" :class="{ 'is-active': dashboardControlForm.visibleTabs.holidays }">
+                <div class="toggle-card-info">
+                  <div class="toggle-card-title">
+                    <span>📅</span> Public Holidays Calendar
+                  </div>
+                  <div class="toggle-card-desc">2026 academic holidays, festival dates & institute leaves</div>
+                </div>
+                <input type="checkbox" v-model="dashboardControlForm.visibleTabs.holidays" class="custom-switch-input">
+              </label>
+
+              <!-- Feature: Virtual Student ID Card -->
+              <label class="toggle-card" :class="{ 'is-active': dashboardControlForm.visibleTabs.idCard }">
+                <div class="toggle-card-info">
+                  <div class="toggle-card-title">
+                    <span>🪪</span> Virtual Student ID Card
+                  </div>
+                  <div class="toggle-card-desc">Digital badge modal, institute QR code & download button</div>
+                </div>
+                <input type="checkbox" v-model="dashboardControlForm.visibleTabs.idCard" class="custom-switch-input">
+              </label>
+            </div>
+          </div>
+
+          <!-- SECTION 2: PERSONAL ANNOUNCEMENT / NOTICE BANNER -->
+          <div class="control-card-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div class="section-badge-title">
+                <span>📢</span> 2. Personal Student Alert / Notice Banner
+              </div>
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.82rem; font-weight: 700; color: #38bdf8;">
+                <input type="checkbox" v-model="dashboardControlForm.noticeBanner.enabled">
+                <span>Display Banner on Student's Dashboard</span>
+              </label>
+            </div>
+            
+            <div v-if="dashboardControlForm.noticeBanner.enabled" style="display: flex; flex-direction: column; gap: 0.85rem; padding-top: 0.5rem;">
+              <div class="admin-grid-2col" style="grid-template-columns: 180px 1fr; gap: 0.85rem;">
+                <div class="form-group">
+                  <label class="form-label">Banner Tone / Type</label>
+                  <select v-model="dashboardControlForm.noticeBanner.type" class="form-control">
+                    <option value="info">ℹ️ Info (Blue)</option>
+                    <option value="warning">⚠️ Warning (Amber)</option>
+                    <option value="urgent">🚨 Urgent (Red)</option>
+                    <option value="success">✅ Announcement (Green)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Banner Title</label>
+                  <input type="text" v-model="dashboardControlForm.noticeBanner.title" class="form-control" placeholder="e.g. Action Required: Fee Due Notice">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Banner Message</label>
+                <textarea v-model="dashboardControlForm.noticeBanner.message" rows="2" class="form-control" placeholder="Write custom instructions or administrative note for this student..."></textarea>
+              </div>
+
+              <!-- Live Banner Preview -->
+              <div v-if="dashboardControlForm.noticeBanner.message" style="padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.82rem;" :style="{
+                background: dashboardControlForm.noticeBanner.type === 'urgent' ? 'rgba(239, 68, 68, 0.15)' : dashboardControlForm.noticeBanner.type === 'warning' ? 'rgba(245, 158, 11, 0.15)' : dashboardControlForm.noticeBanner.type === 'success' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(56, 189, 248, 0.15)',
+                border: '1px solid ' + (dashboardControlForm.noticeBanner.type === 'urgent' ? 'rgba(239, 68, 68, 0.4)' : dashboardControlForm.noticeBanner.type === 'warning' ? 'rgba(245, 158, 11, 0.4)' : dashboardControlForm.noticeBanner.type === 'success' ? 'rgba(16, 185, 129, 0.4)' : 'rgba(56, 189, 248, 0.4)')
+              }">
+                <div style="font-weight: 700; margin-bottom: 0.2rem; color: #fff;">
+                  Preview: {{ dashboardControlForm.noticeBanner.title || 'Administrative Notice' }}
+                </div>
+                <div style="color: var(--text-main);">{{ dashboardControlForm.noticeBanner.message }}</div>
+              </div>
+            </div>
+            <div v-else style="font-size: 0.8rem; color: var(--text-dim); font-style: italic;">
+              Banner is disabled. No announcement will be displayed on this student's portal.
+            </div>
+          </div>
+
+          <!-- SECTION 3: ACADEMIC METRICS & PERFORMANCE OVERRIDES -->
+          <div class="control-card-section">
+            <div class="section-badge-title">
+              <span>📊</span> 3. Academic Metrics & Performance Display
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+              Override or fine-tune the key academic metrics shown on the student's overview and cards.
+            </p>
+
+            <div class="admin-grid-2col" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem;">
+              <div class="form-group">
+                <label class="form-label">Overall Attendance %</label>
+                <input type="text" v-model="dashboardControlForm.academicMetrics.attendanceRate" class="form-control" placeholder="e.g. 94%">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Latest Exam Score</label>
+                <input type="text" v-model="dashboardControlForm.academicMetrics.examScore" class="form-control" placeholder="e.g. 94 / 100">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Batch Rank</label>
+                <input type="text" v-model="dashboardControlForm.academicMetrics.batchRank" class="form-control" placeholder="e.g. Rank #3">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Academic Grade</label>
+                <input type="text" v-model="dashboardControlForm.academicMetrics.grade" class="form-control" placeholder="e.g. Grade A+ (Distinction)">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Course Progress % ({{ dashboardControlForm.academicMetrics.courseProgress }}%)</label>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <input type="range" min="0" max="100" v-model.number="dashboardControlForm.academicMetrics.courseProgress" style="flex: 1;">
+                  <input type="number" min="0" max="100" v-model.number="dashboardControlForm.academicMetrics.courseProgress" class="form-control" style="width: 70px;">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Assigned Lab PC / Station</label>
+                <input type="text" v-model="dashboardControlForm.academicMetrics.labPcNumber" class="form-control" placeholder="e.g. Workstation #04 (Lab A)">
+              </div>
+              <div class="form-group" style="grid-column: 1 / -1;">
+                <label class="form-label">Batch Schedule / Class Timing</label>
+                <input type="text" v-model="dashboardControlForm.academicMetrics.batchTiming" class="form-control" placeholder="e.g. Morning 10:00 AM - 01:00 PM (Mon - Fri)">
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 4: FEE LEDGER & FINANCIAL OVERRIDES -->
+          <div class="control-card-section">
+            <div class="section-badge-title">
+              <span>💳</span> 4. Fee Ledger & Payment Status Overrides
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+              Set the exact financial standing and installment ledger visible on the student's portal.
+            </p>
+
+            <div class="admin-grid-2col" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.85rem;">
+              <div class="form-group">
+                <label class="form-label">Fee Status</label>
+                <select v-model="dashboardControlForm.feeLedger.feeStatus" class="form-control">
+                  <option value="Verified & Paid">Verified & Paid (100% Cleared)</option>
+                  <option value="Pending Verification">Pending Verification</option>
+                  <option value="Partial Payment">Partial Payment (Balance Due)</option>
+                  <option value="Overdue">Overdue / Action Needed</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Total Course Fee</label>
+                <input type="text" v-model="dashboardControlForm.feeLedger.totalFee" class="form-control" placeholder="e.g. ₹15,000">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Amount Paid</label>
+                <input type="text" v-model="dashboardControlForm.feeLedger.feePaid" class="form-control" placeholder="e.g. ₹15,000">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Balance Remaining</label>
+                <input type="text" v-model="dashboardControlForm.feeLedger.feePending" class="form-control" placeholder="e.g. ₹0">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Next Due Date (if pending)</label>
+                <input type="date" v-model="dashboardControlForm.feeLedger.nextDueDate" class="form-control">
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 5: ACCOUNT ACCESS STATUS -->
+          <div class="control-card-section">
+            <div class="section-badge-title">
+              <span>🔒</span> 5. Account Access & Suspension Controls
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+              Control whether this student can access their dashboard normally, or see a hold/suspension notice.
+            </p>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+              <label class="status-radio-card" :class="{ 'is-selected': dashboardControlForm.accountStatus === 'ACTIVE' }">
+                <input type="radio" value="ACTIVE" v-model="dashboardControlForm.accountStatus" style="display: none;">
+                <div style="font-size: 1.1rem;">🟢</div>
+                <div>
+                  <div style="font-weight: 700; color: #10b981;">ACTIVE</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Normal dashboard access</div>
+                </div>
+              </label>
+
+              <label class="status-radio-card" :class="{ 'is-selected': dashboardControlForm.accountStatus === 'ON_HOLD' }">
+                <input type="radio" value="ON_HOLD" v-model="dashboardControlForm.accountStatus" style="display: none;">
+                <div style="font-size: 1.1rem;">🟡</div>
+                <div>
+                  <div style="font-weight: 700; color: #f59e0b;">ON HOLD</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Portal temporarily restricted</div>
+                </div>
+              </label>
+
+              <label class="status-radio-card" :class="{ 'is-selected': dashboardControlForm.accountStatus === 'SUSPENDED' }">
+                <input type="radio" value="SUSPENDED" v-model="dashboardControlForm.accountStatus" style="display: none;">
+                <div style="font-size: 1.1rem;">🔴</div>
+                <div>
+                  <div style="font-weight: 700; color: #ef4444;">SUSPENDED</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Access fully revoked</div>
+                </div>
+              </label>
+            </div>
+
+            <div v-if="dashboardControlForm.accountStatus !== 'ACTIVE'" class="form-group" style="margin-top: 0.5rem;">
+              <label class="form-label" style="color: #f59e0b;">Hold / Suspension Reason (Shown to Student)</label>
+              <textarea v-model="dashboardControlForm.holdReason" rows="2" class="form-control" placeholder="e.g. Your portal access is temporarily on hold due to pending fee verification. Please visit the admin office."></textarea>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Sticky Footer with Save Action -->
+        <div class="modal-footer" style="padding: 1rem 1.5rem; background: rgba(15, 23, 42, 0.95); border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+          <div style="font-size: 0.85rem;">
+            <span v-if="controlSaveMsg" :style="{ color: controlSaveMsg.includes('✓') ? '#34d399' : '#f59e0b', fontWeight: '700' }">
+              {{ controlSaveMsg }}
+            </span>
+          </div>
+          <div style="display: flex; gap: 0.6rem;">
+            <button type="button" class="btn-secondary" @click="showDashboardControlModal = false" :disabled="isSavingControls">
+              Cancel
+            </button>
+            <button 
+              type="button" 
+              class="btn-primary" 
+              style="background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%); border-color: #a855f7; color: #fff; font-weight: 800; box-shadow: 0 4px 14px rgba(168, 85, 247, 0.4);"
+              @click="saveDashboardControls" 
+              :disabled="isSavingControls"
+            >
+              <span v-if="isSavingControls">Saving... ⏳</span>
+              <span v-else>Save & Apply Live to Student Dashboard 💾</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </section>
 </template>
 
@@ -2562,6 +2945,216 @@ const studentsList = ref([]);
 const selectedStudentDetail = ref(null);
 const showStudentDetailModal = ref(false);
 
+// --- STUDENT DASHBOARD CONTROL CENTER (SUPERADMIN FULL CONTROL) ---
+const showDashboardControlModal = ref(false);
+const selectedStudentControl = ref(null);
+const isSavingControls = ref(false);
+const controlSaveMsg = ref('');
+
+const dashboardControlForm = ref({
+  visibleTabs: {
+    overview: true,
+    certificates: true,
+    examScores: true,
+    attendance: true,
+    syllabus: true,
+    holidays: true,
+    idCard: true
+  },
+  noticeBanner: {
+    enabled: false,
+    type: 'info',
+    title: '',
+    message: ''
+  },
+  academicMetrics: {
+    attendanceRate: '94%',
+    examScore: '88%',
+    batchRank: 'Rank #3',
+    grade: 'Grade A+ (Distinction)',
+    courseProgress: 75,
+    labPcNumber: 'Workstation #04 (Lab A)',
+    batchTiming: 'Morning 10:00 AM - 01:00 PM (Mon - Fri)'
+  },
+  feeLedger: {
+    feeStatus: 'Verified & Paid',
+    totalFee: '₹15,000',
+    feePaid: '₹15,000',
+    feePending: '₹0',
+    nextDueDate: ''
+  },
+  accountStatus: 'ACTIVE',
+  holdReason: ''
+});
+
+const openDashboardControlModal = (stu) => {
+  if (!stu) return;
+  selectedStudentControl.value = stu;
+  const existingControls = stu.dashboardControls || {};
+  
+  dashboardControlForm.value = {
+    visibleTabs: {
+      overview: existingControls.visibleTabs?.overview !== false,
+      certificates: existingControls.visibleTabs?.certificates !== false,
+      examScores: existingControls.visibleTabs?.examScores !== false,
+      attendance: existingControls.visibleTabs?.attendance !== false,
+      syllabus: existingControls.visibleTabs?.syllabus !== false,
+      holidays: existingControls.visibleTabs?.holidays !== false,
+      idCard: existingControls.visibleTabs?.idCard !== false
+    },
+    noticeBanner: {
+      enabled: !!existingControls.noticeBanner?.enabled,
+      type: existingControls.noticeBanner?.type || 'info',
+      title: existingControls.noticeBanner?.title || '',
+      message: existingControls.noticeBanner?.message || ''
+    },
+    academicMetrics: {
+      attendanceRate: existingControls.academicMetrics?.attendanceRate || '94%',
+      examScore: existingControls.academicMetrics?.examScore || '88%',
+      batchRank: existingControls.academicMetrics?.batchRank || 'Rank #3',
+      grade: existingControls.academicMetrics?.grade || 'Grade A+ (Distinction)',
+      courseProgress: existingControls.academicMetrics?.courseProgress !== undefined ? existingControls.academicMetrics.courseProgress : 75,
+      labPcNumber: existingControls.academicMetrics?.labPcNumber || 'Workstation #04 (Lab A)',
+      batchTiming: existingControls.academicMetrics?.batchTiming || stu.batchTiming || 'Morning 10:00 AM - 01:00 PM (Mon - Fri)'
+    },
+    feeLedger: {
+      feeStatus: existingControls.feeLedger?.feeStatus || stu.feeStatus || 'Verified & Paid',
+      totalFee: existingControls.feeLedger?.totalFee || stu.totalFee || '₹15,000',
+      feePaid: existingControls.feeLedger?.feePaid || stu.amountPaid || stu.paidFee || '₹15,000',
+      feePending: existingControls.feeLedger?.feePending || stu.balanceFee || '₹0',
+      nextDueDate: existingControls.feeLedger?.nextDueDate || ''
+    },
+    accountStatus: existingControls.accountStatus || stu.accountStatus || 'ACTIVE',
+    holdReason: existingControls.holdReason || ''
+  };
+
+  showDashboardControlModal.value = true;
+};
+
+const applyDashboardPreset = (type) => {
+  if (type === 'all') {
+    dashboardControlForm.value.visibleTabs = {
+      overview: true,
+      certificates: true,
+      examScores: true,
+      attendance: true,
+      syllabus: true,
+      holidays: true,
+      idCard: true
+    };
+    dashboardControlForm.value.accountStatus = 'ACTIVE';
+  } else if (type === 'minimal') {
+    dashboardControlForm.value.visibleTabs = {
+      overview: true,
+      certificates: false,
+      examScores: false,
+      attendance: false,
+      syllabus: true,
+      holidays: false,
+      idCard: false
+    };
+  } else if (type === 'exam') {
+    dashboardControlForm.value.visibleTabs = {
+      overview: true,
+      certificates: false,
+      examScores: true,
+      attendance: true,
+      syllabus: true,
+      holidays: true,
+      idCard: true
+    };
+    dashboardControlForm.value.noticeBanner.enabled = true;
+    dashboardControlForm.value.noticeBanner.type = 'warning';
+    dashboardControlForm.value.noticeBanner.title = 'Final Semester Examinations Announced';
+    dashboardControlForm.value.noticeBanner.message = 'Please check your exam scoreboard and verify timetable before Friday.';
+  } else if (type === 'cert') {
+    dashboardControlForm.value.visibleTabs = {
+      overview: true,
+      certificates: true,
+      examScores: true,
+      attendance: false,
+      syllabus: true,
+      holidays: false,
+      idCard: true
+    };
+    dashboardControlForm.value.noticeBanner.enabled = true;
+    dashboardControlForm.value.noticeBanner.type = 'success';
+    dashboardControlForm.value.noticeBanner.title = 'Official Certificate Issued & Ready!';
+    dashboardControlForm.value.noticeBanner.message = 'Your graduation certificate is now available in your Certificates & QR tab. Scan or download your accredited credential.';
+  } else if (type === 'hold') {
+    dashboardControlForm.value.accountStatus = 'ON_HOLD';
+    dashboardControlForm.value.holdReason = 'Your portal access is placed on temporary hold. Please visit IT HUNT administration desk or contact office.';
+  }
+};
+
+const saveDashboardControls = async () => {
+  if (!selectedStudentControl.value) return;
+  const target = selectedStudentControl.value;
+  const targetId = target.id || target.registrationNo || target.userId || target.enrollmentNumber;
+  isSavingControls.value = true;
+  controlSaveMsg.value = 'Saving controls to database...';
+
+  try {
+    const controlsPayload = JSON.parse(JSON.stringify(dashboardControlForm.value));
+    
+    // Call API to update student
+    await API.updateStudent(targetId, {
+      dashboardControls: controlsPayload,
+      academicStatus: controlsPayload.accountStatus === 'ACTIVE' ? 'ACTIVE' : controlsPayload.accountStatus,
+      accountStatus: controlsPayload.accountStatus,
+      feeStatus: controlsPayload.feeLedger.feeStatus
+    });
+
+    // Update in-memory objects
+    target.dashboardControls = controlsPayload;
+    target.accountStatus = controlsPayload.accountStatus;
+    if (controlsPayload.accountStatus !== 'ACTIVE') {
+      target.academicStatus = controlsPayload.accountStatus;
+    }
+
+    // Update in admissionsList
+    const aIdx = admissionsList.value.findIndex(a => 
+      a.id === targetId || 
+      a.registrationNo === targetId || 
+      a.userId === targetId || 
+      (a.email && a.email.toLowerCase() === String(target.email || '').toLowerCase())
+    );
+    if (aIdx !== -1) {
+      admissionsList.value[aIdx].dashboardControls = controlsPayload;
+      admissionsList.value[aIdx].accountStatus = controlsPayload.accountStatus;
+      if (controlsPayload.accountStatus !== 'ACTIVE') {
+        admissionsList.value[aIdx].academicStatus = controlsPayload.accountStatus;
+      }
+    }
+
+    // Update in studentsList
+    const sIdx = studentsList.value.findIndex(s => 
+      s.id === targetId || 
+      s.registrationNo === targetId || 
+      s.userId === targetId || 
+      (s.email && s.email.toLowerCase() === String(target.email || '').toLowerCase())
+    );
+    if (sIdx !== -1) {
+      studentsList.value[sIdx].dashboardControls = controlsPayload;
+      studentsList.value[sIdx].accountStatus = controlsPayload.accountStatus;
+      if (controlsPayload.accountStatus !== 'ACTIVE') {
+        studentsList.value[sIdx].academicStatus = controlsPayload.accountStatus;
+      }
+    }
+
+    controlSaveMsg.value = '✓ Controls saved & applied to student dashboard!';
+    setTimeout(() => {
+      showDashboardControlModal.value = false;
+      controlSaveMsg.value = '';
+    }, 1200);
+  } catch (err) {
+    console.error('Failed to save dashboard controls:', err);
+    controlSaveMsg.value = '⚠️ Failed to save: ' + err.message;
+  } finally {
+    isSavingControls.value = false;
+  }
+};
+
 const admissionSearch = ref('');
 const admissionStatusFilter = ref('all');
 const nielitSearch = ref('');
@@ -2743,7 +3336,9 @@ const unifiedStudentsList = computed(() => {
       createdAt: adm.date ? `${adm.date} ${adm.time || ''}` : (adm.createdAt || 'Recent'),
       createdAtFormatted: adm.date || 'Recent',
       isAdmissionRecord: true,
-      originalAdmission: adm
+      originalAdmission: adm,
+      dashboardControls: adm.dashboardControls || null,
+      accountStatus: adm.accountStatus || 'ACTIVE'
     });
   });
 
@@ -2766,7 +3361,9 @@ const unifiedStudentsList = computed(() => {
       academicStatus: stu.academicStatus || existing.academicStatus || 'ACTIVE',
       status: stu.status || existing.status || 'ACTIVE',
       admissionConfirmed: stu.admissionConfirmed !== undefined ? stu.admissionConfirmed : (existing.admissionConfirmed !== undefined ? existing.admissionConfirmed : true),
-      password: stu.password || existing.password || ''
+      password: stu.password || existing.password || '',
+      dashboardControls: stu.dashboardControls || existing.dashboardControls || null,
+      accountStatus: stu.accountStatus || existing.accountStatus || 'ACTIVE'
     });
   });
 
@@ -4144,5 +4741,140 @@ body.light-theme .admin-data-table th {
   .admin-action-btn, .admin-logout-btn {
     width: 100%;
   }
+}
+
+/* ==========================================================================
+   Student Dashboard Control Center Modal Styles
+   ========================================================================== */
+.control-center-modal {
+  border: 1px solid rgba(168, 85, 247, 0.35) !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(168, 85, 247, 0.2) !important;
+}
+
+.control-card-section {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.control-card-section:hover {
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+.section-badge-title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 800;
+  color: #f3e8ff;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.preset-badge-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.preset-badge-btn:hover {
+  background: rgba(168, 85, 247, 0.2);
+  border-color: rgba(168, 85, 247, 0.5);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.toggle-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.75rem;
+}
+
+.toggle-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggle-card:hover {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.toggle-card.is-active {
+  background: rgba(168, 85, 247, 0.1);
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+.toggle-card-info {
+  flex: 1;
+}
+
+.toggle-card-title {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.15rem;
+}
+
+.toggle-card.is-active .toggle-card-title {
+  color: #f3e8ff;
+}
+
+.toggle-card-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.custom-switch-input {
+  width: 18px;
+  height: 18px;
+  accent-color: #a855f7;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.status-radio-card {
+  flex: 1;
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.status-radio-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.status-radio-card.is-selected {
+  background: rgba(15, 23, 42, 0.8);
+  border-color: #a855f7;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.2);
 }
 </style>
