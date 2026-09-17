@@ -157,6 +157,7 @@
           @login-success="handleLoginSuccess" 
           @student-login-success="handleStudentLoginSuccess"
           @set-tab="setTab" 
+          @role-change="role => loginActiveRole = role"
         />
 
         <!-- 10. Dedicated SuperAdmin Dashboard View -->
@@ -413,6 +414,7 @@
 
     <!-- Footer Component with Legal PDF Triggers -->
     <Footer 
+      v-if="activeTab !== 'superadmin' && !(activeTab === 'login' && loginActiveRole === 'admin')"
       :content="content" 
       @set-tab="setTab" 
       @open-privacy-policy="openPrivacyPolicyPdf"
@@ -517,6 +519,7 @@ let revealObserver = null;
 
 // SuperAdmin & Auth Session State
 const isAdminLoggedIn = ref(false);
+const loginActiveRole = ref('student');
 const adminUser = ref({
   name: 'Mr. Lakshman Singh Chauhan',
   role: 'Director & Chief Administrator',

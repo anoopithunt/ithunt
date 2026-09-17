@@ -20,8 +20,8 @@
           <a href="#" @click.prevent="$emit('set-tab', 'careers')" class="skill-tag footer-chip footer-chip-orange">
             💼 We Are Hiring (Teachers & Devs) →
           </a>
-          <a href="#" @click.prevent="$emit('set-tab', 'login')" class="skill-tag footer-chip footer-chip-green">
-            🔐 SuperAdmin Portal →
+          <a href="#" @click.prevent="$emit('set-tab', 'admission')" class="skill-tag footer-chip footer-chip-green">
+            🎓 Apply for Admission →
           </a>
         </div>
       </div>
@@ -39,7 +39,6 @@
           <li><a href="#" @click.prevent="$emit('set-tab', 'reviews')">⭐ Reviews & Feedback</a></li>
           <li><a href="#" @click.prevent="$emit('set-tab', 'admission')">Admission Portal</a></li>
           <li><a href="/api/certificates/verify" target="_blank" style="color: #38bdf8; font-weight: 600;">🔍 Verify Certificate (QR Registry)</a></li>
-          <li><a href="#" @click.prevent="$emit('set-tab', 'login')">🔐 SuperAdmin Console</a></li>
         </ul>
       </div>
 
@@ -80,7 +79,6 @@
         <a href="#" @click.prevent="$emit('set-tab', 'reviews')">{{ content.ui?.reviewsAndRatings || '⭐ Reviews & Ratings' }}</a>
         <a href="#" @click.prevent="$emit('set-tab', 'events')">{{ content.ui?.eventsGallery || 'Events Gallery' }}</a>
         <a href="#" @click.prevent="$emit('set-tab', 'testimonials')">{{ content.ui?.alumniStories || 'Alumni Stories' }}</a>
-        <a href="#" @click.prevent="$emit('set-tab', 'login')">🔐 SuperAdmin</a>
         <a href="#" @click.prevent="$emit('open-privacy-policy')">{{ content.ui?.privacyPolicy || 'Privacy Policy' }} 📄</a>
         <a href="#" @click.prevent="$emit('open-terms-conditions')">{{ content.ui?.termsConditions || 'Terms & Conditions' }} 📜</a>
         <a href="#" @click.prevent="scrollToTop">{{ content.ui?.backToTop || '⬆ Back to Top' }}</a>

@@ -292,7 +292,7 @@
         </div>
 
         <!-- Security Footer Notice -->
-        <div class="login-card-footer">
+        <div v-if="activeRole !== 'admin'" class="login-card-footer">
           <div class="security-notice-text">
             🛡️ 256-Bit Encrypted Session • ISO 9001:2015 Verified Academic Portal
           </div>
@@ -306,7 +306,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, watch } from 'vue';
 import { loginUserWithBackend, loginStudentUser, registerStudentUser } from '../../utils/apiClient.js';
 import { DEFAULT_DEMO_STUDENT } from '../../data/studentAcademicData.js';
 
@@ -317,11 +317,15 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['login-success', 'student-login-success', 'set-tab']);
+const emit = defineEmits(['login-success', 'student-login-success', 'set-tab', 'role-change']);
 
 // Tab states
 const activeRole = ref('student'); // 'student' | 'admin'
 const studentMode = ref('login'); // 'login' | 'signup'
+
+watch(activeRole, (newRole) => {
+  emit('role-change', newRole);
+}, { immediate: true });
 
 // Common state
 const showPassword = ref(false);
