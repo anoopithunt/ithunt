@@ -316,6 +316,7 @@ export const API = {
   // Admissions
   getAdmissions: () => apiRequest('/admissions'),
   getAdmission: (id) => apiRequest(`/admissions/${id}`),
+  updateAdmission: (id, data) => apiRequest(`/admissions/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
 
   // Courses
   getCourses: () => apiRequest('/courses'),
@@ -552,6 +553,19 @@ export async function fetchAdmissionsFromBackend() {
   } catch (e) {
     console.warn('Notice loading admissions from MongoDB database:', e.message);
     return [];
+  }
+}
+
+/**
+ * Update an admission record in MongoDB via REST API (PUT /api/admissions/:id)
+ */
+export async function updateAdmissionInBackend(id, updates) {
+  try {
+    const res = await API.updateAdmission(id, updates);
+    return { success: true, data: res };
+  } catch (e) {
+    console.warn('Notice updating admission in MongoDB:', e.message);
+    return { success: false, error: e.message };
   }
 }
 
@@ -1518,6 +1532,7 @@ export default {
   resetStudentPasswordInBackend,
   fetchAdmissionsFromBackend,
   deleteAdmissionFromBackend,
+  updateAdmissionInBackend,
   submitJobApplicationToBackend,
   saveJobApplicationRecord,
   fetchJobApplicationsFromBackend,
