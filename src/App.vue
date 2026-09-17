@@ -414,7 +414,7 @@
 
     <!-- Footer Component with Legal PDF Triggers -->
     <Footer 
-      v-if="activeTab !== 'superadmin' && !(activeTab === 'login' && loginActiveRole === 'admin')"
+      v-if="!isAdminLoggedIn && activeTab !== 'superadmin' && activeTab !== 'login'"
       :content="content" 
       @set-tab="setTab" 
       @open-privacy-policy="openPrivacyPolicyPdf"
@@ -1066,6 +1066,9 @@ const handleLoginAsStudent = (admission) => {
 const handleLoginSuccess = async (user) => {
   isAdminLoggedIn.value = true;
   adminUser.value = user;
+  try {
+    sessionStorage.setItem('ithunt_superadmin_auth', JSON.stringify(user));
+  } catch (e) {}
   activeTab.value = 'superadmin';
   triggerConfetti();
   await loadInitialData();
