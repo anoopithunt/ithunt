@@ -671,7 +671,7 @@ body.light-theme .role-switcher-tabs {
 }
 
 body.light-theme .login-badge-pill {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 .login-title {

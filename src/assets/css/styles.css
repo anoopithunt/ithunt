@@ -696,7 +696,7 @@ body.light-theme .sidebar-nav-item.active {
   background: linear-gradient(90deg, rgba(249, 115, 22, 0.15), rgba(250, 204, 21, 0.06));
   border-color: rgba(249, 115, 22, 0.35);
   border-left: 3px solid var(--color-ai-orange);
-  color: #0f172a;
+  color: #000000;
 }
 
 .sidebar-nav-item.highlight-admin {
@@ -1405,20 +1405,20 @@ body.light-theme .course-category-badge {
 }
 
 body.light-theme .course-title {
-  color: #0f172a;
+  color: #000000;
 }
 
 body.light-theme .course-desc {
-  color: #475569;
+  color: #000000;
 }
 
 body.light-theme .course-meta {
   border-top: 1px solid rgba(15, 23, 42, 0.08);
-  color: #64748b;
+  color: #000000;
 }
 
 body.light-theme .course-meta-item {
-  color: #475569;
+  color: #000000;
 }
 
 body.light-theme .course-action-btn {
@@ -3685,30 +3685,30 @@ body.light-theme .internship-bottom-cta {
 body.light-theme .footer-section {
   background: #ffffff !important;
   border-top: 1px solid #e2e8f0 !important;
-  color: #0f172a !important;
+  color: #000000 !important;
   box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.03);
 }
 
 body.light-theme .footer-section .brand-title {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .footer-section .brand-tagline {
-  color: #64748b !important;
+  color: #000000 !important;
 }
 
 body.light-theme .footer-section p,
 body.light-theme .footer-about-text,
 body.light-theme .footer-contact-item {
-  color: #334155 !important;
+  color: #000000 !important;
 }
 
 body.light-theme .footer-col h4 {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .footer-links a {
-  color: #475569 !important;
+  color: #000000 !important;
 }
 
 body.light-theme .footer-links a:hover {
@@ -3718,7 +3718,7 @@ body.light-theme .footer-links a:hover {
 body.light-theme .footer-bottom,
 body.light-theme .footer-copyright-text,
 body.light-theme .footer-bottom a {
-  color: #64748b !important;
+  color: #000000 !important;
 }
 
 body.light-theme .footer-bottom a:hover {
@@ -6461,7 +6461,7 @@ body.light-theme .stars-layer {
    ========================================================================== */
 
 body.light-theme .hero-badge {
-  color: #0f172a !important;
+  color: #000000 !important;
   background: rgba(249, 115, 22, 0.16) !important;
   border-color: rgba(249, 115, 22, 0.5) !important;
   font-weight: 800 !important;
@@ -6469,13 +6469,13 @@ body.light-theme .hero-badge {
 }
 
 body.light-theme .hero-badge span {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .internship-live-pill,
 body.light-theme .events-badge-pill,
 body.light-theme .duration-pill {
-  color: #0f172a !important;
+  color: #000000 !important;
   background: rgba(249, 115, 22, 0.16) !important;
   border-color: rgba(249, 115, 22, 0.45) !important;
   font-weight: 800 !important;
@@ -6484,7 +6484,7 @@ body.light-theme .duration-pill {
 body.light-theme .internship-live-pill span,
 body.light-theme .events-badge-pill span,
 body.light-theme .duration-pill span {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .section-tag {
@@ -8733,7 +8733,14 @@ body.light-theme main.superadmin-main-active {
 
 body.light-theme {
   background-color: #f8fafc !important;
-  color: #0f172a !important;
+  color: #000000 !important;
+}
+
+body.light-theme,
+body.light-theme * {
+  --text-main: #000000 !important;
+  --text-muted: #000000 !important;
+  --text-dim: #111111 !important;
 }
 
 body.light-theme h1,
@@ -8742,23 +8749,45 @@ body.light-theme h3,
 body.light-theme h4,
 body.light-theme h5,
 body.light-theme h6 {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
-body.light-theme p {
-  color: #334155 !important;
+body.light-theme p,
+body.light-theme li,
+body.light-theme span:not(.text-gradient):not(.badge):not(.status-badge):not(.btn *):not(.code-terminal-card *):not(.tag):not(.badge *):not([class*="gradient"]),
+body.light-theme label,
+body.light-theme input,
+body.light-theme textarea,
+body.light-theme select {
+  color: #000000 !important;
+}
+
+/* Links in Light Mode */
+body.light-theme a:not(.btn):not(.course-action-btn):not(.cta-btn-header):not(.badge):not(.footer-chip):not(.footer-whatsapp-btn) {
+  color: #000000 !important;
+}
+body.light-theme a:not(.btn):not(.course-action-btn):not(.cta-btn-header):not(.badge):not(.footer-chip):not(.footer-whatsapp-btn):hover {
+  color: #ea580c !important;
+}
+
+body.light-theme .nav-item-btn {
+  color: #000000 !important;
+}
+
+body.light-theme .nav-item-btn.active {
+  color: #ffffff !important;
 }
 
 body.light-theme .brand-title {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .brand-tagline {
-  color: #64748b !important;
+  color: #000000 !important;
 }
 
 body.light-theme .hero-title {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .hero-subtitle,
@@ -8774,32 +8803,36 @@ body.light-theme .events-hero-subtitle,
 body.light-theme .event-card-desc,
 body.light-theme .login-subtitle,
 body.light-theme .form-subtitle {
-  color: #334155 !important;
+  color: #000000 !important;
 }
 
 body.light-theme .stat-card {
   background: #ffffff !important;
   border: 1px solid #e2e8f0 !important;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+}
+
+body.light-theme .stat-val {
+  color: #000000 !important;
 }
 
 body.light-theme .stat-label {
-  color: #475569 !important;
+  color: #000000 !important;
   font-weight: 700 !important;
 }
 
 body.light-theme .hero-floating-badge {
   background: #ffffff !important;
   border-color: rgba(249, 115, 22, 0.4) !important;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.1) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
 }
 
 body.light-theme .hero-floating-title {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .hero-floating-sub {
-  color: #64748b !important;
+  color: #000000 !important;
 }
 
 body.light-theme .internship-banner {
@@ -8809,7 +8842,7 @@ body.light-theme .internship-banner {
 }
 
 body.light-theme .spotlight-banner-heading {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .spotlight-sub-card {
@@ -8819,11 +8852,11 @@ body.light-theme .spotlight-sub-card {
 }
 
 body.light-theme .spotlight-card-title {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .spotlight-card-desc {
-  color: #475569 !important;
+  color: #000000 !important;
 }
 
 body.light-theme .director-spotlight-card {
@@ -8833,7 +8866,7 @@ body.light-theme .director-spotlight-card {
 }
 
 body.light-theme .director-name {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .director-title {
@@ -8849,11 +8882,11 @@ body.light-theme .cofounder-title {
 body.light-theme .team-card {
   background: #ffffff !important;
   border-color: #e2e8f0 !important;
-  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05) !important;
 }
 
 body.light-theme .team-name {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .team-role {
@@ -8868,11 +8901,11 @@ body.light-theme .modern-track-card {
 }
 
 body.light-theme .track-card-title {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .track-card-desc {
-  color: #475569 !important;
+  color: #000000 !important;
 }
 
 body.light-theme .track-glass-stats {
@@ -8881,12 +8914,12 @@ body.light-theme .track-glass-stats {
 }
 
 body.light-theme .cell-label {
-  color: #78350f !important;
+  color: #000000 !important;
   font-weight: 800 !important;
 }
 
 body.light-theme .cell-val {
-  color: #0f172a !important;
+  color: #000000 !important;
   font-weight: 900 !important;
 }
 
@@ -8911,7 +8944,7 @@ body.light-theme .projects-preview-label {
 body.light-theme .proj-tag {
   background: #ffffff !important;
   border-color: #fdba74 !important;
-  color: #431407 !important;
+  color: #000000 !important;
 }
 
 body.light-theme .feature-pillar-card,
@@ -8922,22 +8955,22 @@ body.light-theme .roadmap-step-card {
 
 body.light-theme .feature-pillar-card h3,
 body.light-theme .roadmap-step-title {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .feature-pillar-card p,
 body.light-theme .roadmap-step-desc {
-  color: #475569 !important;
+  color: #000000 !important;
 }
 
 body.light-theme .event-card {
   background: #ffffff !important;
   border-color: #e2e8f0 !important;
-  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06) !important;
 }
 
 body.light-theme .event-card-title {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .event-meta-row {
@@ -8954,7 +8987,7 @@ body.light-theme .event-chip {
 body.light-theme .event-cat-btn {
   background: #ffffff !important;
   border-color: #cbd5e1 !important;
-  color: #334155 !important;
+  color: #000000 !important;
 }
 
 body.light-theme .event-cat-btn.active {
@@ -8968,27 +9001,27 @@ body.light-theme .events-search-box {
 }
 
 body.light-theme .events-search-input {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .events-search-input::placeholder {
-  color: #94a3b8 !important;
+  color: #4b5563 !important;
 }
 
 body.light-theme .event-detail-popup {
   background: #ffffff !important;
   border-color: #e2e8f0 !important;
-  color: #0f172a !important;
-  box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.25) !important;
+  color: #000000 !important;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.25) !important;
 }
 
 body.light-theme .event-detail-popup h2,
 body.light-theme .event-detail-popup h3 {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .event-detail-popup p {
-  color: #334155 !important;
+  color: #000000 !important;
 }
 
 body.light-theme .rating-summary-card {
@@ -8998,35 +9031,41 @@ body.light-theme .rating-summary-card {
 }
 
 body.light-theme .rating-count-sub {
-  color: #64748b !important;
+  color: #000000 !important;
 }
 
 body.light-theme .review-card {
   background: #ffffff !important;
   border-color: #e2e8f0 !important;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
 }
 
 body.light-theme .review-author-name {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .review-author-role {
-  color: #64748b !important;
+  color: #000000 !important;
+}
+
+body.light-theme .review-comment,
+body.light-theme .review-content,
+body.light-theme .review-text {
+  color: #000000 !important;
 }
 
 body.light-theme .rating-picker-title {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .career-card {
   background: #ffffff !important;
   border-color: #e2e8f0 !important;
-  box-shadow: 0 6px 20px -2px rgba(15, 23, 42, 0.06) !important;
+  box-shadow: 0 6px 20px -2px rgba(0, 0, 0, 0.06) !important;
 }
 
 body.light-theme .career-card h3 {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .career-benefit-card {
@@ -9035,11 +9074,11 @@ body.light-theme .career-benefit-card {
 }
 
 body.light-theme .benefit-title {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .benefit-desc {
-  color: #475569 !important;
+  color: #000000 !important;
 }
 
 body.light-theme .career-points-box {
@@ -9052,28 +9091,28 @@ body.light-theme .career-points-title {
 }
 
 body.light-theme .career-points-list li {
-  color: #334155 !important;
+  color: #000000 !important;
 }
 
 body.light-theme .form-card {
   background: #ffffff !important;
   border-color: #e2e8f0 !important;
-  box-shadow: 0 10px 35px -5px rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.08) !important;
 }
 
 body.light-theme .form-title {
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .form-label {
-  color: #0f172a !important;
+  color: #000000 !important;
   font-weight: 700 !important;
 }
 
 body.light-theme .form-control {
   background: #ffffff !important;
   border-color: #cbd5e1 !important;
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .form-control:focus {
@@ -9082,14 +9121,14 @@ body.light-theme .form-control:focus {
 }
 
 body.light-theme .radio-option {
-  color: #0f172a !important;
+  color: #000000 !important;
   font-weight: 600 !important;
 }
 
 body.light-theme .btn-secondary {
   background: #ffffff !important;
   border-color: #cbd5e1 !important;
-  color: #0f172a !important;
+  color: #000000 !important;
 }
 
 body.light-theme .btn-secondary:hover {
@@ -9102,12 +9141,26 @@ body.light-theme .floating-back-to-top {
   background: #ffffff !important;
   border: 1.5px solid rgba(249, 115, 22, 0.5) !important;
   color: #ea580c !important;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12), 0 0 15px rgba(249, 115, 22, 0.15) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 0 15px rgba(249, 115, 22, 0.15) !important;
 }
 
 body.light-theme .floating-back-to-top:hover {
   background: var(--gradient-ai-btn) !important;
   color: #ffffff !important;
+}
+
+body.light-theme .alumni-story-text,
+body.light-theme .alumni-stat-label,
+body.light-theme .alumni-batch-tag {
+  color: #000000 !important;
+}
+
+body.light-theme .sidebar-nav-item,
+body.light-theme .sidebar-title,
+body.light-theme .sidebar-subtitle,
+body.light-theme .sidebar-user-name,
+body.light-theme .sidebar-user-role {
+  color: #000000 !important;
 }
 
 /* Ensure Code Terminal syntax is crisp & readable inside terminal in light mode */
