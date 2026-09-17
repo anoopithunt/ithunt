@@ -8649,3 +8649,20 @@ img, video, iframe, canvas {
   }
 }
 
+/* ==========================================================================
+   SUPERADMIN MAIN CANVAS ISOLATION
+   ========================================================================== */
+main.superadmin-main-active {
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+  background: #070a13 !important;
+}
+
+body.light-theme main.superadmin-main-active {
+  background: #f8fafc !important;
+}
+
+

@@ -1,186 +1,628 @@
 <template>
-  <section class="superadmin-section container" style="padding: 2.5rem 1.5rem 5rem;">
-    <!-- 1. TOP SUPERADMIN CONTROL BAR -->
-    <div class="admin-control-bar anim-stagger-1">
-      <div class="admin-profile-info">
-        <div class="admin-avatar-wrap">
-          <img :src="adminUser.avatar || content.director?.image || 'img/ithunt.webp'" :alt="adminUser.name" class="admin-avatar-img" @error="onAvatarError">
-          <span class="admin-live-status-dot" title="Admin Active"></span>
-        </div>
-        <div>
-          <div class="admin-role-badge">
-            <span>🛡️</span> {{ adminUser.role || 'SuperAdmin • Director Desk' }}
-          </div>
-          <h2 class="admin-user-name">{{ adminUser.name || 'Mr. Lakshman Singh Chauhan' }}</h2>
-          <div class="admin-meta-sub">
-            <span>🏛️ {{ content.brand?.name || 'IT HUNT' }}</span>
-            <span>•</span>
-            <span class="text-gradient-gold">⚡ Central Registry Node</span>
-            <span>•</span>
-            <span>Session: {{ sessionTime }}</span>
+  <div class="admin-shell" :class="{ 'sidebar-collapsed': isSidebarCollapsed }">
+    <!-- 1. LEFT ENTERPRISE SIDEBAR NAVIGATION -->
+    <aside class="admin-sidebar" :class="{ 'mobile-open': isMobileSidebarOpen }">
+      <!-- Sidebar Brand / Console Header -->
+      <div class="sidebar-brand">
+        <div class="brand-badge-row">
+          <div class="brand-logo-icon">⚡</div>
+          <div class="brand-titles" v-if="!isSidebarCollapsed">
+            <div class="brand-main-title">IT HUNT</div>
+            <div class="brand-sub-badge">DIRECTORATE CONSOLE</div>
           </div>
         </div>
-      </div>
-
-      <div class="admin-quick-actions">
         <button 
-          class="btn-secondary admin-action-btn" 
-          @click="refreshAllData" 
-          :disabled="isRefreshing" 
-          title="Refresh All Database Registrations & Realtime Student Records"
-          style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;"
+          class="sidebar-collapse-btn" 
+          @click="isSidebarCollapsed = !isSidebarCollapsed" 
+          :title="isSidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'"
         >
-          <span :style="isRefreshing ? 'display: inline-block; animation: spin 1s linear infinite;' : ''">🔄</span>
-          <span>{{ isRefreshing ? 'Syncing...' : 'Refresh Data' }}</span>
-        </button>
-        <button class="btn-secondary admin-action-btn" @click="exportDataToJson" title="Export Complete Database Backup">
-          <span>📥 Backup (JSON)</span>
-        </button>
-        <button class="btn-primary admin-action-btn" @click="openQuickAdmissionModal">
-          <span>+ New Admission</span>
-        </button>
-        <button class="btn-secondary admin-logout-btn" @click="$emit('logout')" title="Log Out Admin Session">
-          <span>🚪 Logout</span>
+          <span>{{ isSidebarCollapsed ? '▶' : '◀' }}</span>
         </button>
       </div>
-    </div>
 
-    <!-- PENDING REGISTRATIONS ACTION BANNER (Visible whenever candidates submit forms) -->
+      <!-- Admin User Snippet -->
+      <div class="sidebar-user-pill">
+        <div class="sidebar-avatar-wrap">
+          <img :src="adminUser.avatar || content.director?.image || 'img/ithunt.webp'" :alt="adminUser.name" class="sidebar-avatar-img" @error="onAvatarError">
+          <span class="live-status-dot-emerald" title="Admin Active Online"></span>
+        </div>
+        <div class="sidebar-user-details" v-if="!isSidebarCollapsed">
+          <div class="sidebar-user-name">{{ adminUser.name || 'Mr. Lakshman Singh Chauhan' }}</div>
+          <div class="sidebar-user-role">🛡️ {{ adminUser.role || 'Director Desk' }}</div>
+        </div>
+      </div>
+
+      <!-- Grouped Sidebar Navigation Items -->
+      <nav class="sidebar-nav-scroll">
+        <!-- Group 1: Core Dashboard -->
+        <div class="nav-group-section">
+          <div class="nav-group-label" v-if="!isSidebarCollapsed">EXECUTIVE</div>
+          <button 
+            class="sidebar-nav-item" 
+            :class="{ active: currentTab === 'overview' }" 
+            @click="currentTab = 'overview'; isMobileSidebarOpen = false"
+            title="Executive Dashboard Overview"
+          >
+            <span class="nav-item-icon">📊</span>
+            <span class="nav-item-label" v-if="!isSidebarCollapsed">Overview</span>
+          </button>
+        </div>
+
+        <!-- Group 2: Academics & Registry -->
+        <div class="nav-group-section">
+          <div class="nav-group-label" v-if="!isSidebarCollapsed">STUDENTS & REGISTRY</div>
+          <button 
+            class="sidebar-nav-item" 
+            :class="{ active: currentTab === 'admissions' }" 
+            @click="currentTab = 'admissions'; isMobileSidebarOpen = false"
+            title="Admissions Registry & Applications"
+          >
+            <span class="nav-item-icon">📝</span>
+            <span class="nav-item-label" v-if="!isSidebarCollapsed">Admissions</span>
+            <span class="nav-badge-pill alert-badge" v-if="pendingAdmissionsCount > 0">{{ pendingAdmissionsCount }} new</span>
+            <span class="nav-badge-pill" v-else-if="!isSidebarCollapsed">{{ admissionsList.length }}</span>
+          </button>
+
+          <button 
+            class="sidebar-nav-item" 
+            :class="{ active: currentTab === 'students' }" 
+            @click="currentTab = 'students'; isMobileSidebarOpen = false"
+            title="Students Master Directory"
+          >
+            <span class="nav-item-icon">🎓</span>
+            <span class="nav-item-label" v-if="!isSidebarCollapsed">Students Directory</span>
+            <span class="nav-badge-pill" v-if="!isSidebarCollapsed">{{ unifiedStudentsList.length }}</span>
+          </button>
+
+          <button 
+            class="sidebar-nav-item" 
+            :class="{ active: currentTab === 'nielit' }" 
+            @click="currentTab = 'nielit'; isMobileSidebarOpen = false"
+            title="NIELIT Project Submissions"
+          >
+            <span class="nav-item-icon">📜</span>
+            <span class="nav-item-label" v-if="!isSidebarCollapsed">NIELIT Submissions</span>
+            <span class="nav-badge-pill" v-if="!isSidebarCollapsed">{{ nielitProjectsList.length }}</span>
+          </button>
+
+          <button 
+            class="sidebar-nav-item" 
+            :class="{ active: currentTab === 'courses' }" 
+            @click="currentTab = 'courses'; isMobileSidebarOpen = false"
+            title="Accredited Courses & Curriculum"
+          >
+            <span class="nav-item-icon">📚</span>
+            <span class="nav-item-label" v-if="!isSidebarCollapsed">Courses</span>
+            <span class="nav-badge-pill" v-if="!isSidebarCollapsed">{{ coursesList.length }}</span>
+          </button>
+        </div>
+
+        <!-- Group 3: Finance & Credentials -->
+        <div class="nav-group-section">
+          <div class="nav-group-label" v-if="!isSidebarCollapsed">FINANCE & CREDENTIALS</div>
+          <button 
+            class="sidebar-nav-item" 
+            :class="{ active: currentTab === 'fees' }" 
+            @click="currentTab = 'fees'; isMobileSidebarOpen = false"
+            title="Fees Ledger & Receipts"
+          >
+            <span class="nav-item-icon">💳</span>
+            <span class="nav-item-label" v-if="!isSidebarCollapsed">Fees & Ledgers</span>
+            <span class="nav-badge-pill" v-if="!isSidebarCollapsed">{{ feesList.length }}</span>
+          </button>
+
+          <button 
+            class="sidebar-nav-item" 
+            :class="{ active: currentTab === 'certificates' }" 
+            @click="currentTab = 'certificates'; isMobileSidebarOpen = false"
+            title="Certificates & QR Registry"
+          >
+            <span class="nav-item-icon">🏅</span>
+            <span class="nav-item-label" v-if="!isSidebarCollapsed">Certificates & QR</span>
+            <span class="nav-badge-pill" v-if="!isSidebarCollapsed">{{ certificatesList.length }}</span>
+          </button>
+
+          <button 
+            class="sidebar-nav-item" 
+            :class="{ active: currentTab === 'internships' }" 
+            @click="currentTab = 'internships'; isMobileSidebarOpen = false"
+            title="Internship Tracks"
+          >
+            <span class="nav-item-icon">🚀</span>
+            <span class="nav-item-label" v-if="!isSidebarCollapsed">Internships</span>
+            <span class="nav-badge-pill" v-if="!isSidebarCollapsed">{{ internshipsList.length || (content.internshipVenture?.tracks?.length || 5) }}</span>
+          </button>
+
+          <button 
+            class="sidebar-nav-item" 
+            :class="{ active: currentTab === 'careers' }" 
+            @click="currentTab = 'careers'; isMobileSidebarOpen = false"
+            title="Faculty & Developer Recruitment"
+          >
+            <span class="nav-item-icon">💼</span>
+            <span class="nav-item-label" v-if="!isSidebarCollapsed">Recruitment</span>
+            <span class="nav-badge-pill" v-if="!isSidebarCollapsed">{{ jobApplicationsList.length }}</span>
+          </button>
+        </div>
+
+        <!-- Group 4: Engagement & Platform -->
+        <div class="nav-group-section">
+          <div class="nav-group-label" v-if="!isSidebarCollapsed">PLATFORM & SUPPORT</div>
+          <button 
+            class="sidebar-nav-item" 
+            :class="{ active: currentTab === 'reviews' }" 
+            @click="currentTab = 'reviews'; isMobileSidebarOpen = false"
+            title="Student Reviews & Feedback"
+          >
+            <span class="nav-item-icon">⭐</span>
+            <span class="nav-item-label" v-if="!isSidebarCollapsed">Reviews</span>
+            <span class="nav-badge-pill" v-if="!isSidebarCollapsed">{{ reviewsList.length }}</span>
+          </button>
+
+          <button 
+            class="sidebar-nav-item" 
+            :class="{ active: currentTab === 'events' }" 
+            @click="currentTab = 'events'; isMobileSidebarOpen = false"
+            title="Events & VIP Passes"
+          >
+            <span class="nav-item-icon">🎪</span>
+            <span class="nav-item-label" v-if="!isSidebarCollapsed">Events & RSVPs</span>
+            <span class="nav-badge-pill" v-if="!isSidebarCollapsed">{{ rsvpsList.length }}</span>
+          </button>
+
+          <button 
+            class="sidebar-nav-item" 
+            :class="{ active: currentTab === 'projects' }" 
+            @click="currentTab = 'projects'; isMobileSidebarOpen = false"
+            title="Capstone Student Projects"
+          >
+            <span class="nav-item-icon">💻</span>
+            <span class="nav-item-label" v-if="!isSidebarCollapsed">Student Projects</span>
+            <span class="nav-badge-pill" v-if="!isSidebarCollapsed">{{ projectsList.length }}</span>
+          </button>
+
+          <button 
+            class="sidebar-nav-item" 
+            :class="{ active: currentTab === 'contact' }" 
+            @click="currentTab = 'contact'; isMobileSidebarOpen = false"
+            title="Contact Inquiries"
+          >
+            <span class="nav-item-icon">📬</span>
+            <span class="nav-item-label" v-if="!isSidebarCollapsed">Enquiries</span>
+            <span class="nav-badge-pill" v-if="!isSidebarCollapsed">{{ contactInquiriesList.length }}</span>
+          </button>
+
+          <button 
+            class="sidebar-nav-item" 
+            :class="{ active: currentTab === 'users' }" 
+            @click="currentTab = 'users'; isMobileSidebarOpen = false"
+            title="User & Staff Accounts"
+          >
+            <span class="nav-item-icon">👥</span>
+            <span class="nav-item-label" v-if="!isSidebarCollapsed">Staff Accounts</span>
+            <span class="nav-badge-pill" v-if="!isSidebarCollapsed">{{ usersList.length }}</span>
+          </button>
+
+          <button 
+            class="sidebar-nav-item" 
+            :class="{ active: currentTab === 'settings' }" 
+            @click="currentTab = 'settings'; isMobileSidebarOpen = false"
+            title="System Configuration & Backups"
+          >
+            <span class="nav-item-icon">⚙️</span>
+            <span class="nav-item-label" v-if="!isSidebarCollapsed">System Settings</span>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Sidebar Bottom Tools -->
+      <div class="sidebar-bottom-actions">
+        <button 
+          class="sidebar-footer-btn back-site-btn" 
+          @click="$emit('set-tab', 'home')" 
+          title="Return to Public Website"
+        >
+          <span class="footer-btn-icon">🌐</span>
+          <span class="footer-btn-text" v-if="!isSidebarCollapsed">Public Website</span>
+        </button>
+        <button 
+          class="sidebar-footer-btn logout-btn" 
+          @click="$emit('logout')" 
+          title="Sign out of SuperAdmin Console"
+        >
+          <span class="footer-btn-icon">🚪</span>
+          <span class="footer-btn-text" v-if="!isSidebarCollapsed">Sign Out</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Mobile Overlay Backdrop -->
     <div 
-      v-if="pendingAdmissionsCount > 0" 
-      style="margin-bottom: 2rem; padding: 1.15rem 1.75rem; background: linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(234, 88, 12, 0.15) 100%); border: 1.5px solid rgba(245, 158, 11, 0.5); border-radius: var(--radius-lg); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; cursor: pointer; box-shadow: 0 8px 25px rgba(245, 158, 11, 0.2);"
-      @click="currentTab = 'admissions'; admissionStatusFilter = 'Pending Verification'"
-      title="Click to view and confirm pending registrations"
-    >
-      <div style="display: flex; align-items: center; gap: 1rem;">
-        <span style="font-size: 2rem;">🔔</span>
-        <div>
-          <div style="font-weight: 800; font-size: 1.05rem; color: #f59e0b; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-            <span>{{ pendingAdmissionsCount }} New Candidate Registration(s) Awaiting SuperAdmin Review!</span>
-            <span style="padding: 2px 9px; border-radius: 999px; background: #f59e0b; color: #000; font-size: 0.72rem; font-weight: 900;">ACTION REQUIRED</span>
+      v-if="isMobileSidebarOpen" 
+      class="admin-sidebar-backdrop" 
+      @click="isMobileSidebarOpen = false" 
+      aria-hidden="true"
+    ></div>
+
+    <!-- 2. MAIN ADMIN CONTENT CANVAS -->
+    <main class="admin-main-canvas">
+      <!-- Top Executive Command Bar -->
+      <header class="admin-top-command-bar">
+        <div class="command-bar-left">
+          <button 
+            class="admin-mobile-toggle" 
+            @click="isMobileSidebarOpen = !isMobileSidebarOpen" 
+            aria-label="Toggle Sidebar Menu"
+          >
+            <span>☰</span>
+          </button>
+          <div class="admin-breadcrumb">
+            <span class="breadcrumb-root">IT HUNT Console</span>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current">{{ currentTabTitle }}</span>
           </div>
-          <div style="font-size: 0.85rem; color: #cbd5e1; margin-top: 3px;">
-            Candidate applications submitted via website. Click here to review candidate details and 1-click confirm their admissions with auto-generated Student User ID & Password.
+        </div>
+
+        <!-- Global Search Input in Command Bar -->
+        <div class="command-bar-search">
+          <span class="command-search-icon">🔍</span>
+          <input 
+            type="text" 
+            v-model="globalAdminSearch" 
+            class="command-search-input" 
+            placeholder="Search records in current tab..."
+          >
+          <button v-if="globalAdminSearch" class="command-search-clear" @click="globalAdminSearch = ''">✕</button>
+        </div>
+
+        <div class="command-bar-right">
+          <!-- Live Cloud Database Status Pill -->
+          <div class="cloud-status-chip" title="Connected to MongoDB Atlas Cloud Cluster (ithunt)">
+            <span class="pulse-dot-emerald"></span>
+            <span class="cloud-status-text">Cloud DB: Online</span>
+          </div>
+
+          <!-- Pending Admissions Notification Pill -->
+          <button 
+            v-if="pendingAdmissionsCount > 0" 
+            class="command-alert-pill" 
+            @click="currentTab = 'admissions'; admissionStatusFilter = 'Pending Verification'"
+            title="Click to review pending student registrations"
+          >
+            <span class="alert-icon">🔔</span>
+            <span class="alert-text">{{ pendingAdmissionsCount }} Pending Review</span>
+          </button>
+
+          <!-- Direct Admission Modal Button -->
+          <button 
+            class="command-primary-btn" 
+            @click="openQuickAdmissionModal" 
+            title="Register New Admission Directly"
+          >
+            <span>+ New Admission</span>
+          </button>
+
+          <!-- Backup Database Button -->
+          <button 
+            class="command-secondary-btn" 
+            @click="exportDataToJson" 
+            title="Download Complete JSON Backup of Database"
+          >
+            <span>📥 Backup</span>
+          </button>
+
+          <!-- Refresh Data Button -->
+          <button 
+            class="command-icon-btn" 
+            @click="refreshAllData" 
+            :disabled="isRefreshing" 
+            title="Sync with Live Database"
+          >
+            <span :style="isRefreshing ? 'display: inline-block; animation: spin 1s linear infinite;' : ''">🔄</span>
+          </button>
+
+          <!-- Theme Toggle -->
+          <button 
+            class="command-icon-btn" 
+            @click="$emit('toggle-theme')" 
+            :title="isDarkMode ? 'Switch to Light Theme' : 'Switch to Dark Theme'"
+          >
+            <span>{{ isDarkMode ? '☀️' : '🌙' }}</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Feedback Toast Banner -->
+      <div v-if="emailActionMsg" class="admin-toast-banner" :class="{ 'is-success': emailActionMsg.includes('✓') }">
+        <span>{{ emailActionMsg }}</span>
+      </div>
+
+      <!-- Main Workspace Panels Area -->
+      <div class="admin-canvas-content">
+
+        <!-- TAB: OVERVIEW (EXECUTIVE DASHBOARD) -->
+        <div v-if="currentTab === 'overview'" class="admin-tab-panel overview-panel anim-stagger-1">
+          <!-- 1. Executive Welcome Banner -->
+          <div class="overview-welcome-card">
+            <div class="welcome-card-left">
+              <div class="welcome-pill">
+                <span class="pulse-dot-emerald"></span>
+                <span>CENTRAL DIRECTORATE CONSOLE • ACADEMIC SESSION 2026-27</span>
+              </div>
+              <h2 class="welcome-title">
+                Welcome back, <span class="text-gradient">{{ adminUser.name || 'Mr. Lakshman Singh Chauhan' }}</span>
+              </h2>
+              <p class="welcome-desc">
+                IT HUNT Academy Central Registry • Connected to MongoDB Atlas Cloud • Session Status: <strong>{{ sessionTime }}</strong>
+              </p>
+            </div>
+            <div class="welcome-card-actions">
+              <button class="btn-primary welcome-cta-btn" @click="openQuickAdmissionModal">
+                <span>+ Direct Admission</span>
+              </button>
+              <button class="btn-secondary welcome-secondary-btn" @click="refreshAllData" :disabled="isRefreshing">
+                <span :style="isRefreshing ? 'display: inline-block; animation: spin 1s linear infinite;' : ''">🔄</span>
+                <span>Sync Live Data</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. Urgent Pending Applications Alert Banner (if pending) -->
+          <div 
+            v-if="pendingAdmissionsCount > 0" 
+            class="overview-urgent-banner"
+            @click="currentTab = 'admissions'; admissionStatusFilter = 'Pending Verification'"
+            title="Click to review and confirm pending registrations"
+          >
+            <div class="banner-left">
+              <div class="banner-icon-badge">🔔</div>
+              <div>
+                <div class="banner-head">
+                  <span>{{ pendingAdmissionsCount }} New Candidate Registration(s) Awaiting Review!</span>
+                  <span class="action-req-chip">ACTION REQUIRED</span>
+                </div>
+                <div class="banner-sub">
+                  Candidate applications submitted online. 1-Click confirm to automatically generate Student User ID & Password.
+                </div>
+              </div>
+            </div>
+            <button class="btn-primary banner-action-btn">
+              <span>Review Applications ({{ pendingAdmissionsCount }}) →</span>
+            </button>
+          </div>
+
+          <!-- 3. Core Executive KPI Metrics -->
+          <div class="overview-kpi-grid">
+            <!-- Metric 1: Total Enrolled Students -->
+            <div class="kpi-card" @click="currentTab = 'students'" title="View Students Directory">
+              <div class="kpi-card-top">
+                <div class="kpi-icon-box primary">🎓</div>
+                <span class="kpi-badge-pill green">Active Roster</span>
+              </div>
+              <div class="kpi-value text-gradient">{{ unifiedStudentsList.length }}</div>
+              <div class="kpi-label">Registered Students</div>
+              <div class="kpi-meta">
+                <span>🟢 {{ confirmedAdmissionsCount }} Confirmed</span>
+                <span>•</span>
+                <span style="color: #f59e0b;">⏳ {{ pendingAdmissionsCount }} Pending</span>
+              </div>
+            </div>
+
+            <!-- Metric 2: Admissions Registry -->
+            <div class="kpi-card" @click="currentTab = 'admissions'" title="View Admissions Registry">
+              <div class="kpi-card-top">
+                <div class="kpi-icon-box warning">📝</div>
+                <span class="kpi-badge-pill orange">Registry Node</span>
+              </div>
+              <div class="kpi-value text-gradient-gold">{{ admissionsList.length }}</div>
+              <div class="kpi-label">Admission Applications</div>
+              <div class="kpi-meta">
+                <span>Session 2026-27</span>
+                <span>•</span>
+                <span style="color: #38bdf8;">{{ content.internshipVenture?.tracks?.length || 5 }} Program Tracks</span>
+              </div>
+            </div>
+
+            <!-- Metric 3: Total Verified Fees Collected -->
+            <div class="kpi-card" @click="currentTab = 'fees'" title="View Fees Ledger">
+              <div class="kpi-card-top">
+                <div class="kpi-icon-box emerald">💳</div>
+                <span class="kpi-badge-pill emerald">Fee Ledger</span>
+              </div>
+              <div class="kpi-value text-gradient-emerald">₹{{ totalFeeCollected.toLocaleString('en-IN') }}</div>
+              <div class="kpi-label">Verified Fee Revenue</div>
+              <div class="kpi-meta">
+                <span>₹{{ totalFeePending.toLocaleString('en-IN') }} Pending</span>
+                <span>•</span>
+                <span>{{ feesList.length }} Accounts</span>
+              </div>
+            </div>
+
+            <!-- Metric 4: Verified Certificates & NIELIT Projects -->
+            <div class="kpi-card" @click="currentTab = 'certificates'" title="View Certificates Registry">
+              <div class="kpi-card-top">
+                <div class="kpi-icon-box purple">🏅</div>
+                <span class="kpi-badge-pill purple">QR Registry</span>
+              </div>
+              <div class="kpi-value" style="color: #c084fc;">{{ certificatesList.length }}</div>
+              <div class="kpi-label">Certificates Issued</div>
+              <div class="kpi-meta">
+                <span>{{ nielitProjectsList.length }} NIELIT Projects</span>
+                <span>•</span>
+                <span>100% Scannable QR</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Quick Action Power Launchpad -->
+          <div class="overview-launchpad-section">
+            <h3 class="section-block-title">⚡ Executive Command Shortcuts</h3>
+            <div class="launchpad-grid">
+              <button class="launch-card" @click="openQuickAdmissionModal">
+                <div class="launch-icon">➕</div>
+                <div class="launch-info">
+                  <div class="launch-title">Register Direct Admission</div>
+                  <div class="launch-desc">Enroll candidate & generate credentials</div>
+                </div>
+                <span class="launch-arrow">→</span>
+              </button>
+
+              <button class="launch-card" @click="currentTab = 'admissions'; admissionStatusFilter = 'Pending Verification'">
+                <div class="launch-icon">📋</div>
+                <div class="launch-info">
+                  <div class="launch-title">Review Pending Admissions</div>
+                  <div class="launch-desc">{{ pendingAdmissionsCount }} candidate(s) awaiting approval</div>
+                </div>
+                <span class="launch-arrow">→</span>
+              </button>
+
+              <button class="launch-card" @click="currentTab = 'students'">
+                <div class="launch-icon">🎛️</div>
+                <div class="launch-info">
+                  <div class="launch-title">Student Dashboard Controls</div>
+                  <div class="launch-desc">Toggle student tabs, notice banners & status</div>
+                </div>
+                <span class="launch-arrow">→</span>
+              </button>
+
+              <button class="launch-card" @click="showCourseCertModal = true">
+                <div class="launch-icon">🏅</div>
+                <div class="launch-info">
+                  <div class="launch-title">Issue Course Certificate</div>
+                  <div class="launch-desc">Generate official ISO certificate with QR</div>
+                </div>
+                <span class="launch-arrow">→</span>
+              </button>
+
+              <button class="launch-card" @click="currentTab = 'fees'">
+                <div class="launch-icon">🧾</div>
+                <div class="launch-info">
+                  <div class="launch-title">Record Fee Payment</div>
+                  <div class="launch-desc">Generate JPG receipts & download ledger</div>
+                </div>
+                <span class="launch-arrow">→</span>
+              </button>
+
+              <button class="launch-card" @click="exportDataToJson">
+                <div class="launch-icon">📥</div>
+                <div class="launch-info">
+                  <div class="launch-title">Export Database Backup</div>
+                  <div class="launch-desc">Download complete system JSON snapshot</div>
+                </div>
+                <span class="launch-arrow">→</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 5. Two-Column Dashboard Split: Recent Pending Queue & Live System Health -->
+          <div class="overview-dual-grid">
+            <!-- Left: Recent Pending Admissions Queue -->
+            <div class="overview-box-card">
+              <div class="box-card-header">
+                <div>
+                  <div class="box-card-title">⏳ Pending Review Queue</div>
+                  <div class="box-card-sub">Latest candidate registrations waiting for Directorate confirmation</div>
+                </div>
+                <button class="box-card-link" @click="currentTab = 'admissions'">View All Admissions →</button>
+              </div>
+
+              <div v-if="recentPendingAdmissions.length === 0" class="empty-state-clean">
+                <span class="empty-icon">✅</span>
+                <div class="empty-title">All Caught Up!</div>
+                <div class="empty-sub">No pending candidate applications. All submitted admissions have been confirmed.</div>
+              </div>
+
+              <div v-else class="queue-list">
+                <div v-for="adm in recentPendingAdmissions" :key="adm.registrationNo || adm.id" class="queue-item">
+                  <div class="queue-item-info">
+                    <div class="queue-item-name">{{ adm.candidateName || adm.fullName || 'Candidate' }}</div>
+                    <div class="queue-item-meta">
+                      <span class="queue-reg-pill">{{ adm.registrationNo || adm.id }}</span>
+                      <span>•</span>
+                      <span>{{ adm.course }}</span>
+                      <span>•</span>
+                      <span>{{ adm.date || 'Today' }}</span>
+                    </div>
+                  </div>
+                  <div class="queue-item-actions">
+                    <button class="btn-primary queue-confirm-btn" @click="handleConfirmAdmission(adm)" title="1-Click Confirm Admission">
+                      <span>Confirm ✓</span>
+                    </button>
+                    <button class="btn-secondary queue-icon-btn" @click="shareCredentialsOnWhatsApp(adm)" title="WhatsApp Candidate">
+                      <span>💬</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Realtime Cloud Infrastructure & Quick Jumpers -->
+            <div class="overview-box-card">
+              <div class="box-card-header">
+                <div>
+                  <div class="box-card-title">🛡️ Central System & Infrastructure</div>
+                  <div class="box-card-sub">Realtime database health, security protocols, and quick jumpers</div>
+                </div>
+                <button class="box-card-link" @click="refreshAllData">🔄 Refresh Status</button>
+              </div>
+
+              <div class="system-health-list">
+                <div class="health-row">
+                  <div class="health-label">
+                    <span class="health-dot-green"></span>
+                    <span>Database Engine</span>
+                  </div>
+                  <div class="health-value">MongoDB Atlas Cloud (ithunt)</div>
+                </div>
+
+                <div class="health-row">
+                  <div class="health-label">
+                    <span class="health-dot-green"></span>
+                    <span>REST API Service</span>
+                  </div>
+                  <div class="health-value">Online • v2.2.2-atlas</div>
+                </div>
+
+                <div class="health-row">
+                  <div class="health-label">
+                    <span class="health-dot-green"></span>
+                    <span>QR Verification Node</span>
+                  </div>
+                  <div class="health-value">Active • ISO 9001:2015</div>
+                </div>
+
+                <div class="health-row">
+                  <div class="health-label">
+                    <span class="health-dot-green"></span>
+                    <span>Security Encryption</span>
+                  </div>
+                  <div class="health-value">256-Bit SSL / JWT Auth</div>
+                </div>
+
+                <div class="health-row">
+                  <div class="health-label">
+                    <span class="health-dot-green"></span>
+                    <span>Session Authority</span>
+                  </div>
+                  <div class="health-value">{{ adminUser.name || 'Director & Founder' }}</div>
+                </div>
+              </div>
+
+              <div class="quick-jump-chips">
+                <span class="jump-label">Quick Jump:</span>
+                <button class="jump-chip" @click="currentTab = 'nielit'">📜 NIELIT Projects ({{ nielitProjectsList.length }})</button>
+                <button class="jump-chip" @click="currentTab = 'courses'">📚 Courses ({{ coursesList.length }})</button>
+                <button class="jump-chip" @click="currentTab = 'careers'">💼 Jobs ({{ jobApplicationsList.length }})</button>
+                <button class="jump-chip" @click="currentTab = 'reviews'">⭐ Reviews ({{ reviewsList.length }})</button>
+                <button class="jump-chip" @click="currentTab = 'events'">🎪 Events ({{ rsvpsList.length }})</button>
+                <button class="jump-chip" @click="currentTab = 'contact'">📬 Inquiries ({{ contactInquiriesList.length }})</button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      <button 
-        class="btn-primary" 
-        style="background: #f59e0b; border-color: #f59e0b; color: #000; font-weight: 800; font-size: 0.85rem; padding: 0.5rem 1.25rem; white-space: nowrap;"
-      >
-        <span>Review Registrations ({{ pendingAdmissionsCount }}) ➔</span>
-      </button>
-    </div>
 
-    <!-- 2. HIGH-LEVEL EXECUTIVE METRIC STATS -->
-    <div class="superadmin-stats-grid anim-stagger-2">
-      <!-- Database Students List -->
-      <div class="admin-stat-card">
-        <div class="admin-stat-icon-box primary-glow">🎓</div>
-        <div class="admin-stat-content">
-          <div class="admin-stat-val text-gradient">{{ unifiedStudentsList.length }}</div>
-          <div class="admin-stat-lbl">Database Students & Registrations</div>
-          <div class="admin-stat-trend">⚡ {{ confirmedAdmissionsCount }} Confirmed • {{ pendingAdmissionsCount }} Pending</div>
-        </div>
-      </div>
-
-      <!-- Total Admissions -->
-      <div class="admin-stat-card">
-        <div class="admin-stat-icon-box primary-glow">📝</div>
-        <div class="admin-stat-content">
-          <div class="admin-stat-val text-gradient">{{ admissionsList.length }}</div>
-          <div class="admin-stat-lbl">Admissions Registry</div>
-          <div class="admin-stat-trend">🟢 Active Batch 2026-27</div>
-        </div>
-      </div>
-
-      <!-- Active Interns -->
-      <div class="admin-stat-card">
-        <div class="admin-stat-icon-box warning-glow">🚀</div>
-        <div class="admin-stat-content">
-          <div class="admin-stat-val text-gradient-gold">{{ content.internshipVenture?.tracks?.length || 5 }} Tracks</div>
-          <div class="admin-stat-lbl">Production Incubator</div>
-          <div class="admin-stat-trend">⚡ 95% Placement Rate</div>
-        </div>
-      </div>
-
-      <!-- Event RSVPs -->
-      <div class="admin-stat-card">
-        <div class="admin-stat-icon-box info-glow">🎟️</div>
-        <div class="admin-stat-content">
-          <div class="admin-stat-val text-gradient-secondary">{{ rsvpsList.length }}</div>
-          <div class="admin-stat-lbl">Event VIP Passes</div>
-          <div class="admin-stat-trend">🎪 Hackathon & AI Summit</div>
-        </div>
-      </div>
-
-      <!-- Job Applications -->
-      <div class="admin-stat-card">
-        <div class="admin-stat-icon-box secondary-glow">💼</div>
-        <div class="admin-stat-content">
-          <div class="admin-stat-val" style="color: #38bdf8;">{{ jobApplicationsList.length }}</div>
-          <div class="admin-stat-lbl">Faculty & Dev Applicants</div>
-          <div class="admin-stat-trend">🔍 Active Recruitment</div>
-        </div>
-      </div>
-
-      <!-- Student Reviews -->
-      <div class="admin-stat-card">
-        <div class="admin-stat-icon-box gold-glow">⭐</div>
-        <div class="admin-stat-content">
-          <div class="admin-stat-val text-gradient-gold">{{ reviewsList.length }}</div>
-          <div class="admin-stat-lbl">Student Scorecards</div>
-          <div class="admin-stat-trend">🏆 4.92 / 5.0 Star Rating</div>
-        </div>
-      </div>
-
-      <!-- NIELIT Submitted Projects -->
-      <div class="admin-stat-card">
-        <div class="admin-stat-icon-box gold-glow">📜</div>
-        <div class="admin-stat-content">
-          <div class="admin-stat-val text-gradient-gold">{{ nielitProjectsList.length }}</div>
-          <div class="admin-stat-lbl">NIELIT Project Submissions</div>
-          <div class="admin-stat-trend">⚡ Official 4-Page Verification</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 3. INTERACTIVE NAVIGATION TABS -->
-    <div class="admin-tabs-nav-bar anim-stagger-2">
-      <button 
-        v-for="tab in defaultTabs"
-        :key="tab.id"
-        class="admin-nav-tab-btn"
-        :class="{ active: currentTab === tab.id }"
-        @click="currentTab = tab.id"
-      >
-        <span>{{ tab.icon }}</span>
-        <span>{{ tab.label }}</span>
-        <span class="tab-badge-counter" v-if="tab.id === 'students'">{{ unifiedStudentsList.length }}</span>
-        <span class="tab-badge-counter" v-else-if="tab.id === 'admissions'">
-          {{ admissionsList.length }}
-          <span v-if="pendingAdmissionsCount > 0" style="background: #f59e0b; color: #000; padding: 1px 6px; border-radius: 999px; font-weight: 900; margin-left: 4px; font-size: 0.7rem;">
-            {{ pendingAdmissionsCount }} new
-          </span>
-        </span>
-        <span class="tab-badge-counter" v-else-if="tab.id === 'courses'">{{ coursesList.length }}</span>
-        <span class="tab-badge-counter" v-else-if="tab.id === 'nielit'">{{ nielitProjectsList.length }}</span>
-        <span class="tab-badge-counter" v-else-if="tab.id === 'careers'">{{ jobApplicationsList.length }}</span>
-        <span class="tab-badge-counter" v-else-if="tab.id === 'events'">{{ rsvpsList.length }}</span>
-        <span class="tab-badge-counter" v-else-if="tab.id === 'internships'">{{ internshipsList.length || (content.internshipVenture?.tracks?.length || 5) }}</span>
-        <span class="tab-badge-counter" v-else-if="tab.id === 'reviews'">{{ reviewsList.length }}</span>
-        <span class="tab-badge-counter" v-else-if="tab.id === 'fees'">{{ feesList.length }}</span>
-        <span class="tab-badge-counter" v-else-if="tab.id === 'certificates'">{{ certificatesList.length }}</span>
-        <span class="tab-badge-counter" v-else-if="tab.id === 'projects'">{{ projectsList.length }}</span>
-        <span class="tab-badge-counter" v-else-if="tab.id === 'contact'">{{ contactInquiriesList.length }}</span>
-        <span class="tab-badge-counter" v-else-if="tab.id === 'users'">{{ usersList.length }}</span>
-      </button>
-    </div>
-
-    <!-- 4. TAB PANELS -->
-
-    <!-- TAB 0: STUDENTS DIRECTORY / STUDENT LIST -->
-    <div v-if="currentTab === 'students'" class="admin-tab-panel anim-stagger-3">
+        <!-- TAB 0: STUDENTS DIRECTORY / STUDENT LIST -->
+        <div v-else-if="currentTab === 'students'" class="admin-tab-panel anim-stagger-3">
       <div class="panel-header-controls">
         <div>
           <h3 class="panel-title">🎓 Students Directory & Master Academic List</h3>
@@ -403,7 +845,7 @@
     </div>
 
     <!-- TAB 1: ADMISSIONS & STUDENT REGISTRY -->
-    <div v-if="currentTab === 'admissions'" class="admin-tab-panel anim-stagger-3">
+    <div v-else-if="currentTab === 'admissions'" class="admin-tab-panel anim-stagger-3">
       <div class="panel-header-controls">
         <div>
           <h3 class="panel-title">🎓 Student Admissions & Candidate Registry</h3>
@@ -2606,7 +3048,9 @@
 
       </div>
     </div>
-  </section>
+      </div> <!-- /.admin-canvas-content -->
+    </main>
+  </div>
 </template>
 
 <script setup>
@@ -2707,10 +3151,30 @@ const props = defineProps({
   allCourses: {
     type: Array,
     default: () => []
+  },
+  isDarkMode: {
+    type: Boolean,
+    default: true
   }
 });
 
-const emit = defineEmits(['logout', 'download-slip', 'download-nielit-pdf', 'add-admission', 'confirm-admission', 'delete-admission', 'update-nielit-project', 'delete-nielit-project', 'delete-student', 'add-course', 'update-course', 'delete-course', 'refresh-data']);
+const emit = defineEmits([
+  'logout', 
+  'download-slip', 
+  'download-nielit-pdf', 
+  'add-admission', 
+  'confirm-admission', 
+  'delete-admission', 
+  'update-nielit-project', 
+  'delete-nielit-project', 
+  'delete-student', 
+  'add-course', 
+  'update-course', 
+  'delete-course', 
+  'refresh-data',
+  'set-tab',
+  'toggle-theme'
+]);
 
 const emailActionMsg = ref('');
 const showAdmissionEmailModal = ref(false);
@@ -2936,7 +3400,11 @@ const confirmFeeAndSendJpgReceipt = async (adm) => {
   setTimeout(() => { emailActionMsg.value = ''; }, 4000);
 };
 
-const currentTab = ref('students');
+// Enterprise Admin Shell State
+const isSidebarCollapsed = ref(false);
+const isMobileSidebarOpen = ref(false);
+const globalAdminSearch = ref('');
+const currentTab = ref('overview');
 const studentSearch = ref('');
 const studentCourseFilter = ref('all');
 const studentBatchFilter = ref('all');
@@ -3175,6 +3643,7 @@ const quickForm = ref({
 });
 
 const defaultTabs = [
+  { id: 'overview', label: '📊 Dashboard Overview', icon: '📊' },
   { id: 'students', label: '🎓 Students Directory', icon: '🎓' },
   { id: 'admissions', label: '📝 Admissions Registry', icon: '📝' },
   { id: 'courses', label: '📚 Courses & Programs', icon: '📚' },
@@ -3204,6 +3673,58 @@ const contactInquiriesList = ref([]);
 const reviewsList = ref([]);
 const usersList = ref([]);
 const coursesList = ref([]);
+
+// --- ENTERPRISE EXECUTIVE OVERVIEW COMPUTED PROPERTIES ---
+const currentTabTitle = computed(() => {
+  const found = defaultTabs.find(t => t.id === currentTab.value);
+  return found ? found.label : 'Directorate Console';
+});
+
+const totalStudentsCount = computed(() => {
+  return studentsList.value.length || (props.allStudents && props.allStudents.length) || 0;
+});
+
+const totalFeeCollected = computed(() => {
+  const list = feesList.value.length ? feesList.value : (props.allFees || []);
+  const sum = list.reduce((acc, f) => {
+    const raw = String(f.amount || f.feePaid || 0).replace(/[^0-9.]/g, '');
+    return acc + (parseFloat(raw) || 0);
+  }, 0);
+  return sum.toLocaleString('en-IN');
+});
+
+const totalFeePending = computed(() => {
+  const list = feesList.value.length ? feesList.value : (props.allFees || []);
+  const sum = list.reduce((acc, f) => {
+    const raw = String(f.pendingAmount || f.feePending || 0).replace(/[^0-9.]/g, '');
+    return acc + (parseFloat(raw) || 0);
+  }, 0);
+  return sum.toLocaleString('en-IN');
+});
+
+const recentPendingAdmissions = computed(() => {
+  const list = admissionsList.value.length ? admissionsList.value : (props.allAdmissions || []);
+  return list
+    .filter(a => a.status === 'Pending Verification' || a.status === 'Pending' || a.status === 'PENDING_REVIEW' || (!a.admissionConfirmed && a.status !== 'Confirmed'))
+    .slice(0, 5);
+});
+
+const handleConfirmAdmission = (adm) => {
+  return handleConfirmAdmissionAndGenerateCredentials(adm);
+};
+
+watch(globalAdminSearch, (val) => {
+  const q = (val || '').trim();
+  if (currentTab.value === 'students') {
+    studentSearch.value = q;
+  } else if (currentTab.value === 'admissions') {
+    admissionSearch.value = q;
+  } else if (currentTab.value === 'nielit') {
+    nielitSearch.value = q;
+  } else if (currentTab.value === 'certificates') {
+    certSearch.value = q;
+  }
+});
 
 watch(() => props.allCourses, (val) => {
   coursesList.value = (val && val.length > 0) ? val : (props.content.coursesSection?.coursesList || []);
@@ -4876,5 +5397,1294 @@ body.light-theme .admin-data-table th {
   background: rgba(15, 23, 42, 0.8);
   border-color: #a855f7;
   box-shadow: 0 0 12px rgba(168, 85, 247, 0.2);
+}
+
+/* ==========================================================================
+   ENTERPRISE SUPERADMIN APP SHELL, SIDEBAR & COMMAND BAR STYLES
+   ========================================================================== */
+.admin-shell {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background: #070a13;
+  color: #f1f5f9;
+  position: relative;
+  font-family: var(--font-body, system-ui, -apple-system, sans-serif);
+}
+
+:global(body.light-theme) .admin-shell {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+/* --- SIDEBAR --- */
+.admin-sidebar {
+  width: 275px;
+  min-width: 275px;
+  max-width: 275px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  background: #0b101e;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.25s, max-width 0.25s;
+}
+
+:global(body.light-theme) .admin-sidebar {
+  background: #ffffff;
+  border-right-color: #e2e8f0;
+}
+
+.admin-shell.sidebar-collapsed .admin-sidebar {
+  width: 76px;
+  min-width: 76px;
+  max-width: 76px;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 0.5rem;
+}
+
+:global(body.light-theme) .sidebar-brand {
+  border-bottom-color: #e2e8f0;
+}
+
+.brand-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  overflow: hidden;
+}
+
+.brand-logo-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+  flex-shrink: 0;
+}
+
+.brand-titles {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.brand-main-title {
+  font-family: var(--font-heading, inherit);
+  font-weight: 900;
+  font-size: 1.05rem;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.2;
+}
+
+.brand-sub-badge {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: var(--font-mono, monospace);
+}
+
+:global(body.light-theme) .brand-sub-badge {
+  color: #64748b;
+}
+
+.sidebar-collapse-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+:global(body.light-theme) .sidebar-collapse-btn {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.sidebar-collapse-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.sidebar-user-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.75rem 0.85rem;
+  margin: 0.75rem 0.75rem 0.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+}
+
+:global(body.light-theme) .sidebar-user-pill {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.sidebar-avatar-wrap {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.sidebar-avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1.5px solid rgba(59, 130, 246, 0.4);
+}
+
+.live-status-dot-emerald {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #10b981;
+  border: 2px solid #0b101e;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.8);
+}
+
+.sidebar-user-details {
+  overflow: hidden;
+}
+
+.sidebar-user-name {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:global(body.light-theme) .sidebar-user-name {
+  color: #0f172a;
+}
+
+.sidebar-user-role {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:global(body.light-theme) .sidebar-user-role {
+  color: #64748b;
+}
+
+.sidebar-nav-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  scrollbar-width: thin;
+}
+
+.nav-group-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.nav-group-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.35);
+  padding: 0.4rem 0.75rem 0.2rem;
+  text-transform: uppercase;
+  font-family: var(--font-mono, monospace);
+}
+
+:global(body.light-theme) .nav-group-label {
+  color: #94a3b8;
+}
+
+.nav-item-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s ease;
+  text-decoration: none;
+}
+
+:global(body.light-theme) .nav-item-btn {
+  color: #475569;
+}
+
+.nav-item-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #f1f5f9;
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+:global(body.light-theme) .nav-item-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #e2e8f0;
+}
+
+.nav-item-btn.active {
+  background: rgba(59, 130, 246, 0.14);
+  color: #60a5fa;
+  border-color: rgba(59, 130, 246, 0.3);
+  font-weight: 700;
+}
+
+:global(body.light-theme) .nav-item-btn.active {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #bfdbfe;
+}
+
+.nav-item-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  width: 22px;
+  text-align: center;
+}
+
+.nav-item-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-badge-pill {
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+}
+
+:global(body.light-theme) .nav-badge-pill {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.nav-badge-pill.alert-badge {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.sidebar-bottom-actions {
+  padding: 0.75rem 0.6rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+:global(body.light-theme) .sidebar-bottom-actions {
+  border-top-color: #e2e8f0;
+}
+
+.sidebar-logout-btn {
+  color: #f87171 !important;
+}
+
+.sidebar-logout-btn:hover {
+  background: rgba(239, 68, 68, 0.12) !important;
+  border-color: rgba(239, 68, 68, 0.25) !important;
+  color: #ef4444 !important;
+}
+
+/* --- CANVAS & TOP COMMAND BAR --- */
+.admin-main-canvas {
+  flex: 1;
+  min-width: 0;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  background: #070a13;
+  scroll-behavior: smooth;
+}
+
+:global(body.light-theme) .admin-main-canvas {
+  background: #f8fafc;
+}
+
+.admin-top-command-bar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.75rem;
+  background: rgba(11, 16, 29, 0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  flex-wrap: wrap;
+}
+
+:global(body.light-theme) .admin-top-command-bar {
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom-color: #e2e8f0;
+}
+
+.command-bar-left, .command-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.admin-mobile-toggle {
+  display: none;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  padding: 0.4rem 0.65rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+:global(body.light-theme) .admin-mobile-toggle {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+.admin-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+}
+
+.breadcrumb-root {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.breadcrumb-separator {
+  color: #475569;
+  font-size: 0.7rem;
+}
+
+.breadcrumb-current {
+  color: #f1f5f9;
+  font-weight: 700;
+}
+
+:global(body.light-theme) .breadcrumb-current {
+  color: #0f172a;
+}
+
+.command-search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 320px;
+}
+
+.command-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  color: #64748b;
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+
+.command-search-input {
+  width: 100%;
+  padding: 0.5rem 2.2rem 0.5rem 2.25rem;
+  font-size: 0.82rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+  transition: all 0.2s;
+  outline: none;
+}
+
+:global(body.light-theme) .command-search-input {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+.command-search-input:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 0.65rem;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.command-alert-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.command-alert-pill:hover {
+  background: rgba(245, 158, 11, 0.25);
+  border-color: rgba(245, 158, 11, 0.5);
+  transform: translateY(-1px);
+}
+
+.command-primary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 1px solid #3b82f6;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+  transition: all 0.2s;
+}
+
+.command-primary-btn:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-1px);
+}
+
+.command-secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+:global(body.light-theme) .command-secondary-btn {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+.command-secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.command-icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+:global(body.light-theme) .command-icon-btn {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+.command-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* --- OVERVIEW DASHBOARD PANEL --- */
+.overview-panel {
+  padding: 1.75rem 2rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  max-width: 1560px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.overview-welcome-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.75rem 2rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  flex-wrap: wrap;
+}
+
+:global(body.light-theme) .overview-welcome-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+
+.welcome-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34d399;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.welcome-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #f8fafc;
+  margin: 0 0 0.25rem 0;
+  letter-spacing: -0.02em;
+}
+
+:global(body.light-theme) .welcome-title {
+  color: #0f172a;
+}
+
+.welcome-highlight {
+  background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.welcome-subtitle {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+:global(body.light-theme) .welcome-subtitle {
+  color: #64748b;
+}
+
+.welcome-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.welcome-cta-btn {
+  padding: 0.65rem 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+  transition: transform 0.2s;
+}
+
+.welcome-cta-btn:hover {
+  transform: translateY(-2px);
+}
+
+.welcome-secondary-btn {
+  padding: 0.65rem 1.15rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+:global(body.light-theme) .welcome-secondary-btn {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.overview-alert-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  flex-wrap: wrap;
+}
+
+.alert-content {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.alert-pulse-icon {
+  font-size: 1.35rem;
+}
+
+.alert-banner-btn {
+  padding: 0.45rem 0.95rem;
+  border-radius: 8px;
+  background: #f59e0b;
+  color: #000;
+  font-size: 0.8rem;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.overview-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+@media (max-width: 1200px) {
+  .overview-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .overview-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kpi-card {
+  padding: 1.35rem 1.5rem;
+  border-radius: 14px;
+  background: rgba(18, 26, 43, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+:global(body.light-theme) .kpi-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+
+.kpi-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.5);
+}
+
+:global(body.light-theme) .kpi-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.kpi-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kpi-card-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+:global(body.light-theme) .kpi-card-label {
+  color: #64748b;
+}
+
+.kpi-icon-pill {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.kpi-students .kpi-icon-pill {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+.kpi-admissions .kpi-icon-pill {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+
+.kpi-fees .kpi-icon-pill {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.kpi-courses .kpi-icon-pill {
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+}
+
+.kpi-value {
+  font-size: 1.85rem;
+  font-weight: 900;
+  color: #f8fafc;
+  line-height: 1.1;
+  margin: 0.25rem 0;
+  letter-spacing: -0.02em;
+}
+
+:global(body.light-theme) .kpi-value {
+  color: #0f172a;
+}
+
+.kpi-footer {
+  font-size: 0.75rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kpi-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+}
+
+.kpi-action-arrow {
+  color: #3b82f6;
+  font-size: 0.9rem;
+  font-weight: 800;
+  transition: transform 0.2s;
+}
+
+.kpi-card:hover .kpi-action-arrow {
+  transform: translateX(3px);
+}
+
+.overview-section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.overview-section-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #f1f5f9;
+  margin: 0;
+}
+
+:global(body.light-theme) .overview-section-title {
+  color: #0f172a;
+}
+
+.overview-section-sub {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin: 0.2rem 0 0 0;
+}
+
+.launchpad-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 1400px) {
+  .launchpad-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .launchpad-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .launchpad-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.launch-card {
+  padding: 1.15rem 1rem;
+  border-radius: 12px;
+  background: rgba(18, 26, 43, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.85rem;
+  color: inherit;
+}
+
+:global(body.light-theme) .launch-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+.launch-card:hover {
+  transform: translateY(-2px);
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.06);
+}
+
+.launch-icon {
+  font-size: 1.4rem;
+}
+
+.launch-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #f1f5f9;
+  margin-bottom: 0.2rem;
+}
+
+:global(body.light-theme) .launch-title {
+  color: #0f172a;
+}
+
+.launch-desc {
+  font-size: 0.7rem;
+  color: #64748b;
+  line-height: 1.3;
+}
+
+.launch-arrow {
+  font-size: 0.85rem;
+  color: #3b82f6;
+  font-weight: 800;
+  align-self: flex-end;
+}
+
+.overview-dual-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1100px) {
+  .overview-dual-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.overview-box-card {
+  padding: 1.5rem;
+  border-radius: 14px;
+  background: rgba(18, 26, 43, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+:global(body.light-theme) .overview-box-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+
+.box-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 0.85rem;
+}
+
+:global(body.light-theme) .box-card-header {
+  border-bottom-color: #e2e8f0;
+}
+
+.box-card-title {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #f1f5f9;
+}
+
+:global(body.light-theme) .box-card-title {
+  color: #0f172a;
+}
+
+.box-card-sub {
+  font-size: 0.74rem;
+  color: #64748b;
+  margin-top: 0.15rem;
+}
+
+.box-card-link {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.box-card-link:hover {
+  text-decoration: underline;
+}
+
+.empty-state-clean {
+  text-align: center;
+  padding: 2.5rem 1rem;
+}
+
+.empty-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.empty-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #f1f5f9;
+}
+
+:global(body.light-theme) .empty-title {
+  color: #0f172a;
+}
+
+.empty-sub {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+}
+
+.queue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.queue-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.15s;
+}
+
+:global(body.light-theme) .queue-item {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.queue-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.queue-item-info {
+  overflow: hidden;
+}
+
+.queue-item-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:global(body.light-theme) .queue-item-name {
+  color: #0f172a;
+}
+
+.queue-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin-top: 0.2rem;
+  flex-wrap: wrap;
+}
+
+.queue-reg-pill {
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.queue-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.queue-confirm-btn {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.queue-icon-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.system-health-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.health-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  font-size: 0.78rem;
+}
+
+:global(body.light-theme) .health-row {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.health-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+:global(body.light-theme) .health-label {
+  color: #475569;
+}
+
+.health-dot-green {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.8);
+}
+
+.health-value {
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  color: #e2e8f0;
+  font-size: 0.75rem;
+}
+
+:global(body.light-theme) .health-value {
+  color: #0f172a;
+}
+
+.quick-jump-chips {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+:global(body.light-theme) .quick-jump-chips {
+  border-top-color: #e2e8f0;
+}
+
+.jump-label {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.jump-chip {
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+:global(body.light-theme) .jump-chip {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.jump-chip:hover {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: #3b82f6;
+  color: #60a5fa;
+}
+
+/* --- MOBILE RESPONSIVE DRAWER & BREAKPOINTS --- */
+@media (max-width: 960px) {
+  .admin-mobile-toggle {
+    display: flex;
+  }
+
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    bottom: 0;
+    height: 100vh;
+    z-index: 9999;
+    box-shadow: 15px 0 50px rgba(0, 0, 0, 0.8);
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .admin-sidebar.mobile-open {
+    left: 0;
+  }
+
+  .admin-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 9998;
+  }
+
+  .command-search-bar {
+    width: 100%;
+    max-width: 240px;
+  }
+
+  .overview-panel {
+    padding: 1rem 1rem 2.5rem;
+    gap: 1.25rem;
+  }
 }
 </style>
