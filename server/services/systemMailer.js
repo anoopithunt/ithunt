@@ -1,8 +1,8 @@
 import nodemailer from 'nodemailer';
 
 function getSmtpCredentials() {
-  const user = (process.env.SMTP_USER || process.env.GMAIL_USER || process.env.CONTACT_EMAIL || 'anoopmishrapitz@gmail.com').trim();
-  const rawPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD || process.env.GMAIL_PASS || 'jbyadbnincvvwqwx';
+  const user = (process.env.SMTP_USER || process.env.GMAIL_USER || process.env.CONTACT_EMAIL || '').trim();
+  const rawPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD || process.env.GMAIL_PASS || '';
   const pass = rawPass.replace(/\s+/g, '');
   return { user, pass };
 }
@@ -10,10 +10,9 @@ function getSmtpCredentials() {
 function getAdminRecipients() {
   const list = [
     process.env.ADMIN_EMAIL,
-    process.env.CONTACT_EMAIL || 'softtechithunt@gmail.com',
-    process.env.SMTP_USER || 'anoopmishrapitz@gmail.com',
-    'softtechithunt@gmail.com',
-    'anoopmishrapitz@gmail.com'
+    process.env.CONTACT_EMAIL,
+    process.env.SMTP_USER,
+    'softtechithunt@gmail.com'
   ].filter(Boolean).map(e => e.trim().toLowerCase());
   return Array.from(new Set(list));
 }
@@ -22,7 +21,10 @@ const FROM_NAME = 'IT HUNT Academy';
 
 async function sendMail({ to, subject, text, html, fromAddress = null, replyTo = null }) {
   const { user, pass } = getSmtpCredentials();
-  if (!user || !pass || !to) return { success: false, reason: 'Missing credentials or recipient' };
+  if (!user || !pass || !to) {
+    console.warn('[SystemMailer] Skipping email send — SMTP_USER or SMTP_PASS not set in environment variables.');
+    return { success: false, reason: 'Missing credentials or recipient' };
+  }
 
   try {
     const transporter = nodemailer.createTransport({
@@ -153,9 +155,10 @@ Email    : ${stuEmail}
 Address  : ${adm.address || 'N/A'}, ${adm.district || ''}
 Timestamp: ${date}`;
 
+  const fallbackFrom = process.env.SMTP_USER || process.env.CONTACT_EMAIL || 'softtechithunt@gmail.com';
   const studentFrom = (stuEmail && stuEmail.includes('@'))
     ? `"${candName} (${stuEmail})" <${stuEmail}>`
-    : `"${candName} (via IT HUNT)" <anoopmishrapitz@gmail.com>`;
+    : `"${candName} (via IT HUNT)" <${fallbackFrom}>`;
 
   for (const adminTo of getAdminRecipients()) {
     await sendMail({
@@ -214,7 +217,7 @@ ${message}`;
 
   const inquirerFrom = (email && email.includes('@'))
     ? `"${name} (${email})" <${email}>`
-    : `"${name} (via IT HUNT)" <anoopmishrapitz@gmail.com>`;
+    : `"${name} (via IT HUNT)" <${fallbackFrom}>`;
 
   for (const adminTo of getAdminRecipients()) {
     await sendMail({

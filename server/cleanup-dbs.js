@@ -3,10 +3,9 @@ dotenv.config();
 
 import mongoose from 'mongoose';
 
-const ATLAS_URI = (process.env.MONGODB_ATLAS_URI || '').trim() ||
-  'mongodb+srv://anoopmishrapitz_db_user:IthuntPass2026@cluster0.oo3akne.mongodb.net/ithunt?retryWrites=true&w=majority';
+const ATLAS_URI = (process.env.MONGODB_ATLAS_URI || process.env.MONGODB_URI || '').trim();
 
-const LOCAL_URI = (process.env.MONGODB_LOCAL_URI || process.env.MONGODB_URI || '').trim() ||
+const LOCAL_URI = (process.env.MONGODB_LOCAL_URI || '').trim() ||
   'mongodb://127.0.0.1:27017/ithunt';
 
 // Junk / dummy / test identifiers to remove

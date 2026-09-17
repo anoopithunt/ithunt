@@ -14,8 +14,8 @@ import PDFDocument from 'pdfkit';
 
 // ── Helpers to get fresh, sanitized credentials & recipients ──────────────────
 function getSmtpCredentials() {
-  const user = (process.env.SMTP_USER || process.env.GMAIL_USER || process.env.CONTACT_EMAIL || 'anoopmishrapitz@gmail.com').trim();
-  const rawPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD || process.env.GMAIL_PASS || 'jbyadbnincvvwqwx';
+  const user = (process.env.SMTP_USER || process.env.GMAIL_USER || process.env.CONTACT_EMAIL || '').trim();
+  const rawPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD || process.env.GMAIL_PASS || '';
   const pass = rawPass.replace(/\s+/g, '');
   return { user, pass };
 }
@@ -23,10 +23,9 @@ function getSmtpCredentials() {
 function getAdminRecipients() {
   const list = [
     process.env.ADMIN_EMAIL,
-    process.env.CONTACT_EMAIL || 'softtechithunt@gmail.com',
-    process.env.SMTP_USER || 'anoopmishrapitz@gmail.com',
-    'softtechithunt@gmail.com',
-    'anoopmishrapitz@gmail.com'
+    process.env.CONTACT_EMAIL,
+    process.env.SMTP_USER,
+    'softtechithunt@gmail.com'
   ].filter(Boolean).map(e => e.trim().toLowerCase());
   return Array.from(new Set(list));
 }
