@@ -261,6 +261,69 @@ router.post('/:id/confirm', async (req, res) => {
 });
 
 /**
+ * PUT /api/admissions/:id
+ * Full update of an admission record by admin
+ */
+router.put('/:id', async (req, res) => {
+  try {
+    const targetId = req.params.id;
+    const body = req.body || {};
+
+    // Find the record by mongo _id, registrationNo, or id field
+    let adm = await dbAdapter.findById('admissions', targetId);
+    if (!adm) {
+      const all = await dbAdapter.find('admissions');
+      adm = all.find(a =>
+        a.id === targetId ||
+        a.registrationNo === targetId ||
+        a.registrationNumber === targetId ||
+        (a.email && a.email.toLowerCase() === String(targetId).toLowerCase())
+      );
+    }
+    if (!adm) {
+      return res.status(404).json({ success: false, message: 'Admission record not found' });
+    }
+
+    // Strip fields that should NOT be changed by a plain edit
+    const { _id, __v, createdAt, ...safeUpdates } = body;
+
+    const updated = await dbAdapter.update('admissions', adm.id || targetId, safeUpdates);
+
+    // Also sync relevant fields to the students collection
+    const studentFields = {};
+    if (safeUpdates.candidateName || safeUpdates.fullName) {
+      studentFields.name = safeUpdates.candidateName || safeUpdates.fullName;
+      studentFields.fullName = studentFields.name;
+    }
+    if (safeUpdates.email) studentFields.email = safeUpdates.email;
+    if (safeUpdates.phone || safeUpdates.mobile) {
+      studentFields.phone = safeUpdates.phone || safeUpdates.mobile;
+      studentFields.mobile = safeUpdates.mobile || safeUpdates.phone;
+    }
+    if (safeUpdates.course) studentFields.course = safeUpdates.course;
+    if (safeUpdates.gender) studentFields.gender = safeUpdates.gender;
+    if (safeUpdates.dob) studentFields.dob = safeUpdates.dob;
+    if (safeUpdates.address) studentFields.address = safeUpdates.address;
+    if (safeUpdates.fatherName) studentFields.guardianName = safeUpdates.fatherName;
+
+    if (Object.keys(studentFields).length > 0) {
+      try {
+        const studentId = adm.userId || adm.enrollmentNumber || adm.registrationNo;
+        if (studentId) {
+          await dbAdapter.update('students', studentId, studentFields);
+        }
+      } catch (syncErr) {
+        console.warn('[Admissions PUT] Could not sync student record:', syncErr.message);
+      }
+    }
+
+    res.json({ success: true, data: updated, message: 'Admission record updated successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
  * PATCH /api/admissions/:id/status
  */
 router.patch('/:id/status', async (req, res) => {

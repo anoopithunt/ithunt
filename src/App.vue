@@ -190,7 +190,9 @@
           @add-admission="handleDirectAdmission"
           @confirm-admission="handleConfirmAdmission"
           @delete-admission="handleDeleteAdmission"
+          @update-admission="handleUpdateAdmission"
           @delete-student="handleDeleteStudent"
+          @update-student="handleUpdateStudent"
           @add-course="handleAddCourse"
           @update-course="handleUpdateCourse"
           @delete-course="handleDeleteCourse"
@@ -465,6 +467,7 @@ import {
   deleteStudentFromBackend,
   deleteUserFromBackend,
   deleteAdmissionFromBackend,
+  updateAdmissionInBackend,
   fetchCoursesFromBackend,
   saveCourseToBackend,
   updateCourseInBackend,
@@ -1194,6 +1197,32 @@ const handleDeleteAdmission = async (adm) => {
     a.id !== altId
   );
   await deleteAdmissionFromBackend(adm);
+};
+
+// Update an admission record in MongoDB and refresh the local list
+const handleUpdateAdmission = async (updatedAdm) => {
+  const targetId = updatedAdm.registrationNo || updatedAdm.id;
+  const idx = liveAdmissionsList.value.findIndex(a =>
+    a.registrationNo === targetId || a.id === targetId
+  );
+  if (idx !== -1) {
+    liveAdmissionsList.value[idx] = { ...liveAdmissionsList.value[idx], ...updatedAdm };
+  }
+  await updateAdmissionInBackend(targetId, updatedAdm);
+};
+
+// Update a student record in MongoDB and refresh the local list
+const handleUpdateStudent = async (updatedStu) => {
+  const targetId = updatedStu.enrollmentNumber || updatedStu.userId || updatedStu.id;
+  const idx = liveStudentsList.value.findIndex(s =>
+    s.enrollmentNumber === targetId || s.userId === targetId || s.id === targetId
+  );
+  if (idx !== -1) {
+    liveStudentsList.value[idx] = { ...liveStudentsList.value[idx], ...updatedStu };
+  }
+  // students PUT endpoint updates both student + admission records
+  const { API: _api } = await import('./utils/apiClient.js');
+  try { await _api.updateStudent(targetId, updatedStu); } catch (e) {}
 };
 
 const handleUpdateNielitProject = async (updatedProject) => {
