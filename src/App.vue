@@ -518,9 +518,17 @@ const showToast = (message, type = 'success', duration = 4000) => {
 let revealObserver = null;
 
 // SuperAdmin & Auth Session State
-const isAdminLoggedIn = ref(false);
+const getStoredAdminAuth = () => {
+  try {
+    const raw = sessionStorage.getItem('ithunt_superadmin_auth') || localStorage.getItem('ithunt_superadmin_auth');
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return null;
+};
+const storedAdmin = getStoredAdminAuth();
+const isAdminLoggedIn = ref(!!storedAdmin);
 const loginActiveRole = ref('student');
-const adminUser = ref({
+const adminUser = ref(storedAdmin || {
   name: 'Mr. Lakshman Singh Chauhan',
   role: 'Director & Chief Administrator',
   email: 'admin@ithunt.com',
@@ -1068,6 +1076,7 @@ const handleLoginSuccess = async (user) => {
   adminUser.value = user;
   try {
     sessionStorage.setItem('ithunt_superadmin_auth', JSON.stringify(user));
+    localStorage.setItem('ithunt_superadmin_auth', JSON.stringify(user));
   } catch (e) {}
   activeTab.value = 'superadmin';
   triggerConfetti();
@@ -1076,8 +1085,17 @@ const handleLoginSuccess = async (user) => {
 
 const handleAdminLogout = () => {
   isAdminLoggedIn.value = false;
+  adminUser.value = {
+    name: 'Mr. Lakshman Singh Chauhan',
+    role: 'Director & Chief Administrator',
+    email: 'admin@ithunt.com',
+    avatar: 'img/ithunt.webp'
+  };
   try {
     sessionStorage.removeItem('ithunt_superadmin_auth');
+    localStorage.removeItem('ithunt_superadmin_auth');
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('token');
   } catch (e) {}
   activeTab.value = 'home';
 };
@@ -1340,7 +1358,7 @@ onMounted(() => {
 
   // Restore saved admin session if any
   try {
-    const savedAdmin = sessionStorage.getItem('ithunt_superadmin_auth');
+    const savedAdmin = sessionStorage.getItem('ithunt_superadmin_auth') || localStorage.getItem('ithunt_superadmin_auth');
     if (savedAdmin) {
       adminUser.value = JSON.parse(savedAdmin);
       isAdminLoggedIn.value = true;
