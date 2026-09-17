@@ -3673,19 +3673,80 @@ body.light-theme .internship-bottom-cta {
   opacity: 1;
 }
 
-/* Ensure footer text stays white in Light Theme as well */
+/* Footer Theme Visibility Controls */
+.footer-section .brand-title {
+  color: #ffffff;
+}
+
+.footer-section .brand-tagline {
+  color: #94a3b8;
+}
+
 body.light-theme .footer-section {
-  background: #140e09;
-  border-top: 1px solid rgba(249, 115, 22, 0.3);
-  color: #ffffff !important;
+  background: #ffffff !important;
+  border-top: 1px solid #e2e8f0 !important;
+  color: #0f172a !important;
+  box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.03);
+}
+
+body.light-theme .footer-section .brand-title {
+  color: #0f172a !important;
+}
+
+body.light-theme .footer-section .brand-tagline {
+  color: #64748b !important;
 }
 
 body.light-theme .footer-section p,
-body.light-theme .footer-col h4,
-body.light-theme .footer-links a,
+body.light-theme .footer-about-text,
+body.light-theme .footer-contact-item {
+  color: #334155 !important;
+}
+
+body.light-theme .footer-col h4 {
+  color: #0f172a !important;
+}
+
+body.light-theme .footer-links a {
+  color: #475569 !important;
+}
+
+body.light-theme .footer-links a:hover {
+  color: #ea580c !important;
+}
+
 body.light-theme .footer-bottom,
+body.light-theme .footer-copyright-text,
 body.light-theme .footer-bottom a {
-  color: #ffffff !important;
+  color: #64748b !important;
+}
+
+body.light-theme .footer-bottom a:hover {
+  color: #ea580c !important;
+}
+
+body.light-theme .footer-chip-yellow {
+  background: #fef9c3 !important;
+  color: #854d0e !important;
+  border: 1.5px solid #facc15 !important;
+}
+
+body.light-theme .footer-chip-orange {
+  background: #ffedd5 !important;
+  color: #9a3412 !important;
+  border: 1.5px solid #fb923c !important;
+}
+
+body.light-theme .footer-chip-green {
+  background: #dcfce7 !important;
+  color: #166534 !important;
+  border: 1.5px solid #4ade80 !important;
+}
+
+body.light-theme .footer-section a[href*="wa.me"] {
+  background: #dcfce7 !important;
+  border: 1px solid #86efac !important;
+  color: #15803d !important;
 }
 
 /* ==========================================================================
@@ -8664,5 +8725,416 @@ main.superadmin-main-active {
 body.light-theme main.superadmin-main-active {
   background: #f8fafc !important;
 }
+
+/* ==========================================================================
+   GLOBAL HIGH-CONTRAST LIGHT THEME MASTER SUITE
+   Guarantees 100% text visibility & crisp contrast across the entire project
+   ========================================================================== */
+
+body.light-theme {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+body.light-theme h1,
+body.light-theme h2,
+body.light-theme h3,
+body.light-theme h4,
+body.light-theme h5,
+body.light-theme h6 {
+  color: #0f172a !important;
+}
+
+body.light-theme p {
+  color: #334155 !important;
+}
+
+body.light-theme .brand-title {
+  color: #0f172a !important;
+}
+
+body.light-theme .brand-tagline {
+  color: #64748b !important;
+}
+
+body.light-theme .hero-title {
+  color: #0f172a !important;
+}
+
+body.light-theme .hero-subtitle,
+body.light-theme .section-subtitle,
+body.light-theme .spotlight-banner-desc,
+body.light-theme .spotlight-card-desc,
+body.light-theme .course-desc,
+body.light-theme .about-desc,
+body.light-theme .director-message,
+body.light-theme .team-bio,
+body.light-theme .internship-main-desc,
+body.light-theme .events-hero-subtitle,
+body.light-theme .event-card-desc,
+body.light-theme .login-subtitle,
+body.light-theme .form-subtitle {
+  color: #334155 !important;
+}
+
+body.light-theme .stat-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
+}
+
+body.light-theme .stat-label {
+  color: #475569 !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .hero-floating-badge {
+  background: #ffffff !important;
+  border-color: rgba(249, 115, 22, 0.4) !important;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.1) !important;
+}
+
+body.light-theme .hero-floating-title {
+  color: #0f172a !important;
+}
+
+body.light-theme .hero-floating-sub {
+  color: #64748b !important;
+}
+
+body.light-theme .internship-banner {
+  background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%) !important;
+  border-color: #fed7aa !important;
+  box-shadow: 0 10px 30px rgba(249, 115, 22, 0.08) !important;
+}
+
+body.light-theme .spotlight-banner-heading {
+  color: #0f172a !important;
+}
+
+body.light-theme .spotlight-sub-card {
+  background: #ffffff !important;
+  border-color: #fed7aa !important;
+  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.06) !important;
+}
+
+body.light-theme .spotlight-card-title {
+  color: #0f172a !important;
+}
+
+body.light-theme .spotlight-card-desc {
+  color: #475569 !important;
+}
+
+body.light-theme .director-spotlight-card {
+  background: #ffffff !important;
+  border-color: #fed7aa !important;
+  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.06) !important;
+}
+
+body.light-theme .director-name {
+  color: #0f172a !important;
+}
+
+body.light-theme .director-title {
+  color: #d97706 !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .cofounder-title {
+  color: #0284c7 !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .team-card {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05) !important;
+}
+
+body.light-theme .team-name {
+  color: #0f172a !important;
+}
+
+body.light-theme .team-role {
+  color: #ea580c !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .modern-track-card {
+  background: #ffffff !important;
+  border-color: #fed7aa !important;
+  box-shadow: 0 10px 30px rgba(249, 115, 22, 0.06) !important;
+}
+
+body.light-theme .track-card-title {
+  color: #0f172a !important;
+}
+
+body.light-theme .track-card-desc {
+  color: #475569 !important;
+}
+
+body.light-theme .track-glass-stats {
+  background: #fffbeb !important;
+  border-color: #fde68a !important;
+}
+
+body.light-theme .cell-label {
+  color: #78350f !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .cell-val {
+  color: #0f172a !important;
+  font-weight: 900 !important;
+}
+
+body.light-theme .cell-green {
+  color: #166534 !important;
+}
+
+body.light-theme .cell-cyan {
+  color: #0369a1 !important;
+}
+
+body.light-theme .track-projects-preview {
+  background: #fff7ed !important;
+  border-color: #fed7aa !important;
+}
+
+body.light-theme .projects-preview-label {
+  color: #c2410c !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .proj-tag {
+  background: #ffffff !important;
+  border-color: #fdba74 !important;
+  color: #431407 !important;
+}
+
+body.light-theme .feature-pillar-card,
+body.light-theme .roadmap-step-card {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+body.light-theme .feature-pillar-card h3,
+body.light-theme .roadmap-step-title {
+  color: #0f172a !important;
+}
+
+body.light-theme .feature-pillar-card p,
+body.light-theme .roadmap-step-desc {
+  color: #475569 !important;
+}
+
+body.light-theme .event-card {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06) !important;
+}
+
+body.light-theme .event-card-title {
+  color: #0f172a !important;
+}
+
+body.light-theme .event-meta-row {
+  color: #d97706 !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .event-chip {
+  background: #fff7ed !important;
+  border-color: #fed7aa !important;
+  color: #c2410c !important;
+}
+
+body.light-theme .event-cat-btn {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+body.light-theme .event-cat-btn.active {
+  background: var(--gradient-ai-btn) !important;
+  color: #ffffff !important;
+}
+
+body.light-theme .events-search-box {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+body.light-theme .events-search-input {
+  color: #0f172a !important;
+}
+
+body.light-theme .events-search-input::placeholder {
+  color: #94a3b8 !important;
+}
+
+body.light-theme .event-detail-popup {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+  box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.25) !important;
+}
+
+body.light-theme .event-detail-popup h2,
+body.light-theme .event-detail-popup h3 {
+  color: #0f172a !important;
+}
+
+body.light-theme .event-detail-popup p {
+  color: #334155 !important;
+}
+
+body.light-theme .rating-summary-card {
+  background: #ffffff !important;
+  border-color: #fed7aa !important;
+  box-shadow: 0 10px 30px rgba(249, 115, 22, 0.06) !important;
+}
+
+body.light-theme .rating-count-sub {
+  color: #64748b !important;
+}
+
+body.light-theme .review-card {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
+}
+
+body.light-theme .review-author-name {
+  color: #0f172a !important;
+}
+
+body.light-theme .review-author-role {
+  color: #64748b !important;
+}
+
+body.light-theme .rating-picker-title {
+  color: #0f172a !important;
+}
+
+body.light-theme .career-card {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 6px 20px -2px rgba(15, 23, 42, 0.06) !important;
+}
+
+body.light-theme .career-card h3 {
+  color: #0f172a !important;
+}
+
+body.light-theme .career-benefit-card {
+  background: #ffffff !important;
+  border-color: #fed7aa !important;
+}
+
+body.light-theme .benefit-title {
+  color: #0f172a !important;
+}
+
+body.light-theme .benefit-desc {
+  color: #475569 !important;
+}
+
+body.light-theme .career-points-box {
+  background: #fff7ed !important;
+  border-color: #fed7aa !important;
+}
+
+body.light-theme .career-points-title {
+  color: #c2410c !important;
+}
+
+body.light-theme .career-points-list li {
+  color: #334155 !important;
+}
+
+body.light-theme .form-card {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 10px 35px -5px rgba(15, 23, 42, 0.08) !important;
+}
+
+body.light-theme .form-title {
+  color: #0f172a !important;
+}
+
+body.light-theme .form-label {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .form-control {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.light-theme .form-control:focus {
+  border-color: #f97316 !important;
+  background: #ffffff !important;
+}
+
+body.light-theme .radio-option {
+  color: #0f172a !important;
+  font-weight: 600 !important;
+}
+
+body.light-theme .btn-secondary {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.light-theme .btn-secondary:hover {
+  background: #f8fafc !important;
+  border-color: #f97316 !important;
+  color: #ea580c !important;
+}
+
+body.light-theme .floating-back-to-top {
+  background: #ffffff !important;
+  border: 1.5px solid rgba(249, 115, 22, 0.5) !important;
+  color: #ea580c !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12), 0 0 15px rgba(249, 115, 22, 0.15) !important;
+}
+
+body.light-theme .floating-back-to-top:hover {
+  background: var(--gradient-ai-btn) !important;
+  color: #ffffff !important;
+}
+
+/* Ensure Code Terminal syntax is crisp & readable inside terminal in light mode */
+body.light-theme .code-terminal-card .code-punct {
+  color: #e2e8f0 !important;
+}
+body.light-theme .code-terminal-card .code-kw {
+  color: #f43f5e !important;
+}
+body.light-theme .code-terminal-card .code-fn {
+  color: #38bdf8 !important;
+}
+body.light-theme .code-terminal-card .code-str {
+  color: #34d399 !important;
+}
+body.light-theme .code-terminal-card .code-prop {
+  color: #fbbf24 !important;
+}
+body.light-theme .code-terminal-card .code-comment {
+  color: #94a3b8 !important;
+}
+body.light-theme .code-terminal-card .terminal-title {
+  color: #94a3b8 !important;
+}
+body.light-theme .code-terminal-card .code-line-num {
+  color: #64748b !important;
+}
+
 
 

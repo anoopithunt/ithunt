@@ -112,6 +112,14 @@ body.light-theme {
   --text-muted: #475569;
   --text-dim: #64748b;
 
+  /* High-Contrast Brand Accents on Light Surfaces */
+  --color-ai-cyan: #0284c7;
+  --color-ai-cyan-hover: #0369a1;
+  --color-ai-yellow: #d97706;
+  --color-ai-yellow-hover: #b45309;
+  --color-ai-gold: #b45309;
+  --color-ai-amber: #d97706;
+
   --syn-keyword: #dc2626;
   --syn-func: #0284c7;
   --syn-str: #059669;
