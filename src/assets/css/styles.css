@@ -8734,13 +8734,7 @@ body.light-theme main.superadmin-main-active {
 body.light-theme {
   background-color: #f8fafc !important;
   color: #000000 !important;
-}
-
-body.light-theme,
-body.light-theme * {
-  --text-main: #000000 !important;
-  --text-muted: #000000 !important;
-  --text-dim: #111111 !important;
+  -webkit-text-fill-color: initial !important;
 }
 
 body.light-theme h1,
@@ -8750,32 +8744,86 @@ body.light-theme h4,
 body.light-theme h5,
 body.light-theme h6 {
   color: #000000 !important;
+  -webkit-text-fill-color: initial !important;
 }
 
 body.light-theme p,
 body.light-theme li,
-body.light-theme span:not(.text-gradient):not(.badge):not(.status-badge):not(.btn *):not(.code-terminal-card *):not(.tag):not(.badge *):not([class*="gradient"]),
 body.light-theme label,
 body.light-theme input,
 body.light-theme textarea,
 body.light-theme select {
   color: #000000 !important;
+  -webkit-text-fill-color: initial !important;
+}
+
+/* Ensure gradient text elements maintain transparent text-fill so their radiant gradient shines */
+.text-gradient,
+.text-gradient-secondary,
+.text-gradient-gold,
+.text-gradient-emerald,
+body.light-theme .text-gradient,
+body.light-theme .text-gradient-secondary,
+body.light-theme .text-gradient-gold,
+body.light-theme .text-gradient-emerald {
+  -webkit-text-fill-color: transparent !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+}
+
+/* Ensure vibrant gradient buttons maintain crisp white text in light & dark modes */
+.btn-primary,
+.btn-primary *,
+.cta-btn-header,
+.cta-btn-header *,
+.btn-gradient,
+.btn-gradient *,
+.upcoming-action-btn,
+.upcoming-action-btn *,
+.command-primary-btn,
+.command-primary-btn *,
+.course-card:hover .course-action-btn,
+.course-card:hover .course-action-btn *,
+body.light-theme .btn-primary,
+body.light-theme .btn-primary *,
+body.light-theme .cta-btn-header,
+body.light-theme .cta-btn-header *,
+body.light-theme .btn-gradient,
+body.light-theme .btn-gradient *,
+body.light-theme .upcoming-action-btn,
+body.light-theme .upcoming-action-btn *,
+body.light-theme .command-primary-btn,
+body.light-theme .command-primary-btn *,
+body.light-theme .course-card:hover .course-action-btn,
+body.light-theme .course-card:hover .course-action-btn * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 /* Links in Light Mode */
-body.light-theme a:not(.btn):not(.course-action-btn):not(.cta-btn-header):not(.badge):not(.footer-chip):not(.footer-whatsapp-btn) {
+body.light-theme a:not(.btn):not(.course-action-btn):not(.cta-btn-header):not(.badge):not(.footer-chip):not(.footer-whatsapp-btn):not(.btn-primary *) {
   color: #000000 !important;
+  -webkit-text-fill-color: initial !important;
 }
-body.light-theme a:not(.btn):not(.course-action-btn):not(.cta-btn-header):not(.badge):not(.footer-chip):not(.footer-whatsapp-btn):hover {
+body.light-theme a:not(.btn):not(.course-action-btn):not(.cta-btn-header):not(.badge):not(.footer-chip):not(.footer-whatsapp-btn):not(.btn-primary *):hover {
   color: #ea580c !important;
+  -webkit-text-fill-color: #ea580c !important;
 }
 
 body.light-theme .nav-item-btn {
   color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
 }
 
-body.light-theme .nav-item-btn.active {
+body.light-theme .nav-item-btn:hover {
+  color: #ea580c !important;
+  -webkit-text-fill-color: #ea580c !important;
+}
+
+body.light-theme .nav-item-btn.active,
+body.light-theme .nav-item-btn.active * {
   color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 body.light-theme .brand-title {
@@ -9155,12 +9203,42 @@ body.light-theme .alumni-batch-tag {
   color: #000000 !important;
 }
 
-body.light-theme .sidebar-nav-item,
-body.light-theme .sidebar-title,
-body.light-theme .sidebar-subtitle,
-body.light-theme .sidebar-user-name,
-body.light-theme .sidebar-user-role {
+/* Mobile Navigation Sidebar Theme Polish */
+body.light-theme .mobile-nav-sidebar .sidebar-nav-item {
   color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+
+body.light-theme .mobile-nav-sidebar .sidebar-nav-item:hover {
+  color: var(--color-ai-orange) !important;
+  -webkit-text-fill-color: var(--color-ai-orange) !important;
+  background: rgba(249, 115, 22, 0.08) !important;
+}
+
+body.light-theme .mobile-nav-sidebar .sidebar-nav-item.active {
+  color: var(--color-ai-orange) !important;
+  -webkit-text-fill-color: var(--color-ai-orange) !important;
+  background: rgba(249, 115, 22, 0.12) !important;
+  font-weight: 800 !important;
+}
+
+body.light-theme .mobile-nav-sidebar .sidebar-brand-title,
+body.light-theme .mobile-nav-sidebar .sidebar-brand-sub,
+body.light-theme .mobile-nav-sidebar .sidebar-user-name,
+body.light-theme .mobile-nav-sidebar .sidebar-user-sub,
+body.light-theme .mobile-nav-sidebar .sidebar-nav-heading {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+
+/* Footer verification link */
+.footer-qr-verify-link {
+  color: var(--color-ai-yellow);
+  font-weight: 700;
+}
+body.light-theme .footer-qr-verify-link {
+  color: #0284c7 !important;
+  -webkit-text-fill-color: #0284c7 !important;
 }
 
 /* Ensure Code Terminal syntax is crisp & readable inside terminal in light mode */
