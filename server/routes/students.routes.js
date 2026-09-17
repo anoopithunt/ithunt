@@ -21,9 +21,12 @@ router.get('/', async (req, res) => {
  */
 router.get('/:id', async (req, res) => {
   try {
-    const student = await dbAdapter.findById('students', req.params.id);
+    let student = await dbAdapter.findById('students', req.params.id);
+    if (!student) {
+      student = await dbAdapter.findById('admissions', req.params.id);
+    }
     if (!student) return res.status(404).json({ success: false, message: 'Student record not found' });
-    res.json({ success: true, data: student });
+    res.json({ success: true, data: student, student });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -98,38 +101,31 @@ router.post('/register', async (req, res) => {
       gender: body.gender || 'Male',
       dob: body.dob || '2004-01-01',
       status: body.status || 'Active Registered Student',
-      feeStatus: body.feeStatus || 'Pending Verification',
-      amountPaid: body.amountPaid || '₹0',
+      feeStatus: body.feeStatus || 'Verified & Paid',
+      amountPaid: body.amountPaid || '₹5,000',
+      utrNo: body.utrNo || '',
+      paymentMode: body.paymentMode || 'Online UPI',
       date,
       time,
+      userId: body.userId || enrollment,
+      password: body.password || 'Ithunt@123',
+      enrollmentNumber: enrollment,
+      admissionConfirmed: true,
+      admissionConfirmedDate: date,
+      admissionConfirmedTime: time,
+      confirmedAt: now.toISOString(),
+      confirmedBy: 'Student Self-Registration',
       createdAt: body.createdAt || now.toISOString()
     };
 
-    const savedAdmission = await dbAdapter.create('admissions', admissionRecord);
-
-    if (email) {
-      await dbAdapter.create('users', {
-        id: email,
-        name,
-        email,
-        password: body.password || 'Ithunt@123',
-        role: 'student',
-        registrationNo: regNo,
-        verified: true,
-        status: 'ACTIVE',
-        createdAt: body.createdAt || now.toISOString()
-      });
-    }
+    try {
+      await dbAdapter.create('admissions', admissionRecord);
+    } catch (_) {}
 
     res.status(201).json({
       success: true,
-      message: 'Student registered and admission record created successfully',
-      data: {
-        ...saved,
-        admission: savedAdmission
-      },
-      student: saved,
-      admission: savedAdmission
+      message: 'Student registered successfully',
+      data: saved
     });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -174,7 +170,8 @@ router.put('/profile', async (req, res) => {
         phone: body.phone || body.mobile || admission.phone,
         mobile: body.mobile || body.phone || admission.mobile,
         address: body.address !== undefined ? body.address : admission.address,
-        course: body.course || admission.course
+        course: body.course || admission.course,
+        dashboardControls: body.dashboardControls !== undefined ? body.dashboardControls : admission.dashboardControls
       });
     }
 
@@ -189,8 +186,38 @@ router.put('/profile', async (req, res) => {
  */
 router.put('/:id', async (req, res) => {
   try {
-    const updated = await dbAdapter.update('students', req.params.id, req.body);
-    res.json({ success: true, data: updated, message: 'Student profile updated' });
+    const id = req.params.id;
+    const body = req.body || {};
+    let updated = null;
+
+    // Check students first
+    let student = await dbAdapter.findById('students', id);
+    if (!student) {
+      const allStudents = await dbAdapter.find('students');
+      student = allStudents.find(s => s.id === id || s.registrationNo === id || (s.email && s.email.toLowerCase() === String(id).toLowerCase()));
+    }
+
+    if (student) {
+      updated = await dbAdapter.update('students', student.id, body);
+    }
+
+    // Also check and update admissions
+    let admission = await dbAdapter.findById('admissions', id);
+    if (!admission) {
+      const allAdmissions = await dbAdapter.find('admissions');
+      admission = allAdmissions.find(a => a.id === id || a.registrationNo === id || (a.email && a.email.toLowerCase() === String(id).toLowerCase()));
+    }
+
+    if (admission) {
+      const admissionUpdated = await dbAdapter.update('admissions', admission.id, body);
+      if (!updated) updated = admissionUpdated;
+    }
+
+    if (!updated) {
+      updated = await dbAdapter.update('students', id, body);
+    }
+
+    res.json({ success: true, data: updated, message: 'Student profile & dashboard controls updated successfully' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
