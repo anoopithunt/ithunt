@@ -493,6 +493,7 @@ const handleAdminLogin = async () => {
       if (rememberMe.value) {
         try {
           sessionStorage.setItem('ithunt_superadmin_auth', JSON.stringify(adminUser));
+          localStorage.setItem('ithunt_superadmin_auth', JSON.stringify(adminUser));
         } catch (e) {}
       }
 
@@ -521,6 +522,7 @@ const handleAdminLogin = async () => {
     if (rememberMe.value) {
       try {
         sessionStorage.setItem('ithunt_superadmin_auth', JSON.stringify(adminUser));
+        localStorage.setItem('ithunt_superadmin_auth', JSON.stringify(adminUser));
       } catch (e) {}
     }
 
