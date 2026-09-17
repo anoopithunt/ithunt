@@ -4,6 +4,7 @@
   "type": "module",
   "description": "IT HUNT - Software Solutions & Tech Academy Web Portal (Vue 3 + Vite)",
   "scripts": {
+    "start": "vite --host",
     "dev": "vite --host",
     "server": "node server/server.js",
     "server:dev": "node --watch server/server.js",
