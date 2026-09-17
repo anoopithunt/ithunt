@@ -11,8 +11,6 @@ let secondaryConnection = null;
 let lastAttemptTime = 0;
 let activeMaskedUri = null;
 
-const ATLAS_PRODUCTION_URI = 'mongodb+srv://anoopmishrapitz_db_user:IthuntPass2026@cluster0.oo3akne.mongodb.net/ithunt?retryWrites=true&w=majority';
-
 function maskUri(uri) {
   if (!uri) return 'none';
   return uri.replace(/:([^:@]+)@/, ':****@');
@@ -47,13 +45,13 @@ export async function connectMongo() {
   }
   lastAttemptTime = now;
 
-  // 100% Direct Cloud Database: All environments connect to MongoDB Atlas Cloud
+  // Cloud Database: Connect to MongoDB via MONGODB_ATLAS_URI or MONGODB_URI
   let rawUri = (process.env.MONGODB_ATLAS_URI || process.env.MONGODB_URI || '').trim();
-  if (!rawUri || rawUri.includes('127.0.0.1') || rawUri.includes('localhost') || !rawUri.includes('cluster0.oo3akne.mongodb.net')) {
-    rawUri = ATLAS_PRODUCTION_URI;
+  if (!rawUri) {
+    rawUri = 'mongodb://127.0.0.1:27017/ithunt';
   }
 
-  isAtlasConnection = true;
+  isAtlasConnection = rawUri.includes('mongodb+srv://') || !rawUri.includes('127.0.0.1');
   activeMaskedUri = maskUri(rawUri);
 
   try {

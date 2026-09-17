@@ -6,7 +6,8 @@ import { seedDatabase } from './seed.js';
 
 const ATLAS_URI = (
   process.env.MONGODB_ATLAS_URI || 
-  'mongodb+srv://anoopmishrapitz_db_user:IthuntPass2026@cluster0.oo3akne.mongodb.net/ithunt?retryWrites=true&w=majority'
+  process.env.MONGODB_URI || 
+  ''
 ).trim();
 
 const LOCAL_URI = (
