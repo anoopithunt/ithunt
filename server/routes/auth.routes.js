@@ -117,9 +117,9 @@ router.post('/login', async (req, res) => {
 });
 
 /**
- * GET /api/auth/users
+ * GET /api/auth/users and /api/users
  */
-router.get('/users', async (req, res) => {
+router.get(['/users', '/'], async (req, res) => {
   try {
     const users = await dbAdapter.find('users');
     const sanitized = users.map(u => ({
@@ -138,9 +138,9 @@ router.get('/users', async (req, res) => {
 });
 
 /**
- * DELETE /api/auth/users/:id
+ * DELETE /api/auth/users/:id and /api/users/:id
  */
-router.delete('/users/:id', verifyToken, requireAdmin, async (req, res) => {
+router.delete(['/users/:id', '/:id'], verifyToken, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     await dbAdapter.delete('users', id);

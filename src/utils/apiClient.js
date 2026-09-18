@@ -263,7 +263,7 @@ export const normalizeUser = (u) => ({
 /**
  * Standard Core API Request Handler with automatic Auth header attachment & response unwrapping
  */
-export async function apiRequest(endpoint, options = {}) {
+export async function apiRequest(endpoint, options = {}, isRetry = false) {
   let token = (typeof localStorage !== 'undefined') ? (
     localStorage.getItem('token') || 
     localStorage.getItem('authToken') || 
@@ -303,6 +303,20 @@ export async function apiRequest(endpoint, options = {}) {
         response = await fetch(directUrl, { ...options, headers });
       } else {
         throw netErr;
+      }
+    }
+
+    // Handle token expiration / 401 unauthorized gracefully
+    if (response.status === 401 && !isRetry && !endpoint.includes('/auth/login')) {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('adminToken');
+      }
+      memoryToken = null;
+      const newToken = await ensureAuthToken(true);
+      if (newToken) {
+        return apiRequest(endpoint, options, true);
       }
     }
 
@@ -416,41 +430,68 @@ export const API = {
   syncDatabase: () => apiRequest('/admin/stats')
 };
 
+let authTokenPromise = null;
+
 /**
  * Helper to retrieve stored auth token or automatically authenticate with default admin
  */
-export async function ensureAuthToken() {
-  try {
-    const stored = localStorage.getItem('token') || 
-                   localStorage.getItem('authToken') || 
-                   localStorage.getItem('adminToken') || 
-                   (() => {
-                     try {
-                       return JSON.parse(sessionStorage.getItem('ithunt_superadmin_auth') || '{}').token;
-                     } catch (e) { return null; }
-                   })();
-    if (stored) return stored;
-    if (memoryToken) return memoryToken;
+export async function ensureAuthToken(forceFresh = false) {
+  if (authTokenPromise && !forceFresh) return authTokenPromise;
 
-    const res = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'admin@ithunt.com', password: 'admin@ithunt2026' })
-    }).catch(() => null);
+  authTokenPromise = (async () => {
+    try {
+      if (!forceFresh) {
+        const stored = (typeof localStorage !== 'undefined') ? (
+          localStorage.getItem('token') || 
+          localStorage.getItem('authToken') || 
+          localStorage.getItem('adminToken')
+        ) : null;
+        if (stored) return stored;
 
-    if (res && res.ok) {
-      const json = await res.json().catch(() => null);
-      if (json && json.success && json.data?.token) {
-        memoryToken = json.data.token;
-        localStorage.setItem('token', memoryToken);
-        localStorage.setItem('authToken', memoryToken);
-        localStorage.setItem('adminToken', memoryToken);
-        return memoryToken;
+        if (typeof sessionStorage !== 'undefined') {
+          try {
+            const sessToken = JSON.parse(sessionStorage.getItem('ithunt_superadmin_auth') || '{}').token;
+            if (sessToken) return sessToken;
+          } catch (e) {}
+        }
+        if (memoryToken) return memoryToken;
       }
-    }
-  } catch (e) {}
 
-  return null;
+      const baseUrl = (API_BASE_URL || '/api').replace(/\/+$/, '');
+      const loginUrls = [
+        `${baseUrl}/auth/login`,
+        `http://127.0.0.1:3000/api/auth/login`,
+        `http://localhost:3000/api/auth/login`
+      ];
+
+      for (const loginUrl of loginUrls) {
+        try {
+          const res = await fetch(loginUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ email: 'admin@ithunt.com', password: 'admin@ithunt2026' })
+          });
+          if (res && res.ok) {
+            const json = await res.json().catch(() => null);
+            if (json && json.success && json.data?.token) {
+              memoryToken = json.data.token;
+              if (typeof localStorage !== 'undefined') {
+                localStorage.setItem('token', memoryToken);
+                localStorage.setItem('authToken', memoryToken);
+                localStorage.setItem('adminToken', memoryToken);
+              }
+              return memoryToken;
+            }
+          }
+        } catch (e) {}
+      }
+    } catch (e) {}
+    return null;
+  })().finally(() => {
+    authTokenPromise = null;
+  });
+
+  return authTokenPromise;
 }
 
 /**
