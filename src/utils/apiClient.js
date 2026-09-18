@@ -364,6 +364,8 @@ export const API = {
   getFees: () => apiRequest('/fees'),
   getStudentFees: (studentId) => apiRequest(`/fees/student/${studentId}`),
   recordFee: (feeData) => apiRequest('/fees/record', { method: 'POST', body: JSON.stringify(feeData) }),
+  updateFee: (id, feeData) => apiRequest(`/fees/${id}`, { method: 'PUT', body: JSON.stringify(feeData) }),
+  deleteFee: (id) => apiRequest(`/fees/${id}`, { method: 'DELETE' }),
 
   // Certificates
   getCertificates: () => apiRequest('/certificates'),
@@ -381,6 +383,7 @@ export const API = {
   // Contact Inquiries
   getContactInquiries: () => apiRequest('/contact'),
   submitContactInquiry: (data) => apiRequest('/contact', { method: 'POST', body: JSON.stringify(data) }),
+  deleteContactInquiry: (id) => apiRequest(`/contact/${id}`, { method: 'DELETE' }),
 
   // Auth & Admin Users
   login: (credentials) => apiRequest('/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),
@@ -996,6 +999,19 @@ export async function deleteStudentFromBackend(student) {
 }
 
 /**
+ * Update an existing student record in MongoDB via REST API (PUT /api/students/:id)
+ */
+export async function updateStudentInBackend(id, updates) {
+  try {
+    const res = await API.updateStudent(id, updates);
+    return { success: true, data: res };
+  } catch (e) {
+    console.warn('Notice updating student in MongoDB:', e.message);
+    return { success: false, error: e.message };
+  }
+}
+
+/**
  * Register a new student user via backend REST API (MongoDB ithunt)
  */
 export async function registerStudentWithBackend(studentData) {
@@ -1338,6 +1354,58 @@ export async function fetchFeesFromBackend() {
 }
 
 /**
+ * Save new fee payment transaction to MongoDB (ithunt) via REST API
+ */
+export async function saveFeeToBackend(feeData) {
+  try {
+    const res = await API.recordFee(feeData);
+    return { success: true, data: res?.data || res };
+  } catch (e) {
+    console.warn('Notice saving fee to MongoDB:', e.message);
+    return { success: false, error: e.message };
+  }
+}
+
+/**
+ * Update existing fee transaction in MongoDB via REST API
+ */
+export async function updateFeeInBackend(id, updates) {
+  try {
+    const res = await API.updateFee(id, updates);
+    return { success: true, data: res?.data || res };
+  } catch (e) {
+    console.warn('Notice updating fee in MongoDB:', e.message);
+    return { success: false, error: e.message };
+  }
+}
+
+/**
+ * Delete fee transaction from MongoDB via REST API
+ */
+export async function deleteFeeFromBackend(id) {
+  try {
+    await API.deleteFee(id);
+    return { success: true };
+  } catch (e) {
+    console.warn('Notice deleting fee from MongoDB:', e.message);
+    return { success: false, error: e.message };
+  }
+}
+
+/**
+ * Delete contact inquiry from MongoDB via REST API
+ */
+export async function deleteContactInquiryFromBackend(id) {
+  try {
+    await API.deleteContactInquiry(id);
+    return { success: true };
+  } catch (e) {
+    console.warn('Notice deleting contact inquiry from MongoDB:', e.message);
+    return { success: false, error: e.message };
+  }
+}
+
+/**
  * Fetch all Verified Certificates from MongoDB (ithunt) via REST API
  */
 export async function fetchCertificatesFromBackend() {
@@ -1565,5 +1633,10 @@ export default {
   fetchCoursesFromBackend,
   saveCourseToBackend,
   updateCourseInBackend,
-  deleteCourseFromBackend
+  deleteCourseFromBackend,
+  updateStudentInBackend,
+  saveFeeToBackend,
+  updateFeeInBackend,
+  deleteFeeFromBackend,
+  deleteContactInquiryFromBackend
 };

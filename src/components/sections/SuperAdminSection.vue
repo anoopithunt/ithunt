@@ -776,6 +776,14 @@
                       👁️ Profile
                     </button>
                     <button 
+                      class="admin-icon-btn" 
+                      title="Edit Student Record"
+                      style="color: var(--color-ai-cyan); border-color: rgba(56, 189, 248, 0.4);"
+                      @click="openEditStudentModal(stu)"
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button 
                       type="button"
                       class="admin-icon-btn" 
                       title="Issue Official Course Completion Certificate"
@@ -1002,6 +1010,15 @@
                 </td>
                 <td style="text-align: right;">
                   <div class="admin-row-actions">
+                    <!-- ✏️ Edit Admission Record Button -->
+                    <button 
+                      class="admin-icon-btn" 
+                      @click="openEditAdmissionModal(adm)" 
+                      title="Edit Candidate Admission Details"
+                      style="color: var(--color-ai-cyan); border-color: rgba(56, 189, 248, 0.4);"
+                    >
+                      ✏️ Edit
+                    </button>
                     <!-- 1-Click Confirm & Auto-Generate Credentials for Pending Registrations -->
                     <button 
                       v-if="adm.status !== 'Confirmed' && !adm.admissionConfirmed"
@@ -1201,7 +1218,15 @@
           <p class="panel-subtitle">Review candidate project forms, guide declarations, fee UTR details, and official 4-Page PDF verification documents.</p>
         </div>
 
-        <div class="panel-filter-group">
+        <div class="panel-filter-group" style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+          <button 
+            type="button" 
+            class="btn-primary" 
+            style="background: linear-gradient(135deg, #38bdf8, #0284c7); border-color: #38bdf8; font-weight: 800; font-size: 0.85rem;"
+            @click="openAddNielitModal()"
+          >
+            <span>📜 + New NIELIT Submission</span>
+          </button>
           <!-- Search input -->
           <div class="events-search-box" style="margin: 0; min-width: 260px;">
             <span class="events-search-icon">🔍</span>
@@ -1534,6 +1559,16 @@
           <h3 class="panel-title">💳 Student Fees Ledger & Transaction History</h3>
           <p class="panel-subtitle">Official verified UPI receipts, installment tracking, and payment reconciliations.</p>
         </div>
+        <div>
+          <button 
+            type="button" 
+            class="btn-primary" 
+            style="background: linear-gradient(135deg, #10b981, #059669); border-color: #10b981; font-weight: 800; font-size: 0.85rem;"
+            @click="openAddFeeModal()"
+          >
+            <span>💳 + Record Fee Payment</span>
+          </button>
+        </div>
       </div>
 
       <div class="admin-table-card">
@@ -1563,9 +1598,17 @@
                   <span class="admin-status-chip status-confirmed">{{ fee.status || 'Verified & Paid' }}</span>
                 </td>
                 <td style="text-align: right;">
-                  <button class="btn-primary" @click="confirmFeeAndSendJpgReceipt(fee)" style="padding: 0.35rem 0.75rem; font-size: 0.78rem;">
-                    <span>JPG Slip 🧾</span>
-                  </button>
+                  <div style="display: flex; gap: 0.35rem; justify-content: flex-end; align-items: center;">
+                    <button class="btn-primary" @click="confirmFeeAndSendJpgReceipt(fee)" style="padding: 0.35rem 0.75rem; font-size: 0.78rem;">
+                      <span>JPG Slip 🧾</span>
+                    </button>
+                    <button class="admin-icon-btn" @click="openEditFeeModal(fee)" title="Edit Fee" style="color: var(--color-ai-cyan); border-color: rgba(56, 189, 248, 0.4);">
+                      ✏️
+                    </button>
+                    <button class="admin-icon-btn" @click="handleDeleteFee(fee)" title="Delete Fee Record" style="color: #ef4444;">
+                      🗑️
+                    </button>
+                  </div>
                 </td>
               </tr>
               <tr v-if="feesList.length === 0">
@@ -1813,19 +1856,25 @@
                 <th>Subject</th>
                 <th>Message Content</th>
                 <th>Received Date</th>
+                <th style="text-align: right;">Action</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="inq in contactInquiriesList" :key="inq.id">
+              <tr v-for="inq in contactInquiriesList" :key="inq.id || inq._id">
                 <td style="font-weight: 800; color: var(--text-main);">{{ inq.name || inq.fullName }}</td>
                 <td>📞 {{ inq.phone || inq.mobile }}</td>
                 <td style="color: var(--color-ai-cyan);">{{ inq.email }}</td>
                 <td style="font-weight: 700; color: var(--color-ai-yellow);">{{ inq.subject }}</td>
                 <td style="max-width: 320px; font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">{{ inq.message }}</td>
                 <td style="font-family: var(--font-mono); font-size: 0.8rem;">{{ inq.createdAt }}</td>
+                <td style="text-align: right;">
+                  <button class="admin-icon-btn" @click="handleDeleteContact(inq)" title="Delete Contact Inquiry" style="color: #ef4444;">
+                    🗑️
+                  </button>
+                </td>
               </tr>
               <tr v-if="contactInquiriesList.length === 0">
-                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-dim);">No inbound enquiries recorded yet.</td>
+                <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-dim);">No inbound enquiries recorded yet.</td>
               </tr>
             </tbody>
           </table>
@@ -2046,6 +2095,302 @@
               <button type="button" class="btn-secondary" @click="showAddCourseModal = false">Cancel</button>
               <button type="submit" class="btn-primary">
                 <span>{{ isEditingCourse ? 'Update Course in Database 💾' : 'Save Course to Database 🚀' }}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Admission Modal -->
+    <div class="modal-overlay" v-if="showEditAdmissionModal" @click.self="showEditAdmissionModal = false">
+      <div class="modal-card" style="max-width: 700px;">
+        <div class="modal-header">
+          <div class="modal-title"><span>✏️</span> Edit Admission Record (MongoDB)</div>
+          <button class="modal-close-btn" @click="showEditAdmissionModal = false">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 1.5rem;">
+          <form @submit.prevent="handleSaveEditedAdmission">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Registration No</label>
+                <input type="text" v-model="editAdmissionForm.registrationNo" disabled class="form-control" style="opacity: 0.7;">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Candidate Name <span class="req">*</span></label>
+                <input type="text" v-model="editAdmissionForm.candidateName" required class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Father's Name</label>
+                <input type="text" v-model="editAdmissionForm.fatherName" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Mother's Name</label>
+                <input type="text" v-model="editAdmissionForm.motherName" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Mobile Number <span class="req">*</span></label>
+                <input type="tel" v-model="editAdmissionForm.mobile" required class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email Address <span class="req">*</span></label>
+                <input type="email" v-model="editAdmissionForm.email" required class="form-control">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Program / Track <span class="req">*</span></label>
+                <select v-model="editAdmissionForm.course" class="form-control" required>
+                  <option v-for="c in coursesList" :key="c.id || c.code" :value="c.title || c.name">
+                    {{ c.title || c.name }} ({{ c.code }})
+                  </option>
+                  <option v-if="coursesList.length === 0" value="Web Development (MERN Stack & Cloud Architecture)">
+                    Web Development (MERN Stack & Cloud Architecture)
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Admission Status</label>
+                <select v-model="editAdmissionForm.status" class="form-control">
+                  <option value="Confirmed">Confirmed</option>
+                  <option value="Pending Verification">Pending Verification</option>
+                  <option value="Verified">Verified</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Fee Status</label>
+                <select v-model="editAdmissionForm.feeStatus" class="form-control">
+                  <option value="Verified & Paid">Verified & Paid</option>
+                  <option value="Pending Verification">Pending Verification</option>
+                  <option value="Partial Payment">Partial Payment</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Amount Paid</label>
+                <input type="text" v-model="editAdmissionForm.amountPaid" class="form-control" placeholder="e.g. ₹5,000">
+              </div>
+              <div class="form-group">
+                <label class="form-label">District</label>
+                <input type="text" v-model="editAdmissionForm.district" class="form-control" placeholder="e.g. Prayagraj">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Residential Address</label>
+                <textarea v-model="editAdmissionForm.address" rows="2" class="form-control" placeholder="Full residential street address"></textarea>
+              </div>
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+              <button type="button" class="btn-secondary" @click="showEditAdmissionModal = false">Cancel</button>
+              <button type="submit" class="btn-primary">
+                <span>Save Changes to Database 💾</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Student Modal -->
+    <div class="modal-overlay" v-if="showEditStudentModal" @click.self="showEditStudentModal = false">
+      <div class="modal-card" style="max-width: 680px;">
+        <div class="modal-header">
+          <div class="modal-title"><span>🎓</span> Edit Student Profile (MongoDB)</div>
+          <button class="modal-close-btn" @click="showEditStudentModal = false">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 1.5rem;">
+          <form @submit.prevent="handleSaveEditedStudent">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Enrollment / User ID</label>
+                <input type="text" v-model="editStudentForm.enrollmentNumber" disabled class="form-control" style="opacity: 0.7;">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Full Name <span class="req">*</span></label>
+                <input type="text" v-model="editStudentForm.name" required class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Mobile Number <span class="req">*</span></label>
+                <input type="tel" v-model="editStudentForm.phone" required class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email Address <span class="req">*</span></label>
+                <input type="email" v-model="editStudentForm.email" required class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Course / Program</label>
+                <select v-model="editStudentForm.course" class="form-control" required>
+                  <option v-for="c in coursesList" :key="c.id || c.code" :value="c.title || c.name">
+                    {{ c.title || c.name }} ({{ c.code }})
+                  </option>
+                  <option v-if="coursesList.length === 0" value="MERN Stack Developer">MERN Stack Developer</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Batch</label>
+                <input type="text" v-model="editStudentForm.batch" class="form-control" placeholder="e.g. 2026">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Academic Status</label>
+                <select v-model="editStudentForm.academicStatus" class="form-control">
+                  <option value="ACTIVE">ACTIVE</option>
+                  <option value="PENDING_REVIEW">PENDING_REVIEW</option>
+                  <option value="COMPLETED">COMPLETED</option>
+                  <option value="SUSPENDED">SUSPENDED</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Gender</label>
+                <select v-model="editStudentForm.gender" class="form-control">
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">DOB</label>
+                <input type="date" v-model="editStudentForm.dob" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Guardian / Father Name</label>
+                <input type="text" v-model="editStudentForm.guardianName" class="form-control">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Address</label>
+                <textarea v-model="editStudentForm.address" rows="2" class="form-control"></textarea>
+              </div>
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+              <button type="button" class="btn-secondary" @click="showEditStudentModal = false">Cancel</button>
+              <button type="submit" class="btn-primary">
+                <span>Update Student Profile 💾</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add / Edit Fee Payment Modal -->
+    <div class="modal-overlay" v-if="showAddFeeModal" @click.self="showAddFeeModal = false">
+      <div class="modal-card" style="max-width: 650px;">
+        <div class="modal-header">
+          <div class="modal-title"><span>💳</span> {{ isEditingFee ? 'Edit Fee Transaction' : 'Record Fee Payment' }}</div>
+          <button class="modal-close-btn" @click="showAddFeeModal = false">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 1.5rem;">
+          <form @submit.prevent="handleSaveFee">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Receipt Number <span class="req">*</span></label>
+                <input type="text" v-model="feeForm.receiptNo" required class="form-control" placeholder="e.g. REC-58392" :disabled="isEditingFee">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Student Name <span class="req">*</span></label>
+                <input type="text" v-model="feeForm.studentName" required class="form-control" placeholder="Candidate / Student name">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Program / Course <span class="req">*</span></label>
+                <select v-model="feeForm.course" class="form-control" required>
+                  <option v-for="c in coursesList" :key="c.id || c.code" :value="c.title || c.name">
+                    {{ c.title || c.name }}
+                  </option>
+                  <option v-if="coursesList.length === 0" value="Web Development (MERN Stack & Cloud Architecture)">
+                    Web Development (MERN Stack & Cloud Architecture)
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Amount Paid <span class="req">*</span></label>
+                <input type="text" v-model="feeForm.amount" required class="form-control" placeholder="e.g. ₹5,000">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Payment Mode</label>
+                <select v-model="feeForm.paymentMode" class="form-control">
+                  <option value="Online UPI">Online UPI</option>
+                  <option value="Net Banking">Net Banking</option>
+                  <option value="Cash">Cash</option>
+                  <option value="Cheque / DD">Cheque / DD</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Payment Date</label>
+                <input type="text" v-model="feeForm.date" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Status</label>
+                <select v-model="feeForm.status" class="form-control">
+                  <option value="Verified & Paid">Verified & Paid</option>
+                  <option value="Pending Verification">Pending Verification</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+              <button type="button" class="btn-secondary" @click="showAddFeeModal = false">Cancel</button>
+              <button type="submit" class="btn-primary">
+                <span>{{ isEditingFee ? 'Update Fee Record 💾' : 'Save Fee to Database 🚀' }}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add New NIELIT Submission Modal -->
+    <div class="modal-overlay" v-if="showAddNielitModal" @click.self="showAddNielitModal = false">
+      <div class="modal-card" style="max-width: 750px;">
+        <div class="modal-header">
+          <div class="modal-title"><span>📜</span> Register New NIELIT Project Submission</div>
+          <button class="modal-close-btn" @click="showAddNielitModal = false">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 1.5rem;">
+          <form @submit.prevent="handleSaveNewNielit">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">NIELIT Registration No <span class="req">*</span></label>
+                <input type="text" v-model="newNielitForm.registrationNo" required class="form-control" placeholder="e.g. NIELIT-123456">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Candidate Name <span class="req">*</span></label>
+                <input type="text" v-model="newNielitForm.candidateName" required class="form-control" placeholder="Full candidate name">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Father's Name</label>
+                <input type="text" v-model="newNielitForm.fatherName" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Mobile Number <span class="req">*</span></label>
+                <input type="tel" v-model="newNielitForm.mobile" required class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email Address <span class="req">*</span></label>
+                <input type="email" v-model="newNielitForm.email" required class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">NIELIT Level <span class="req">*</span></label>
+                <select v-model="newNielitForm.nielitLevel" class="form-control" required>
+                  <option value="O">'O' Level</option>
+                  <option value="A">'A' Level</option>
+                  <option value="B">'B' Level</option>
+                </select>
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Project Title <span class="req">*</span></label>
+                <input type="text" v-model="newNielitForm.projectTitle" required class="form-control" placeholder="e.g. Full Stack MERN Web Application">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Supervisor / Guide Name</label>
+                <input type="text" v-model="newNielitForm.guideName" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Fee Paid / UTR</label>
+                <input type="text" v-model="newNielitForm.utrNumber" class="form-control" placeholder="UTR Number or UPI Reference">
+              </div>
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+              <button type="button" class="btn-secondary" @click="showAddNielitModal = false">Cancel</button>
+              <button type="submit" class="btn-primary">
+                <span>Save NIELIT Project to Database 🚀</span>
               </button>
             </div>
           </form>
@@ -3069,16 +3414,33 @@ import {
   fetchAdmissionsFromBackend,
   fetchStudentsFromBackend,
   fetchUsersFromBackend,
+  fetchCoursesFromBackend,
+  fetchNielitProjectsFromBackend,
+  fetchFeesFromBackend,
+  fetchCertificatesFromBackend,
+  fetchProjectsFromBackend,
+  fetchContactInquiriesFromBackend,
+  fetchReviewsFromBackend,
+  fetchJobApplicationsFromBackend,
+  fetchRsvpsFromBackend,
   confirmAdmissionInBackend,
   resetStudentPasswordInBackend,
   deleteAdmissionFromBackend, 
+  updateAdmissionInBackend,
+  deleteStudentFromBackend,
+  updateStudentInBackend,
   deleteUserFromBackend, 
   updateNielitProjectInBackend, 
   deleteNielitProjectFromBackend, 
   deleteProject,
   deleteJobApplicationFromBackend,
   deleteRsvpFromBackend,
-  deleteReviewFromBackend
+  deleteReviewFromBackend,
+  saveFeeToBackend,
+  updateFeeInBackend,
+  deleteFeeFromBackend,
+  deleteContactInquiryFromBackend,
+  saveNielitProjectRecord
 } from '../../utils/apiClient.js';
 import CertificatePreviewModal from '../modals/CertificatePreviewModal.vue';
 import { 
@@ -3165,12 +3527,19 @@ const emit = defineEmits([
   'add-admission', 
   'confirm-admission', 
   'delete-admission', 
-  'update-nielit-project', 
-  'delete-nielit-project', 
+  'update-admission',
   'delete-student', 
+  'update-student',
   'add-course', 
   'update-course', 
   'delete-course', 
+  'update-nielit-project', 
+  'delete-nielit-project', 
+  'submit-nielit-project',
+  'add-fee',
+  'update-fee',
+  'delete-fee',
+  'delete-contact',
   'refresh-data',
   'set-tab',
   'toggle-theme'
@@ -4492,6 +4861,296 @@ const onAvatarError = (event) => {
   event.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=60';
 };
 
+// Edit Admission Modal State
+const showEditAdmissionModal = ref(false);
+const editAdmissionForm = ref({
+  id: '',
+  registrationNo: '',
+  candidateName: '',
+  fatherName: '',
+  motherName: '',
+  dob: '',
+  gender: 'Male',
+  course: '',
+  mobile: '',
+  email: '',
+  district: 'Prayagraj',
+  address: '',
+  status: 'Confirmed',
+  feeStatus: 'Verified & Paid',
+  amountPaid: '₹5,000'
+});
+
+const openEditAdmissionModal = (adm) => {
+  editAdmissionForm.value = {
+    id: adm.id || adm.registrationNo,
+    registrationNo: adm.registrationNo || adm.id,
+    candidateName: adm.candidateName || adm.fullName || '',
+    fatherName: adm.fatherName || '',
+    motherName: adm.motherName || '',
+    dob: adm.dob || '2004-01-01',
+    gender: adm.gender || 'Male',
+    course: adm.course || 'Web Development (MERN Stack & Cloud Architecture)',
+    mobile: adm.mobile || adm.phone || '',
+    email: adm.email || '',
+    district: adm.district || 'Prayagraj',
+    address: adm.address || '',
+    status: adm.status || (adm.admissionConfirmed ? 'Confirmed' : 'Pending Verification'),
+    feeStatus: adm.feeStatus || 'Verified & Paid',
+    amountPaid: adm.amountPaid || '₹5,000'
+  };
+  showEditAdmissionModal.value = true;
+};
+
+const handleSaveEditedAdmission = async () => {
+  const updated = { ...editAdmissionForm.value };
+  const targetId = updated.registrationNo || updated.id;
+  const idx = admissionsList.value.findIndex(a => a.registrationNo === targetId || a.id === targetId);
+  if (idx !== -1) {
+    admissionsList.value[idx] = { ...admissionsList.value[idx], ...updated };
+  }
+  const sIdx = studentsList.value.findIndex(s => s.registrationNo === targetId || s.id === targetId || s.userId === updated.email);
+  if (sIdx !== -1) {
+    studentsList.value[sIdx] = {
+      ...studentsList.value[sIdx],
+      name: updated.candidateName,
+      fullName: updated.candidateName,
+      email: updated.email,
+      mobile: updated.mobile,
+      phone: updated.mobile,
+      course: updated.course
+    };
+  }
+  emit('update-admission', updated);
+  try {
+    await updateAdmissionInBackend(targetId, updated);
+    emailActionMsg.value = `✓ Admission record for ${updated.candidateName} updated in MongoDB!`;
+  } catch (err) {
+    console.warn('Update admission notice:', err.message);
+  }
+  showEditAdmissionModal.value = false;
+  setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+};
+
+// Edit Student Modal State
+const showEditStudentModal = ref(false);
+const editStudentForm = ref({
+  id: '',
+  enrollmentNumber: '',
+  userId: '',
+  name: '',
+  email: '',
+  phone: '',
+  course: '',
+  batch: '2026',
+  academicStatus: 'ACTIVE',
+  gender: 'Male',
+  dob: '',
+  address: '',
+  guardianName: ''
+});
+
+const openEditStudentModal = (stu) => {
+  editStudentForm.value = {
+    id: stu.id || stu.enrollmentNumber || stu.userId,
+    enrollmentNumber: stu.enrollmentNumber || stu.id || stu.userId,
+    userId: stu.userId || stu.enrollmentNumber || stu.id,
+    name: stu.name || stu.fullName || stu.candidateName || '',
+    email: stu.email || '',
+    phone: stu.phone || stu.mobile || '',
+    course: stu.course || 'Software Engineering',
+    batch: stu.batch || '2026',
+    academicStatus: stu.academicStatus || stu.status || 'ACTIVE',
+    gender: stu.gender || 'Male',
+    dob: stu.dob || '2004-01-01',
+    address: stu.address || 'Prayagraj, UP',
+    guardianName: stu.guardianName || stu.fatherName || ''
+  };
+  showEditStudentModal.value = true;
+};
+
+const handleSaveEditedStudent = async () => {
+  const updated = { ...editStudentForm.value };
+  const targetId = updated.enrollmentNumber || updated.userId || updated.id;
+  const idx = studentsList.value.findIndex(s => s.enrollmentNumber === targetId || s.userId === targetId || s.id === targetId);
+  if (idx !== -1) {
+    studentsList.value[idx] = { ...studentsList.value[idx], ...updated };
+  }
+  const aIdx = admissionsList.value.findIndex(a => a.enrollmentNumber === targetId || a.userId === targetId || a.registrationNo === targetId || a.id === targetId);
+  if (aIdx !== -1) {
+    admissionsList.value[aIdx] = {
+      ...admissionsList.value[aIdx],
+      candidateName: updated.name,
+      fullName: updated.name,
+      email: updated.email,
+      phone: updated.phone,
+      mobile: updated.phone,
+      course: updated.course
+    };
+  }
+  emit('update-student', updated);
+  try {
+    await updateStudentInBackend(targetId, updated);
+    emailActionMsg.value = `✓ Student ${updated.name} updated in MongoDB!`;
+  } catch (err) {
+    console.warn('Update student notice:', err.message);
+  }
+  showEditStudentModal.value = false;
+  setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+};
+
+// Fee Modal State (Add & Edit)
+const showAddFeeModal = ref(false);
+const isEditingFee = ref(false);
+const feeForm = ref({
+  id: '',
+  receiptNo: '',
+  studentName: '',
+  course: 'Web Development (MERN Stack & Cloud Architecture)',
+  amount: '₹5,000',
+  paymentMode: 'Online UPI',
+  date: new Date().toLocaleDateString('en-GB'),
+  status: 'Verified & Paid'
+});
+
+const openAddFeeModal = () => {
+  isEditingFee.value = false;
+  const recId = `REC-${Math.floor(10000 + Math.random() * 90000)}`;
+  feeForm.value = {
+    id: recId,
+    receiptNo: recId,
+    studentName: '',
+    course: coursesList.value[0]?.title || coursesList.value[0]?.name || 'Web Development (MERN Stack & Cloud Architecture)',
+    amount: '₹5,000',
+    paymentMode: 'Online UPI',
+    date: new Date().toLocaleDateString('en-GB'),
+    status: 'Verified & Paid'
+  };
+  showAddFeeModal.value = true;
+};
+
+const openEditFeeModal = (fee) => {
+  isEditingFee.value = true;
+  feeForm.value = {
+    id: fee.id || fee.receiptNo,
+    receiptNo: fee.receiptNo || fee.id,
+    studentName: fee.studentName || '',
+    course: fee.course || 'Web Development (MERN Stack & Cloud Architecture)',
+    amount: fee.amount || '₹5,000',
+    paymentMode: fee.paymentMode || 'Online UPI',
+    date: fee.date || new Date().toLocaleDateString('en-GB'),
+    status: fee.status || 'Verified & Paid'
+  };
+  showAddFeeModal.value = true;
+};
+
+const handleSaveFee = async () => {
+  const f = { ...feeForm.value };
+  if (isEditingFee.value) {
+    const idx = feesList.value.findIndex(item => item.id === f.id || item.receiptNo === f.id);
+    if (idx !== -1) {
+      feesList.value[idx] = { ...feesList.value[idx], ...f };
+    }
+    emit('update-fee', f.id, f);
+    try {
+      await updateFeeInBackend(f.id, f);
+      emailActionMsg.value = `✓ Fee record ${f.receiptNo} updated in MongoDB!`;
+    } catch (e) {}
+  } else {
+    feesList.value.unshift(f);
+    emit('add-fee', f);
+    try {
+      await saveFeeToBackend(f);
+      emailActionMsg.value = `✓ Fee payment recorded and saved to MongoDB!`;
+    } catch (e) {}
+  }
+  showAddFeeModal.value = false;
+  setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+};
+
+const handleDeleteFee = async (fee) => {
+  const id = fee.id || fee.receiptNo;
+  if (!confirm(`Delete fee transaction ${fee.receiptNo || id} for ${fee.studentName}?`)) return;
+  feesList.value = feesList.value.filter(f => f.id !== id && f.receiptNo !== id);
+  emit('delete-fee', id);
+  try {
+    await deleteFeeFromBackend(id);
+    emailActionMsg.value = `✓ Fee record deleted.`;
+  } catch (e) {}
+  setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+};
+
+const handleDeleteContact = async (inq) => {
+  const id = inq.id || inq._id;
+  if (!confirm(`Delete contact inquiry from ${inq.name || inq.fullName}?`)) return;
+  contactInquiriesList.value = contactInquiriesList.value.filter(c => c.id !== id && c._id !== id);
+  emit('delete-contact', id);
+  try {
+    await deleteContactInquiryFromBackend(id);
+    emailActionMsg.value = `✓ Contact inquiry deleted.`;
+  } catch (e) {}
+  setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+};
+
+// Add NIELIT Modal State
+const showAddNielitModal = ref(false);
+const newNielitForm = ref({
+  registrationNo: '',
+  candidateName: '',
+  fatherName: '',
+  mobile: '',
+  email: '',
+  nielitLevel: 'O',
+  projectTitle: 'Web Development (MERN Stack)',
+  guideName: 'Mr. Lakshman Singh Chauhan',
+  guideQualification: 'MCA (Computer Science)',
+  guideDesignation: 'Director & Founder, IT HUNT',
+  amount: '₹1,000',
+  utrNumber: '',
+  district: 'Prayagraj',
+  state: 'Uttar Pradesh',
+  status: 'Submitted'
+});
+
+const openAddNielitModal = () => {
+  const regId = 'NIELIT-' + Math.floor(100000 + Math.random() * 900000);
+  newNielitForm.value = {
+    registrationNo: regId,
+    nielitRegNo: regId,
+    candidateName: '',
+    fatherName: '',
+    mobile: '',
+    email: '',
+    nielitLevel: 'O',
+    projectTitle: 'Web Development (MERN Stack)',
+    guideName: 'Mr. Lakshman Singh Chauhan',
+    guideQualification: 'MCA (Computer Science)',
+    guideDesignation: 'Director & Founder, IT HUNT',
+    amount: '₹1,000',
+    utrNumber: '',
+    district: 'Prayagraj',
+    state: 'Uttar Pradesh',
+    status: 'Submitted',
+    date: new Date().toLocaleDateString('en-GB')
+  };
+  showAddNielitModal.value = true;
+};
+
+const handleSaveNewNielit = async () => {
+  const p = { ...newNielitForm.value };
+  p.id = p.registrationNo;
+  nielitProjectsList.value.unshift(p);
+  emit('submit-nielit-project', p);
+  try {
+    await saveNielitProjectRecord(p);
+    emailActionMsg.value = `✓ NIELIT Project for ${p.candidateName} registered in MongoDB!`;
+  } catch (err) {
+    console.warn('Save NIELIT error:', err.message);
+  }
+  showAddNielitModal.value = false;
+  setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+};
+
 let refreshTimer = null;
 const isRefreshing = ref(false);
 const lastRefreshedTime = ref('');
@@ -4500,14 +5159,34 @@ const refreshAllData = async () => {
   isRefreshing.value = true;
   try {
     emit('refresh-data');
-    const [adms, stus, usrs] = await Promise.all([
+    const [
+      adms, stus, usrs, crss, nielits, fees, certs, projs, inqs, revs, jobs, rsvps
+    ] = await Promise.all([
       fetchAdmissionsFromBackend(),
       fetchStudentsFromBackend(),
-      fetchUsersFromBackend()
+      fetchUsersFromBackend(),
+      fetchCoursesFromBackend(),
+      fetchNielitProjectsFromBackend(),
+      fetchFeesFromBackend(),
+      fetchCertificatesFromBackend(),
+      fetchProjectsFromBackend(),
+      fetchContactInquiriesFromBackend(),
+      fetchReviewsFromBackend(),
+      fetchJobApplicationsFromBackend(),
+      fetchRsvpsFromBackend()
     ]);
     if (adms && adms.length > 0) admissionsList.value = adms;
     if (stus && stus.length > 0) studentsList.value = stus;
     if (usrs && usrs.length > 0) usersList.value = usrs;
+    if (crss && crss.length > 0) coursesList.value = crss;
+    if (nielits && nielits.length > 0) nielitProjectsList.value = nielits;
+    if (fees && fees.length > 0) feesList.value = fees;
+    if (certs && certs.length > 0) certificatesList.value = certs;
+    if (projs && projs.length > 0) projectsList.value = projs;
+    if (inqs && inqs.length > 0) contactInquiriesList.value = inqs;
+    if (revs && revs.length > 0) reviewsList.value = revs;
+    if (jobs && jobs.length > 0) jobApplicationsList.value = jobs;
+    if (rsvps && rsvps.length > 0) rsvpsList.value = rsvps;
     lastRefreshedTime.value = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   } catch (err) {
     console.warn('SuperAdmin refresh notice:', err.message);

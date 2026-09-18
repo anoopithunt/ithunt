@@ -198,6 +198,10 @@
           @delete-course="handleDeleteCourse"
           @update-nielit-project="handleUpdateNielitProject"
           @delete-nielit-project="handleDeleteNielitProject"
+          @add-fee="handleAddFee"
+          @update-fee="handleUpdateFee"
+          @delete-fee="handleDeleteFee"
+          @delete-contact="handleDeleteContact"
           @set-tab="setTab" 
         />
 
@@ -468,10 +472,15 @@ import {
   deleteUserFromBackend,
   deleteAdmissionFromBackend,
   updateAdmissionInBackend,
+  updateStudentInBackend,
   fetchCoursesFromBackend,
   saveCourseToBackend,
   updateCourseInBackend,
   deleteCourseFromBackend,
+  saveFeeToBackend,
+  updateFeeInBackend,
+  deleteFeeFromBackend,
+  deleteContactInquiryFromBackend,
   registerStudentUser, 
   loginStudentUser, 
   saveStudentAccount,
@@ -655,6 +664,46 @@ const liveContactInquiriesList = ref([]);
 const liveReviewsList = ref([]);
 const liveUsersList = ref([]);
 const liveCoursesList = ref([]);
+
+// Primary dynamic database loader across all Swagger REST API endpoints
+const loadInitialData = async () => {
+  try {
+    const [
+      admissions, jobs, rsvps, nielitProjects, students,
+      internships, fees, certificates, projects, contactInquiries, reviews, users, courses
+    ] = await Promise.all([
+      fetchAdmissionsFromBackend(),
+      fetchJobApplicationsFromBackend(),
+      fetchRsvpsFromBackend(),
+      fetchNielitProjectsFromBackend(),
+      fetchStudentsFromBackend(),
+      fetchInternshipsFromBackend(),
+      fetchFeesFromBackend(),
+      fetchCertificatesFromBackend(),
+      fetchProjectsFromBackend(),
+      fetchContactInquiriesFromBackend(),
+      fetchReviewsFromBackend(),
+      fetchUsersFromBackend(),
+      fetchCoursesFromBackend()
+    ]);
+
+    liveAdmissionsList.value = admissions || [];
+    liveJobApplicationsList.value = jobs || [];
+    liveRsvpsList.value = rsvps || [];
+    liveNielitProjectsList.value = nielitProjects || [];
+    liveStudentsList.value = students || [];
+    liveInternshipsList.value = internships || [];
+    liveFeesList.value = fees || [];
+    liveCertificatesList.value = certificates || [];
+    liveProjectsList.value = projects || [];
+    liveContactInquiriesList.value = contactInquiries || [];
+    liveReviewsList.value = reviews || [];
+    liveUsersList.value = users || [];
+    liveCoursesList.value = courses || [];
+  } catch (e) {
+    console.warn('Notice loading initial records from REST API:', e);
+  }
+};
 
 const handleAddCourse = async (courseData) => {
   const res = await saveCourseToBackend(courseData);
@@ -1208,7 +1257,14 @@ const handleUpdateAdmission = async (updatedAdm) => {
   if (idx !== -1) {
     liveAdmissionsList.value[idx] = { ...liveAdmissionsList.value[idx], ...updatedAdm };
   }
+  const sIdx = liveStudentsList.value.findIndex(s =>
+    s.registrationNo === targetId || s.id === targetId || s.userId === updatedAdm.userId
+  );
+  if (sIdx !== -1) {
+    liveStudentsList.value[sIdx] = { ...liveStudentsList.value[sIdx], ...updatedAdm };
+  }
   await updateAdmissionInBackend(targetId, updatedAdm);
+  showToast(`Admission record for ${updatedAdm.candidateName || targetId} updated in database!`, 'success');
 };
 
 // Update a student record in MongoDB and refresh the local list
@@ -1220,9 +1276,50 @@ const handleUpdateStudent = async (updatedStu) => {
   if (idx !== -1) {
     liveStudentsList.value[idx] = { ...liveStudentsList.value[idx], ...updatedStu };
   }
-  // students PUT endpoint updates both student + admission records
-  const { API: _api } = await import('./utils/apiClient.js');
-  try { await _api.updateStudent(targetId, updatedStu); } catch (e) {}
+  const aIdx = liveAdmissionsList.value.findIndex(a =>
+    a.enrollmentNumber === targetId || a.userId === targetId || a.registrationNo === targetId || a.id === targetId
+  );
+  if (aIdx !== -1) {
+    liveAdmissionsList.value[aIdx] = { ...liveAdmissionsList.value[aIdx], ...updatedStu };
+  }
+  await updateStudentInBackend(targetId, updatedStu);
+  showToast(`Student record for ${updatedStu.name || targetId} updated in database!`, 'success');
+};
+
+const handleAddFee = async (feeData) => {
+  const res = await saveFeeToBackend(feeData);
+  if (res.success) {
+    const saved = res.data?.data || res.data || feeData;
+    liveFeesList.value.unshift(saved);
+    showToast(`Fee payment recorded and saved to database!`, 'success');
+  } else {
+    showToast(`Error saving fee: ${res.error}`, 'error');
+  }
+};
+
+const handleUpdateFee = async (id, feeData) => {
+  const res = await updateFeeInBackend(id, feeData);
+  if (res.success) {
+    const idx = liveFeesList.value.findIndex(f => f.id === id || f.receiptNo === id);
+    if (idx !== -1) {
+      liveFeesList.value[idx] = { ...liveFeesList.value[idx], ...feeData };
+    }
+    showToast(`Fee transaction updated in database!`, 'success');
+  } else {
+    showToast(`Error updating fee: ${res.error}`, 'error');
+  }
+};
+
+const handleDeleteFee = async (id) => {
+  await deleteFeeFromBackend(id);
+  liveFeesList.value = liveFeesList.value.filter(f => f.id !== id && f.receiptNo !== id);
+  showToast('Fee transaction removed from database.', 'info');
+};
+
+const handleDeleteContact = async (id) => {
+  await deleteContactInquiryFromBackend(id);
+  liveContactInquiriesList.value = liveContactInquiriesList.value.filter(c => c.id !== id);
+  showToast('Contact inquiry removed from database.', 'info');
 };
 
 const handleUpdateNielitProject = async (updatedProject) => {
@@ -1417,44 +1514,6 @@ onMounted(() => {
   }
 
   // Load 100% live database records across all Swagger API endpoints from ithunt-api REST API
-  const loadInitialData = async () => {
-    try {
-      const [
-        admissions, jobs, rsvps, nielitProjects, students,
-        internships, fees, certificates, projects, contactInquiries, reviews, users, courses
-      ] = await Promise.all([
-        fetchAdmissionsFromBackend(),
-        fetchJobApplicationsFromBackend(),
-        fetchRsvpsFromBackend(),
-        fetchNielitProjectsFromBackend(),
-        fetchStudentsFromBackend(),
-        fetchInternshipsFromBackend(),
-        fetchFeesFromBackend(),
-        fetchCertificatesFromBackend(),
-        fetchProjectsFromBackend(),
-        fetchContactInquiriesFromBackend(),
-        fetchReviewsFromBackend(),
-        fetchUsersFromBackend(),
-        fetchCoursesFromBackend()
-      ]);
-
-      liveAdmissionsList.value = admissions || [];
-      liveJobApplicationsList.value = jobs || [];
-      liveRsvpsList.value = rsvps || [];
-      liveNielitProjectsList.value = nielitProjects || [];
-      liveStudentsList.value = students || [];
-      liveInternshipsList.value = internships || [];
-      liveFeesList.value = fees || [];
-      liveCertificatesList.value = certificates || [];
-      liveProjectsList.value = projects || [];
-      liveContactInquiriesList.value = contactInquiries || [];
-      liveReviewsList.value = reviews || [];
-      liveUsersList.value = users || [];
-      liveCoursesList.value = courses || [];
-    } catch (e) {
-      console.warn('Notice loading initial records from REST API:', e);
-    }
-  };
   loadInitialData();
 
   // Initialize SEO Metadata for active view
