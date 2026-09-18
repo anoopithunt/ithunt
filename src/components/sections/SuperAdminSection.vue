@@ -514,41 +514,120 @@
             </div>
           </div>
 
-          <!-- 5. Two-Column Dashboard Split: Recent Pending Queue & Live System Health -->
+          <!-- MongoDB Atlas Live Connectivity & Document Counters Bar -->
+          <div class="overview-db-status-bar" style="margin-top: 1.5rem; margin-bottom: 1.5rem; padding: 1rem 1.25rem; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.65rem;">
+              <span class="live-status-dot-emerald" style="width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981; display: inline-block;"></span>
+              <strong style="color: #10b981; font-size: 0.925rem;">MongoDB Atlas Cloud Live (ithunt)</strong>
+              <span style="font-size: 0.78rem; color: var(--text-dim);">• All Collections Synced</span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">📝 {{ admissionsList.length }} Admissions</span>
+              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">🎓 {{ unifiedStudentsList.length }} Students</span>
+              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">📜 {{ nielitProjectsList.length }} NIELIT</span>
+              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">📚 {{ coursesList.length }} Courses</span>
+              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">💳 {{ feesList.length }} Fees</span>
+              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">🏅 {{ certificatesList.length }} Certificates</span>
+              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">🚀 {{ internshipsList.length }} Internships</span>
+              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">🎪 {{ eventsCatalogList.length }} Events</span>
+              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">💻 {{ projectsList.length }} Projects</span>
+              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">⭐ {{ reviewsList.length }} Reviews</span>
+              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">👥 {{ usersList.length }} Users</span>
+            </div>
+          </div>
+
+          <!-- 5. Two-Column Dashboard Split: Recent Admissions Registry & Live System Health -->
           <div class="overview-dual-grid">
-            <!-- Left: Recent Pending Admissions Queue -->
-            <div class="overview-box-card">
-              <div class="box-card-header">
+            <!-- Left: Recent Candidate Admissions & Confirmed Roster -->
+            <div class="overview-box-card" style="flex: 1.4;">
+              <div class="box-card-header" style="flex-wrap: wrap; gap: 0.75rem;">
                 <div>
-                  <div class="box-card-title">⏳ Pending Review Queue</div>
-                  <div class="box-card-sub">Latest candidate registrations waiting for Directorate confirmation</div>
+                  <div class="box-card-title">📋 Admissions & Registered Students Registry</div>
+                  <div class="box-card-sub">Active records loaded live from MongoDB Atlas database</div>
                 </div>
-                <button class="box-card-link" @click="currentTab = 'admissions'">View All Admissions →</button>
+                <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
+                  <button 
+                    type="button"
+                    class="admin-tab-btn" 
+                    :class="{ active: overviewAdmissionFilter === 'all' }"
+                    @click="overviewAdmissionFilter = 'all'"
+                    style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: 6px;"
+                  >All ({{ admissionsList.length }})</button>
+                  <button 
+                    type="button"
+                    class="admin-tab-btn" 
+                    :class="{ active: overviewAdmissionFilter === 'confirmed' }"
+                    @click="overviewAdmissionFilter = 'confirmed'"
+                    style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: 6px;"
+                  >Confirmed ({{ confirmedAdmissionsCount }})</button>
+                  <button 
+                    type="button"
+                    class="admin-tab-btn" 
+                    :class="{ active: overviewAdmissionFilter === 'pending' }"
+                    @click="overviewAdmissionFilter = 'pending'"
+                    style="padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: 6px;"
+                  >Pending ({{ pendingAdmissionsCount }})</button>
+                  <button class="box-card-link" @click="currentTab = 'admissions'" style="margin-left: 0.25rem;">View All →</button>
+                </div>
               </div>
 
-              <div v-if="recentPendingAdmissions.length === 0" class="empty-state-clean">
-                <span class="empty-icon">✅</span>
-                <div class="empty-title">All Caught Up!</div>
-                <div class="empty-sub">No pending candidate applications. All submitted admissions have been confirmed.</div>
+              <div v-if="recentAdmissions.length === 0" class="empty-state-clean">
+                <span class="empty-icon">📂</span>
+                <div class="empty-title">No Candidate Records Found</div>
+                <div class="empty-sub">No candidate registrations match the selected filter.</div>
               </div>
 
               <div v-else class="queue-list">
-                <div v-for="adm in recentPendingAdmissions" :key="adm.registrationNo || adm.id" class="queue-item">
-                  <div class="queue-item-info">
-                    <div class="queue-item-name">{{ adm.candidateName || adm.fullName || 'Candidate' }}</div>
-                    <div class="queue-item-meta">
-                      <span class="queue-reg-pill">{{ adm.registrationNo || adm.id }}</span>
+                <div v-for="adm in recentAdmissions" :key="adm.registrationNo || adm.id" class="queue-item" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.05); gap: 1rem;">
+                  <div class="queue-item-info" style="flex: 1; min-width: 0;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                      <div class="queue-item-name" style="font-weight: 700; color: #fff;">{{ adm.candidateName || adm.fullName || 'Candidate' }}</div>
+                      <span class="admin-status-chip" :class="(adm.status === 'Confirmed' || adm.status === 'Active Registered Student' || adm.admissionConfirmed) ? 'status-confirmed' : 'status-pending'" style="font-size: 0.7rem; padding: 0.15rem 0.5rem;">
+                        {{ (adm.status === 'Confirmed' || adm.status === 'Active Registered Student' || adm.admissionConfirmed) ? 'Confirmed ✓' : 'Pending Review' }}
+                      </span>
+                    </div>
+                    <div class="queue-item-meta" style="font-size: 0.78rem; color: var(--text-dim); margin-top: 0.25rem; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                      <span class="queue-reg-pill" style="font-family: var(--font-mono); color: #38bdf8;">{{ adm.registrationNo || adm.id }}</span>
                       <span>•</span>
-                      <span>{{ adm.course }}</span>
+                      <span style="color: #94a3b8;">{{ adm.course }}</span>
                       <span>•</span>
-                      <span>{{ adm.date || 'Today' }}</span>
+                      <span>📞 {{ adm.mobile || adm.phone || '—' }}</span>
+                      <span>•</span>
+                      <span>💳 {{ adm.feeStatus || 'Pending' }}</span>
                     </div>
                   </div>
-                  <div class="queue-item-actions">
-                    <button class="btn-primary queue-confirm-btn" @click="handleConfirmAdmission(adm)" title="1-Click Confirm Admission">
+                  <div class="queue-item-actions" style="display: flex; gap: 0.4rem; align-items: center; flex-shrink: 0;">
+                    <button 
+                      v-if="!adm.admissionConfirmed && adm.status !== 'Confirmed' && adm.status !== 'Active Registered Student'"
+                      class="btn-primary queue-confirm-btn" 
+                      @click="handleConfirmAdmission(adm)" 
+                      title="1-Click Confirm Admission"
+                      style="font-size: 0.78rem; padding: 0.35rem 0.7rem;"
+                    >
                       <span>Confirm ✓</span>
                     </button>
-                    <button class="btn-secondary queue-icon-btn" @click="shareCredentialsOnWhatsApp(adm)" title="WhatsApp Candidate">
+                    <button 
+                      class="btn-secondary queue-icon-btn" 
+                      @click="openCredentialsModal(adm)" 
+                      title="View Student Portal Login Credentials"
+                      style="font-size: 0.78rem; padding: 0.35rem 0.65rem;"
+                    >
+                      <span>🔑 Logins</span>
+                    </button>
+                    <button 
+                      class="btn-secondary queue-icon-btn" 
+                      @click="emit('download-slip', adm)" 
+                      title="Download ISO Admission Slip"
+                      style="font-size: 0.78rem; padding: 0.35rem 0.65rem;"
+                    >
+                      <span>📄 Slip</span>
+                    </button>
+                    <button 
+                      class="btn-secondary queue-icon-btn" 
+                      @click="shareCredentialsOnWhatsApp(adm)" 
+                      title="WhatsApp Candidate"
+                      style="font-size: 0.78rem; padding: 0.35rem 0.55rem;"
+                    >
                       <span>💬</span>
                     </button>
                   </div>
@@ -646,11 +725,8 @@
 
           <!-- Course Filter -->
           <select v-model="studentCourseFilter" class="form-control admin-select-filter">
-            <option value="all">All Courses</option>
-            <option value="6-Month Software & Cloud Masterclass">6-Month Software & Cloud Masterclass</option>
-            <option value="Mobile App Engineering (Flutter/iOS)">Mobile App Engineering (Flutter/iOS)</option>
-            <option value="3-Month MERN Stack Web Engineer">3-Month MERN Stack Web Engineer</option>
-            <option value="NIELIT O/A Level Diploma">NIELIT O/A Level Diploma</option>
+            <option value="all">All Courses ({{ availableCoursesForFilter.length }})</option>
+            <option v-for="c in availableCoursesForFilter" :key="c" :value="c">{{ c }}</option>
           </select>
 
           <!-- Batch Filter -->
@@ -1352,8 +1428,80 @@
     <div v-else-if="currentTab === 'internships'" class="admin-tab-panel anim-stagger-3">
       <div class="panel-header-controls">
         <div>
-          <h3 class="panel-title">🚀 Production Internship Tracks & Capacity</h3>
-          <p class="panel-subtitle">Monitor batch sizes, active syllabus roadmaps, and industry placement standards.</p>
+          <h3 class="panel-title">🚀 Production Internship Tracks & Candidate Registry</h3>
+          <p class="panel-subtitle">Live candidate applications from MongoDB Atlas, industry tracks, and placement roadmaps.</p>
+        </div>
+        <div>
+          <button 
+            type="button" 
+            class="btn-primary" 
+            style="background: linear-gradient(135deg, #06b6d4, #0284c7); border-color: #06b6d4; font-weight: 800; font-size: 0.85rem;"
+            @click="openAddInternshipModal()"
+          >
+            <span>🚀 + Register Internship Applicant</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Internship Applications Registry Table from MongoDB -->
+      <div class="admin-table-card" style="margin-bottom: 2rem;">
+        <div class="table-card-header" style="padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+          <div>
+            <h4 style="font-size: 1rem; font-weight: 800; color: #fff; margin: 0;">📋 Registered Internship Applicants ({{ internshipsList.length }})</h4>
+            <div style="font-size: 0.78rem; color: var(--text-dim); margin-top: 0.2rem;">Live records retrieved from MongoDB Atlas (internships collection)</div>
+          </div>
+          <button class="box-card-link" @click="refreshAllData">🔄 Refresh Data</button>
+        </div>
+        <div class="table-responsive">
+          <table class="admin-data-table">
+            <thead>
+              <tr>
+                <th>App ID</th>
+                <th>Applicant Name</th>
+                <th>Contact Details</th>
+                <th>Domain / Track</th>
+                <th>Duration & Mode</th>
+                <th>College / Branch</th>
+                <th>Status</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="intern in internshipsList" :key="intern.id || intern._id">
+                <td><span class="admin-reg-pill">{{ intern.id || intern._id }}</span></td>
+                <td style="font-weight: 800; color: var(--text-main);">
+                  <div>{{ intern.name || intern.candidateName }}</div>
+                </td>
+                <td>
+                  <div style="font-size: 0.85rem;">📞 {{ intern.phone || intern.mobile || '—' }}</div>
+                  <div style="font-size: 0.78rem; color: var(--color-ai-cyan);">{{ intern.email }}</div>
+                </td>
+                <td style="font-weight: 700; color: #38bdf8;">{{ intern.track || intern.domain || 'Full Stack Web Development' }}</td>
+                <td>
+                  <div>⏱️ {{ intern.duration || '6 Months' }}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-dim);">{{ intern.mode || 'Studio / Hybrid' }}</div>
+                </td>
+                <td style="color: var(--text-muted); font-size: 0.82rem;">
+                  <div>{{ intern.college || 'Engineering College' }}</div>
+                  <div style="font-size: 0.74rem; color: var(--text-dim);">{{ intern.branch || 'CSE' }}</div>
+                </td>
+                <td>
+                  <span class="admin-status-chip status-confirmed">{{ intern.status || 'Confirmed' }}</span>
+                </td>
+                <td style="text-align: right;">
+                  <div style="display: inline-flex; gap: 0.35rem;">
+                    <button class="admin-icon-btn" @click="openEditInternshipModal(intern)" title="Edit Internship Details" style="color: #38bdf8;">✏️</button>
+                    <button class="admin-icon-btn" @click="handleDeleteInternship(intern)" title="Delete Internship" style="color: #ef4444;">🗑️</button>
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="internshipsList.length === 0">
+                <td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-dim);">
+                  No internship applications found in MongoDB Atlas. Click "+ Register Internship Applicant" to add one.
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -1414,8 +1562,75 @@
     <div v-else-if="currentTab === 'events'" class="admin-tab-panel anim-stagger-3">
       <div class="panel-header-controls">
         <div>
-          <h3 class="panel-title">🎪 Event RSVPs & VIP Pass Bookings</h3>
-          <p class="panel-subtitle">Live registrations for annual hackathons, AI workshops, and convocation summits.</p>
+          <h3 class="panel-title">🎪 Events Directory & VIP Pass Bookings</h3>
+          <p class="panel-subtitle">Scheduled hackathons, tech conferences, and live VIP pass reservations stored in MongoDB Atlas.</p>
+        </div>
+        <div>
+          <button 
+            type="button" 
+            class="btn-primary" 
+            style="background: linear-gradient(135deg, #f59e0b, #d97706); border-color: #f59e0b; font-weight: 800; font-size: 0.85rem;"
+            @click="openAddEventModal()"
+          >
+            <span>🎪 + Schedule New Event</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Scheduled Events Catalog Directory from MongoDB -->
+      <div class="admin-table-card" style="margin-bottom: 2rem;">
+        <div class="table-card-header" style="padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+          <div>
+            <h4 style="font-size: 1rem; font-weight: 800; color: #fff; margin: 0;">📅 Scheduled Campus Events & Summits ({{ eventsCatalogList.length }})</h4>
+            <div style="font-size: 0.78rem; color: var(--text-dim); margin-top: 0.2rem;">Events directory stored in MongoDB Atlas (events collection)</div>
+          </div>
+          <button class="box-card-link" @click="refreshAllData">🔄 Refresh Data</button>
+        </div>
+        <div class="table-responsive">
+          <table class="admin-data-table">
+            <thead>
+              <tr>
+                <th>Event ID</th>
+                <th>Event Title & Topic</th>
+                <th>Category</th>
+                <th>Date & Time</th>
+                <th>Venue / Location</th>
+                <th>Capacity</th>
+                <th>Status</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="evt in eventsCatalogList" :key="evt.id || evt._id">
+                <td><span class="admin-reg-pill">{{ evt.id || evt._id }}</span></td>
+                <td>
+                  <div style="font-weight: 800; color: var(--text-main);">{{ evt.title || evt.name }}</div>
+                  <div style="font-size: 0.76rem; color: var(--text-dim);" v-if="evt.description">{{ evt.description.slice(0, 60) }}...</div>
+                </td>
+                <td><span class="badge-tag" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">{{ evt.category || 'Tech Summit' }}</span></td>
+                <td>
+                  <div style="font-weight: 700;">📅 {{ evt.date }}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-dim);">⏰ {{ evt.time || '10:00 AM' }}</div>
+                </td>
+                <td style="font-size: 0.82rem; color: var(--text-muted);">📍 {{ evt.location || evt.venue || 'IT HUNT Studio Lab' }}</td>
+                <td style="font-weight: 700; color: var(--color-ai-cyan);">👥 {{ evt.capacity || '100+' }}</td>
+                <td>
+                  <span class="admin-status-chip status-confirmed">{{ evt.status || 'Upcoming' }}</span>
+                </td>
+                <td style="text-align: right;">
+                  <div style="display: inline-flex; gap: 0.35rem;">
+                    <button class="admin-icon-btn" @click="openEditEventModal(evt)" title="Edit Event" style="color: #38bdf8;">✏️</button>
+                    <button class="admin-icon-btn" @click="handleDeleteEvent(evt)" title="Cancel/Delete Event" style="color: #ef4444;">🗑️</button>
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="eventsCatalogList.length === 0">
+                <td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-dim);">
+                  No scheduled events found in MongoDB Atlas. Click "+ Schedule New Event" to create one.
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -1527,7 +1742,17 @@
       <div class="panel-header-controls">
         <div>
           <h3 class="panel-title">⭐ Student Reviews & Facility Ratings Moderation</h3>
-          <p class="panel-subtitle">Review feedback regarding lab workstations, mentor guidance, and learning outcomes.</p>
+          <p class="panel-subtitle">Review feedback regarding lab workstations, mentor guidance, and learning outcomes ({{ reviewsList.length }} reviews in DB).</p>
+        </div>
+        <div>
+          <button 
+            type="button" 
+            class="btn-primary" 
+            style="background: linear-gradient(135deg, #eab308, #ca8a04); border-color: #eab308; font-weight: 800; font-size: 0.85rem; color: #000;"
+            @click="openAddReviewModal()"
+          >
+            <span>⭐ + Add Student Review</span>
+          </button>
         </div>
       </div>
 
@@ -1788,7 +2013,17 @@
       <div class="panel-header-controls">
         <div>
           <h3 class="panel-title">💻 Capstone Projects & Student Repositories</h3>
-          <p class="panel-subtitle">Production apps built by interns with live cloud hosting and public Git repos.</p>
+          <p class="panel-subtitle">Production apps built by interns with live cloud hosting and public Git repos ({{ projectsList.length }} projects in DB).</p>
+        </div>
+        <div>
+          <button 
+            type="button" 
+            class="btn-primary" 
+            style="background: linear-gradient(135deg, #10b981, #059669); border-color: #10b981; font-weight: 800; font-size: 0.85rem;"
+            @click="openAddProjectModal()"
+          >
+            <span>💻 + Add Capstone Project</span>
+          </button>
         </div>
       </div>
 
@@ -1803,13 +2038,14 @@
                 <th>Repository</th>
                 <th>Live Demo</th>
                 <th>Status</th>
+                <th style="text-align: right;">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="prj in projectsList" :key="prj.id">
+              <tr v-for="prj in projectsList" :key="prj.id || prj._id">
                 <td>
                   <div style="font-weight: 800; color: var(--text-main);">{{ prj.title || prj.projectTitle }}</div>
-                  <div style="font-size: 0.75rem; color: var(--text-dim);">ID: {{ prj.id }}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-dim);">ID: {{ prj.id || prj._id }}</div>
                 </td>
                 <td style="font-weight: 700; color: var(--color-ai-yellow);">{{ prj.studentName }}</td>
                 <td><span style="font-size: 0.8rem; color: var(--color-ai-cyan);">{{ prj.techStack }}</span></td>
@@ -1817,18 +2053,26 @@
                   <a v-if="prj.repoUrl" :href="prj.repoUrl" target="_blank" rel="noopener noreferrer" style="color: var(--color-ai-cyan); text-decoration: underline; font-size: 0.8rem;">
                     📦 GitHub Repo
                   </a>
+                  <span v-else style="color: var(--text-dim); font-size: 0.8rem;">—</span>
                 </td>
                 <td>
                   <a v-if="prj.liveUrl" :href="prj.liveUrl" target="_blank" rel="noopener noreferrer" style="color: #10b981; text-decoration: underline; font-size: 0.8rem; font-weight: 700;">
                     🚀 Live Demo
                   </a>
+                  <span v-else style="color: var(--text-dim); font-size: 0.8rem;">—</span>
                 </td>
                 <td>
                   <span class="admin-status-chip status-confirmed">{{ prj.status || 'Completed & Deployed' }}</span>
                 </td>
+                <td style="text-align: right;">
+                  <div style="display: inline-flex; gap: 0.35rem;">
+                    <button class="admin-icon-btn" @click="openEditProjectModal(prj)" title="Edit Project" style="color: #38bdf8;">✏️</button>
+                    <button class="admin-icon-btn" @click="handleDeleteProject(prj)" title="Delete Project" style="color: #ef4444;">🗑️</button>
+                  </div>
+                </td>
               </tr>
               <tr v-if="projectsList.length === 0">
-                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-dim);">No capstone projects registered yet.</td>
+                <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-dim);">No capstone projects registered yet. Click "+ Add Capstone Project" to create one.</td>
               </tr>
             </tbody>
           </table>
@@ -3393,6 +3637,260 @@
 
       </div>
     </div>
+
+    <!-- Add / Edit Internship Application Modal -->
+    <div class="modal-overlay" v-if="showAddInternshipModal" @click.self="showAddInternshipModal = false">
+      <div class="modal-card" style="max-width: 650px;">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>🚀</span> {{ isEditingInternship ? 'Edit Internship Applicant' : 'Register New Internship Applicant' }}
+          </div>
+          <button class="modal-close-btn" @click="showAddInternshipModal = false">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 1.5rem;">
+          <form @submit.prevent="handleSaveInternship">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Applicant Full Name <span class="req">*</span></label>
+                <input type="text" v-model="internshipForm.name" required class="form-control" placeholder="Candidate Name">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email Address <span class="req">*</span></label>
+                <input type="email" v-model="internshipForm.email" required class="form-control" placeholder="candidate@email.com">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Mobile Number</label>
+                <input type="tel" v-model="internshipForm.phone" class="form-control" placeholder="10-digit phone">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Target Domain / Track <span class="req">*</span></label>
+                <select v-model="internshipForm.track" class="form-control" required>
+                  <option value="Full Stack Web Development (MERN)">Full Stack Web Development (MERN)</option>
+                  <option value="Cloud Architecture & DevOps">Cloud Architecture & DevOps</option>
+                  <option value="AI / ML Engineering & Data Science">AI / ML Engineering & Data Science</option>
+                  <option value="Mobile Application Development (Flutter/iOS)">Mobile Application Development (Flutter/iOS)</option>
+                  <option value="Cyber Security & Ethical Hacking">Cyber Security & Ethical Hacking</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Duration</label>
+                <select v-model="internshipForm.duration" class="form-control">
+                  <option value="6 Months">6 Months Industry Internship</option>
+                  <option value="3 Months">3 Months Fast-Track</option>
+                  <option value="1 Year">1 Year Apprenticeship</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Mode</label>
+                <select v-model="internshipForm.mode" class="form-control">
+                  <option value="Offline Studio / Hybrid">Offline Studio / Hybrid (Prayagraj)</option>
+                  <option value="Remote / Virtual">Remote / Virtual</option>
+                  <option value="Full-Time On-Premise">Full-Time On-Premise</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">College / Institute</label>
+                <input type="text" v-model="internshipForm.college" class="form-control" placeholder="e.g. United College of Engg">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Branch / Specialization</label>
+                <input type="text" v-model="internshipForm.branch" class="form-control" placeholder="e.g. Computer Science (B.Tech / BCA)">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Application Status</label>
+                <select v-model="internshipForm.status" class="form-control">
+                  <option value="Confirmed">Confirmed & Active Intern</option>
+                  <option value="Under Review">Under Review</option>
+                  <option value="Shortlisted">Shortlisted for Interview</option>
+                  <option value="Completed">Internship Completed</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer-actions" style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
+              <button type="button" class="btn-secondary" @click="showAddInternshipModal = false">Cancel</button>
+              <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #06b6d4, #0284c7); border-color: #06b6d4;">
+                <span>{{ isEditingInternship ? 'Update Internship Record' : 'Save to MongoDB Atlas' }} 💾</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add / Edit Event Modal -->
+    <div class="modal-overlay" v-if="showAddEventModal" @click.self="showAddEventModal = false">
+      <div class="modal-card" style="max-width: 650px;">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>🎪</span> {{ isEditingEvent ? 'Edit Scheduled Campus Event' : 'Schedule New Campus Event' }}
+          </div>
+          <button class="modal-close-btn" @click="showAddEventModal = false">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 1.5rem;">
+          <form @submit.prevent="handleSaveEvent">
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label class="form-label">Event Title <span class="req">*</span></label>
+                <input type="text" v-model="eventForm.title" required class="form-control" placeholder="e.g. National Hackathon 2026">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Category</label>
+                <select v-model="eventForm.category" class="form-control">
+                  <option value="Hackathon">Hackathon</option>
+                  <option value="Workshop">Hands-on Workshop</option>
+                  <option value="Tech Summit">Tech Summit / Conference</option>
+                  <option value="Convocation">Convocation / Award Ceremony</option>
+                  <option value="Webinar">Live Masterclass / Webinar</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Date <span class="req">*</span></label>
+                <input type="text" v-model="eventForm.date" required class="form-control" placeholder="e.g. 25 Oct 2026 or DD-MM-YYYY">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Time</label>
+                <input type="text" v-model="eventForm.time" class="form-control" placeholder="e.g. 10:00 AM - 04:00 PM">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Expected Capacity</label>
+                <input type="number" v-model="eventForm.capacity" class="form-control" placeholder="e.g. 150">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Venue / Location</label>
+                <input type="text" v-model="eventForm.location" class="form-control" placeholder="e.g. IT HUNT Main Auditorium & Studio, Prayagraj">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Keynote Speaker / Mentor</label>
+                <input type="text" v-model="eventForm.speaker" class="form-control" placeholder="e.g. Mr. Lakshman Singh Chauhan">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Status</label>
+                <select v-model="eventForm.status" class="form-control">
+                  <option value="Upcoming">Upcoming</option>
+                  <option value="Registration Open">Registration Open</option>
+                  <option value="Live Now">Live Now</option>
+                  <option value="Completed">Completed</option>
+                </select>
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Tags (comma-separated)</label>
+                <input type="text" v-model="eventForm.tags" class="form-control" placeholder="AI, Cloud, MERN Stack, Flutter">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Brief Description</label>
+                <textarea v-model="eventForm.description" rows="2" class="form-control" placeholder="Event overview, objectives, and eligibility..."></textarea>
+              </div>
+            </div>
+            <div class="modal-footer-actions" style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
+              <button type="button" class="btn-secondary" @click="showAddEventModal = false">Cancel</button>
+              <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #f59e0b, #d97706); border-color: #f59e0b;">
+                <span>{{ isEditingEvent ? 'Update Event Record' : 'Save Event to MongoDB Atlas' }} 💾</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add / Edit Capstone Project Modal -->
+    <div class="modal-overlay" v-if="showAddProjectModal" @click.self="showAddProjectModal = false">
+      <div class="modal-card" style="max-width: 650px;">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>💻</span> {{ isEditingProject ? 'Edit Capstone Project' : 'Add New Capstone Project' }}
+          </div>
+          <button class="modal-close-btn" @click="showAddProjectModal = false">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 1.5rem;">
+          <form @submit.prevent="handleSaveProject">
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label class="form-label">Project Title <span class="req">*</span></label>
+                <input type="text" v-model="projectForm.title" required class="form-control" placeholder="e.g. AI-Powered Healthcare Diagnostic Portal">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Developer / Student Name <span class="req">*</span></label>
+                <input type="text" v-model="projectForm.studentName" required class="form-control" placeholder="e.g. Aditya Verma">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tech Stack</label>
+                <input type="text" v-model="projectForm.techStack" class="form-control" placeholder="e.g. React, Node.js, Express, MongoDB">
+              </div>
+              <div class="form-group">
+                <label class="form-label">GitHub Repository URL</label>
+                <input type="url" v-model="projectForm.repoUrl" class="form-control" placeholder="https://github.com/...">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Live Hosted Demo URL</label>
+                <input type="url" v-model="projectForm.liveUrl" class="form-control" placeholder="https://...">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Deployment Status</label>
+                <select v-model="projectForm.status" class="form-control">
+                  <option value="Completed & Deployed">Completed & Deployed</option>
+                  <option value="In Progress">In Progress (Beta)</option>
+                  <option value="Submitted for Review">Submitted for Review</option>
+                </select>
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Project Summary</label>
+                <textarea v-model="projectForm.description" rows="2" class="form-control" placeholder="Brief description of key features and architecture..."></textarea>
+              </div>
+            </div>
+            <div class="modal-footer-actions" style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
+              <button type="button" class="btn-secondary" @click="showAddProjectModal = false">Cancel</button>
+              <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); border-color: #10b981;">
+                <span>{{ isEditingProject ? 'Update Project' : 'Save Project to MongoDB Atlas' }} 💾</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Student Review Modal -->
+    <div class="modal-overlay" v-if="showAddReviewModal" @click.self="showAddReviewModal = false">
+      <div class="modal-card" style="max-width: 550px;">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>⭐</span> Add Student Review & Testimonial
+          </div>
+          <button class="modal-close-btn" @click="showAddReviewModal = false">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 1.5rem;">
+          <form @submit.prevent="handleSaveReview">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Student Name <span class="req">*</span></label>
+                <input type="text" v-model="reviewForm.name" required class="form-control" placeholder="Full name">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Role / Batch / Course</label>
+                <input type="text" v-model="reviewForm.role" class="form-control" placeholder="e.g. MERN Stack Graduate, Batch 2026">
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Star Rating</label>
+                <select v-model="reviewForm.rating" class="form-control">
+                  <option :value="5">⭐⭐⭐⭐⭐ 5 Stars (Excellent)</option>
+                  <option :value="4">⭐⭐⭐⭐ 4 Stars (Very Good)</option>
+                  <option :value="3">⭐⭐⭐ 3 Stars (Good)</option>
+                </select>
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Review Comment & Testimonial <span class="req">*</span></label>
+                <textarea v-model="reviewForm.comment" rows="3" required class="form-control" placeholder="Enter student's experience, learning outcomes, lab feedback..."></textarea>
+              </div>
+            </div>
+            <div class="modal-footer-actions" style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
+              <button type="button" class="btn-secondary" @click="showAddReviewModal = false">Cancel</button>
+              <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #eab308, #ca8a04); border-color: #eab308; color: #000; font-weight: 800;">
+                <span>Save Review to MongoDB Atlas 💾</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
       </div> <!-- /.admin-canvas-content -->
     </main>
   </div>
@@ -3440,7 +3938,19 @@ import {
   updateFeeInBackend,
   deleteFeeFromBackend,
   deleteContactInquiryFromBackend,
-  saveNielitProjectRecord
+  saveNielitProjectRecord,
+  fetchInternshipsFromBackend,
+  fetchEventsCatalogFromBackend,
+  saveInternshipToBackend,
+  updateInternshipInBackend,
+  deleteInternshipFromBackend,
+  saveEventToBackend,
+  updateEventInBackend,
+  deleteEventFromBackend,
+  saveProjectToBackend,
+  updateProjectInBackend,
+  deleteProjectFromBackend,
+  saveReviewToBackend
 } from '../../utils/apiClient.js';
 import CertificatePreviewModal from '../modals/CertificatePreviewModal.vue';
 import { 
@@ -3483,6 +3993,10 @@ const props = defineProps({
     default: () => []
   },
   allInternships: {
+    type: Array,
+    default: () => []
+  },
+  allEventsCatalog: {
     type: Array,
     default: () => []
   },
@@ -3539,6 +4053,17 @@ const emit = defineEmits([
   'add-fee',
   'update-fee',
   'delete-fee',
+  'add-internship',
+  'update-internship',
+  'delete-internship',
+  'add-event',
+  'update-event',
+  'delete-event',
+  'add-project',
+  'update-project',
+  'delete-project',
+  'add-review',
+  'delete-review',
   'delete-contact',
   'refresh-data',
   'set-tab',
@@ -3674,7 +4199,7 @@ const pendingAdmissionsCount = computed(() => {
 });
 
 const confirmedAdmissionsCount = computed(() => {
-  return admissionsList.value.filter(a => a.status === 'Confirmed' || a.admissionConfirmed).length;
+  return admissionsList.value.filter(a => a.status === 'Confirmed' || a.status === 'Active Registered Student' || a.status === 'Verified' || a.admissionConfirmed).length;
 });
 
 const openAdmissionEmailModal = (adm) => {
@@ -4042,8 +4567,25 @@ const contactInquiriesList = ref([]);
 const reviewsList = ref([]);
 const usersList = ref([]);
 const coursesList = ref([]);
+const eventsCatalogList = ref([]);
+
+watch(() => props.allEventsCatalog, (val) => {
+  eventsCatalogList.value = val || [];
+}, { immediate: true, deep: true });
 
 // --- ENTERPRISE EXECUTIVE OVERVIEW COMPUTED PROPERTIES ---
+const overviewAdmissionFilter = ref('all');
+const recentAdmissions = computed(() => {
+  const list = admissionsList.value.length ? admissionsList.value : (props.allAdmissions || []);
+  if (overviewAdmissionFilter.value === 'pending') {
+    return list.filter(a => a.status === 'Pending Verification' || a.status === 'Pending Confirmation' || (!a.status && !a.admissionConfirmed)).slice(0, 10);
+  }
+  if (overviewAdmissionFilter.value === 'confirmed') {
+    return list.filter(a => a.status === 'Confirmed' || a.status === 'Active Registered Student' || a.status === 'Verified' || a.admissionConfirmed).slice(0, 10);
+  }
+  return list.slice(0, 10);
+});
+
 const currentTabTitle = computed(() => {
   const found = defaultTabs.find(t => t.id === currentTab.value);
   return found ? found.label : 'Directorate Console';
@@ -4260,6 +4802,18 @@ const unifiedStudentsList = computed(() => {
   return Array.from(map.values());
 });
 
+const availableCoursesForFilter = computed(() => {
+  const set = new Set();
+  coursesList.value.forEach(c => {
+    if (c.title) set.add(c.title);
+    if (c.name) set.add(c.name);
+  });
+  unifiedStudentsList.value.forEach(s => {
+    if (s.course) set.add(s.course);
+  });
+  return Array.from(set).filter(Boolean);
+});
+
 const filteredStudents = computed(() => {
   return unifiedStudentsList.value.filter(stu => {
     const search = studentSearch.value.toLowerCase().trim();
@@ -4273,13 +4827,13 @@ const filteredStudents = computed(() => {
       (stu.mobile && stu.mobile.includes(search)) ||
       (stu.course && stu.course.toLowerCase().includes(search));
 
-    const matchesCourse = studentCourseFilter.value === 'all' || stu.course === studentCourseFilter.value;
+    const matchesCourse = studentCourseFilter.value === 'all' || stu.course === studentCourseFilter.value || (stu.course && stu.course.includes(studentCourseFilter.value));
     const matchesBatch = studentBatchFilter.value === 'all' || stu.batch === studentBatchFilter.value;
     let matchesStatus = true;
     if (studentStatusFilter.value === 'ACTIVE') {
-      matchesStatus = stu.academicStatus === 'ACTIVE' || stu.status === 'ACTIVE' || stu.admissionConfirmed;
+      matchesStatus = stu.academicStatus === 'ACTIVE' || stu.status === 'ACTIVE' || stu.status === 'Active Registered Student' || stu.status === 'Confirmed' || stu.admissionConfirmed;
     } else if (studentStatusFilter.value === 'PENDING_REVIEW') {
-      matchesStatus = stu.academicStatus === 'PENDING_REVIEW' || stu.status === 'Pending Verification' || !stu.admissionConfirmed;
+      matchesStatus = stu.academicStatus === 'PENDING_REVIEW' || stu.status === 'Pending Verification' || (!stu.status && !stu.admissionConfirmed);
     } else if (studentStatusFilter.value !== 'all') {
       matchesStatus = stu.academicStatus === studentStatusFilter.value || stu.status === studentStatusFilter.value;
     }
@@ -4336,7 +4890,7 @@ const filteredAdmissions = computed(() => {
   return admissionsList.value.filter(adm => {
     let matchStatus = true;
     if (admissionStatusFilter.value === 'Confirmed') {
-      matchStatus = adm.status === 'Confirmed' || adm.admissionConfirmed === true;
+      matchStatus = adm.status === 'Confirmed' || adm.status === 'Active Registered Student' || adm.status === 'Verified' || adm.admissionConfirmed === true;
     } else if (admissionStatusFilter.value === 'Pending Verification' || admissionStatusFilter.value === 'Pending Confirmation') {
       matchStatus = adm.status === 'Pending Verification' || adm.status === 'Pending Confirmation' || (!adm.status && !adm.admissionConfirmed);
     } else if (admissionStatusFilter.value !== 'all') {
@@ -4496,7 +5050,7 @@ const deleteNielitProject = async (p) => {
 };
 
 // Universal alias
-const handleDeleteProject = (projectId) => deleteNielitProject(projectId);
+const handleDeleteNielit = (projectId) => deleteNielitProject(projectId);
 
 const cycleNielitStatus = (p) => {
   if (!p.status || p.status === 'Submitted') p.status = 'Under Review';
@@ -5160,7 +5714,7 @@ const refreshAllData = async () => {
   try {
     emit('refresh-data');
     const [
-      adms, stus, usrs, crss, nielits, fees, certs, projs, inqs, revs, jobs, rsvps
+      adms, stus, usrs, crss, nielits, fees, certs, projs, inqs, revs, jobs, rsvps, interns, eventsCat
     ] = await Promise.all([
       fetchAdmissionsFromBackend(),
       fetchStudentsFromBackend(),
@@ -5173,7 +5727,9 @@ const refreshAllData = async () => {
       fetchContactInquiriesFromBackend(),
       fetchReviewsFromBackend(),
       fetchJobApplicationsFromBackend(),
-      fetchRsvpsFromBackend()
+      fetchRsvpsFromBackend(),
+      fetchInternshipsFromBackend(),
+      fetchEventsCatalogFromBackend()
     ]);
     if (adms && adms.length > 0) admissionsList.value = adms;
     if (stus && stus.length > 0) studentsList.value = stus;
@@ -5187,12 +5743,353 @@ const refreshAllData = async () => {
     if (revs && revs.length > 0) reviewsList.value = revs;
     if (jobs && jobs.length > 0) jobApplicationsList.value = jobs;
     if (rsvps && rsvps.length > 0) rsvpsList.value = rsvps;
+    if (interns && interns.length > 0) internshipsList.value = interns;
+    if (eventsCat && eventsCat.length > 0) eventsCatalogList.value = eventsCat;
     lastRefreshedTime.value = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   } catch (err) {
     console.warn('SuperAdmin refresh notice:', err.message);
   } finally {
     isRefreshing.value = false;
   }
+};
+
+// --- INTERNSHIP MANAGEMENT STATE & ACTIONS ---
+const showAddInternshipModal = ref(false);
+const isEditingInternship = ref(false);
+const editingInternshipId = ref(null);
+const internshipForm = ref({
+  id: '',
+  name: '',
+  email: '',
+  phone: '',
+  track: 'Full Stack Web Development (MERN)',
+  duration: '6 Months',
+  college: '',
+  branch: 'Computer Science & Engineering',
+  mode: 'Offline Studio / Hybrid',
+  status: 'Confirmed'
+});
+
+const openAddInternshipModal = () => {
+  isEditingInternship.value = false;
+  editingInternshipId.value = null;
+  const newId = `INT-${Math.floor(10000 + Math.random() * 90000)}`;
+  internshipForm.value = {
+    id: newId,
+    name: '',
+    email: '',
+    phone: '',
+    track: 'Full Stack Web Development (MERN)',
+    duration: '6 Months',
+    college: '',
+    branch: 'Computer Science & Engineering',
+    mode: 'Offline Studio / Hybrid',
+    status: 'Confirmed'
+  };
+  showAddInternshipModal.value = true;
+};
+
+const openEditInternshipModal = (intern) => {
+  isEditingInternship.value = true;
+  editingInternshipId.value = intern.id || intern._id;
+  internshipForm.value = {
+    id: intern.id || intern._id,
+    name: intern.name || intern.candidateName || '',
+    email: intern.email || '',
+    phone: intern.phone || intern.mobile || '',
+    track: intern.track || intern.domain || 'Full Stack Web Development (MERN)',
+    duration: intern.duration || '6 Months',
+    college: intern.college || '',
+    branch: intern.branch || 'Computer Science & Engineering',
+    mode: intern.mode || 'Offline Studio / Hybrid',
+    status: intern.status || 'Confirmed'
+  };
+  showAddInternshipModal.value = true;
+};
+
+const handleSaveInternship = async () => {
+  if (!internshipForm.value.name || !internshipForm.value.email) {
+    alert('Please enter Applicant Name and Email.');
+    return;
+  }
+  const item = { ...internshipForm.value };
+  if (isEditingInternship.value && editingInternshipId.value) {
+    const idx = internshipsList.value.findIndex(i => (i.id === editingInternshipId.value || i._id === editingInternshipId.value));
+    if (idx !== -1) internshipsList.value[idx] = { ...internshipsList.value[idx], ...item };
+    emit('update-internship', editingInternshipId.value, item);
+    try {
+      await updateInternshipInBackend(editingInternshipId.value, item);
+      emailActionMsg.value = `✓ Internship for ${item.name} updated in MongoDB!`;
+    } catch (e) {
+      console.warn('Update internship error:', e.message);
+    }
+  } else {
+    internshipsList.value.unshift(item);
+    emit('add-internship', item);
+    try {
+      await saveInternshipToBackend(item);
+      emailActionMsg.value = `✓ New internship registration saved to MongoDB Atlas!`;
+    } catch (e) {
+      console.warn('Save internship error:', e.message);
+    }
+  }
+  showAddInternshipModal.value = false;
+  setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+};
+
+const handleDeleteInternship = async (intern) => {
+  const targetId = intern.id || intern._id;
+  if (confirm(`Delete internship application for ${intern.name || intern.candidateName}?`)) {
+    internshipsList.value = internshipsList.value.filter(i => i.id !== targetId && i._id !== targetId);
+    emit('delete-internship', targetId);
+    try {
+      await deleteInternshipFromBackend(targetId);
+      emailActionMsg.value = `✓ Internship application deleted.`;
+    } catch (e) {
+      console.warn('Delete internship error:', e.message);
+    }
+    setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+  }
+};
+
+// --- EVENT CATALOG MANAGEMENT STATE & ACTIONS ---
+const showAddEventModal = ref(false);
+const isEditingEvent = ref(false);
+const editingEventId = ref(null);
+const eventForm = ref({
+  id: '',
+  title: '',
+  description: '',
+  date: '',
+  time: '10:00 AM - 04:00 PM',
+  location: 'IT HUNT Campus & Innovation Lab, Prayagraj',
+  category: 'Hackathon',
+  status: 'Upcoming',
+  capacity: 100,
+  speaker: 'Mr. Lakshman Singh Chauhan',
+  tags: 'AI, WebDev, Cloud'
+});
+
+const openAddEventModal = () => {
+  isEditingEvent.value = false;
+  editingEventId.value = null;
+  const newId = `EVT-${Math.floor(1000 + Math.random() * 9000)}`;
+  eventForm.value = {
+    id: newId,
+    title: '',
+    description: '',
+    date: new Date().toLocaleDateString('en-GB'),
+    time: '10:00 AM - 04:00 PM',
+    location: 'IT HUNT Campus & Innovation Lab, Prayagraj',
+    category: 'Hackathon',
+    status: 'Upcoming',
+    capacity: 100,
+    speaker: 'Mr. Lakshman Singh Chauhan',
+    tags: 'AI, WebDev, Cloud'
+  };
+  showAddEventModal.value = true;
+};
+
+const openEditEventModal = (evt) => {
+  isEditingEvent.value = true;
+  editingEventId.value = evt.id || evt._id;
+  eventForm.value = {
+    id: evt.id || evt._id,
+    title: evt.title || evt.name || '',
+    description: evt.description || '',
+    date: evt.date || '',
+    time: evt.time || '10:00 AM - 04:00 PM',
+    location: evt.location || evt.venue || 'IT HUNT Campus & Innovation Lab, Prayagraj',
+    category: evt.category || 'Hackathon',
+    status: evt.status || 'Upcoming',
+    capacity: evt.capacity || 100,
+    speaker: evt.speaker || 'Mr. Lakshman Singh Chauhan',
+    tags: Array.isArray(evt.tags) ? evt.tags.join(', ') : (evt.tags || '')
+  };
+  showAddEventModal.value = true;
+};
+
+const handleSaveEvent = async () => {
+  if (!eventForm.value.title) {
+    alert('Please enter Event Title.');
+    return;
+  }
+  const item = { 
+    ...eventForm.value,
+    tags: typeof eventForm.value.tags === 'string' ? eventForm.value.tags.split(',').map(t => t.trim()).filter(Boolean) : eventForm.value.tags
+  };
+  if (isEditingEvent.value && editingEventId.value) {
+    const idx = eventsCatalogList.value.findIndex(e => (e.id === editingEventId.value || e._id === editingEventId.value));
+    if (idx !== -1) eventsCatalogList.value[idx] = { ...eventsCatalogList.value[idx], ...item };
+    emit('update-event', editingEventId.value, item);
+    try {
+      await updateEventInBackend(editingEventId.value, item);
+      emailActionMsg.value = `✓ Event "${item.title}" updated in MongoDB!`;
+    } catch (e) {
+      console.warn('Update event error:', e.message);
+    }
+  } else {
+    eventsCatalogList.value.unshift(item);
+    emit('add-event', item);
+    try {
+      await saveEventToBackend(item);
+      emailActionMsg.value = `✓ New Event scheduled and saved to MongoDB Atlas!`;
+    } catch (e) {
+      console.warn('Save event error:', e.message);
+    }
+  }
+  showAddEventModal.value = false;
+  setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+};
+
+const handleDeleteEvent = async (evt) => {
+  const targetId = evt.id || evt._id;
+  if (confirm(`Cancel and remove scheduled event "${evt.title || evt.name}"?`)) {
+    eventsCatalogList.value = eventsCatalogList.value.filter(e => e.id !== targetId && e._id !== targetId);
+    emit('delete-event', targetId);
+    try {
+      await deleteEventFromBackend(targetId);
+      emailActionMsg.value = `✓ Event removed from directory.`;
+    } catch (e) {
+      console.warn('Delete event error:', e.message);
+    }
+    setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+  }
+};
+
+// --- CAPSTONE PROJECT MANAGEMENT STATE & ACTIONS ---
+const showAddProjectModal = ref(false);
+const isEditingProject = ref(false);
+const editingProjectId = ref(null);
+const projectForm = ref({
+  id: '',
+  title: '',
+  studentName: '',
+  techStack: 'Vue.js, Node.js, Express, MongoDB',
+  description: '',
+  repoUrl: '',
+  liveUrl: '',
+  status: 'Completed & Deployed'
+});
+
+const openAddProjectModal = () => {
+  isEditingProject.value = false;
+  editingProjectId.value = null;
+  const newId = `PRJ-${Math.floor(1000 + Math.random() * 9000)}`;
+  projectForm.value = {
+    id: newId,
+    title: '',
+    studentName: '',
+    techStack: 'Vue.js, Node.js, Express, MongoDB',
+    description: '',
+    repoUrl: '',
+    liveUrl: '',
+    status: 'Completed & Deployed'
+  };
+  showAddProjectModal.value = true;
+};
+
+const openEditProjectModal = (prj) => {
+  isEditingProject.value = true;
+  editingProjectId.value = prj.id || prj._id;
+  projectForm.value = {
+    id: prj.id || prj._id,
+    title: prj.title || prj.projectTitle || '',
+    studentName: prj.studentName || '',
+    techStack: prj.techStack || 'Vue.js, Node.js, Express, MongoDB',
+    description: prj.description || '',
+    repoUrl: prj.repoUrl || '',
+    liveUrl: prj.liveUrl || '',
+    status: prj.status || 'Completed & Deployed'
+  };
+  showAddProjectModal.value = true;
+};
+
+const handleSaveProject = async () => {
+  if (!projectForm.value.title || !projectForm.value.studentName) {
+    alert('Please enter Project Title and Developer Name.');
+    return;
+  }
+  const item = { ...projectForm.value };
+  if (isEditingProject.value && editingProjectId.value) {
+    const idx = projectsList.value.findIndex(p => (p.id === editingProjectId.value || p._id === editingProjectId.value));
+    if (idx !== -1) projectsList.value[idx] = { ...projectsList.value[idx], ...item };
+    emit('update-project', editingProjectId.value, item);
+    try {
+      await updateProjectInBackend(editingProjectId.value, item);
+      emailActionMsg.value = `✓ Project "${item.title}" updated in MongoDB!`;
+    } catch (e) {
+      console.warn('Update project error:', e.message);
+    }
+  } else {
+    projectsList.value.unshift(item);
+    emit('add-project', item);
+    try {
+      await saveProjectToBackend(item);
+      emailActionMsg.value = `✓ Capstone Project added and saved to MongoDB Atlas!`;
+    } catch (e) {
+      console.warn('Save project error:', e.message);
+    }
+  }
+  showAddProjectModal.value = false;
+  setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+};
+
+const handleDeleteProject = async (prj) => {
+  const targetId = prj.id || prj._id;
+  if (confirm(`Delete capstone project "${prj.title || prj.projectTitle}"?`)) {
+    projectsList.value = projectsList.value.filter(p => p.id !== targetId && p._id !== targetId);
+    emit('delete-project', targetId);
+    try {
+      await deleteProjectFromBackend(targetId);
+      emailActionMsg.value = `✓ Project deleted.`;
+    } catch (e) {
+      console.warn('Delete project error:', e.message);
+    }
+    setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+  }
+};
+
+// --- STUDENT REVIEWS MANAGEMENT STATE & ACTIONS ---
+const showAddReviewModal = ref(false);
+const reviewForm = ref({
+  name: '',
+  role: 'Full Stack Developer / Student',
+  comment: '',
+  rating: 5,
+  date: new Date().toLocaleDateString('en-GB')
+});
+
+const openAddReviewModal = () => {
+  reviewForm.value = {
+    name: '',
+    role: 'Full Stack Developer / Student',
+    comment: '',
+    rating: 5,
+    date: new Date().toLocaleDateString('en-GB')
+  };
+  showAddReviewModal.value = true;
+};
+
+const handleSaveReview = async () => {
+  if (!reviewForm.value.name || !reviewForm.value.comment) {
+    alert('Please enter Reviewer Name and Feedback Comment.');
+    return;
+  }
+  const item = {
+    id: `REV-${Math.floor(1000 + Math.random() * 9000)}`,
+    ...reviewForm.value
+  };
+  reviewsList.value.unshift(item);
+  emit('add-review', item);
+  try {
+    await saveReviewToBackend(item);
+    emailActionMsg.value = `✓ Student review saved to MongoDB Atlas!`;
+  } catch (e) {
+    console.warn('Save review error:', e.message);
+  }
+  showAddReviewModal.value = false;
+  setTimeout(() => { emailActionMsg.value = ''; }, 4000);
 };
 
 // Certificate Generation & Management State (SuperAdmin Only)

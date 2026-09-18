@@ -106,4 +106,29 @@ router.delete('/rsvps/:id', async (req, res) => {
   }
 });
 
+/**
+ * PUT /api/events/:id
+ */
+router.put('/:id', async (req, res) => {
+  try {
+    const updated = await dbAdapter.update('events_catalog', req.params.id, req.body);
+    res.json({ success: true, data: updated, message: 'Event updated' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * DELETE /api/events/:id
+ */
+router.delete('/:id', async (req, res) => {
+  try {
+    await dbAdapter.delete('events_catalog', req.params.id);
+    res.json({ success: true, message: `Event ${req.params.id} deleted.` });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 export default router;
+
