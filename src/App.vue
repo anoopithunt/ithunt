@@ -562,7 +562,16 @@ let revealObserver = null;
 const getStoredAdminAuth = () => {
   try {
     const raw = sessionStorage.getItem('ithunt_superadmin_auth') || localStorage.getItem('ithunt_superadmin_auth');
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // Only restore sessions for users with superadmin role
+      if (parsed.roleType === 'superadmin' || parsed.role === 'Director & Chief Administrator' || parsed.email === 'admin@ithunt.com') {
+        return parsed;
+      }
+      // Non-superadmin session found - clear it
+      sessionStorage.removeItem('ithunt_superadmin_auth');
+      localStorage.removeItem('ithunt_superadmin_auth');
+    }
   } catch (e) {}
   return null;
 };
@@ -572,6 +581,7 @@ const loginActiveRole = ref('student');
 const adminUser = ref(storedAdmin || {
   name: 'Mr. Lakshman Singh Chauhan',
   role: 'Director & Chief Administrator',
+  roleType: 'superadmin',
   email: 'admin@ithunt.com',
   avatar: 'img/ithunt.webp'
 });
