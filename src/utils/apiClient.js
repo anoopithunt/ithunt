@@ -3,8 +3,8 @@ import { DEFAULT_DEMO_STUDENT } from '../data/studentAcademicData.js';
 
 const env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : (typeof process !== 'undefined' ? process.env : {});
 const RAW_API_URL = (
-  env.VITE_API_URL || 
-  env.VITE_API_BASE_URL || 
+  env.VITE_API_URL ||
+  env.VITE_API_BASE_URL ||
   ''
 ).trim();
 
@@ -266,8 +266,8 @@ export const normalizeUser = (u) => ({
  */
 export async function apiRequest(endpoint, options = {}, isRetry = false) {
   let token = (typeof localStorage !== 'undefined') ? (
-    localStorage.getItem('token') || 
-    localStorage.getItem('authToken') || 
+    localStorage.getItem('token') ||
+    localStorage.getItem('authToken') ||
     localStorage.getItem('adminToken')
   ) : null;
   if (!token && typeof sessionStorage !== 'undefined') {
@@ -443,8 +443,8 @@ export async function ensureAuthToken(forceFresh = false) {
     try {
       if (!forceFresh) {
         const stored = (typeof localStorage !== 'undefined') ? (
-          localStorage.getItem('token') || 
-          localStorage.getItem('authToken') || 
+          localStorage.getItem('token') ||
+          localStorage.getItem('authToken') ||
           localStorage.getItem('adminToken')
         ) : null;
         if (stored) return stored;
@@ -453,7 +453,7 @@ export async function ensureAuthToken(forceFresh = false) {
           try {
             const sessToken = JSON.parse(sessionStorage.getItem('ithunt_superadmin_auth') || '{}').token;
             if (sessToken) return sessToken;
-          } catch (e) {}
+          } catch (e) { }
         }
         if (memoryToken) return memoryToken;
       }
@@ -484,9 +484,9 @@ export async function ensureAuthToken(forceFresh = false) {
               return memoryToken;
             }
           }
-        } catch (e) {}
+        } catch (e) { }
       }
-    } catch (e) {}
+    } catch (e) { }
     return null;
   })().finally(() => {
     authTokenPromise = null;
@@ -545,7 +545,7 @@ export async function submitAdmissionToBackend(data) {
  */
 export async function saveAdmissionRecord(data) {
   if (!data) return { success: false, error: 'No form data provided' };
-  
+
   const normEmail = (data.email || '').toLowerCase().trim();
   const defaultPassword = data.password || 'Ithunt@123';
 
@@ -587,7 +587,7 @@ export async function saveAdmissionRecord(data) {
     try {
       localStorage.removeItem('ithunt_all_admissions');
       localStorage.removeItem('ithunt_all_students');
-    } catch (e) {}
+    } catch (e) { }
   }
 
   return {
@@ -606,8 +606,8 @@ export async function saveAdmissionRecord(data) {
 export async function fetchAdmissionsFromBackend() {
   try {
     const data = await API.getAdmissions();
-    const rawList = Array.isArray(data?.admissions) 
-      ? data.admissions 
+    const rawList = Array.isArray(data?.admissions)
+      ? data.admissions
       : (Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []));
 
     // Deduplicate records directly from database
@@ -654,8 +654,8 @@ export async function deleteAdmissionFromBackend(adm) {
   });
 
   for (const id of Array.from(new Set(idsToTry))) {
-    try { await API.deleteAdmission(id); } catch (e) {}
-    try { await API.deleteStudent(id); } catch (e) {}
+    try { await API.deleteAdmission(id); } catch (e) { }
+    try { await API.deleteStudent(id); } catch (e) { }
   }
 
   return { success: true };
@@ -667,7 +667,7 @@ export async function deleteAdmissionFromBackend(adm) {
 export async function confirmAdmissionInBackend(adm, creds = {}) {
   if (!adm) return { success: false, error: 'No admission record provided' };
   const targetId = typeof adm === 'object' ? (adm.registrationNo || adm.id) : adm;
-  
+
   try {
     const res = await API.confirmAdmission(targetId, creds);
     if (res && res.success) {
@@ -746,8 +746,8 @@ export async function fetchJobApplicationsFromBackend() {
 
   try {
     const data = await API.getCareers();
-    const rawList = Array.isArray(data?.applications) 
-      ? data.applications 
+    const rawList = Array.isArray(data?.applications)
+      ? data.applications
       : (Array.isArray(data) ? data : []);
     if (rawList.length > 0) {
       list = rawList;
@@ -887,8 +887,8 @@ export async function fetchNielitProjectsFromBackend() {
 
   try {
     const data = await API.getNielitProjects();
-    const rawList = Array.isArray(data?.projects) 
-      ? data.projects 
+    const rawList = Array.isArray(data?.projects)
+      ? data.projects
       : (Array.isArray(data) ? data : []);
     if (rawList.length > 0) {
       list = rawList;
@@ -921,7 +921,7 @@ export async function updateNielitProjectInBackend(id, data) {
   } catch (error) {
     try {
       return await API.updateProject(cleanId, data);
-    } catch (e) {}
+    } catch (e) { }
   }
   return { success: true, localOnly: true };
 }
@@ -1023,8 +1023,8 @@ export async function fetchStudentsFromBackend(filters = {}) {
     if (filters.status) queryObj.status = filters.status;
 
     const data = await API.getStudents(queryObj);
-    const rawList = Array.isArray(data?.students) 
-      ? data.students 
+    const rawList = Array.isArray(data?.students)
+      ? data.students
       : (Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []));
 
     // Deduplicate students directly from database
@@ -1052,7 +1052,7 @@ export async function deleteStudentFromBackend(student) {
   if (typeof window !== 'undefined' && window.localStorage) {
     try {
       localStorage.removeItem('ithunt_all_students');
-    } catch (e) {}
+    } catch (e) { }
   }
 
   try {
@@ -1191,10 +1191,10 @@ export async function registerStudentUser(signupData) {
 
   const apiRes = await registerStudentWithBackend(studentRecord);
   if (apiRes && apiRes.success) {
-    return { 
-      success: true, 
+    return {
+      success: true,
       user: apiRes.data?.user || apiRes.data?.student || studentRecord,
-      admission: apiRes.data?.admission 
+      admission: apiRes.data?.admission
     };
   }
   return { success: true, user: studentRecord };
@@ -1236,7 +1236,7 @@ export function saveStudentAccount(account) {
       updatedAt: new Date().toISOString()
     };
     localStorage.setItem('ithunt_student_user', JSON.stringify(userObj));
-  } catch (e) {}
+  } catch (e) { }
 }
 
 /**
@@ -1244,7 +1244,7 @@ export function saveStudentAccount(account) {
  */
 export async function changeStudentPassword(email, oldPassword, newPassword) {
   const normEmail = (email || '').toLowerCase().trim();
-  
+
   if (!newPassword || newPassword.length < 6) {
     return { success: false, error: 'New password must be at least 6 characters long.' };
   }
@@ -1262,7 +1262,7 @@ export async function changeStudentPassword(email, oldPassword, newPassword) {
             savedStudent.password = newPassword;
             localStorage.setItem('ithunt_student_user', JSON.stringify(savedStudent));
           }
-        } catch (e) {}
+        } catch (e) { }
       }
       return { success: true, message: 'Password updated successfully in database! Use your new password for all future sign-ins.' };
     }
@@ -1279,7 +1279,7 @@ export async function changeStudentPassword(email, oldPassword, newPassword) {
         localStorage.setItem('ithunt_student_user', JSON.stringify(savedStudent));
         return { success: true, message: 'Password updated successfully!' };
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   return { success: true, message: 'Password updated successfully in database!' };
@@ -1302,7 +1302,7 @@ export async function loginStudentUser(email, password) {
       if (res && res.success && (res.data?.user || res.data?.student)) {
         return { success: true, user: res.data?.user || res.data?.student };
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   // 2. Check locally saved student account in localStorage
@@ -1319,7 +1319,7 @@ export async function loginStudentUser(email, password) {
           }
         }
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   // 3. Default demo student fallback for presentation
@@ -1354,7 +1354,7 @@ export async function updateStudentProfile(studentData) {
   await updateStudentProfileWithBackend(studentData);
   try {
     localStorage.setItem('ithunt_student_user', JSON.stringify(studentData));
-  } catch (e) {}
+  } catch (e) { }
   return { success: true };
 }
 
@@ -1686,17 +1686,17 @@ export async function deleteUserFromBackend(userId, token = '') {
   try {
     await API.deleteUser(userId);
     return { success: true };
-  } catch (e) {}
+  } catch (e) { }
 
   try {
     await API.deleteAdmission(userId);
     return { success: true };
-  } catch (e) {}
+  } catch (e) { }
 
   try {
     await API.deleteStudent(userId);
     return { success: true };
-  } catch (e) {}
+  } catch (e) { }
 
   return { success: true, localOnly: true };
 }
@@ -1708,7 +1708,7 @@ export async function deleteJobApplicationFromBackend(id) {
   if (!id) return { success: false };
   try {
     await API.deleteJobApplication(id);
-  } catch (e) {}
+  } catch (e) { }
   return { success: true };
 }
 
@@ -1719,7 +1719,7 @@ export async function deleteRsvpFromBackend(id) {
   if (!id) return { success: false };
   try {
     await API.deleteRsvp(id);
-  } catch (e) {}
+  } catch (e) { }
   return { success: true };
 }
 
@@ -1730,7 +1730,7 @@ export async function deleteReviewFromBackend(id) {
   if (!id) return { success: false };
   try {
     await API.deleteReview(id);
-  } catch (e) {}
+  } catch (e) { }
   return { success: true };
 }
 

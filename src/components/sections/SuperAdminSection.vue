@@ -5,7 +5,7 @@
       <!-- Sidebar Brand / Console Header -->
       <div class="sidebar-brand">
         <div class="brand-badge-row">
-          <div class="brand-logo-icon">⚡</div>
+          <img :src="content.brand?.logoImage" :alt="(content.brand?.name || 'IT HUNT') + ' Logo'" class="brand-logo-img" @error="onImgError">
           <div class="brand-titles" v-if="!isSidebarCollapsed">
             <div class="brand-main-title">IT HUNT</div>
             <div class="brand-sub-badge">DIRECTORATE CONSOLE</div>
