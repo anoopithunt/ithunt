@@ -476,6 +476,14 @@ const handleAdminLogin = async () => {
     if (apiRes && apiRes.success) {
       const user = apiRes.data?.user || apiRes.data || {};
       const token = apiRes.data?.token || '';
+
+      // Only allow superadmin role to access the SuperAdmin console
+      if (user.role !== 'superadmin') {
+        isLoading.value = false;
+        errorMessage.value = 'Access Denied: Your account does not have SuperAdmin privileges. Only users with the "superadmin" role can access this console.';
+        return;
+      }
+
       if (token) {
         localStorage.setItem('token', token);
         localStorage.setItem('adminToken', token);
@@ -484,6 +492,7 @@ const handleAdminLogin = async () => {
       const adminUser = {
         name: user.name || 'Mr. Lakshman Singh Chauhan',
         role: user.role === 'superadmin' ? 'Director & Chief Administrator' : (user.role || 'Administrator'),
+        roleType: user.role || 'superadmin',
         email: user.email || inputUser,
         token: token,
         avatar: props.content.director?.image || 'img/ithunt.webp',
@@ -509,11 +518,12 @@ const handleAdminLogin = async () => {
   const validUsername = props.content.superAdminData?.adminAuth?.defaultUsername || 'admin@ithunt.com';
   const validPassword = props.content.superAdminData?.adminAuth?.defaultPassword || 'admin@ithunt2026';
 
-  if ((inputUser.toLowerCase() === validUsername.toLowerCase() || inputUser === 'admin') && 
+  if ((inputUser.toLowerCase() === validUsername.toLowerCase() || inputUser === 'admin') &&
       (inputPass === validPassword || inputPass === 'admin123' || inputPass === 'admin@ithunt2026')) {
     const adminUser = {
       name: props.content.superAdminData?.adminAuth?.superAdminName || 'Mr. Lakshman Singh Chauhan',
       role: props.content.superAdminData?.adminAuth?.role || 'Director & Chief Administrator',
+      roleType: 'superadmin',
       email: validUsername,
       avatar: props.content.director?.image || 'img/ithunt.webp',
       loginTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })

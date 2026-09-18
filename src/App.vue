@@ -950,6 +950,17 @@ const triggerConfetti = () => {
 
 // Methods
 const setTab = (tab) => {
+  // Prevent non-superadmin users from accessing the SuperAdmin console
+  if (tab === 'superadmin') {
+    const user = adminUser.value;
+    const isSuperAdmin = user?.roleType === 'superadmin' || 
+                         user?.role === 'Director & Chief Administrator' || 
+                         user?.email === 'admin@ithunt.com';
+    if (!isAdminLoggedIn.value || !isSuperAdmin) {
+      activeTab.value = 'login';
+      return;
+    }
+  }
   activeTab.value = tab;
   // Keep URL completely clean without exposing hash fragment
   if (window.history && window.history.replaceState) {
@@ -1256,6 +1267,11 @@ const handleLoginAsStudent = (admission) => {
 };
 
 const handleLoginSuccess = async (user) => {
+  // Enforce that only superadmin role can access the SuperAdmin console
+  if (user.roleType !== 'superadmin' && user.role !== 'Director & Chief Administrator' && user.email !== 'admin@ithunt.com') {
+    showToast('Access Denied: Only SuperAdmin users can access this console.', 'error');
+    return;
+  }
   isAdminLoggedIn.value = true;
   adminUser.value = user;
   try {
@@ -1618,8 +1634,16 @@ onMounted(() => {
   try {
     const savedAdmin = sessionStorage.getItem('ithunt_superadmin_auth') || localStorage.getItem('ithunt_superadmin_auth');
     if (savedAdmin) {
-      adminUser.value = JSON.parse(savedAdmin);
-      isAdminLoggedIn.value = true;
+      const parsedAdmin = JSON.parse(savedAdmin);
+      // Only restore session if user has superadmin role
+      if (parsedAdmin.roleType === 'superadmin' || parsedAdmin.role === 'Director & Chief Administrator' || parsedAdmin.email === 'admin@ithunt.com') {
+        adminUser.value = parsedAdmin;
+        isAdminLoggedIn.value = true;
+      } else {
+        // Non-superadmin user trying to access admin session - clear it
+        sessionStorage.removeItem('ithunt_superadmin_auth');
+        localStorage.removeItem('ithunt_superadmin_auth');
+      }
     }
   } catch (e) {}
 
