@@ -69,4 +69,39 @@ const recordFeeHandler = async (req, res) => {
 router.post('/record', recordFeeHandler);
 router.post('/', recordFeeHandler);
 
+/**
+ * PUT /api/fees/:id
+ */
+router.put('/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const body = req.body || {};
+    let item = await dbAdapter.findById('fees', id);
+    if (!item) {
+      const all = await dbAdapter.find('fees');
+      item = all.find(f => f.id === id || f.receiptNo === id || f.receiptNumber === id);
+    }
+    if (!item) return res.status(404).json({ success: false, message: 'Fee transaction not found' });
+
+    const { _id, __v, createdAt, ...safeUpdates } = body;
+    const updated = await dbAdapter.update('fees', item.id || id, safeUpdates);
+    res.json({ success: true, message: 'Fee transaction updated', data: updated });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * DELETE /api/fees/:id
+ */
+router.delete('/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    await dbAdapter.delete('fees', id);
+    res.json({ success: true, message: 'Fee transaction deleted' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 export default router;

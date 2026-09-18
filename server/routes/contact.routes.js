@@ -57,4 +57,17 @@ router.post('/', async (req, res) => {
   }
 });
 
+/**
+ * DELETE /api/contact/:id
+ */
+router.delete('/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    await dbAdapter.delete('contact', id);
+    res.json({ success: true, message: 'Contact inquiry deleted' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 export default router;
