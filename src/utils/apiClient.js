@@ -141,6 +141,22 @@ export const normalizeRsvp = (r) => ({
   date: r.date || (r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB'))
 });
 
+export const normalizeEventCatalog = (e) => ({
+  id: e.id || e.slug || e._id || `EVT-${Date.now()}`,
+  title: e.title || e.name || 'Campus Event',
+  name: e.title || e.name || 'Campus Event',
+  category: e.category || 'Workshop',
+  date: e.date || 'TBA',
+  time: e.time || '10:00 AM - 04:00 PM',
+  venue: e.venue || e.location || 'IT HUNT Tech Campus, Prayagraj',
+  location: e.location || e.venue || 'IT HUNT Tech Campus, Prayagraj',
+  status: e.status || 'UPCOMING',
+  description: e.description || '',
+  badge: e.badge || 'Featured',
+  seats: e.seats || e.capacity || 100,
+  rsvpsCount: e.rsvpsCount || 0
+});
+
 export const normalizeReview = (r) => ({
   id: r.id || `REV-${Date.now()}`,
   name: r.name || r.fullName || 'Verified Student',
@@ -346,9 +362,16 @@ export const API = {
   // Internships
   getInternshipApplications: () => apiRequest('/internships/applications'),
   applyInternship: (data) => apiRequest('/internships/apply', { method: 'POST', body: JSON.stringify(data) }),
+  saveInternship: (data) => apiRequest('/internships', { method: 'POST', body: JSON.stringify(data) }),
+  updateInternship: (id, data) => apiRequest(`/internships/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteInternship: (id) => apiRequest(`/internships/${id}`, { method: 'DELETE' }),
   updateInternshipStatus: (id, status) => apiRequest(`/internships/applications/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
 
   // Events & RSVPs
+  getEventsCatalog: () => apiRequest('/events'),
+  saveEvent: (data) => apiRequest('/events', { method: 'POST', body: JSON.stringify(data) }),
+  updateEvent: (id, data) => apiRequest(`/events/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteEvent: (id) => apiRequest(`/events/${id}`, { method: 'DELETE' }),
   getEvents: () => apiRequest('/events/rsvps'),
   submitRsvp: (rsvpData) => apiRequest('/events/rsvp', { method: 'POST', body: JSON.stringify(rsvpData) }),
   deleteRsvp: (id) => apiRequest(`/events/rsvps/${id}`, { method: 'DELETE' }),
@@ -1337,6 +1360,99 @@ export async function fetchInternshipsFromBackend() {
 }
 
 /**
+ * Save / Register new Internship Application to MongoDB (ithunt) via REST API
+ */
+export async function saveInternshipToBackend(internshipData) {
+  try {
+    const res = await API.saveInternship(internshipData);
+    return { success: true, data: res?.data || res };
+  } catch (e) {
+    console.warn('Notice saving internship to MongoDB:', e.message);
+    return { success: false, error: e.message };
+  }
+}
+
+/**
+ * Update Internship Application in MongoDB via REST API
+ */
+export async function updateInternshipInBackend(id, updates) {
+  try {
+    const res = await API.updateInternship(id, updates);
+    return { success: true, data: res?.data || res };
+  } catch (e) {
+    console.warn('Notice updating internship in MongoDB:', e.message);
+    return { success: false, error: e.message };
+  }
+}
+
+/**
+ * Delete Internship Application from MongoDB via REST API
+ */
+export async function deleteInternshipFromBackend(id) {
+  try {
+    await API.deleteInternship(id);
+    return { success: true };
+  } catch (e) {
+    console.warn('Notice deleting internship from MongoDB:', e.message);
+    return { success: false, error: e.message };
+  }
+}
+
+/**
+ * Fetch all Scheduled Events from MongoDB (ithunt) via REST API
+ */
+export async function fetchEventsCatalogFromBackend() {
+  let list = [];
+  try {
+    const data = await API.getEventsCatalog();
+    const rawList = Array.isArray(data?.events) ? data.events : (Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []));
+    if (rawList.length > 0) list = rawList;
+  } catch (e) {
+    console.warn('Notice loading events catalog from API:', e.message);
+  }
+  return list.map(normalizeEventCatalog);
+}
+
+/**
+ * Save new Scheduled Event to MongoDB (ithunt) via REST API
+ */
+export async function saveEventToBackend(eventData) {
+  try {
+    const res = await API.saveEvent(eventData);
+    return { success: true, data: res?.data || res };
+  } catch (e) {
+    console.warn('Notice saving event to MongoDB:', e.message);
+    return { success: false, error: e.message };
+  }
+}
+
+/**
+ * Update Scheduled Event in MongoDB via REST API
+ */
+export async function updateEventInBackend(id, updates) {
+  try {
+    const res = await API.updateEvent(id, updates);
+    return { success: true, data: res?.data || res };
+  } catch (e) {
+    console.warn('Notice updating event in MongoDB:', e.message);
+    return { success: false, error: e.message };
+  }
+}
+
+/**
+ * Delete Scheduled Event from MongoDB via REST API
+ */
+export async function deleteEventFromBackend(id) {
+  try {
+    await API.deleteEvent(id);
+    return { success: true };
+  } catch (e) {
+    console.warn('Notice deleting event from MongoDB:', e.message);
+    return { success: false, error: e.message };
+  }
+}
+
+/**
  * Fetch all Fees Ledger Payments from MongoDB (ithunt) via REST API
  */
 export async function fetchFeesFromBackend() {
@@ -1440,6 +1556,46 @@ export async function fetchProjectsFromBackend() {
 }
 
 /**
+ * Save new Capstone Project to MongoDB (ithunt) via REST API
+ */
+export async function saveProjectToBackend(projectData) {
+  try {
+    const res = await API.submitProject(projectData);
+    return { success: true, data: res?.data || res };
+  } catch (e) {
+    console.warn('Notice saving project to MongoDB:', e.message);
+    return { success: false, error: e.message };
+  }
+}
+
+/**
+ * Update Capstone Project in MongoDB via REST API
+ */
+export async function updateProjectInBackend(id, updates) {
+  try {
+    const res = await API.updateProject(id, updates);
+    return { success: true, data: res?.data || res };
+  } catch (e) {
+    console.warn('Notice updating project in MongoDB:', e.message);
+    return { success: false, error: e.message };
+  }
+}
+
+/**
+ * Delete Capstone Project from MongoDB via REST API
+ */
+export async function deleteProjectFromBackend(id) {
+  try {
+    await API.deleteProject(id);
+    return { success: true };
+  } catch (e) {
+    console.warn('Notice deleting project from MongoDB:', e.message);
+    return { success: false, error: e.message };
+  }
+}
+
+
+/**
  * Fetch all Contact Inquiries from MongoDB (ithunt) via REST API
  */
 export async function fetchContactInquiriesFromBackend() {
@@ -1535,6 +1691,20 @@ export async function deleteReviewFromBackend(id) {
   } catch (e) {}
   return { success: true };
 }
+
+/**
+ * Save new student review to MongoDB (ithunt) via REST API
+ */
+export async function saveReviewToBackend(reviewData) {
+  try {
+    const res = await API.submitReview(reviewData);
+    return { success: true, data: res?.data || res };
+  } catch (e) {
+    console.warn('Notice saving review to MongoDB:', e.message);
+    return { success: false, error: e.message };
+  }
+}
+
 
 /**
  * Fetch all Courses from MongoDB Backend (ithunt)

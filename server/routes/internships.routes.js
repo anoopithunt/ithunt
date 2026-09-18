@@ -26,16 +26,19 @@ const applyInternshipHandler = async (req, res) => {
     const body = req.body || {};
     const id = `INT-${Date.now()}`;
     const candidateName = body.candidateName || body.fullName || body.name || 'Applicant';
+    const phone = body.phone || body.mobile || '';
 
     const record = {
       ...body,
-      id,
+      id: body.id || id,
       candidateName,
       name: candidateName,
+      phone,
+      mobile: phone,
       track: body.track || body.internshipTrack || 'Full Stack MERN',
       duration: body.duration || '6 Months',
-      status: 'Active Internship',
-      appliedAt: new Date().toLocaleDateString('en-GB'),
+      status: body.status || 'Confirmed',
+      appliedAt: body.appliedAt || new Date().toLocaleDateString('en-GB'),
       createdAt: new Date().toISOString()
     };
 
@@ -66,4 +69,32 @@ router.put('/applications/:id/status', async (req, res) => {
   }
 });
 
+/**
+ * PUT /api/internships/:id
+ */
+router.put('/:id', async (req, res) => {
+  try {
+    const updated = await dbAdapter.update('internships', req.params.id, req.body);
+    res.json({ success: true, data: updated, message: 'Internship application updated' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * DELETE /api/internships/:id or /api/internships/applications/:id
+ */
+const deleteInternshipHandler = async (req, res) => {
+  try {
+    await dbAdapter.delete('internships', req.params.id);
+    res.json({ success: true, message: `Internship application ${req.params.id} deleted.` });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+router.delete('/applications/:id', deleteInternshipHandler);
+router.delete('/:id', deleteInternshipHandler);
+
 export default router;
+

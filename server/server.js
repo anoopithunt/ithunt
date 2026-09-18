@@ -132,6 +132,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admissions', admissionsRoutes);
 app.use('/api/students', studentsRoutes);
 app.use('/api/nielit-projects', nielitRoutes);
+app.use('/api/nielit', nielitRoutes);
 app.use('/api/careers', careersRoutes);
 app.use('/api/internships', internshipsRoutes);
 app.use('/api/events', eventsRoutes);
@@ -142,9 +143,11 @@ app.use('/api/projects', projectsRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/courses', coursesRoutes);
+app.use('/api/users', authRoutes);
 
 // Dual Mount Route Aliases (Direct Root without /api prefix for flexibility)
 app.use('/auth', authRoutes);
+app.use('/users', authRoutes);
 app.use('/admissions', admissionsRoutes);
 app.use('/students', studentsRoutes);
 app.use('/nielit-projects', nielitRoutes);

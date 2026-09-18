@@ -176,6 +176,7 @@
           :allNielitProjects="liveNielitProjectsList"
           :allStudents="liveStudentsList"
           :allInternships="liveInternshipsList"
+          :allEventsCatalog="liveEventsCatalogList"
           :allFees="liveFeesList"
           :allCertificates="liveCertificatesList"
           :allProjects="liveProjectsList"
@@ -201,6 +202,17 @@
           @add-fee="handleAddFee"
           @update-fee="handleUpdateFee"
           @delete-fee="handleDeleteFee"
+          @add-internship="handleAddInternship"
+          @update-internship="handleUpdateInternship"
+          @delete-internship="handleDeleteInternship"
+          @add-event="handleAddEvent"
+          @update-event="handleUpdateEvent"
+          @delete-event="handleDeleteEvent"
+          @add-project="handleAddProject"
+          @update-project="handleUpdateProject"
+          @delete-project="handleDeleteProject"
+          @add-review="handleAddReview"
+          @delete-review="handleDeleteReview"
           @delete-contact="handleDeleteContact"
           @set-tab="setTab" 
         />
@@ -481,6 +493,18 @@ import {
   updateFeeInBackend,
   deleteFeeFromBackend,
   deleteContactInquiryFromBackend,
+  fetchEventsCatalogFromBackend,
+  saveEventToBackend,
+  updateEventInBackend,
+  deleteEventFromBackend,
+  saveInternshipToBackend,
+  updateInternshipInBackend,
+  deleteInternshipFromBackend,
+  saveProjectToBackend,
+  updateProjectInBackend,
+  deleteProjectFromBackend,
+  saveReviewToBackend,
+  deleteReviewFromBackend,
   registerStudentUser, 
   loginStudentUser, 
   saveStudentAccount,
@@ -664,13 +688,14 @@ const liveContactInquiriesList = ref([]);
 const liveReviewsList = ref([]);
 const liveUsersList = ref([]);
 const liveCoursesList = ref([]);
+const liveEventsCatalogList = ref([]);
 
 // Primary dynamic database loader across all Swagger REST API endpoints
 const loadInitialData = async () => {
   try {
     const [
       admissions, jobs, rsvps, nielitProjects, students,
-      internships, fees, certificates, projects, contactInquiries, reviews, users, courses
+      internships, fees, certificates, projects, contactInquiries, reviews, users, courses, eventsCatalog
     ] = await Promise.all([
       fetchAdmissionsFromBackend(),
       fetchJobApplicationsFromBackend(),
@@ -684,7 +709,8 @@ const loadInitialData = async () => {
       fetchContactInquiriesFromBackend(),
       fetchReviewsFromBackend(),
       fetchUsersFromBackend(),
-      fetchCoursesFromBackend()
+      fetchCoursesFromBackend(),
+      fetchEventsCatalogFromBackend()
     ]);
 
     liveAdmissionsList.value = admissions || [];
@@ -700,6 +726,7 @@ const loadInitialData = async () => {
     liveReviewsList.value = reviews || [];
     liveUsersList.value = users || [];
     liveCoursesList.value = courses || [];
+    liveEventsCatalogList.value = eventsCatalog || [];
   } catch (e) {
     console.warn('Notice loading initial records from REST API:', e);
   }
@@ -740,6 +767,104 @@ const handleDeleteStudent = async (student) => {
   liveStudentsList.value = liveStudentsList.value.filter(s => s.id !== idToDelete && s.userId !== idToDelete);
   await deleteStudentFromBackend(student);
 };
+
+const handleAddInternship = async (data) => {
+  const res = await saveInternshipToBackend(data);
+  if (res.success) {
+    const saved = res.data?.data || res.data || data;
+    liveInternshipsList.value.unshift(saved);
+    showToast(`Internship application for ${saved.candidateName || saved.name} registered in MongoDB!`, 'success');
+  } else {
+    showToast(`Failed to register internship: ${res.error}`, 'error');
+  }
+};
+
+const handleUpdateInternship = async (id, data) => {
+  const res = await updateInternshipInBackend(id, data);
+  if (res.success) {
+    const idx = liveInternshipsList.value.findIndex(i => i.id === id || i._id === id);
+    if (idx !== -1) liveInternshipsList.value[idx] = { ...liveInternshipsList.value[idx], ...data };
+    showToast('Internship application updated in database!', 'success');
+  }
+};
+
+const handleDeleteInternship = async (item) => {
+  const targetId = typeof item === 'object' ? (item.id || item._id) : item;
+  await deleteInternshipFromBackend(targetId);
+  liveInternshipsList.value = liveInternshipsList.value.filter(i => i.id !== targetId && i._id !== targetId);
+  showToast('Internship application deleted from database.', 'info');
+};
+
+const handleAddEvent = async (data) => {
+  const res = await saveEventToBackend(data);
+  if (res.success) {
+    const saved = res.data?.data || res.data || data;
+    liveEventsCatalogList.value.unshift(saved);
+    showToast(`Event "${saved.title || saved.name}" scheduled in MongoDB!`, 'success');
+  } else {
+    showToast(`Failed to schedule event: ${res.error}`, 'error');
+  }
+};
+
+const handleUpdateEvent = async (id, data) => {
+  const res = await updateEventInBackend(id, data);
+  if (res.success) {
+    const idx = liveEventsCatalogList.value.findIndex(e => e.id === id || e._id === id || e.slug === id);
+    if (idx !== -1) liveEventsCatalogList.value[idx] = { ...liveEventsCatalogList.value[idx], ...data };
+    showToast('Event updated in database!', 'success');
+  }
+};
+
+const handleDeleteEvent = async (item) => {
+  const targetId = typeof item === 'object' ? (item.id || item._id || item.slug) : item;
+  await deleteEventFromBackend(targetId);
+  liveEventsCatalogList.value = liveEventsCatalogList.value.filter(e => e.id !== targetId && e._id !== targetId && e.slug !== targetId);
+  showToast('Event removed from database.', 'info');
+};
+
+const handleAddProject = async (data) => {
+  const res = await saveProjectToBackend(data);
+  if (res.success) {
+    const saved = res.data?.data || res.data || data;
+    liveProjectsList.value.unshift(saved);
+    showToast(`Project "${saved.title || saved.projectTitle}" saved to MongoDB!`, 'success');
+  } else {
+    showToast(`Failed to save project: ${res.error}`, 'error');
+  }
+};
+
+const handleUpdateProject = async (id, data) => {
+  const res = await updateProjectInBackend(id, data);
+  if (res.success) {
+    const idx = liveProjectsList.value.findIndex(p => p.id === id || p._id === id);
+    if (idx !== -1) liveProjectsList.value[idx] = { ...liveProjectsList.value[idx], ...data };
+    showToast('Capstone project updated in database!', 'success');
+  }
+};
+
+const handleDeleteProject = async (item) => {
+  const targetId = typeof item === 'object' ? (item.id || item._id) : item;
+  await deleteProjectFromBackend(targetId);
+  liveProjectsList.value = liveProjectsList.value.filter(p => p.id !== targetId && p._id !== targetId);
+  showToast('Capstone project removed from database.', 'info');
+};
+
+const handleAddReview = async (data) => {
+  const res = await saveReviewToBackend(data);
+  if (res.success) {
+    const saved = res.data?.data || res.data || data;
+    liveReviewsList.value.unshift(saved);
+    showToast('Student review recorded in database!', 'success');
+  }
+};
+
+const handleDeleteReview = async (item) => {
+  const targetId = typeof item === 'object' ? (item.id || item._id) : item;
+  await deleteReviewFromBackend(targetId);
+  liveReviewsList.value = liveReviewsList.value.filter(r => r.id !== targetId && r._id !== targetId);
+  showToast('Review removed from database.', 'info');
+};
+
 
 // Admission Form State
 const form = ref({
