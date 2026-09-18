@@ -5496,6 +5496,10 @@ const onAvatarError = (event) => {
   event.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=60';
 };
 
+const onImgError = (event) => {
+  event.target.src = 'img/ithunt.webp';
+};
+
 // Edit Admission Modal State
 const showEditAdmissionModal = ref(false);
 const editAdmissionForm = ref({
@@ -7142,17 +7146,11 @@ body.light-theme .admin-data-table th {
   overflow: hidden;
 }
 
-.brand-logo-icon {
+.brand-logo-img {
   width: 38px;
   height: 38px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+  object-fit: cover;
   flex-shrink: 0;
 }
 
