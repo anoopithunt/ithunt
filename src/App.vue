@@ -693,10 +693,7 @@ const liveEventsCatalogList = ref([]);
 // Primary dynamic database loader across all Swagger REST API endpoints
 const loadInitialData = async () => {
   try {
-    const [
-      admissions, jobs, rsvps, nielitProjects, students,
-      internships, fees, certificates, projects, contactInquiries, reviews, users, courses, eventsCatalog
-    ] = await Promise.all([
+    const results = await Promise.allSettled([
       fetchAdmissionsFromBackend(),
       fetchJobApplicationsFromBackend(),
       fetchRsvpsFromBackend(),
@@ -713,20 +710,25 @@ const loadInitialData = async () => {
       fetchEventsCatalogFromBackend()
     ]);
 
-    liveAdmissionsList.value = admissions || [];
-    liveJobApplicationsList.value = jobs || [];
-    liveRsvpsList.value = rsvps || [];
-    liveNielitProjectsList.value = nielitProjects || [];
-    liveStudentsList.value = students || [];
-    liveInternshipsList.value = internships || [];
-    liveFeesList.value = fees || [];
-    liveCertificatesList.value = certificates || [];
-    liveProjectsList.value = projects || [];
-    liveContactInquiriesList.value = contactInquiries || [];
-    liveReviewsList.value = reviews || [];
-    liveUsersList.value = users || [];
-    liveCoursesList.value = courses || [];
-    liveEventsCatalogList.value = eventsCatalog || [];
+    const getVal = (idx, fallback = []) => {
+      const res = results[idx];
+      return (res && res.status === 'fulfilled' && Array.isArray(res.value) && res.value.length > 0) ? res.value : fallback;
+    };
+
+    liveAdmissionsList.value = getVal(0, liveAdmissionsList.value);
+    liveJobApplicationsList.value = getVal(1, liveJobApplicationsList.value);
+    liveRsvpsList.value = getVal(2, liveRsvpsList.value);
+    liveNielitProjectsList.value = getVal(3, liveNielitProjectsList.value);
+    liveStudentsList.value = getVal(4, liveStudentsList.value);
+    liveInternshipsList.value = getVal(5, liveInternshipsList.value);
+    liveFeesList.value = getVal(6, liveFeesList.value);
+    liveCertificatesList.value = getVal(7, liveCertificatesList.value);
+    liveProjectsList.value = getVal(8, liveProjectsList.value);
+    liveContactInquiriesList.value = getVal(9, liveContactInquiriesList.value);
+    liveReviewsList.value = getVal(10, liveReviewsList.value);
+    liveUsersList.value = getVal(11, liveUsersList.value);
+    liveCoursesList.value = getVal(12, liveCoursesList.value);
+    liveEventsCatalogList.value = getVal(13, liveEventsCatalogList.value);
   } catch (e) {
     console.warn('Notice loading initial records from REST API:', e);
   }

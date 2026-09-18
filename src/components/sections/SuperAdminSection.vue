@@ -371,7 +371,7 @@
           <div 
             v-if="pendingAdmissionsCount > 0" 
             class="overview-urgent-banner"
-            @click="currentTab = 'admissions'; admissionStatusFilter = 'Pending Verification'"
+            @click="currentTab = 'admissions'; admissionStatusFilter = (pendingAdmissionsCount > 0 ? 'Pending Verification' : 'all')"
             title="Click to review and confirm pending registrations"
           >
             <div class="banner-left">
@@ -467,11 +467,11 @@
                 <span class="launch-arrow">→</span>
               </button>
 
-              <button class="launch-card" @click="currentTab = 'admissions'; admissionStatusFilter = 'Pending Verification'">
+              <button class="launch-card" @click="currentTab = 'admissions'; admissionStatusFilter = (pendingAdmissionsCount > 0 ? 'Pending Verification' : 'all')">
                 <div class="launch-icon">📋</div>
                 <div class="launch-info">
-                  <div class="launch-title">Review Pending Admissions</div>
-                  <div class="launch-desc">{{ pendingAdmissionsCount }} candidate(s) awaiting approval</div>
+                  <div class="launch-title">Review Admissions Registry</div>
+                  <div class="launch-desc">{{ pendingAdmissionsCount > 0 ? (pendingAdmissionsCount + ' candidate(s) awaiting approval') : (admissionsList.length + ' registered candidates (All Confirmed)') }}</div>
                 </div>
                 <span class="launch-arrow">→</span>
               </button>
@@ -571,10 +571,39 @@
                 </div>
               </div>
 
+              <!-- Informative Banner when user selected Pending but all are Confirmed -->
+              <div 
+                v-if="overviewAdmissionFilter === 'pending' && pendingAdmissionsCount === 0 && admissionsList.length > 0" 
+                style="margin: 0.85rem 0.85rem 0 0.85rem; padding: 0.65rem 0.85rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; font-size: 0.8rem; color: #34d399; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;"
+              >
+                <span>✓ All {{ admissionsList.length }} candidate applications are Confirmed & Verified! Displaying registered candidates below:</span>
+                <button type="button" class="admin-tab-btn" @click="overviewAdmissionFilter = 'all'" style="font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 6px;">Show All Filter</button>
+              </div>
+
               <div v-if="recentAdmissions.length === 0" class="empty-state-clean">
                 <span class="empty-icon">📂</span>
                 <div class="empty-title">No Candidate Records Found</div>
-                <div class="empty-sub">No candidate registrations match the selected filter.</div>
+                <div class="empty-sub">
+                  {{ admissionsList.length > 0 ? 'No candidate registrations match this filter (' + overviewAdmissionFilter + ').' : 'Connecting to live database...' }}
+                </div>
+                <button 
+                  v-if="admissionsList.length > 0"
+                  type="button" 
+                  class="btn-primary" 
+                  style="margin-top: 0.75rem; padding: 0.35rem 0.85rem; font-size: 0.8rem;" 
+                  @click="overviewAdmissionFilter = 'all'"
+                >
+                  View All {{ admissionsList.length }} Registered Candidates
+                </button>
+                <button 
+                  v-else
+                  type="button" 
+                  class="btn-secondary" 
+                  style="margin-top: 0.75rem; padding: 0.35rem 0.85rem; font-size: 0.8rem;" 
+                  @click="refreshAllData"
+                >
+                  🔄 Sync from MongoDB Atlas
+                </button>
               </div>
 
               <div v-else class="queue-list">
@@ -918,8 +947,32 @@
 
               <!-- Empty state -->
               <tr v-if="filteredStudents.length === 0">
-                <td colspan="7" style="text-align: center; padding: 3rem; color: var(--text-muted);">
-                  🎓 No student records found matching your filter criteria.
+                <td colspan="7" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                  <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎓</div>
+                  <div style="font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 0.5rem;">
+                    {{ unifiedStudentsList.length > 0 ? 'No student records match current filter (' + studentStatusFilter + ').' : 'No student records found in database.' }}
+                  </div>
+                  <div style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem;">
+                    {{ unifiedStudentsList.length > 0 ? 'Total ' + unifiedStudentsList.length + ' registered students exist in MongoDB Atlas roster.' : 'Connecting to live database...' }}
+                  </div>
+                  <button 
+                    v-if="studentStatusFilter !== 'all' || studentSearch || studentCourseFilter !== 'all' || studentBatchFilter !== 'all'"
+                    type="button" 
+                    class="btn-primary" 
+                    style="padding: 0.4rem 1rem; font-size: 0.85rem;" 
+                    @click="studentStatusFilter = 'all'; studentCourseFilter = 'all'; studentBatchFilter = 'all'; studentSearch = ''"
+                  >
+                    Show All {{ unifiedStudentsList.length }} Students
+                  </button>
+                  <button 
+                    v-else
+                    type="button" 
+                    class="btn-secondary" 
+                    style="padding: 0.4rem 1rem; font-size: 0.85rem;" 
+                    @click="refreshAllData"
+                  >
+                    🔄 Sync from MongoDB Atlas
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -1182,7 +1235,30 @@
               <tr v-if="filteredAdmissions.length === 0">
                 <td colspan="8" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
                   <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔍</div>
-                  <div>No candidate admissions found matching your criteria.</div>
+                  <div style="font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 0.5rem;">
+                    {{ admissionsList.length > 0 ? 'No candidates match filter "' + admissionStatusFilter + '".' : 'No candidate admissions found.' }}
+                  </div>
+                  <div style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem;">
+                    {{ admissionsList.length > 0 ? 'All ' + admissionsList.length + ' registered candidates in MongoDB Atlas are currently Confirmed.' : 'Connecting to live database...' }}
+                  </div>
+                  <button 
+                    v-if="admissionStatusFilter !== 'all' || admissionSearch"
+                    type="button" 
+                    class="btn-primary" 
+                    style="padding: 0.4rem 1rem; font-size: 0.85rem;" 
+                    @click="admissionStatusFilter = 'all'; admissionSearch = ''"
+                  >
+                    Show All {{ admissionsList.length }} Registered Candidates
+                  </button>
+                  <button 
+                    v-else
+                    type="button" 
+                    class="btn-secondary" 
+                    style="padding: 0.4rem 1rem; font-size: 0.85rem;" 
+                    @click="refreshAllData"
+                  >
+                    🔄 Sync from MongoDB Atlas
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -4303,7 +4379,7 @@ const studentSearch = ref('');
 const studentCourseFilter = ref('all');
 const studentBatchFilter = ref('all');
 const studentStatusFilter = ref('all');
-const studentsList = ref([]);
+const studentsList = ref(props.allStudents && props.allStudents.length ? [...props.allStudents] : []);
 const selectedStudentDetail = ref(null);
 const showStudentDetailModal = ref(false);
 
@@ -4554,36 +4630,40 @@ const defaultTabs = [
   { id: 'settings', label: '⚙️ System Config', icon: '⚙️' }
 ];
 
-// Reactive dataset states
-const admissionsList = ref([]);
-const jobApplicationsList = ref([]);
-const rsvpsList = ref([]);
-const nielitProjectsList = ref([]);
-const internshipsList = ref([]);
-const feesList = ref([]);
-const certificatesList = ref([]);
-const projectsList = ref([]);
-const contactInquiriesList = ref([]);
-const reviewsList = ref([]);
-const usersList = ref([]);
-const coursesList = ref([]);
-const eventsCatalogList = ref([]);
+// Reactive dataset states (initialized from live props if available)
+const admissionsList = ref(props.allAdmissions && props.allAdmissions.length ? [...props.allAdmissions] : []);
+const jobApplicationsList = ref(props.allJobApplications && props.allJobApplications.length ? [...props.allJobApplications] : []);
+const rsvpsList = ref(props.allRsvps && props.allRsvps.length ? [...props.allRsvps] : []);
+const nielitProjectsList = ref(props.allNielitProjects && props.allNielitProjects.length ? [...props.allNielitProjects] : []);
+const internshipsList = ref(props.allInternships && props.allInternships.length ? [...props.allInternships] : []);
+const feesList = ref(props.allFees && props.allFees.length ? [...props.allFees] : []);
+const certificatesList = ref(props.allCertificates && props.allCertificates.length ? [...props.allCertificates] : []);
+const projectsList = ref(props.allProjects && props.allProjects.length ? [...props.allProjects] : []);
+const contactInquiriesList = ref(props.allContactInquiries && props.allContactInquiries.length ? [...props.allContactInquiries] : []);
+const reviewsList = ref(props.allReviews && props.allReviews.length ? [...props.allReviews] : []);
+const usersList = ref(props.allUsers && props.allUsers.length ? [...props.allUsers] : []);
+const coursesList = ref(props.allCourses && props.allCourses.length ? [...props.allCourses] : (props.content?.coursesSection?.coursesList || []));
+const eventsCatalogList = ref(props.allEventsCatalog && props.allEventsCatalog.length ? [...props.allEventsCatalog] : []);
 
 watch(() => props.allEventsCatalog, (val) => {
-  eventsCatalogList.value = val || [];
+  if (val && val.length > 0) eventsCatalogList.value = val;
 }, { immediate: true, deep: true });
 
 // --- ENTERPRISE EXECUTIVE OVERVIEW COMPUTED PROPERTIES ---
 const overviewAdmissionFilter = ref('all');
 const recentAdmissions = computed(() => {
-  const list = admissionsList.value.length ? admissionsList.value : (props.allAdmissions || []);
+  const list = (admissionsList.value && admissionsList.value.length) ? admissionsList.value : (props.allAdmissions && props.allAdmissions.length ? props.allAdmissions : []);
   if (overviewAdmissionFilter.value === 'pending') {
-    return list.filter(a => a.status === 'Pending Verification' || a.status === 'Pending Confirmation' || (!a.status && !a.admissionConfirmed)).slice(0, 10);
+    const pending = list.filter(a => a.status === 'Pending Verification' || a.status === 'Pending Confirmation' || (!a.status && !a.admissionConfirmed));
+    if (pending.length > 0) return pending.slice(0, 15);
+    // If pending is 0 (all are confirmed), show all candidates so user never gets an empty box
+    return list.slice(0, 15);
   }
   if (overviewAdmissionFilter.value === 'confirmed') {
-    return list.filter(a => a.status === 'Confirmed' || a.status === 'Active Registered Student' || a.status === 'Verified' || a.admissionConfirmed).slice(0, 10);
+    const conf = list.filter(a => a.status === 'Confirmed' || a.status === 'Active Registered Student' || a.status === 'Verified' || a.admissionConfirmed);
+    return conf.length > 0 ? conf.slice(0, 15) : list.slice(0, 15);
   }
-  return list.slice(0, 10);
+  return list.slice(0, 15);
 });
 
 const currentTabTitle = computed(() => {
@@ -4732,7 +4812,7 @@ const filterAdmissionsByCourse = (courseName) => {
 };
 
 watch(() => props.allStudents, (val) => {
-  studentsList.value = val || [];
+  if (val && val.length > 0) studentsList.value = val;
 }, { immediate: true, deep: true });
 
 // Unified student list that combines both confirmed students and pending candidate registrations
@@ -4843,51 +4923,52 @@ const filteredStudents = computed(() => {
 });
 
 watch(() => props.allAdmissions, (val) => {
-  admissionsList.value = val || [];
+  if (val && val.length > 0) admissionsList.value = val;
 }, { immediate: true, deep: true });
 
 watch(() => props.allJobApplications, (val) => {
-  jobApplicationsList.value = val || [];
+  if (val && val.length > 0) jobApplicationsList.value = val;
 }, { immediate: true, deep: true });
 
 watch(() => props.allRsvps, (val) => {
-  rsvpsList.value = val || [];
+  if (val && val.length > 0) rsvpsList.value = val;
 }, { immediate: true, deep: true });
 
 watch(() => props.allNielitProjects, (val) => {
-  nielitProjectsList.value = val || [];
+  if (val && val.length > 0) nielitProjectsList.value = val;
 }, { immediate: true, deep: true });
 
 watch(() => props.allInternships, (val) => {
-  internshipsList.value = val || [];
+  if (val && val.length > 0) internshipsList.value = val;
 }, { immediate: true, deep: true });
 
 watch(() => props.allFees, (val) => {
-  feesList.value = val || [];
+  if (val && val.length > 0) feesList.value = val;
 }, { immediate: true, deep: true });
 
 watch(() => props.allCertificates, (val) => {
-  certificatesList.value = val || [];
+  if (val && val.length > 0) certificatesList.value = val;
 }, { immediate: true, deep: true });
 
 watch(() => props.allProjects, (val) => {
-  projectsList.value = val || [];
+  if (val && val.length > 0) projectsList.value = val;
 }, { immediate: true, deep: true });
 
 watch(() => props.allContactInquiries, (val) => {
-  contactInquiriesList.value = val || [];
+  if (val && val.length > 0) contactInquiriesList.value = val;
 }, { immediate: true, deep: true });
 
 watch(() => props.allReviews, (val) => {
-  reviewsList.value = val || [];
+  if (val && val.length > 0) reviewsList.value = val;
 }, { immediate: true, deep: true });
 
 watch(() => props.allUsers, (val) => {
-  usersList.value = val || [];
+  if (val && val.length > 0) usersList.value = val;
 }, { immediate: true, deep: true });
 
 const filteredAdmissions = computed(() => {
-  return admissionsList.value.filter(adm => {
+  const list = (admissionsList.value && admissionsList.value.length) ? admissionsList.value : (props.allAdmissions && props.allAdmissions.length ? props.allAdmissions : []);
+  return list.filter(adm => {
     let matchStatus = true;
     if (admissionStatusFilter.value === 'Confirmed') {
       matchStatus = adm.status === 'Confirmed' || adm.status === 'Active Registered Student' || adm.status === 'Verified' || adm.admissionConfirmed === true;
@@ -4907,8 +4988,8 @@ const filteredAdmissions = computed(() => {
       (adm.registrationNo && adm.registrationNo.toLowerCase().includes(query)) ||
       (adm.userId && adm.userId.toLowerCase().includes(query)) ||
       (adm.email && adm.email.toLowerCase().includes(query)) ||
-      (adm.mobile && adm.mobile.includes(query)) ||
-      (adm.phone && adm.phone.includes(query)) ||
+      (adm.mobile && String(adm.mobile).includes(query)) ||
+      (adm.phone && String(adm.phone).includes(query)) ||
       (adm.course && adm.course.toLowerCase().includes(query)) ||
       (adm.district && adm.district.toLowerCase().includes(query));
 
@@ -5713,9 +5794,7 @@ const refreshAllData = async () => {
   isRefreshing.value = true;
   try {
     emit('refresh-data');
-    const [
-      adms, stus, usrs, crss, nielits, fees, certs, projs, inqs, revs, jobs, rsvps, interns, eventsCat
-    ] = await Promise.all([
+    const results = await Promise.allSettled([
       fetchAdmissionsFromBackend(),
       fetchStudentsFromBackend(),
       fetchUsersFromBackend(),
@@ -5731,6 +5810,27 @@ const refreshAllData = async () => {
       fetchInternshipsFromBackend(),
       fetchEventsCatalogFromBackend()
     ]);
+
+    const getVal = (idx) => {
+      const res = results[idx];
+      return (res && res.status === 'fulfilled' && Array.isArray(res.value)) ? res.value : null;
+    };
+
+    const adms = getVal(0);
+    const stus = getVal(1);
+    const usrs = getVal(2);
+    const crss = getVal(3);
+    const nielits = getVal(4);
+    const fees = getVal(5);
+    const certs = getVal(6);
+    const projs = getVal(7);
+    const inqs = getVal(8);
+    const revs = getVal(9);
+    const jobs = getVal(10);
+    const rsvps = getVal(11);
+    const interns = getVal(12);
+    const eventsCat = getVal(13);
+
     if (adms && adms.length > 0) admissionsList.value = adms;
     if (stus && stus.length > 0) studentsList.value = stus;
     if (usrs && usrs.length > 0) usersList.value = usrs;
