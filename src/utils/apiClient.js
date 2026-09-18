@@ -9,9 +9,10 @@ const RAW_API_URL = (
 ).trim();
 
 const IS_LOCAL_DEV = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const HAS_LOCAL_API_URL = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?(?:\/|$)/i.test(RAW_API_URL);
 
 // Connected REST API & Database Endpoint (defaults to /api which proxies to port 3000)
-export const API_BASE_URL = (RAW_API_URL || '/api').replace(/\/+$/, '');
+export const API_BASE_URL = ((!RAW_API_URL || (!IS_LOCAL_DEV && HAS_LOCAL_API_URL)) ? '/api' : RAW_API_URL).replace(/\/+$/, '');
 
 let memoryToken = null;
 
