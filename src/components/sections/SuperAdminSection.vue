@@ -257,6 +257,7 @@
       v-if="isMobileSidebarOpen" 
       class="admin-sidebar-backdrop" 
       @click="isMobileSidebarOpen = false" 
+      @touchstart.passive="isMobileSidebarOpen = false"
       aria-hidden="true"
     ></div>
 
@@ -4505,6 +4506,8 @@ const unlockAdminScroll = () => {
   document.body.style.overflow = '';
   document.body.style.overscrollBehavior = '';
 
+  document.removeEventListener('click', handleAdminOutsideClick, true);
+  document.removeEventListener('touchstart', handleAdminOutsideClick, { capture: true });
   window.removeEventListener('touchstart', handleAdminTouchStart);
   window.removeEventListener('touchmove', handleAdminTouchMove);
   window.removeEventListener('wheel', handleAdminWheel);
@@ -4512,11 +4515,30 @@ const unlockAdminScroll = () => {
   window.scrollTo(0, scrollYToRestore);
 };
 
+const handleAdminOutsideClick = (e) => {
+  if (!isMobileSidebarOpen.value) return;
+  // If clicked inside admin sidebar, do not close
+  if (e.target && e.target.closest && e.target.closest('.admin-sidebar')) {
+    return;
+  }
+  // If clicked the admin mobile toggle button, toggle button handles itself
+  if (e.target && e.target.closest && e.target.closest('.admin-mobile-toggle')) {
+    return;
+  }
+  isMobileSidebarOpen.value = false;
+};
+
 watch(isMobileSidebarOpen, (isOpen) => {
   if (isOpen) {
     lockAdminScroll();
+    setTimeout(() => {
+      document.addEventListener('click', handleAdminOutsideClick, true);
+      document.addEventListener('touchstart', handleAdminOutsideClick, { passive: true, capture: true });
+    }, 50);
   } else {
     unlockAdminScroll();
+    document.removeEventListener('click', handleAdminOutsideClick, true);
+    document.removeEventListener('touchstart', handleAdminOutsideClick, { capture: true });
   }
 });
 const globalAdminSearch = ref('');
@@ -6659,6 +6681,8 @@ onUnmounted(() => {
   }
   if (typeof window !== 'undefined') {
     window.removeEventListener('resize', updateAdminHeaderHeight);
+    document.removeEventListener('click', handleAdminOutsideClick, true);
+    document.removeEventListener('touchstart', handleAdminOutsideClick, { capture: true });
   }
   unlockAdminScroll();
 });
