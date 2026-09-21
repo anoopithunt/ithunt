@@ -156,6 +156,7 @@ button, input, select, textarea {
 .text-gradient {
   background: var(--gradient-ai-hero);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline;
   -webkit-box-decoration-break: clone;
@@ -165,6 +166,7 @@ button, input, select, textarea {
 .text-gradient-secondary {
   background: var(--gradient-ai-secondary);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline;
   -webkit-box-decoration-break: clone;
@@ -174,6 +176,7 @@ button, input, select, textarea {
 .text-gradient-gold {
   background: var(--gradient-ai-gold);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline;
   -webkit-box-decoration-break: clone;
@@ -201,6 +204,8 @@ button, input, select, textarea {
   align-items: center;
   justify-content: space-between;
   height: var(--navbar-height, 72px);
+  position: relative;
+  z-index: 2001;
 }
 
 .brand-logo {
@@ -366,6 +371,7 @@ body.light-theme .nav-item-btn:hover {
   pointer-events: none;
   visibility: hidden;
   contain: layout paint;
+  overscroll-behavior: contain;
 }
 
 .mobile-nav-sidebar.open {
@@ -8189,6 +8195,8 @@ body.light-theme .toast-item {
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
+  touch-action: none;
+  overscroll-behavior: contain;
   transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s ease;
 }
 
@@ -8415,6 +8423,7 @@ body.light-theme .toast-item {
 .section-title > .text-gradient {
   background: var(--gradient-ai-hero);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -8512,13 +8521,13 @@ body.light-theme .toast-item {
 /* 1. Global Viewport Overflow Protection */
 html, body {
   max-width: 100vw;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 #app {
   width: 100%;
   max-width: 100vw;
-  overflow-x: hidden;
+  overflow-x: clip;
   position: relative;
 }
 

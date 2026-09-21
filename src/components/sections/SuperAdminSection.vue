@@ -1,5 +1,13 @@
 <template>
-  <div class="admin-shell" :class="{ 'sidebar-collapsed': isSidebarCollapsed, 'light-theme': !isDarkMode, 'dark-theme': isDarkMode }">
+  <div 
+    class="admin-shell" 
+    :class="{ 
+      'sidebar-collapsed': isSidebarCollapsed, 
+      'light-theme': !isDarkMode, 
+      'dark-theme': isDarkMode 
+    }"
+    :style="{ '--admin-header-height': adminHeaderHeight + 'px' }"
+  >
     <!-- 1. LEFT ENTERPRISE SIDEBAR NAVIGATION -->
     <aside class="admin-sidebar" :class="{ 'mobile-open': isMobileSidebarOpen }">
       <!-- Sidebar Brand / Console Header -->
@@ -17,6 +25,14 @@
           :title="isSidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'"
         >
           <span>{{ isSidebarCollapsed ? '▶' : '◀' }}</span>
+        </button>
+        <button 
+          class="sidebar-mobile-close-btn" 
+          @click="isMobileSidebarOpen = false" 
+          aria-label="Close Sidebar Menu"
+          title="Close Sidebar Menu"
+        >
+          <span>✕</span>
         </button>
       </div>
 
@@ -247,14 +263,16 @@
     <!-- 2. MAIN ADMIN CONTENT CANVAS -->
     <main class="admin-main-canvas">
       <!-- Top Executive Command Bar -->
-      <header class="admin-top-command-bar">
+      <header ref="adminHeaderRef" class="admin-top-command-bar">
         <div class="command-bar-left">
           <button 
             class="admin-mobile-toggle" 
+            :class="{ active: isMobileSidebarOpen }"
             @click="isMobileSidebarOpen = !isMobileSidebarOpen" 
-            aria-label="Toggle Sidebar Menu"
+            :aria-label="isMobileSidebarOpen ? 'Close Sidebar Menu' : 'Open Sidebar Menu'"
+            :title="isMobileSidebarOpen ? 'Close Menu' : 'Open Menu'"
           >
-            <span>☰</span>
+            <span>{{ isMobileSidebarOpen ? '✕' : '☰' }}</span>
           </button>
           <div class="admin-breadcrumb">
             <span class="breadcrumb-root">IT HUNT Console</span>
@@ -4384,6 +4402,14 @@ const confirmFeeAndSendJpgReceipt = async (adm) => {
 // Enterprise Admin Shell State
 const isSidebarCollapsed = ref(false);
 const isMobileSidebarOpen = ref(false);
+const adminHeaderRef = ref(null);
+const adminHeaderHeight = ref(60);
+
+const updateAdminHeaderHeight = () => {
+  if (adminHeaderRef.value) {
+    adminHeaderHeight.value = adminHeaderRef.value.offsetHeight || 60;
+  }
+};
 const globalAdminSearch = ref('');
 const currentTab = ref('overview');
 const studentSearch = ref('');
@@ -6491,10 +6517,24 @@ const handleDeleteCertificate = async (cert) => {
   setTimeout(() => { emailActionMsg.value = ''; }, 4000);
 };
 
+let headerResizeObserver = null;
+
 onMounted(() => {
   sessionTime.value = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   refreshDatabaseStatus();
   refreshAllData();
+
+  // Dynamic header height measurement for mobile sticky alignment
+  updateAdminHeaderHeight();
+  if (typeof window !== 'undefined' && 'ResizeObserver' in window && adminHeaderRef.value) {
+    headerResizeObserver = new ResizeObserver(() => {
+      updateAdminHeaderHeight();
+    });
+    headerResizeObserver.observe(adminHeaderRef.value);
+  }
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', updateAdminHeaderHeight, { passive: true });
+  }
 
   // Live polling every 12 seconds so SuperAdmin gets new candidate registrations in real-time
   refreshTimer = setInterval(() => {
@@ -6504,6 +6544,13 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (refreshTimer) clearInterval(refreshTimer);
+  if (headerResizeObserver) {
+    headerResizeObserver.disconnect();
+    headerResizeObserver = null;
+  }
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('resize', updateAdminHeaderHeight);
+  }
 });
 </script>
 
@@ -7266,6 +7313,7 @@ body.light-theme .admin-data-table th {
   letter-spacing: 0.05em;
   background: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   line-height: 1.2;
 }
@@ -7273,6 +7321,7 @@ body.light-theme .admin-data-table th {
 .admin-shell.light-theme .brand-main-title {
   background: linear-gradient(135deg, #1d4ed8 0%, #6b21a8 100%) !important;
   -webkit-background-clip: text !important;
+  background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
 }
 
@@ -7318,6 +7367,34 @@ body.light-theme .admin-data-table th {
 .admin-shell.light-theme .sidebar-collapse-btn:hover {
   background: #e2e8f0 !important;
   color: #000000 !important;
+}
+
+.sidebar-mobile-close-btn {
+  display: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.admin-shell.light-theme .sidebar-mobile-close-btn {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+.sidebar-mobile-close-btn:hover {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+  color: #ef4444 !important;
 }
 
 .sidebar-user-pill {
@@ -7604,9 +7681,10 @@ body.light-theme .admin-data-table th {
 }
 
 .admin-top-command-bar {
+  position: -webkit-sticky;
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 500;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -8222,36 +8300,42 @@ body.light-theme .admin-data-table th {
 .text-gradient {
   background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .admin-shell.light-theme .text-gradient {
   background: linear-gradient(135deg, #1d4ed8 0%, #6b21a8 100%) !important;
   -webkit-background-clip: text !important;
+  background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
 }
 
 .text-gradient-gold {
   background: linear-gradient(135deg, #fbbf24 0%, #f97316 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .admin-shell.light-theme .text-gradient-gold {
   background: linear-gradient(135deg, #b45309 0%, #c2410c 100%) !important;
   -webkit-background-clip: text !important;
+  background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
 }
 
 .text-gradient-emerald {
   background: linear-gradient(135deg, #34d399 0%, #059669 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .admin-shell.light-theme .text-gradient-emerald {
   background: linear-gradient(135deg, #047857 0%, #065f46 100%) !important;
   -webkit-background-clip: text !important;
+  background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
 }
 
@@ -9060,16 +9144,18 @@ label {
   min-height: 100vh;
   width: 100%;
   max-width: 100vw;
-  overflow-x: hidden;
+  overflow-x: clip !important;
 }
 
 .admin-main-canvas {
   flex: 1;
   min-width: 0;
   max-width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip !important;
   height: 100vh;
+  height: 100dvh;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 @media (max-width: 1400px) {
@@ -9095,39 +9181,101 @@ label {
 }
 
 @media (max-width: 960px) {
+  .sidebar-collapse-btn {
+    display: none !important;
+  }
+
+  .sidebar-mobile-close-btn {
+    display: flex !important;
+  }
+
   .admin-mobile-toggle {
     display: flex !important;
     align-items: center;
     justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .admin-mobile-toggle.active {
+    background: rgba(249, 115, 22, 0.2) !important;
+    border-color: rgba(249, 115, 22, 0.5) !important;
+    color: #f97316 !important;
+  }
+
+  /* Keep header sticky always even when sidebar is appeared on mobile */
+  .admin-top-command-bar {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100000 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 0.65rem 1rem !important;
+    gap: 0.65rem !important;
+    background: rgba(11, 16, 29, 0.96) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+
+  .admin-shell.light-theme .admin-top-command-bar {
+    background: rgba(255, 255, 255, 0.98) !important;
+    border-bottom: 1px solid #e2e8f0 !important;
   }
 
   .admin-sidebar {
     position: fixed !important;
-    top: 0 !important;
+    top: var(--admin-header-height, 60px) !important;
     left: -320px !important;
     bottom: 0 !important;
-    height: 100vh !important;
-    z-index: 99999 !important;
-    box-shadow: 15px 0 50px rgba(0, 0, 0, 0.8) !important;
+    width: 285px !important;
+    min-width: 285px !important;
+    max-width: 85vw !important;
+    height: calc(100vh - var(--admin-header-height, 60px)) !important;
+    height: calc(100dvh - var(--admin-header-height, 60px)) !important;
+    max-height: calc(100dvh - var(--admin-header-height, 60px)) !important;
+    z-index: 99995 !important;
+    box-shadow: 15px 0 50px rgba(0, 0, 0, 0.85) !important;
     transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    touch-action: pan-y !important;
   }
 
   .admin-sidebar.mobile-open {
     left: 0 !important;
   }
 
-  .admin-sidebar-backdrop {
-    position: fixed !important;
-    inset: 0 !important;
-    background: rgba(0, 0, 0, 0.65) !important;
-    backdrop-filter: blur(4px) !important;
-    z-index: 99998 !important;
+  /* Inside mobile sidebar: brand & footer are sticky, only content list is scrollable */
+  .admin-sidebar .sidebar-brand,
+  .admin-sidebar .sidebar-user-pill,
+  .admin-sidebar .sidebar-bottom-actions {
+    flex-shrink: 0 !important;
   }
 
-  .admin-top-command-bar {
-    padding: 0.65rem 1rem !important;
-    gap: 0.65rem !important;
+  .admin-sidebar .sidebar-nav-scroll {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    touch-action: pan-y !important;
   }
+
+  .admin-sidebar-backdrop {
+    position: fixed !important;
+    top: var(--admin-header-height, 60px) !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.65) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    z-index: 99990 !important;
+    touch-action: none !important;
+    overscroll-behavior: contain !important;
+  }
+
 
   .command-bar-search,
   .command-search-bar {
