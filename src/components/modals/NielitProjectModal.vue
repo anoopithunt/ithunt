@@ -345,9 +345,13 @@
               <input 
                 type="text" 
                 v-model="form.utrNumber" 
+                @input="form.utrNumber = ($event.target.value || '').toUpperCase()"
                 required 
                 class="form-control font-mono" 
                 placeholder="e.g. CHD550W1FMSF1B" 
+                style="text-transform: uppercase;"
+                autocomplete="off"
+                spellcheck="false"
               />
               <span v-if="validationErrors.utrNumber" class="error-hint">{{ validationErrors.utrNumber }}</span>
             </div>
@@ -505,7 +509,7 @@ const form = ref({
 
   amount: props.initialData.amount || '1000',
   paymentDate: toIsoDate(props.initialData.paymentDate),
-  utrNumber: props.initialData.utrNumber || '',
+  utrNumber: (props.initialData.utrNumber || '').trim().toUpperCase(),
   accountHolderName: props.initialData.accountHolderName || '',
   paymentRemark: 'Paid'
 });
@@ -551,6 +555,9 @@ const validateStep2 = () => {
 
 const validateStep3 = () => {
   const errs = {};
+  if (form.value.utrNumber) {
+    form.value.utrNumber = form.value.utrNumber.trim().toUpperCase();
+  }
   if (!form.value.amount?.trim()) errs.amount = 'Fee amount is required';
   if (!form.value.paymentDate) errs.paymentDate = 'Payment date is required';
   if (!form.value.utrNumber?.trim()) errs.utrNumber = 'UTR / Transaction number is required';
@@ -612,6 +619,9 @@ const handleFormSubmit = () => {
     return;
   }
 
+  const cleanUtr = (form.value.utrNumber || '').trim().toUpperCase();
+  form.value.utrNumber = cleanUtr;
+
   const regId = form.value.nielitRegNo || form.value.regNo || String(Date.now());
   const payload = {
     ...form.value,
@@ -624,7 +634,8 @@ const handleFormSubmit = () => {
     level: form.value.nielitLevel ? `${form.value.nielitLevel} Level` : 'O Level',
     status: 'Submitted',
     feePaid: `₹${form.value.amount || '1,000'}`,
-    utrNo: form.value.utrNumber || '',
+    utrNumber: cleanUtr,
+    utrNo: cleanUtr,
     paymentRemark: 'Paid',
     guideName: form.value.guideName || 'Er. Sushil Kumar',
     guideQualification: form.value.guideQualification || 'MCA (Computer Science)',
