@@ -78,6 +78,19 @@ export async function seedDatabase() {
         avatar: 'img/anoop.png'
       },
       {
+        userId: 'usr-faculty-sandeep',
+        name: 'Er. Sandeep Srivastava',
+        email: 'teacher@ithunt.com',
+        password: hashedAdminPassword,
+        role: 'teacher',
+        phone: '+91 9795771807',
+        course: 'Senior MERN & Cloud Faculty Mentor',
+        registrationNo: 'ITH-FACULTY-01',
+        verified: true,
+        status: 'ACTIVE',
+        avatar: 'img/ithunt.jpg'
+      },
+      {
         userId: 'usr-stu-aditya',
         name: 'Aditya Kumar Sharma',
         email: 'aditya@example.com',

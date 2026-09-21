@@ -1,298 +1,199 @@
 <template>
-  <section class="login-page-section container" style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 4rem 1.5rem;">
+  <section class="login-page-section container" style="min-height: 82vh; display: flex; align-items: center; justify-content: center; padding: 3.5rem 1.5rem;">
     <div class="login-card-wrap anim-stagger-1">
       <!-- Glow Backdrop Aura -->
       <div class="login-glow-aura" aria-hidden="true"></div>
 
       <div class="login-card">
-        <!-- Unified Portal Role Tabs -->
-        <div class="role-switcher-tabs" role="tablist">
-          <button 
-            type="button"
-            class="role-tab-btn" 
-            :class="{ active: activeRole === 'student' }" 
-            @click="activeRole = 'student'; errorMessage = '';"
-            role="tab"
-            :aria-selected="activeRole === 'student'"
-          >
-            <span>🎓 Student Portal</span>
-          </button>
+        <!-- Brand & Header -->
+        <div class="login-card-header">
+          <div class="login-badge-pill">
+            <span class="pulse-dot"></span>
+            <span>🔐 UNIFIED IT HUNT SECURE PORTAL</span>
+          </div>
 
-          <button 
-            type="button"
-            class="role-tab-btn" 
-            :class="{ active: activeRole === 'admin' }" 
-            @click="activeRole = 'admin'; errorMessage = '';"
-            role="tab"
-            :aria-selected="activeRole === 'admin'"
-          >
-            <span>⚡ SuperAdmin Console</span>
-          </button>
+          <h1 class="login-title">
+            Portal <span class="text-gradient">{{ authMode === 'login' ? 'Sign In' : 'Registration' }}</span>
+          </h1>
+
+          <p class="login-subtitle">
+            <span v-if="authMode === 'login'">
+              Enter your credentials. The system automatically identifies your role and opens your 
+              <strong style="color: #34d399;">Admin Console</strong>, 
+              <strong style="color: #38bdf8;">Teacher Portal</strong>, or 
+              <strong style="color: var(--color-ai-orange);">Student Dashboard</strong>.
+            </span>
+            <span v-else>
+              Apply and create your student account to access live course materials, attendance tracking, and batch schedules.
+            </span>
+          </p>
+        </div>
+
+        <!-- Feedback Alert if Error -->
+        <div v-if="errorMessage" class="login-error-alert" role="alert">
+          <span style="font-size: 1.25rem;">⚠️</span>
+          <div>
+            <strong>Authentication Notice:</strong>
+            <div>{{ errorMessage }}</div>
+          </div>
+        </div>
+
+        <!-- Success Toast Alert if any -->
+        <div v-if="successMessage" class="login-success-alert" role="alert">
+          <span style="font-size: 1.25rem;">✅</span>
+          <div>{{ successMessage }}</div>
         </div>
 
         <!-- ================================================================= -->
-        <!-- 1. STUDENT AUTHENTICATION FLOW                                    -->
+        <!-- UNIFIED SINGLE LOGIN FORM                                         -->
         <!-- ================================================================= -->
-        <div v-if="activeRole === 'student'">
-          <!-- Brand & Header -->
-          <div class="login-card-header">
-            <div class="login-badge-pill student-badge">
-              <span class="pulse-dot" style="background: var(--color-ai-orange);"></span>
-              <span>🎓 IT HUNT ACADEMY STUDENT GATEWAY</span>
-            </div>
-
-            <h1 class="login-title">
-              Student <span class="text-gradient">Portal Login</span>
-            </h1>
-
-            <p class="login-subtitle">
-              Access your enrolled course progress, attendance sheet, public holidays calendar, and batch exam scoreboard.
-            </p>
-          </div>
-
-          <!-- Student Mode Sub-Tabs (Login vs Signup) -->
-          <div class="sub-auth-mode-row">
-            <button 
-              type="button"
-              class="sub-mode-btn" 
-              :class="{ active: studentMode === 'login' }"
-              @click="studentMode = 'login'; errorMessage = '';"
+        <form v-if="authMode === 'login'" @submit.prevent="handleUnifiedLogin" class="login-form">
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" for="login-identifier">
+              <span>👤</span> User ID / Email / Username / Reg No <span class="req">*</span>
+            </label>
+            <input 
+              id="login-identifier"
+              type="text" 
+              v-model="loginIdentifier" 
+              required 
+              class="form-control" 
+              placeholder="e.g. admin@ithunt.com, teacher@ithunt.com, or student email / ID"
+              autocomplete="username"
             >
-              🔐 Student Sign In
-            </button>
-            <button 
-              type="button"
-              class="sub-mode-btn" 
-              :class="{ active: studentMode === 'signup' }"
-              @click="studentMode = 'signup'; errorMessage = '';"
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <label class="form-label" for="login-password" style="margin-bottom: 0;">
+                <span>🔑</span> Password <span class="req">*</span>
+              </label>
+              <button 
+                type="button" 
+                class="password-toggle-btn" 
+                @click="showPassword = !showPassword"
+                :title="showPassword ? 'Hide password' : 'Show password'"
+              >
+                {{ showPassword ? '🙈 Hide' : '👁️ Show' }}
+              </button>
+            </div>
+            <input 
+              id="login-password"
+              :type="showPassword ? 'text' : 'password'" 
+              v-model="loginPassword" 
+              required 
+              class="form-control" 
+              placeholder="Enter your security password"
+              autocomplete="current-password"
             >
-              ✨ New Student Registration
+          </div>
+
+          <!-- Options Row -->
+          <div class="login-options-row">
+            <label class="checkbox-label">
+              <input type="checkbox" v-model="rememberMe">
+              <span>Stay signed in on this device</span>
+            </label>
+            <span class="security-chip">🔒 256-Bit SSL Encrypted</span>
+          </div>
+
+          <!-- Submit Button -->
+          <div style="margin-top: 1.5rem;">
+            <button type="submit" class="btn-primary login-submit-btn" :disabled="isLoading">
+              <span v-if="isLoading" class="spinner-inline"></span>
+              <span>{{ isLoading ? 'Verifying Credentials...' : 'Sign In to Portal 🚀' }}</span>
             </button>
           </div>
 
-          <!-- Feedback Alert if Error -->
-          <div v-if="errorMessage" class="login-error-alert" role="alert">
-            <span style="font-size: 1.25rem;">⚠️</span>
-            <div>
-              <strong>Authentication Notice:</strong>
-              <div>{{ errorMessage }}</div>
-            </div>
-          </div>
-
-          <!-- 1.A Student Login Form -->
-          <form v-if="studentMode === 'login'" @submit.prevent="handleStudentLoginSubmit" class="login-form">
-            <div class="form-group" style="margin-bottom: 1.25rem;">
-              <label class="form-label" for="student-email">
-                <span>📧</span> Student User ID / Email / Reg No <span class="req">*</span>
-              </label>
-              <input 
-                id="student-email"
-                type="text" 
-                v-model="studentLoginEmail" 
-                required 
-                class="form-control" 
-                placeholder="e.g. ITH-2026-STU8492 or your.email@example.com"
-                autocomplete="username"
-              >
-            </div>
-
-            <div class="form-group" style="margin-bottom: 1.25rem;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-                <label class="form-label" for="student-password" style="margin-bottom: 0;">
-                  <span>🔑</span> Student Password <span class="req">*</span>
-                </label>
-                <button 
-                  type="button" 
-                  class="password-toggle-btn" 
-                  @click="showPassword = !showPassword"
-                  :title="showPassword ? 'Hide password' : 'Show password'"
-                >
-                  {{ showPassword ? '🙈 Hide' : '👁️ Show' }}
-                </button>
-              </div>
-              <input 
-                id="student-password"
-                :type="showPassword ? 'text' : 'password'" 
-                v-model="studentLoginPassword" 
-                required 
-                class="form-control" 
-                placeholder="Default password is Ithunt@123"
-                autocomplete="current-password"
-              >
-              <small style="display: block; margin-top: 0.4rem; color: #38bdf8; font-size: 0.78rem; font-weight: 600;">
-                💡 Registered for Admission? Username = <strong>Email</strong> • Default Password = <strong>Ithunt@123</strong>
-              </small>
-            </div>
-
-            <div class="login-options-row">
-              <label class="checkbox-label">
-                <input type="checkbox" v-model="rememberMe">
-                <span>Stay signed in on this device</span>
-              </label>
-              <span class="security-chip">🎓 Verified Student</span>
-            </div>
-
-            <div style="margin-top: 1.5rem;">
-              <button type="submit" class="btn-primary login-submit-btn" :disabled="isLoading">
-                <span v-if="isLoading" class="spinner-inline"></span>
-                <span>{{ isLoading ? 'Verifying Student Credentials...' : 'Sign In to Student Dashboard 🚀' }}</span>
-              </button>
-            </div>
-          </form>
-
-          <!-- 1.B Student Signup Form -->
-          <form v-else @submit.prevent="handleStudentSignupSubmit" class="login-form">
-            <div class="form-group" style="margin-bottom: 1rem;">
-              <label class="form-label">Candidate Full Name <span class="req">*</span></label>
-              <input type="text" v-model="studentSignup.candidateName" required class="form-control" placeholder="Your full legal name">
-            </div>
-
-            <div class="form-group" style="margin-bottom: 1rem;">
-              <label class="form-label">Email Address <span class="req">*</span></label>
-              <input type="email" v-model="studentSignup.email" required class="form-control" placeholder="name@example.com">
-            </div>
-
-            <div class="form-group" style="margin-bottom: 1rem;">
-              <label class="form-label">Mobile Number <span class="req">*</span></label>
-              <input type="tel" v-model="studentSignup.mobile" pattern="[0-9]{10}" required class="form-control" placeholder="10-digit mobile">
-            </div>
-
-            <div class="form-group" style="margin-bottom: 1rem;">
-              <label class="form-label">Desired Program <span class="req">*</span></label>
-              <select v-model="studentSignup.course" class="form-control" required>
-                <option value="3-Month MERN Stack Web Engineer">3-Month MERN Stack Web Engineer</option>
-                <option value="6-Month Software & Cloud Masterclass">6-Month Software & Cloud Masterclass</option>
-                <option value="NIELIT O/A Level Diploma">NIELIT O/A Level Diploma</option>
-                <option value="Mobile App Engineering (Flutter/iOS)">Mobile App Engineering (Flutter/iOS)</option>
-              </select>
-            </div>
-
-            <div class="form-group" style="margin-bottom: 1.25rem;">
-              <label class="form-label">Create Password <span class="req">*</span></label>
-              <input type="password" v-model="studentSignup.password" required class="form-control" placeholder="At least 6 characters">
-            </div>
-
-            <div style="margin-top: 1.5rem;">
-              <button type="submit" class="btn-primary login-submit-btn" :disabled="isLoading">
-                <span v-if="isLoading" class="spinner-inline"></span>
-                <span>{{ isLoading ? 'Creating Student Account...' : 'Register & Enter Student Dashboard 🎓' }}</span>
-              </button>
-            </div>
-          </form>
-
-          <!-- Demo Quick-Fill Pill for Student -->
+          <!-- Quick 1-Click Demo Credentials Pill Helpers -->
           <div class="login-demo-helper">
-            <div class="demo-cred-text">
-              🔑 Student Login: User ID = <strong>Student Email</strong> • Default Password = <strong>Ithunt@123</strong>
+            <div class="demo-cred-title">
+              ⚡ Quick Demo Login Shortcuts (Click to Auto-Fill):
             </div>
-            <button type="button" class="btn-secondary quick-fill-btn" @click="quickFillStudent">
-              <span>Auto-Fill Demo Student Credentials ⚡</span>
+            <div class="demo-chips-grid">
+              <button 
+                type="button" 
+                class="demo-chip-btn chip-admin" 
+                @click="quickFillRole('admin')"
+                title="Fill SuperAdmin credentials (admin@ithunt.com)"
+              >
+                <span>⚡ Admin</span>
+              </button>
+              <button 
+                type="button" 
+                class="demo-chip-btn chip-teacher" 
+                @click="quickFillRole('teacher')"
+                title="Fill Teacher credentials (teacher@ithunt.com)"
+              >
+                <span>👨‍🏫 Teacher</span>
+              </button>
+              <button 
+                type="button" 
+                class="demo-chip-btn chip-student" 
+                @click="quickFillRole('student')"
+                title="Fill Student credentials (student@ithunt.com)"
+              >
+                <span>🎓 Student</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Student Registration Prompt -->
+          <div class="new-student-callout">
+            <span>New Student seeking admission?</span>
+            <button type="button" class="register-switch-link" @click="authMode = 'register'; errorMessage = '';">
+              Create Student Account / Register →
             </button>
           </div>
-        </div>
+        </form>
 
         <!-- ================================================================= -->
-        <!-- 2. SUPERADMIN AUTHENTICATION FLOW                                 -->
+        <!-- OPTIONAL: NEW STUDENT REGISTRATION FORM                           -->
         <!-- ================================================================= -->
-        <div v-else>
-          <!-- Brand & Header -->
-          <div class="login-card-header">
-            <div class="login-badge-pill admin-badge">
-              <span class="pulse-dot"></span>
-              <span>{{ content.superAdminData?.loginUI?.badge || '🔐 SECURE SUPERADMIN GATEWAY' }}</span>
-            </div>
-
-            <h1 class="login-title">
-              {{ content.superAdminData?.loginUI?.titlePrefix || 'Administrator ' }}<span class="text-gradient">{{ content.superAdminData?.loginUI?.titleGradient || 'Portal Login' }}</span>
-            </h1>
-
-            <p class="login-subtitle">
-              {{ content.superAdminData?.loginUI?.subtitle || 'Authorized access for IT HUNT Directorate, Faculty Leads, and Academic Registry staff.' }}
-            </p>
+        <form v-else @submit.prevent="handleStudentSignupSubmit" class="login-form">
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label class="form-label">Candidate Full Name <span class="req">*</span></label>
+            <input type="text" v-model="studentSignup.candidateName" required class="form-control" placeholder="Your full legal name">
           </div>
 
-          <!-- Feedback Alert if Error -->
-          <div v-if="errorMessage" class="login-error-alert" role="alert">
-            <span style="font-size: 1.25rem;">⚠️</span>
-            <div>
-              <strong>Authentication Failed:</strong>
-              <div>{{ errorMessage }}</div>
-            </div>
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label class="form-label">Email Address <span class="req">*</span></label>
+            <input type="email" v-model="studentSignup.email" required class="form-control" placeholder="name@example.com">
           </div>
 
-          <!-- Admin Login Form -->
-          <form @submit.prevent="handleAdminLogin" class="login-form">
-            <div class="form-group" style="margin-bottom: 1.25rem;">
-              <label class="form-label" for="admin-username">
-                <span>👤</span> {{ content.superAdminData?.loginUI?.usernameLabel || 'Admin Email or Username' }} <span class="req">*</span>
-              </label>
-              <input 
-                id="admin-username"
-                type="text" 
-                v-model="adminUsername" 
-                required 
-                class="form-control" 
-                :placeholder="content.superAdminData?.loginUI?.usernamePlaceholder || 'admin@ithunt.com'"
-                autocomplete="username"
-              >
-            </div>
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label class="form-label">Mobile Number <span class="req">*</span></label>
+            <input type="tel" v-model="studentSignup.mobile" pattern="[0-9]{10}" required class="form-control" placeholder="10-digit mobile">
+          </div>
 
-            <div class="form-group" style="margin-bottom: 1.25rem;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-                <label class="form-label" for="admin-password" style="margin-bottom: 0;">
-                  <span>🔑</span> {{ content.superAdminData?.loginUI?.passwordLabel || 'Security Password' }} <span class="req">*</span>
-                </label>
-                <button 
-                  type="button" 
-                  class="password-toggle-btn" 
-                  @click="showPassword = !showPassword"
-                  :title="showPassword ? 'Hide password' : 'Show password'"
-                >
-                  {{ showPassword ? '🙈 Hide' : '👁️ Show' }}
-                </button>
-              </div>
-              <input 
-                id="admin-password"
-                :type="showPassword ? 'text' : 'password'" 
-                v-model="adminPassword" 
-                required 
-                class="form-control" 
-                :placeholder="content.superAdminData?.loginUI?.passwordPlaceholder || 'Enter administrator password'"
-                autocomplete="current-password"
-              >
-            </div>
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label class="form-label">Desired Program <span class="req">*</span></label>
+            <select v-model="studentSignup.course" class="form-control" required>
+              <option value="3-Month MERN Stack Web Engineer">3-Month MERN Stack Web Engineer</option>
+              <option value="6-Month Software & Cloud Masterclass">6-Month Software & Cloud Masterclass</option>
+              <option value="NIELIT O/A Level Diploma">NIELIT O/A Level Diploma</option>
+              <option value="Mobile App Engineering (Flutter/iOS)">Mobile App Engineering (Flutter/iOS)</option>
+            </select>
+          </div>
 
-            <!-- Remember Me & Security Badge -->
-            <div class="login-options-row">
-              <label class="checkbox-label">
-                <input type="checkbox" v-model="rememberMe">
-                <span>{{ content.superAdminData?.loginUI?.rememberMeLabel || 'Keep me authenticated' }}</span>
-              </label>
-              <span class="security-chip">🔒 256-Bit SSL</span>
-            </div>
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label">Create Password <span class="req">*</span></label>
+            <input type="password" v-model="studentSignup.password" required class="form-control" placeholder="At least 6 characters">
+          </div>
 
-            <!-- Submit Button -->
-            <div style="margin-top: 1.5rem;">
-              <button type="submit" class="btn-primary login-submit-btn" :disabled="isLoading">
-                <span v-if="isLoading" class="spinner-inline"></span>
-                <span>{{ isLoading ? 'Verifying Administrator...' : (content.superAdminData?.loginUI?.loginBtnText || 'Sign In to SuperAdmin Console 🚀') }}</span>
-              </button>
-            </div>
-          </form>
-
-          <!-- Demo Quick-Fill Pill for Admin -->
-          <div class="login-demo-helper">
-            <div class="demo-cred-text">
-              {{ content.superAdminData?.loginUI?.demoAdminCredentialsText || '🔑 Demo Credentials: admin@ithunt.com / admin@ithunt2026' }}
-            </div>
-            <button type="button" class="btn-secondary quick-fill-btn" @click="quickFillAdmin">
-              <span>{{ content.superAdminData?.loginUI?.quickFillBtnText || 'Auto-Fill SuperAdmin Credentials ⚡' }}</span>
+          <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
+            <button type="button" class="btn-secondary" style="flex: 1; justify-content: center;" @click="authMode = 'login'; errorMessage = '';">
+              ← Back to Sign In
+            </button>
+            <button type="submit" class="btn-primary" style="flex: 2; justify-content: center;" :disabled="isLoading">
+              <span v-if="isLoading" class="spinner-inline"></span>
+              <span>{{ isLoading ? 'Creating Account...' : 'Register & Enter Dashboard 🎓' }}</span>
             </button>
           </div>
-        </div>
+        </form>
 
         <!-- Security Footer Notice -->
-        <div v-if="activeRole !== 'admin'" class="login-card-footer">
+        <div class="login-card-footer">
           <div class="security-notice-text">
             🛡️ 256-Bit Encrypted Session • ISO 9001:2015 Verified Academic Portal
           </div>
@@ -306,7 +207,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch } from 'vue';
+import { ref, reactive } from 'vue';
 import { loginUserWithBackend, loginStudentUser, registerStudentUser } from '../../utils/apiClient.js';
 import { DEFAULT_DEMO_STUDENT } from '../../data/studentAcademicData.js';
 
@@ -319,28 +220,19 @@ const props = defineProps({
 
 const emit = defineEmits(['login-success', 'student-login-success', 'set-tab', 'role-change']);
 
-// Tab states
-const activeRole = ref('student'); // 'student' | 'admin'
-const studentMode = ref('login'); // 'login' | 'signup'
+// View mode: 'login' | 'register'
+const authMode = ref('login');
 
-watch(activeRole, (newRole) => {
-  emit('role-change', newRole);
-}, { immediate: true });
-
-// Common state
+// Unified Form State
+const loginIdentifier = ref('');
+const loginPassword = ref('');
 const showPassword = ref(false);
 const rememberMe = ref(true);
 const isLoading = ref(false);
 const errorMessage = ref('');
+const successMessage = ref('');
 
-// Admin inputs
-const adminUsername = ref('');
-const adminPassword = ref('');
-
-// Student inputs
-const studentLoginEmail = ref('');
-const studentLoginPassword = ref('');
-
+// Student Registration State
 const studentSignup = reactive({
   candidateName: '',
   email: '',
@@ -349,66 +241,207 @@ const studentSignup = reactive({
   password: ''
 });
 
-// ==========================================
-// Student Auth Handlers
-// ==========================================
-const handleStudentLoginSubmit = async () => {
+// Quick 1-Click Demo Credentials
+const quickFillRole = (role) => {
   errorMessage.value = '';
-  isLoading.value = true;
+  successMessage.value = '';
+  authMode.value = 'login';
 
-  const emailInput = studentLoginEmail.value.trim();
-  const passInput = studentLoginPassword.value.trim();
+  if (role === 'admin') {
+    loginIdentifier.value = props.content.superAdminData?.adminAuth?.defaultUsername || 'admin@ithunt.com';
+    loginPassword.value = props.content.superAdminData?.adminAuth?.defaultPassword || 'admin@ithunt2026';
+    successMessage.value = '⚡ Admin demo credentials loaded: admin@ithunt.com / admin@ithunt2026';
+  } else if (role === 'teacher') {
+    loginIdentifier.value = 'teacher@ithunt.com';
+    loginPassword.value = 'teacher@123';
+    successMessage.value = '👨‍🏫 Teacher demo credentials loaded: teacher@ithunt.com / teacher@123';
+  } else if (role === 'student') {
+    loginIdentifier.value = 'student@ithunt.com';
+    loginPassword.value = 'Ithunt@123';
+    successMessage.value = '🎓 Student demo credentials loaded: student@ithunt.com / Ithunt@123';
+  }
+};
 
-  // Smart detect: if user entered admin credentials into student tab
-  const validAdminUser = props.content.superAdminData?.adminAuth?.defaultUsername || 'admin@ithunt.com';
-  if (emailInput.toLowerCase() === validAdminUser.toLowerCase() || emailInput.toLowerCase() === 'admin') {
-    activeRole.value = 'admin';
-    adminUsername.value = emailInput;
-    adminPassword.value = passInput;
-    isLoading.value = false;
-    handleAdminLogin();
+/**
+ * Route user based on their detected role:
+ * - 'superadmin' | 'admin' => SuperAdmin Console
+ * - 'teacher' | 'faculty' => Faculty / Teacher Console
+ * - 'student' => Student Dashboard
+ */
+const routeUserByRole = (user) => {
+  isLoading.value = false;
+  const role = String(user.roleType || user.role || 'student').toLowerCase();
+  const email = (user.email || loginIdentifier.value).trim();
+
+  // 1. ADMIN / SUPERADMIN ROLE
+  if (role === 'superadmin' || role === 'admin' || email === 'admin@ithunt.com') {
+    const adminUser = {
+      name: user.name || 'Mr. Lakshman Singh Chauhan',
+      role: role === 'superadmin' ? 'Director & Chief Administrator' : (user.role || 'Administrator'),
+      roleType: 'superadmin',
+      email: email,
+      avatar: user.avatar || props.content.director?.image || 'img/ithunt.webp',
+      loginTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+    };
+
+    if (rememberMe.value) {
+      try {
+        sessionStorage.setItem('ithunt_superadmin_auth', JSON.stringify(adminUser));
+        localStorage.setItem('ithunt_superadmin_auth', JSON.stringify(adminUser));
+      } catch (e) {}
+    }
+
+    emit('role-change', 'admin');
+    emit('login-success', adminUser);
     return;
   }
 
-  // 1. Check student credentials through unified auth service
-  try {
-    const apiRes = await loginStudentUser(emailInput, passInput);
-    if (apiRes && apiRes.success && apiRes.user) {
-      const studentUser = { ...apiRes.user };
-      if (rememberMe.value) {
-        try {
-          localStorage.setItem('ithunt_student_user', JSON.stringify(studentUser));
-        } catch (e) {}
-      }
-      isLoading.value = false;
-      emit('student-login-success', studentUser);
-      return;
-    } else if (apiRes && (apiRes.error || apiRes.message)) {
-      isLoading.value = false;
-      errorMessage.value = apiRes.message || apiRes.error;
-      return;
-    }
-  } catch (err) {
-    console.warn('Student login auth notice:', err);
-  }
+  // 2. TEACHER / FACULTY ROLE
+  if (role === 'teacher' || role === 'faculty' || role.includes('teacher') || role.includes('faculty')) {
+    const teacherUser = {
+      name: user.name || 'Er. Sandeep Srivastava (Teacher)',
+      role: user.designation || user.role || 'Senior Faculty Lead & Technical Mentor',
+      roleType: 'teacher',
+      email: email,
+      avatar: user.avatar || 'img/ithunt.jpg',
+      loginTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+    };
 
-  // 2. Check if matching default demo student
-  if (emailInput.toLowerCase() === 'student@ithunt.com' && (passInput === 'Ithunt@123' || passInput === 'student123' || passInput === 'student' || passInput === 'password')) {
-    const studentUser = { ...DEFAULT_DEMO_STUDENT };
     if (rememberMe.value) {
       try {
-        localStorage.setItem('ithunt_student_user', JSON.stringify(studentUser));
+        sessionStorage.setItem('ithunt_superadmin_auth', JSON.stringify(teacherUser));
+        localStorage.setItem('ithunt_superadmin_auth', JSON.stringify(teacherUser));
       } catch (e) {}
     }
+
+    emit('role-change', 'teacher');
+    emit('login-success', teacherUser);
+    return;
+  }
+
+  // 3. STUDENT ROLE
+  const studentUser = {
+    ...user,
+    candidateName: user.candidateName || user.fullName || user.name || 'Student',
+    name: user.name || user.candidateName || 'Student',
+    email: email,
+    role: 'student',
+    roleType: 'student',
+    registrationNo: user.registrationNo || user.enrollmentNumber || user.id || 'ITH-2026-STU'
+  };
+
+  if (rememberMe.value) {
+    try {
+      localStorage.setItem('ithunt_student_user', JSON.stringify(studentUser));
+    } catch (e) {}
+  }
+
+  emit('role-change', 'student');
+  emit('student-login-success', studentUser);
+};
+
+// ==========================================
+// UNIFIED AUTHENTICATION HANDLER
+// ==========================================
+const handleUnifiedLogin = async () => {
+  errorMessage.value = '';
+  successMessage.value = '';
+  isLoading.value = true;
+
+  const rawIdentifier = loginIdentifier.value.trim();
+  const rawPassword = loginPassword.value.trim();
+  const norm = rawIdentifier.toLowerCase();
+
+  if (!rawIdentifier || !rawPassword) {
     isLoading.value = false;
-    emit('student-login-success', studentUser);
+    errorMessage.value = 'Please enter your User ID / Email and password.';
+    return;
+  }
+
+  // 1. Authenticate with backend API: POST /api/auth/login
+  try {
+    const apiRes = await loginUserWithBackend(rawIdentifier, rawPassword);
+    if (apiRes && apiRes.success) {
+      const userData = apiRes.data?.user || apiRes.data || {};
+      const token = apiRes.data?.token || '';
+      if (token) {
+        localStorage.setItem('token', token);
+        if (userData.role === 'admin' || userData.role === 'superadmin' || userData.role === 'teacher' || userData.role === 'faculty') {
+          localStorage.setItem('adminToken', token);
+        }
+      }
+      routeUserByRole(userData);
+      return;
+    } else if (apiRes && (apiRes.pending || apiRes.error || apiRes.message)) {
+      if (apiRes.pending) {
+        isLoading.value = false;
+        errorMessage.value = apiRes.message || 'Your admission is pending review by SuperAdmin.';
+        return;
+      }
+    }
+  } catch (apiErr) {
+    console.warn('Backend API auth note:', apiErr.message);
+  }
+
+  // 2. Client-Side Fallback Verification (Offline & Demo Accounts)
+
+  // 2.A Check Admin fallback
+  const validAdminUser = (props.content.superAdminData?.adminAuth?.defaultUsername || 'admin@ithunt.com').toLowerCase();
+  const validAdminPass = props.content.superAdminData?.adminAuth?.defaultPassword || 'admin@ithunt2026';
+  if ((norm === validAdminUser || norm === 'admin') &&
+      (rawPassword === validAdminPass || rawPassword === 'admin' || rawPassword === 'admin123' || rawPassword === 'admin@ithunt2026')) {
+    routeUserByRole({
+      name: props.content.superAdminData?.adminAuth?.superAdminName || 'Mr. Lakshman Singh Chauhan',
+      email: validAdminUser,
+      role: 'superadmin',
+      roleType: 'superadmin'
+    });
+    return;
+  }
+
+  // 2.B Check Teacher fallback
+  if ((norm === 'teacher@ithunt.com' || norm === 'teacher' || norm === 'faculty@ithunt.com' || norm === 'faculty') &&
+      (rawPassword === 'teacher@ithunt2026' || rawPassword === 'teacher@123' || rawPassword === 'teacher' || rawPassword === 'faculty@123' || rawPassword === 'faculty')) {
+    routeUserByRole({
+      name: 'Er. Sandeep Srivastava (Teacher)',
+      email: 'teacher@ithunt.com',
+      role: 'teacher',
+      roleType: 'teacher',
+      designation: 'Senior Faculty Lead & Technical Mentor'
+    });
+    return;
+  }
+
+  // 2.C Check Student fallback (queries student API & localStorage)
+  try {
+    const stuRes = await loginStudentUser(rawIdentifier, rawPassword);
+    if (stuRes && stuRes.success && stuRes.user) {
+      routeUserByRole({
+        ...stuRes.user,
+        role: 'student',
+        roleType: 'student'
+      });
+      return;
+    }
+  } catch (e) {}
+
+  // 2.D Default demo student fallback
+  if (norm === 'student@ithunt.com' && (rawPassword === 'Ithunt@123' || rawPassword === 'student123' || rawPassword === 'student' || rawPassword === 'password')) {
+    routeUserByRole({
+      ...DEFAULT_DEMO_STUDENT,
+      role: 'student',
+      roleType: 'student'
+    });
     return;
   }
 
   isLoading.value = false;
-  errorMessage.value = 'Invalid student credentials. Please enter your confirmed Student User ID / Email and your generated password.';
+  errorMessage.value = 'Invalid credentials. Please verify your User ID / Email and password, or use the quick demo shortcuts below.';
 };
 
+// ==========================================
+// Student Registration Submit Handler
+// ==========================================
 const handleStudentSignupSubmit = async () => {
   errorMessage.value = '';
   isLoading.value = true;
@@ -446,108 +479,12 @@ const handleStudentSignupSubmit = async () => {
     }
 
     isLoading.value = false;
+    emit('role-change', 'student');
     emit('student-login-success', studentUser);
   } catch (err) {
     isLoading.value = false;
     errorMessage.value = err.message || 'Registration failed. Please try again.';
   }
-};
-
-const quickFillStudent = () => {
-  studentLoginEmail.value = 'student@ithunt.com';
-  studentLoginPassword.value = 'Ithunt@123';
-  studentMode.value = 'login';
-  errorMessage.value = '';
-};
-
-// ==========================================
-// Administrator Auth Handlers
-// ==========================================
-const handleAdminLogin = async () => {
-  errorMessage.value = '';
-  isLoading.value = true;
-
-  const inputUser = adminUsername.value.trim();
-  const inputPass = adminPassword.value.trim();
-
-  // 1. Authenticate with backend REST API: POST /api/auth/login
-  try {
-    const apiRes = await loginUserWithBackend(inputUser, inputPass);
-    if (apiRes && apiRes.success) {
-      const user = apiRes.data?.user || apiRes.data || {};
-      const token = apiRes.data?.token || '';
-
-      // Only allow superadmin role to access the SuperAdmin console
-      if (user.role !== 'superadmin') {
-        isLoading.value = false;
-        errorMessage.value = 'Access Denied: Your account does not have SuperAdmin privileges. Only users with the "superadmin" role can access this console.';
-        return;
-      }
-
-      if (token) {
-        localStorage.setItem('token', token);
-        localStorage.setItem('adminToken', token);
-      }
-
-      const adminUser = {
-        name: user.name || 'Mr. Lakshman Singh Chauhan',
-        role: user.role === 'superadmin' ? 'Director & Chief Administrator' : (user.role || 'Administrator'),
-        roleType: user.role || 'superadmin',
-        email: user.email || inputUser,
-        token: token,
-        avatar: props.content.director?.image || 'img/ithunt.webp',
-        loginTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-      };
-
-      if (rememberMe.value) {
-        try {
-          sessionStorage.setItem('ithunt_superadmin_auth', JSON.stringify(adminUser));
-          localStorage.setItem('ithunt_superadmin_auth', JSON.stringify(adminUser));
-        } catch (e) {}
-      }
-
-      isLoading.value = false;
-      emit('login-success', adminUser);
-      return;
-    }
-  } catch (apiErr) {
-    console.info('Backend API auth notice:', apiErr.message);
-  }
-
-  // 2. Fallback check for default SuperAdmin portal credentials
-  const validUsername = props.content.superAdminData?.adminAuth?.defaultUsername || 'admin@ithunt.com';
-  const validPassword = props.content.superAdminData?.adminAuth?.defaultPassword || 'admin@ithunt2026';
-
-  if ((inputUser.toLowerCase() === validUsername.toLowerCase() || inputUser === 'admin') &&
-      (inputPass === validPassword || inputPass === 'admin123' || inputPass === 'admin@ithunt2026')) {
-    const adminUser = {
-      name: props.content.superAdminData?.adminAuth?.superAdminName || 'Mr. Lakshman Singh Chauhan',
-      role: props.content.superAdminData?.adminAuth?.role || 'Director & Chief Administrator',
-      roleType: 'superadmin',
-      email: validUsername,
-      avatar: props.content.director?.image || 'img/ithunt.webp',
-      loginTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-    };
-
-    if (rememberMe.value) {
-      try {
-        sessionStorage.setItem('ithunt_superadmin_auth', JSON.stringify(adminUser));
-        localStorage.setItem('ithunt_superadmin_auth', JSON.stringify(adminUser));
-      } catch (e) {}
-    }
-
-    isLoading.value = false;
-    emit('login-success', adminUser);
-  } else {
-    isLoading.value = false;
-    errorMessage.value = 'Invalid administrator credentials. Verify your email & password or click "Auto-Fill SuperAdmin Credentials".';
-  }
-};
-
-const quickFillAdmin = () => {
-  adminUsername.value = props.content.superAdminData?.adminAuth?.defaultUsername || 'admin@ithunt.com';
-  adminPassword.value = props.content.superAdminData?.adminAuth?.defaultPassword || 'admin@ithunt2026';
-  errorMessage.value = '';
 };
 </script>
 
@@ -559,7 +496,7 @@ const quickFillAdmin = () => {
 
 .login-card-wrap {
   width: 100%;
-  max-width: 540px;
+  max-width: 520px;
   position: relative;
 }
 
@@ -570,7 +507,7 @@ const quickFillAdmin = () => {
   transform: translate(-50%, -50%);
   width: 110%;
   height: 110%;
-  background: radial-gradient(circle, rgba(249, 115, 22, 0.22) 0%, rgba(250, 204, 21, 0.1) 50%, rgba(0, 0, 0, 0) 80%);
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.2) 0%, rgba(14, 165, 233, 0.12) 50%, rgba(0, 0, 0, 0) 80%);
   filter: blur(40px);
   pointer-events: none;
   z-index: -1;
@@ -583,69 +520,7 @@ const quickFillAdmin = () => {
   -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-xl);
   padding: 2.25rem 2.25rem;
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 30px rgba(249, 115, 22, 0.18);
-}
-
-/* Role Switcher Tabs */
-.role-switcher-tabs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  background: rgba(0, 0, 0, 0.35);
-  padding: 0.35rem;
-  border-radius: var(--radius-full);
-  margin-bottom: 2rem;
-  border: 1px solid var(--border-cyber);
-}
-
-body.light-theme .role-switcher-tabs {
-  background: rgba(241, 245, 249, 0.9);
-}
-
-.role-tab-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.65rem 1rem;
-  border: none;
-  border-radius: var(--radius-full);
-  background: transparent;
-  color: var(--text-muted);
-  font-weight: 700;
-  font-size: 0.88rem;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.role-tab-btn.active {
-  background: linear-gradient(135deg, var(--color-ai-orange), #ea580c);
-  color: #ffffff;
-  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
-}
-
-.sub-auth-mode-row {
-  display: flex;
-  justify-content: center;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-}
-
-.sub-mode-btn {
-  padding: 0.45rem 1rem;
-  border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-cyber);
-  color: var(--text-muted);
-  font-size: 0.825rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.sub-mode-btn.active {
-  background: rgba(249, 115, 22, 0.15);
-  border-color: var(--color-ai-orange);
-  color: var(--color-ai-yellow);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 30px rgba(249, 115, 22, 0.15);
 }
 
 .login-card-header {
@@ -658,7 +533,7 @@ body.light-theme .role-switcher-tabs {
   align-items: center;
   gap: 0.5rem;
   padding: 0.35rem 0.95rem;
-  background: rgba(249, 115, 22, 0.15);
+  background: rgba(249, 115, 22, 0.12);
   border: 1px solid rgba(249, 115, 22, 0.35);
   border-radius: var(--radius-full);
   font-size: 0.76rem;
@@ -666,18 +541,6 @@ body.light-theme .role-switcher-tabs {
   color: var(--color-ai-yellow);
   font-family: var(--font-mono);
   margin-bottom: 0.85rem;
-}
-
-.login-badge-pill.student-badge {
-  background: rgba(249, 115, 22, 0.15);
-  border-color: rgba(249, 115, 22, 0.4);
-  color: var(--color-ai-yellow);
-}
-
-.login-badge-pill.admin-badge {
-  background: rgba(16, 185, 129, 0.15);
-  border-color: rgba(16, 185, 129, 0.4);
-  color: #34d399;
 }
 
 body.light-theme .login-badge-pill {
@@ -688,7 +551,7 @@ body.light-theme .login-badge-pill {
   font-family: var(--font-heading);
   font-size: 2rem;
   font-weight: 800;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.45rem;
 }
 
 .login-subtitle {
@@ -715,6 +578,26 @@ body.light-theme .login-error-alert {
   color: #991b1b;
   background: #fee2e2;
   border-color: #fca5a5;
+}
+
+.login-success-alert {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #6ee7b7;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+body.light-theme .login-success-alert {
+  color: #065f46;
+  background: #d1fae5;
+  border-color: #a7f3d0;
 }
 
 .password-toggle-btn {
@@ -780,45 +663,113 @@ body.light-theme .login-error-alert {
 
 .login-demo-helper {
   margin-top: 1.5rem;
-  padding: 0.9rem;
-  background: rgba(15, 23, 42, 0.5);
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.4);
   border: 1px dashed var(--border-cyber);
   border-radius: var(--radius-md);
-  text-align: center;
 }
 
 body.light-theme .login-demo-helper {
-  background: rgba(249, 115, 22, 0.06);
+  background: rgba(241, 245, 249, 0.7);
 }
 
-.demo-cred-text {
-  font-size: 0.78rem;
-  color: var(--color-ai-yellow);
-  font-family: var(--font-mono);
+.demo-cred-title {
+  font-size: 0.76rem;
+  color: var(--text-muted);
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.65rem;
+  text-align: center;
 }
 
-body.light-theme .demo-cred-text {
-  color: #c2410c;
+.demo-chips-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
 }
 
-.quick-fill-btn {
-  width: 100%;
+.demo-chip-btn {
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  padding: 0.5rem 1rem;
-  font-size: 0.825rem;
+  border: 1px solid transparent;
+}
+
+.chip-admin {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.chip-admin:hover {
+  background: rgba(16, 185, 129, 0.28);
+  transform: translateY(-1px);
+}
+
+.chip-teacher {
+  background: rgba(14, 165, 233, 0.15);
+  color: #38bdf8;
+  border-color: rgba(14, 165, 233, 0.35);
+}
+
+.chip-teacher:hover {
+  background: rgba(14, 165, 233, 0.28);
+  transform: translateY(-1px);
+}
+
+.chip-student {
+  background: rgba(249, 115, 22, 0.15);
+  color: var(--color-ai-yellow);
+  border-color: rgba(249, 115, 22, 0.35);
+}
+
+.chip-student:hover {
+  background: rgba(249, 115, 22, 0.28);
+  transform: translateY(-1px);
+}
+
+.new-student-callout {
+  margin-top: 1.25rem;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.register-switch-link {
+  background: transparent;
+  border: none;
+  color: var(--color-ai-orange);
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 0;
+  transition: var(--transition);
+}
+
+.register-switch-link:hover {
+  text-decoration: underline;
+  color: var(--color-ai-yellow);
 }
 
 .login-card-footer {
-  margin-top: 1.75rem;
+  margin-top: 1.5rem;
   text-align: center;
   padding-top: 1.25rem;
   border-top: 1px solid var(--border-cyber);
 }
 
 .security-notice-text {
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   color: var(--text-dim);
   margin-bottom: 0.75rem;
 }

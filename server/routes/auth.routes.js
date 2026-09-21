@@ -28,6 +28,7 @@ router.post('/login', async (req, res) => {
         name: 'IT HUNT Super Admin',
         email: 'admin@ithunt.com',
         role: 'superadmin',
+        roleType: 'superadmin',
         verified: true
       };
       const token = generateToken(adminUser);
@@ -38,7 +39,55 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // 2. Check Database Users, Admissions, and Students
+    // 2. Check Default Teacher / Faculty credentials
+    if (
+      (normEmail === 'teacher@ithunt.com' || normEmail === 'teacher' || normEmail === 'faculty@ithunt.com' || normEmail === 'faculty') &&
+      (password === 'teacher@ithunt2026' || password === 'teacher@123' || password === 'teacher' || password === 'faculty@123' || password === 'faculty')
+    ) {
+      const teacherUser = {
+        id: 'usr-teacher-default',
+        name: 'Er. Sandeep Srivastava (Teacher)',
+        email: 'teacher@ithunt.com',
+        role: 'teacher',
+        roleType: 'teacher',
+        designation: 'Senior Faculty Lead & Technical Mentor',
+        verified: true
+      };
+      const token = generateToken(teacherUser);
+      return res.json({
+        success: true,
+        message: 'Authentication successful',
+        data: { token, user: teacherUser }
+      });
+    }
+
+    // 3. Check Default Demo Student credentials
+    if (
+      (normEmail === 'student@ithunt.com' || normEmail === 'student') &&
+      (password === 'Ithunt@123' || password === 'student123' || password === 'student' || password === 'password')
+    ) {
+      const demoStudent = {
+        id: 'STU-DEMO-01',
+        userId: 'student@ithunt.com',
+        name: 'Aditya Kumar Sharma',
+        fullName: 'Aditya Kumar Sharma',
+        candidateName: 'Aditya Kumar Sharma',
+        email: 'student@ithunt.com',
+        role: 'student',
+        roleType: 'student',
+        registrationNo: 'ITH-2026-004',
+        course: '3-Month MERN Stack Web Engineer',
+        verified: true
+      };
+      const token = generateToken(demoStudent);
+      return res.json({
+        success: true,
+        message: 'Authentication successful',
+        data: { token, user: demoStudent }
+      });
+    }
+
+    // 4. Check Database Users, Students, and Admissions
     const allUsers = await dbAdapter.find('users');
     let user = allUsers.find(u => 
       (u.userId && u.userId.toLowerCase() === normEmail) ||
@@ -47,6 +96,32 @@ router.post('/login', async (req, res) => {
       (u.enrollmentNumber && u.enrollmentNumber.toLowerCase() === normEmail) ||
       (u.id && u.id.toLowerCase() === normEmail)
     );
+
+    if (!user) {
+      const allStudents = await dbAdapter.find('students');
+      const stu = allStudents.find(s => 
+        (s.userId && s.userId.toLowerCase() === normEmail) ||
+        (s.email && s.email.toLowerCase() === normEmail) || 
+        (s.registrationNo && s.registrationNo.toLowerCase() === normEmail) ||
+        (s.enrollmentNumber && s.enrollmentNumber.toLowerCase() === normEmail) ||
+        (s.id && s.id.toLowerCase() === normEmail)
+      );
+      if (stu) {
+        user = {
+          id: stu.userId || stu.id,
+          userId: stu.userId || stu.id,
+          name: stu.name || stu.fullName || stu.candidateName || 'Student',
+          email: stu.email,
+          password: stu.password || 'Ithunt@123',
+          role: 'student',
+          roleType: 'student',
+          registrationNo: stu.registrationNo || stu.id,
+          enrollmentNumber: stu.enrollmentNumber || stu.userId || '',
+          course: stu.course || 'Software Engineering',
+          verified: true
+        };
+      }
+    }
 
     if (!user) {
       const allAdmissions = await dbAdapter.find('admissions');
@@ -65,8 +140,10 @@ router.post('/login', async (req, res) => {
           email: adm.email,
           password: adm.password || 'Ithunt@123',
           role: 'student',
+          roleType: 'student',
           registrationNo: adm.registrationNo || adm.id,
           enrollmentNumber: adm.enrollmentNumber || adm.userId || adm.registrationNo || '',
+          course: adm.course || 'Software Engineering',
           verified: adm.status === 'Confirmed' || adm.admissionConfirmed
         };
       }
@@ -98,10 +175,17 @@ router.post('/login', async (req, res) => {
 
     const safeUser = {
       id: user.id || user._id,
-      name: user.name,
+      userId: user.userId || user.id,
+      name: user.name || user.candidateName || 'User',
+      fullName: user.name || user.candidateName || 'User',
+      candidateName: user.candidateName || user.name || 'User',
       email: user.email,
       role: user.role || 'student',
+      roleType: user.roleType || user.role || 'student',
       registrationNo: user.registrationNo || '',
+      enrollmentNumber: user.enrollmentNumber || user.userId || '',
+      course: user.course || '',
+      designation: user.designation || (user.role === 'teacher' || user.role === 'faculty' ? 'Faculty Instructor' : ''),
       verified: user.verified !== false
     };
 

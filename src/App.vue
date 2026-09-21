@@ -62,6 +62,7 @@
       :isDarkMode="isDarkMode" 
       :studentUser="studentUser" 
       :isAdminLoggedIn="isAdminLoggedIn"
+      :adminUser="adminUser"
       @set-tab="setTab" 
       @toggle-theme="toggleTheme" 
       @open-nielit-modal="showNielitModal = true"
@@ -1277,19 +1278,34 @@ const handleLoginAsStudent = (admission) => {
 };
 
 const handleLoginSuccess = async (user) => {
-  // Enforce that only superadmin role can access the SuperAdmin console
-  if (user.roleType !== 'superadmin' && user.role !== 'Director & Chief Administrator' && user.email !== 'admin@ithunt.com') {
-    showToast('Access Denied: Only SuperAdmin users can access this console.', 'error');
+  const isTeacher = user.roleType === 'teacher' || user.role === 'teacher' || user.role === 'faculty' || user.roleType === 'faculty' || String(user.role || '').toLowerCase().includes('faculty') || String(user.role || '').toLowerCase().includes('teacher');
+  const isAdmin = user.roleType === 'superadmin' || user.roleType === 'admin' || user.role === 'superadmin' || user.role === 'admin' || user.role === 'Director & Chief Administrator' || user.email === 'admin@ithunt.com';
+
+  if (!isTeacher && !isAdmin) {
+    showToast('Access Denied: You do not have administrator or faculty privileges.', 'error');
     return;
   }
   isAdminLoggedIn.value = true;
-  adminUser.value = user;
+  adminUser.value = {
+    ...user,
+    name: user.name || (isTeacher ? 'Er. Sandeep Srivastava' : 'Mr. Lakshman Singh Chauhan'),
+    role: isTeacher ? (user.designation || user.role || 'Senior Faculty Lead & Teacher') : (user.role || 'Director & Chief Administrator'),
+    roleType: isTeacher ? 'teacher' : (user.roleType || 'superadmin'),
+    avatar: isTeacher ? (user.avatar || 'img/ithunt.jpg') : (user.avatar || 'img/ithunt.webp'),
+    email: user.email || (isTeacher ? 'teacher@ithunt.com' : 'admin@ithunt.com'),
+    loginTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+  };
   try {
-    sessionStorage.setItem('ithunt_superadmin_auth', JSON.stringify(user));
-    localStorage.setItem('ithunt_superadmin_auth', JSON.stringify(user));
+    sessionStorage.setItem('ithunt_superadmin_auth', JSON.stringify(adminUser.value));
+    localStorage.setItem('ithunt_superadmin_auth', JSON.stringify(adminUser.value));
   } catch (e) {}
   activeTab.value = 'superadmin';
   triggerConfetti();
+  if (isTeacher) {
+    showToast(`Welcome Teacher ${adminUser.value.name}! Logged into Faculty Management Console.`, 'success');
+  } else {
+    showToast(`Welcome Administrator ${adminUser.value.name}! Logged into SuperAdmin Console.`, 'success');
+  }
   await loadInitialData();
 };
 
