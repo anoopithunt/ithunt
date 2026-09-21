@@ -78,9 +78,12 @@
               <input 
                 type="text" 
                 v-model="form.candidateName" 
+                @blur="form.candidateName = toTitleCase(form.candidateName)"
                 required 
                 class="form-control" 
-                placeholder="e.g. Anup Kumar" 
+                placeholder="e.g. Anup Kumar Mishra" 
+                style="text-transform: capitalize;"
+                spellcheck="false"
               />
               <span v-if="validationErrors.candidateName" class="error-hint">{{ validationErrors.candidateName }}</span>
             </div>
@@ -118,9 +121,12 @@
               <input 
                 type="text" 
                 v-model="form.fatherName" 
+                @blur="form.fatherName = toTitleCase(form.fatherName)"
                 required 
                 class="form-control" 
                 placeholder="e.g. Shiv Shanker Mishra" 
+                style="text-transform: capitalize;"
+                spellcheck="false"
               />
               <span v-if="validationErrors.fatherName" class="error-hint">{{ validationErrors.fatherName }}</span>
             </div>
@@ -162,9 +168,12 @@
             <input 
               type="text" 
               v-model="form.address" 
+              @blur="form.address = toTitleCase(form.address)"
               required 
               class="form-control" 
               placeholder="House/Street, Landmark, Village/Town" 
+              style="text-transform: capitalize;"
+              spellcheck="false"
             />
             <span v-if="validationErrors.address" class="error-hint">{{ validationErrors.address }}</span>
           </div>
@@ -177,9 +186,12 @@
               <input 
                 type="text" 
                 v-model="form.district" 
+                @blur="form.district = toTitleCase(form.district)"
                 required 
                 class="form-control" 
                 placeholder="e.g. Prayagraj" 
+                style="text-transform: capitalize;"
+                spellcheck="false"
               />
               <span v-if="validationErrors.district" class="error-hint">{{ validationErrors.district }}</span>
             </div>
@@ -191,9 +203,12 @@
               <input 
                 type="text" 
                 v-model="form.state" 
+                @blur="form.state = toTitleCase(form.state)"
                 required 
                 class="form-control" 
                 placeholder="e.g. Uttar Pradesh" 
+                style="text-transform: capitalize;"
+                spellcheck="false"
               />
             </div>
 
@@ -235,9 +250,12 @@
               <input 
                 type="text" 
                 v-model="form.projectTitle" 
+                @blur="form.projectTitle = toTitleCase(form.projectTitle)"
                 required 
                 class="form-control" 
                 placeholder="e.g. AI-Powered Network Traffic Monitoring and Intrusion Detection System" 
+                style="text-transform: capitalize;"
+                spellcheck="false"
               />
               <span v-if="validationErrors.projectTitle" class="error-hint">{{ validationErrors.projectTitle }}</span>
             </div>
@@ -364,9 +382,12 @@
             <input 
               type="text" 
               v-model="form.accountHolderName" 
+              @blur="form.accountHolderName = toTitleCase(form.accountHolderName)"
               required 
               class="form-control" 
-              placeholder="Name as registered with bank" 
+              placeholder="e.g. Anup Kumar Mishra" 
+              style="text-transform: capitalize;"
+              spellcheck="false"
             />
             <span v-if="validationErrors.accountHolderName" class="error-hint">{{ validationErrors.accountHolderName }}</span>
           </div>
@@ -483,34 +504,45 @@ function toIsoDate(val) {
   return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 }
 
+function toTitleCase(val) {
+  if (!val || typeof val !== 'string') return '';
+  return val.replace(/\b([a-zA-Z])([a-zA-Z0-9&/'-]*)\b/g, (match, first, rest) => {
+    const upper = match.toUpperCase();
+    if (['AI', 'ML', 'IT', 'MERN', 'MEAN', 'AWS', 'API', 'UI', 'UX', 'IOT', 'PHP', 'SQL', 'DBMS', 'MCA', 'BCA', 'NIELIT', 'PDF', 'QR', 'UP'].includes(upper)) {
+      return upper;
+    }
+    return first.toUpperCase() + rest.toLowerCase();
+  });
+}
+
 const form = ref({
-  studentName: props.initialData.studentName || props.initialData.candidateName || '',
-  candidateName: props.initialData.candidateName || props.initialData.studentName || '',
+  studentName: toTitleCase(props.initialData.studentName || props.initialData.candidateName || ''),
+  candidateName: toTitleCase(props.initialData.candidateName || props.initialData.studentName || ''),
   regNo: props.initialData.regNo || props.initialData.nielitRegNo || '',
   nielitRegNo: props.initialData.nielitRegNo || props.initialData.regNo || '',
   nielitLevel: props.initialData.nielitLevel || 'A',
   level: props.initialData.level || 'A Level',
-  fatherName: props.initialData.fatherName || '',
+  fatherName: toTitleCase(props.initialData.fatherName || ''),
   email: props.initialData.email || '',
   mobile: props.initialData.mobile || '',
-  address: props.initialData.address || '',
-  district: props.initialData.district || 'Prayagraj',
-  state: props.initialData.state || 'Uttar Pradesh',
+  address: toTitleCase(props.initialData.address || ''),
+  district: toTitleCase(props.initialData.district || 'Prayagraj'),
+  state: toTitleCase(props.initialData.state || 'Uttar Pradesh'),
   pin: props.initialData.pin || '212503',
 
-  projectTitle: props.initialData.projectTitle || '',
-  guideName: props.initialData.guideName || 'Er. Sushil Kumar',
+  projectTitle: toTitleCase(props.initialData.projectTitle || ''),
+  guideName: toTitleCase(props.initialData.guideName || 'Er. Sushil Kumar'),
   guideQualification: props.initialData.guideQualification || 'MCA (Computer Science)',
   guideDesignation: props.initialData.guideDesignation || 'Sr. Laravel & Cloud Developer',
-  guidePlace: props.initialData.guidePlace || 'Prayagraj',
-  guideAddress: props.initialData.guideAddress || 'Holagarh, Prayagraj, UP',
+  guidePlace: toTitleCase(props.initialData.guidePlace || 'Prayagraj'),
+  guideAddress: toTitleCase(props.initialData.guideAddress || 'Holagarh, Prayagraj, UP'),
   projectDate: toIsoDate(props.initialData.projectDate),
   githubRepo: props.initialData.githubRepo || '',
 
   amount: props.initialData.amount || '1000',
   paymentDate: toIsoDate(props.initialData.paymentDate),
   utrNumber: (props.initialData.utrNumber || '').trim().toUpperCase(),
-  accountHolderName: props.initialData.accountHolderName || '',
+  accountHolderName: toTitleCase(props.initialData.accountHolderName || ''),
   paymentRemark: 'Paid'
 });
 
@@ -530,6 +562,12 @@ const isSection3Filled = computed(() => {
 });
 
 const validateStep1 = () => {
+  if (form.value.candidateName) form.value.candidateName = toTitleCase(form.value.candidateName.trim());
+  if (form.value.fatherName) form.value.fatherName = toTitleCase(form.value.fatherName.trim());
+  if (form.value.address) form.value.address = toTitleCase(form.value.address.trim());
+  if (form.value.district) form.value.district = toTitleCase(form.value.district.trim());
+  if (form.value.state) form.value.state = toTitleCase(form.value.state.trim());
+
   const errs = {};
   if (!form.value.candidateName?.trim()) errs.candidateName = 'Candidate full name is required';
   if (!form.value.nielitRegNo?.trim()) errs.nielitRegNo = 'NIELIT registration number is required';
@@ -545,6 +583,8 @@ const validateStep1 = () => {
 };
 
 const validateStep2 = () => {
+  if (form.value.projectTitle) form.value.projectTitle = toTitleCase(form.value.projectTitle.trim());
+
   const errs = {};
   if (!form.value.projectTitle?.trim()) errs.projectTitle = 'Project / Dissertation title is required';
   if (!form.value.projectDate) errs.projectDate = 'Project submission date is required';
@@ -557,6 +597,9 @@ const validateStep3 = () => {
   const errs = {};
   if (form.value.utrNumber) {
     form.value.utrNumber = form.value.utrNumber.trim().toUpperCase();
+  }
+  if (form.value.accountHolderName) {
+    form.value.accountHolderName = toTitleCase(form.value.accountHolderName.trim());
   }
   if (!form.value.amount?.trim()) errs.amount = 'Fee amount is required';
   if (!form.value.paymentDate) errs.paymentDate = 'Payment date is required';
@@ -621,13 +664,20 @@ const handleFormSubmit = () => {
 
   const cleanUtr = (form.value.utrNumber || '').trim().toUpperCase();
   form.value.utrNumber = cleanUtr;
+  form.value.candidateName = toTitleCase(form.value.candidateName?.trim() || '');
+  form.value.fatherName = toTitleCase(form.value.fatherName?.trim() || '');
+  form.value.address = toTitleCase(form.value.address?.trim() || '');
+  form.value.district = toTitleCase(form.value.district?.trim() || '');
+  form.value.state = toTitleCase(form.value.state?.trim() || '');
+  form.value.projectTitle = toTitleCase(form.value.projectTitle?.trim() || '');
+  form.value.accountHolderName = toTitleCase(form.value.accountHolderName?.trim() || form.value.candidateName);
 
   const regId = form.value.nielitRegNo || form.value.regNo || String(Date.now());
   const payload = {
     ...form.value,
     id: regId,
-    studentName: form.value.candidateName || form.value.studentName || '',
-    candidateName: form.value.candidateName || form.value.studentName || '',
+    studentName: form.value.candidateName,
+    candidateName: form.value.candidateName,
     regNo: regId,
     registrationNo: regId,
     nielitRegNo: regId,
