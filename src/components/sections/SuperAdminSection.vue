@@ -4410,6 +4410,23 @@ const updateAdminHeaderHeight = () => {
     adminHeaderHeight.value = adminHeaderRef.value.offsetHeight || 60;
   }
 };
+
+const preventBackgroundScroll = (e) => {
+  if (e.target && e.target.closest && e.target.closest('.sidebar-nav-scroll')) {
+    return; // Allow smooth scrolling within the drawer nav list
+  }
+  e.preventDefault();
+};
+
+watch(isMobileSidebarOpen, (isOpen) => {
+  if (typeof window !== 'undefined') {
+    if (isOpen) {
+      window.addEventListener('touchmove', preventBackgroundScroll, { passive: false });
+    } else {
+      window.removeEventListener('touchmove', preventBackgroundScroll);
+    }
+  }
+});
 const globalAdminSearch = ref('');
 const currentTab = ref('overview');
 const studentSearch = ref('');
@@ -6550,6 +6567,7 @@ onUnmounted(() => {
   }
   if (typeof window !== 'undefined') {
     window.removeEventListener('resize', updateAdminHeaderHeight);
+    window.removeEventListener('touchmove', preventBackgroundScroll);
   }
 });
 </script>
@@ -9202,12 +9220,12 @@ label {
     color: #f97316 !important;
   }
 
-  /* Keep header sticky always even when sidebar is appeared on mobile */
+  /* Keep header sticky always when navigating & scrolling page */
   .admin-top-command-bar {
     position: -webkit-sticky !important;
     position: sticky !important;
     top: 0 !important;
-    z-index: 100000 !important;
+    z-index: 1000 !important;
     width: 100% !important;
     box-sizing: border-box !important;
     padding: 0.65rem 1rem !important;
@@ -9223,20 +9241,21 @@ label {
     border-bottom: 1px solid #e2e8f0 !important;
   }
 
+  /* Dedicated full-height mobile drawer: cleanly overlays screen with zero header content collision */
   .admin-sidebar {
     position: fixed !important;
-    top: var(--admin-header-height, 60px) !important;
-    left: -320px !important;
+    top: 0 !important;
+    left: -340px !important;
     bottom: 0 !important;
-    width: 285px !important;
-    min-width: 285px !important;
-    max-width: 85vw !important;
-    height: calc(100vh - var(--admin-header-height, 60px)) !important;
-    height: calc(100dvh - var(--admin-header-height, 60px)) !important;
-    max-height: calc(100dvh - var(--admin-header-height, 60px)) !important;
-    z-index: 99995 !important;
-    box-shadow: 15px 0 50px rgba(0, 0, 0, 0.85) !important;
-    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    width: min(310px, 86vw) !important;
+    min-width: unset !important;
+    max-width: 86vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    z-index: 100002 !important;
+    box-shadow: 20px 0 60px rgba(0, 0, 0, 0.9) !important;
+    transition: left 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
@@ -9262,18 +9281,22 @@ label {
     touch-action: pan-y !important;
   }
 
+  /* Full screen dark backdrop behind mobile drawer */
   .admin-sidebar-backdrop {
     position: fixed !important;
-    top: var(--admin-header-height, 60px) !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    background: rgba(0, 0, 0, 0.65) !important;
-    backdrop-filter: blur(4px) !important;
-    -webkit-backdrop-filter: blur(4px) !important;
-    z-index: 99990 !important;
+    inset: 0 !important;
+    background: rgba(0, 0, 0, 0.75) !important;
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+    z-index: 100001 !important;
     touch-action: none !important;
     overscroll-behavior: contain !important;
+  }
+
+  /* Prevent page scrolling when side menu is open */
+  .admin-main-canvas.canvas-locked {
+    overflow-y: hidden !important;
+    touch-action: none !important;
   }
 
 
