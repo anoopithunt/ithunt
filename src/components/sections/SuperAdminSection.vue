@@ -276,10 +276,15 @@
         </div>
 
         <div class="command-bar-right">
-          <!-- Live Cloud Database Status Pill -->
-          <div class="cloud-status-chip" title="Connected to MongoDB Atlas Cloud Cluster (ithunt)">
-            <span class="pulse-dot-emerald"></span>
-            <span class="cloud-status-text">Cloud DB: Online</span>
+          <!-- Live Cloud Database Status Pill (Dynamic From Server) -->
+          <div 
+            class="cloud-status-chip" 
+            :class="dbStatusClass"
+            :title="dbStatusTitle"
+          >
+            <span :class="dbStatus.connected ? 'pulse-dot-emerald' : 'pulse-dot-amber'"></span>
+            <span class="cloud-status-text">{{ dbStatus.connected ? dbEngineLabel + ': ' + dbStatusLabel : 'DB: ' + dbStatusLabel }}</span>
+            <span v-if="dbStatus.latency" style="font-size: 0.72rem; color: #34d399; margin-left: 0.25rem;">({{ dbStatus.latency }}ms)</span>
           </div>
 
           <!-- Pending Admissions Notification Pill -->
@@ -353,7 +358,7 @@
                 Welcome back, <span class="text-gradient">{{ adminUser.name || 'Mr. Lakshman Singh Chauhan' }}</span>
               </h2>
               <p class="welcome-desc">
-                IT HUNT Academy Central Registry • Connected to MongoDB Atlas Cloud • Session Status: <strong>{{ sessionTime }}</strong>
+                IT HUNT Academy Central Registry • Connected to {{ dbEngineLabel }} ({{ dbStatus.name }}) • Database: <strong :style="{ color: dbStatusColor }">{{ dbStatusLabel }}</strong>
               </p>
             </div>
             <div class="welcome-card-actions">
@@ -419,7 +424,7 @@
               <div class="kpi-meta">
                 <span>Session 2026-27</span>
                 <span>•</span>
-                <span style="color: #38bdf8;">{{ content.internshipVenture?.tracks?.length || 5 }} Program Tracks</span>
+                <span style="color: #38bdf8;">{{ availableInternshipTracks.length }} Program Tracks</span>
               </div>
             </div>
 
@@ -514,12 +519,12 @@
             </div>
           </div>
 
-          <!-- MongoDB Atlas Live Connectivity & Document Counters Bar -->
-          <div class="overview-db-status-bar" style="margin-top: 1.5rem; margin-bottom: 1.5rem; padding: 1rem 1.25rem; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+          <!-- MongoDB Atlas Live Connectivity & Document Counters Bar (Dynamic From Server) -->
+          <div class="overview-db-status-bar" :style="{ background: dbStatusBg, borderColor: dbStatusBorder }" style="margin-top: 1.25rem; margin-bottom: 1.25rem; padding: 0.85rem 1.25rem; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
             <div style="display: flex; align-items: center; gap: 0.65rem;">
-              <span class="live-status-dot-emerald" style="width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981; display: inline-block;"></span>
-              <strong style="color: #10b981; font-size: 0.925rem;">MongoDB Atlas Cloud Live (ithunt)</strong>
-              <span style="font-size: 0.78rem; color: var(--text-dim);">• All Collections Synced</span>
+              <span :style="{ width: '10px', height: '10px', borderRadius: '50%', background: dbStatusColor, boxShadow: '0 0 10px ' + dbStatusColor, display: 'inline-block' }"></span>
+              <strong :style="{ color: dbStatusColor, fontSize: '0.925rem' }">{{ dbEngineLabel }} ({{ dbStatus.name }})</strong>
+              <span style="font-size: 0.78rem; color: var(--text-dim);">• {{ dbStatus.connected ? 'Cluster Live • All Collections Synced' : 'Connecting to Server...' }} <span v-if="dbStatus.latency" style="color: #38bdf8;">({{ dbStatus.latency }}ms ping)</span></span>
             </div>
             <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
               <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">📝 {{ admissionsList.length }} Admissions</span>
@@ -677,18 +682,24 @@
               <div class="system-health-list">
                 <div class="health-row">
                   <div class="health-label">
-                    <span class="health-dot-green"></span>
+                    <span :style="{ width: '8px', height: '8px', borderRadius: '50%', background: dbStatusColor, display: 'inline-block' }"></span>
                     <span>Database Engine</span>
                   </div>
-                  <div class="health-value">MongoDB Atlas Cloud (ithunt)</div>
+                  <div class="health-value">
+                    {{ dbEngineLabel }} ({{ dbStatus.name }})
+                    <span :style="{ color: dbStatusColor, marginLeft: '0.35rem', fontSize: '0.76rem' }">● {{ dbStatusLabel }}</span>
+                  </div>
                 </div>
 
                 <div class="health-row">
                   <div class="health-label">
-                    <span class="health-dot-green"></span>
+                    <span :class="dbStatus.connected ? 'health-dot-green' : 'health-dot-amber'"></span>
                     <span>REST API Service</span>
                   </div>
-                  <div class="health-value">Online • v2.2.2-atlas</div>
+                  <div class="health-value">
+                    {{ dbStatus.connected ? 'Online' : 'Standby' }} • v2.2.2-atlas
+                    <span v-if="dbStatus.latency" style="color: #38bdf8; margin-left: 0.35rem; font-size: 0.76rem;">({{ dbStatus.latency }}ms)</span>
+                  </div>
                 </div>
 
                 <div class="health-row">
@@ -1582,7 +1593,7 @@
       </div>
 
       <div class="admin-grid-2col">
-        <div class="modern-track-card" v-for="track in content.internshipVenture?.tracks" :key="track.id">
+        <div class="modern-track-card" v-for="track in availableInternshipTracks" :key="track.id">
           <div class="track-card-header">
             <div class="track-icon-bubble" v-html="track.icon"></div>
             <div class="track-meta-pills">
@@ -2284,7 +2295,7 @@
             </div>
             <div class="config-row">
               <span class="config-key">DATABASE:</span>
-              <span class="config-val" style="color: #10b981; font-weight: 700;">MongoDB (ithunt) ✅</span>
+              <span class="config-val" :style="{ color: dbStatusColor, fontWeight: '700' }">{{ dbEngineLabel }} ({{ dbStatus.name }}) • {{ dbStatusLabel }} ✅</span>
             </div>
             <div class="config-row">
               <span class="config-key">ACCREDITATION:</span>
@@ -4599,6 +4610,62 @@ const nielitSearch = ref('');
 const nielitStatusFilter = ref('all');
 const sessionTime = ref('Active Now');
 
+// --- DYNAMIC DATABASE ENGINE & SERVER CONNECTIVITY (MONGODB) ---
+const dbStatus = ref({
+  connected: false,
+  name: 'ithunt',
+  engine: 'MongoDB Atlas Cloud',
+  mode: 'Standby',
+  latency: 0,
+  lastChecked: ''
+});
+
+const dbStatusLabel = computed(() => dbStatus.value.connected ? 'Online' : 'Standby');
+const dbEngineLabel = computed(() => dbStatus.value.engine || 'MongoDB Atlas Cloud');
+const dbStatusClass = computed(() => dbStatus.value.connected ? 'db-online' : 'db-disconnected');
+const dbStatusColor = computed(() => dbStatus.value.connected ? '#10b981' : '#f59e0b');
+const dbStatusBg = computed(() => dbStatus.value.connected ? 'rgba(16, 185, 129, 0.08)' : 'rgba(245, 158, 11, 0.08)');
+const dbStatusBorder = computed(() => dbStatus.value.connected ? 'rgba(16, 185, 129, 0.25)' : 'rgba(245, 158, 11, 0.3)');
+const dbStatusTitle = computed(() => dbStatus.value.connected 
+  ? `Connected to ${dbStatus.value.engine} (${dbStatus.value.name}) • Latency: ${dbStatus.value.latency}ms` 
+  : `Database connecting (${dbStatus.value.name})`
+);
+
+const refreshDatabaseStatus = async () => {
+  const start = performance.now();
+  try {
+    const health = await API.getHealth();
+    const db = health?.database;
+    const latency = Math.round(performance.now() - start);
+    if (db) {
+      dbStatus.value = {
+        connected: db.connected === true,
+        name: db.name || 'ithunt',
+        engine: db.type || (db.connected ? 'MongoDB Atlas Cloud' : 'MongoDB'),
+        mode: db.mode || (db.connected ? 'Online' : 'Standby'),
+        latency,
+        lastChecked: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      };
+    } else {
+      dbStatus.value = {
+        ...dbStatus.value,
+        connected: false,
+        mode: 'Standby',
+        latency,
+        lastChecked: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      };
+    }
+  } catch (err) {
+    dbStatus.value = {
+      ...dbStatus.value,
+      connected: false,
+      mode: 'Standby',
+      latency: Math.round(performance.now() - start),
+      lastChecked: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    };
+  }
+};
+
 const featureAdmissionPortal = ref(true);
 const featureCareersPortal = ref(true);
 const featureCosmicStarfield = ref(true);
@@ -4648,6 +4715,36 @@ const eventsCatalogList = ref(props.allEventsCatalog && props.allEventsCatalog.l
 watch(() => props.allEventsCatalog, (val) => {
   if (val && val.length > 0) eventsCatalogList.value = val;
 }, { immediate: true, deep: true });
+
+const availableInternshipTracks = computed(() => {
+  const contentTracks = props.content?.internshipVenture?.tracks || [];
+  if (contentTracks.length > 0) {
+    return contentTracks.map((t, idx) => ({
+      id: t.id || `track-${idx}`,
+      icon: t.icon || '🚀',
+      duration: t.duration || '6 Months',
+      badge: t.badge || 'Industry Venture',
+      title: t.title || 'Tech Internship',
+      description: t.description || 'Hands-on practical development with real-world deployments.',
+      earningPotential: t.earningPotential || { fresher: '₹4.5 - ₹7.5 LPA' },
+      jobPlacementRate: t.jobPlacementRate || { percentage: 95 },
+      learningHours: t.learningHours || { totalHours: '180+ Hrs' },
+      liveProjects: t.liveProjects || [{ name: 'Enterprise Portal' }, { name: 'Cloud API Service' }]
+    }));
+  }
+  return (coursesList.value || []).map((c, idx) => ({
+    id: c.id || `track-${idx}`,
+    icon: c.icon || '💻',
+    duration: c.duration || '6 Months',
+    badge: c.category || 'Diploma Track',
+    title: c.title || c.name || 'Full Stack Track',
+    description: c.description || 'Comprehensive industry curriculum and live lab training.',
+    earningPotential: { fresher: '₹4.0 - ₹7.0 LPA' },
+    jobPlacementRate: { percentage: 92 },
+    learningHours: { totalHours: '160+ Hrs' },
+    liveProjects: [{ name: `${c.title || 'Full Stack'} Capstone` }]
+  }));
+});
 
 // --- ENTERPRISE EXECUTIVE OVERVIEW COMPUTED PROPERTIES ---
 const overviewAdmissionFilter = ref('all');
@@ -4718,7 +4815,7 @@ watch(globalAdminSearch, (val) => {
 });
 
 watch(() => props.allCourses, (val) => {
-  coursesList.value = (val && val.length > 0) ? val : (props.content.coursesSection?.coursesList || []);
+  if (val && val.length > 0) coursesList.value = val;
 }, { immediate: true, deep: true });
 
 const showAddCourseModal = ref(false);
@@ -5798,6 +5895,7 @@ const refreshAllData = async () => {
   isRefreshing.value = true;
   try {
     emit('refresh-data');
+    refreshDatabaseStatus();
     const results = await Promise.allSettled([
       fetchAdmissionsFromBackend(),
       fetchStudentsFromBackend(),
@@ -6395,6 +6493,7 @@ const handleDeleteCertificate = async (cert) => {
 
 onMounted(() => {
   sessionTime.value = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  refreshDatabaseStatus();
   refreshAllData();
 
   // Live polling every 12 seconds so SuperAdmin gets new candidate registrations in real-time
@@ -8954,27 +9053,52 @@ label {
 }
 
 /* ==========================================================================
-   COMPREHENSIVE RESPONSIVE STYLES FOR SUPERADMIN
+   COMPREHENSIVE RESPONSIVE STYLES & SPACE MANAGEMENT FOR SUPERADMIN
    ========================================================================== */
-@media (max-width: 1200px) {
+.admin-shell {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.admin-main-canvas {
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+@media (max-width: 1400px) {
   .overview-kpi-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
     gap: 1rem !important;
   }
-
-  .launchpad-grid {
-    grid-template-columns: repeat(3, 1fr) !important;
-  }
-
   .overview-dual-grid {
     grid-template-columns: 1fr !important;
     gap: 1.25rem !important;
   }
 }
 
+@media (max-width: 1200px) {
+  .launchpad-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+  .admin-grid-2col {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+}
+
 @media (max-width: 960px) {
   .admin-mobile-toggle {
     display: flex !important;
+    align-items: center;
+    justify-content: center;
   }
 
   .admin-sidebar {
@@ -9001,8 +9125,8 @@ label {
   }
 
   .admin-top-command-bar {
-    padding: 0.75rem 1rem !important;
-    gap: 0.75rem !important;
+    padding: 0.65rem 1rem !important;
+    gap: 0.65rem !important;
   }
 
   .command-bar-search,
@@ -9010,15 +9134,29 @@ label {
     order: 3;
     width: 100% !important;
     max-width: 100% !important;
-    margin-top: 0.25rem;
+    margin-top: 0.35rem;
   }
 
   .command-bar-left {
     flex: 1;
+    min-width: 0;
+  }
+
+  .command-bar-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
   }
 
   .cloud-status-chip {
-    display: none !important;
+    display: flex !important;
+    padding: 0.25rem 0.55rem !important;
+    font-size: 0.72rem !important;
+    border-radius: 20px;
+    align-items: center;
+    gap: 0.35rem;
   }
 
   .admin-tab-panel,
@@ -9038,26 +9176,30 @@ label {
   .welcome-card-actions {
     width: 100% !important;
     display: flex !important;
-    flex-direction: column !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
     gap: 0.5rem !important;
   }
 
   .welcome-cta-btn,
   .welcome-secondary-btn {
-    width: 100% !important;
+    flex: 1 !important;
+    min-width: 140px;
     text-align: center !important;
     justify-content: center !important;
   }
 
   .overview-urgent-banner {
-    padding: 1rem !important;
+    padding: 0.85rem 1rem !important;
     flex-direction: column !important;
     align-items: flex-start !important;
+    gap: 0.75rem !important;
   }
 
-  .banner-action-btn {
+  .banner-action-btn,
+  .urgent-banner-cta {
     width: 100% !important;
-    margin-top: 0.5rem;
+    justify-content: center !important;
   }
 
   .launchpad-grid {
@@ -9068,11 +9210,14 @@ label {
   .panel-header-controls {
     flex-direction: column !important;
     align-items: flex-start !important;
-    gap: 1rem !important;
+    gap: 0.85rem !important;
   }
 
   .panel-filter-group {
     width: 100% !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
   }
 
   .panel-filter-group input,
@@ -9080,25 +9225,38 @@ label {
   .admin-select-filter,
   .admin-search-input {
     width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-overlay {
+    padding: 0.75rem !important;
+    align-items: center !important;
   }
 
   .modal-card {
-    width: 95vw !important;
+    width: 100% !important;
     max-width: 95vw !important;
-    margin: 0.5rem auto !important;
-    padding: 1rem !important;
+    max-height: 90vh !important;
+    margin: auto !important;
+    border-radius: 14px !important;
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .overview-kpi-grid {
     grid-template-columns: 1fr !important;
-    gap: 0.85rem !important;
+    gap: 0.75rem !important;
   }
 
   .launchpad-grid {
     grid-template-columns: 1fr !important;
-    gap: 0.75rem !important;
+    gap: 0.65rem !important;
   }
 
   .queue-item {
@@ -9111,20 +9269,72 @@ label {
     width: 100% !important;
     display: flex !important;
     justify-content: flex-end !important;
-  }
-
-  .command-bar-right {
+    flex-wrap: wrap !important;
     gap: 0.35rem !important;
   }
 
-  .command-secondary-btn span,
-  .command-primary-btn span {
-    font-size: 0.75rem !important;
+  .admin-tab-panel {
+    padding: 0.75rem 0.5rem 2rem !important;
+  }
+
+  .admin-table-card {
+    border-radius: 8px !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .admin-data-table th,
+  .admin-data-table td {
+    padding: 0.65rem 0.6rem !important;
+    font-size: 0.78rem !important;
+    white-space: nowrap !important;
+  }
+
+  .command-bar-right {
+    gap: 0.25rem !important;
+  }
+
+  .command-primary-btn,
+  .command-secondary-btn {
+    padding: 0.3rem 0.55rem !important;
+    font-size: 0.74rem !important;
   }
 
   .command-alert-pill {
-    padding: 0.35rem 0.6rem !important;
-    font-size: 0.7rem !important;
+    padding: 0.3rem 0.5rem !important;
+    font-size: 0.68rem !important;
+  }
+
+  .breadcrumb-root,
+  .breadcrumb-sep {
+    display: none !important;
+  }
+
+  .breadcrumb-current {
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+  }
+
+  .overview-db-status-bar {
+    padding: 0.75rem 0.85rem !important;
+    gap: 0.5rem !important;
+  }
+
+  .modal-card {
+    max-width: 98vw !important;
+    max-height: 94vh !important;
+    padding: 0 !important;
+  }
+
+  .modal-header {
+    padding: 0.75rem 1rem !important;
+  }
+
+  .modal-body {
+    padding: 0.85rem 1rem !important;
+  }
+
+  .modal-footer {
+    padding: 0.75rem 1rem !important;
   }
 }
 </style>
