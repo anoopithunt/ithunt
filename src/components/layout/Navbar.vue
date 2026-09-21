@@ -87,14 +87,17 @@
       </div>
     </div>
 
-    <!-- Mobile Backdrop Overlay — closes sidebar on outside tap -->
-    <div 
-      class="mobile-nav-backdrop" 
-      :class="{ open: isMobileNavOpen }" 
-      @click="closeMobileNav"
-      @touchmove.prevent
-      aria-hidden="true"
-    ></div>
+    <!-- Teleport Mobile Drawer & Backdrop directly to body for true viewport stacking and full-screen outside click detection -->
+    <Teleport to="body">
+      <!-- Mobile Backdrop Overlay — closes sidebar on outside tap -->
+      <div 
+        class="mobile-nav-backdrop" 
+        :class="{ open: isMobileNavOpen }" 
+        @click="closeMobileNav"
+        @touchstart.passive="closeMobileNav"
+        @touchmove.prevent
+        aria-hidden="true"
+      ></div>
 
     <!-- Mobile Off-Canvas Navigation Sidebar (Side Menu) -->
     <aside 
@@ -365,6 +368,7 @@
         </div>
       </div>
     </aside>
+    </Teleport>
   </header>
 </template>
 
@@ -514,6 +518,8 @@ const unlockBodyScroll = () => {
   document.body.style.overflow = '';
   document.body.style.overscrollBehavior = '';
 
+  document.removeEventListener('click', handleOutsideClick, true);
+  document.removeEventListener('touchstart', handleOutsideClick, { capture: true });
   window.removeEventListener('touchstart', handleTouchStart);
   window.removeEventListener('touchmove', handleTouchMove);
   window.removeEventListener('wheel', handleWheel);
@@ -521,11 +527,31 @@ const unlockBodyScroll = () => {
   window.scrollTo(0, scrollYToRestore);
 };
 
+const handleOutsideClick = (e) => {
+  if (!isMobileNavOpen.value) return;
+  // If clicked inside the mobile sidebar drawer, do not close
+  if (e.target && e.target.closest && e.target.closest('.mobile-nav-sidebar')) {
+    return;
+  }
+  // If clicked the mobile toggle button, toggle button has its own handler
+  if (e.target && e.target.closest && e.target.closest('.mobile-toggle-btn')) {
+    return;
+  }
+  // Outside click detected -> close the side menu
+  closeMobileNav();
+};
+
 watch(isMobileNavOpen, (isOpen) => {
   if (isOpen) {
     lockBodyScroll();
+    setTimeout(() => {
+      document.addEventListener('click', handleOutsideClick, true);
+      document.addEventListener('touchstart', handleOutsideClick, { passive: true, capture: true });
+    }, 50);
   } else {
     unlockBodyScroll();
+    document.removeEventListener('click', handleOutsideClick, true);
+    document.removeEventListener('touchstart', handleOutsideClick, { capture: true });
   }
 });
 
@@ -556,6 +582,8 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('scroll', handleNavScroll);
   window.removeEventListener('keydown', handleKeyDown);
+  document.removeEventListener('click', handleOutsideClick, true);
+  document.removeEventListener('touchstart', handleOutsideClick, { capture: true });
   unlockBodyScroll();
 });
 
