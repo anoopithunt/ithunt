@@ -8204,6 +8204,28 @@ body.light-theme .toast-item {
   visibility: visible;
 }
 
+/* --- Mobile Nav Locked State (Total Page Scroll Freeze) --- */
+html.mobile-nav-locked,
+body.mobile-nav-locked {
+  overflow: hidden !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  touch-action: none !important;
+  -webkit-overflow-scrolling: auto !important;
+  overscroll-behavior: none !important;
+}
+
+.mobile-nav-sidebar {
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
+.sidebar-nav-body {
+  touch-action: pan-y !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* --- Enhanced Card Hover Spring Physics --- */
 .course-card,
 .team-card,

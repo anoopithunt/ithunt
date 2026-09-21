@@ -418,20 +418,114 @@ const closeMobileNav = () => {
   isMobileNavOpen.value = false;
 };
 
-const preventNavBodyScroll = (e) => {
-  if (e.target && e.target.closest && e.target.closest('.sidebar-nav-body')) {
+let savedScrollY = 0;
+let isScrollLocked = false;
+let touchStartY = 0;
+
+const handleTouchStart = (e) => {
+  if (e.touches && e.touches.length > 0) {
+    touchStartY = e.touches[0].clientY;
+  }
+};
+
+const handleTouchMove = (e) => {
+  if (!isMobileNavOpen.value) return;
+
+  const scrollable = e.target && e.target.closest ? e.target.closest('.sidebar-nav-body') : null;
+  if (!scrollable) {
+    if (e.cancelable) e.preventDefault();
     return;
   }
-  e.preventDefault();
+
+  const touchY = e.touches && e.touches[0] ? e.touches[0].clientY : 0;
+  const isDraggingDown = touchY > touchStartY;
+  const isDraggingUp = touchY < touchStartY;
+
+  const atTop = scrollable.scrollTop <= 0;
+  const atBottom = Math.ceil(scrollable.scrollTop + scrollable.clientHeight) >= scrollable.scrollHeight;
+
+  if ((atTop && isDraggingDown) || (atBottom && isDraggingUp)) {
+    if (e.cancelable) e.preventDefault();
+  }
+};
+
+const handleWheel = (e) => {
+  if (!isMobileNavOpen.value) return;
+
+  const scrollable = e.target && e.target.closest ? e.target.closest('.sidebar-nav-body') : null;
+  if (!scrollable) {
+    if (e.cancelable) e.preventDefault();
+    return;
+  }
+
+  const isScrollingUp = e.deltaY < 0;
+  const isScrollingDown = e.deltaY > 0;
+
+  const atTop = scrollable.scrollTop <= 0;
+  const atBottom = Math.ceil(scrollable.scrollTop + scrollable.clientHeight) >= scrollable.scrollHeight;
+
+  if ((atTop && isScrollingUp) || (atBottom && isScrollingDown)) {
+    if (e.cancelable) e.preventDefault();
+  }
+};
+
+const lockBodyScroll = () => {
+  if (typeof window === 'undefined' || typeof document === 'undefined' || isScrollLocked) return;
+  
+  savedScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+  isScrollLocked = true;
+
+  document.documentElement.classList.add('mobile-nav-locked');
+  document.body.classList.add('mobile-nav-locked');
+
+  document.documentElement.style.overflow = 'hidden';
+  document.documentElement.style.overscrollBehavior = 'none';
+
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${savedScrollY}px`;
+  document.body.style.left = '0';
+  document.body.style.right = '0';
+  document.body.style.width = '100%';
+  document.body.style.overflow = 'hidden';
+  document.body.style.overscrollBehavior = 'none';
+
+  window.addEventListener('touchstart', handleTouchStart, { passive: true });
+  window.addEventListener('touchmove', handleTouchMove, { passive: false });
+  window.addEventListener('wheel', handleWheel, { passive: false });
+};
+
+const unlockBodyScroll = () => {
+  if (typeof window === 'undefined' || typeof document === 'undefined' || !isScrollLocked) return;
+  
+  const scrollYToRestore = savedScrollY;
+  isScrollLocked = false;
+
+  document.documentElement.classList.remove('mobile-nav-locked');
+  document.body.classList.remove('mobile-nav-locked');
+
+  document.documentElement.style.overflow = '';
+  document.documentElement.style.overscrollBehavior = '';
+
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.left = '';
+  document.body.style.right = '';
+  document.body.style.width = '';
+  document.body.style.overflow = '';
+  document.body.style.overscrollBehavior = '';
+
+  window.removeEventListener('touchstart', handleTouchStart);
+  window.removeEventListener('touchmove', handleTouchMove);
+  window.removeEventListener('wheel', handleWheel);
+
+  window.scrollTo(0, scrollYToRestore);
 };
 
 watch(isMobileNavOpen, (isOpen) => {
-  if (typeof window !== 'undefined') {
-    if (isOpen) {
-      window.addEventListener('touchmove', preventNavBodyScroll, { passive: false });
-    } else {
-      window.removeEventListener('touchmove', preventNavBodyScroll);
-    }
+  if (isOpen) {
+    lockBodyScroll();
+  } else {
+    unlockBodyScroll();
   }
 });
 
@@ -442,6 +536,14 @@ const handleNavScroll = () => {
 const handleKeyDown = (e) => {
   if (e.key === 'Escape' && isMobileNavOpen.value) {
     closeMobileNav();
+    return;
+  }
+  if (!isMobileNavOpen.value) return;
+  if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(e.key)) {
+    const scrollable = e.target && e.target.closest ? e.target.closest('.sidebar-nav-body') : null;
+    if (!scrollable) {
+      e.preventDefault();
+    }
   }
 };
 
@@ -454,9 +556,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('scroll', handleNavScroll);
   window.removeEventListener('keydown', handleKeyDown);
-  if (typeof window !== 'undefined') {
-    window.removeEventListener('touchmove', preventNavBodyScroll);
-  }
+  unlockBodyScroll();
 });
 
 const onImgError = (event) => {

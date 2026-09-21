@@ -4411,20 +4411,112 @@ const updateAdminHeaderHeight = () => {
   }
 };
 
-const preventBackgroundScroll = (e) => {
-  if (e.target && e.target.closest && e.target.closest('.sidebar-nav-scroll')) {
-    return; // Allow smooth scrolling within the drawer nav list
+let savedAdminScrollY = 0;
+let isAdminScrollLocked = false;
+let adminTouchStartY = 0;
+
+const handleAdminTouchStart = (e) => {
+  if (e.touches && e.touches.length > 0) {
+    adminTouchStartY = e.touches[0].clientY;
   }
-  e.preventDefault();
+};
+
+const handleAdminTouchMove = (e) => {
+  if (!isMobileSidebarOpen.value) return;
+
+  const scrollable = e.target && e.target.closest ? e.target.closest('.sidebar-nav-scroll') : null;
+  if (!scrollable) {
+    if (e.cancelable) e.preventDefault();
+    return;
+  }
+
+  const touchY = e.touches && e.touches[0] ? e.touches[0].clientY : 0;
+  const isDraggingDown = touchY > adminTouchStartY;
+  const isDraggingUp = touchY < adminTouchStartY;
+
+  const atTop = scrollable.scrollTop <= 0;
+  const atBottom = Math.ceil(scrollable.scrollTop + scrollable.clientHeight) >= scrollable.scrollHeight;
+
+  if ((atTop && isDraggingDown) || (atBottom && isDraggingUp)) {
+    if (e.cancelable) e.preventDefault();
+  }
+};
+
+const handleAdminWheel = (e) => {
+  if (!isMobileSidebarOpen.value) return;
+
+  const scrollable = e.target && e.target.closest ? e.target.closest('.sidebar-nav-scroll') : null;
+  if (!scrollable) {
+    if (e.cancelable) e.preventDefault();
+    return;
+  }
+
+  const isScrollingUp = e.deltaY < 0;
+  const isScrollingDown = e.deltaY > 0;
+
+  const atTop = scrollable.scrollTop <= 0;
+  const atBottom = Math.ceil(scrollable.scrollTop + scrollable.clientHeight) >= scrollable.scrollHeight;
+
+  if ((atTop && isScrollingUp) || (atBottom && isScrollingDown)) {
+    if (e.cancelable) e.preventDefault();
+  }
+};
+
+const lockAdminScroll = () => {
+  if (typeof window === 'undefined' || typeof document === 'undefined' || isAdminScrollLocked) return;
+  savedAdminScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+  isAdminScrollLocked = true;
+
+  document.documentElement.classList.add('mobile-nav-locked');
+  document.body.classList.add('mobile-nav-locked');
+
+  document.documentElement.style.overflow = 'hidden';
+  document.documentElement.style.overscrollBehavior = 'none';
+
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${savedAdminScrollY}px`;
+  document.body.style.left = '0';
+  document.body.style.right = '0';
+  document.body.style.width = '100%';
+  document.body.style.overflow = 'hidden';
+  document.body.style.overscrollBehavior = 'none';
+
+  window.addEventListener('touchstart', handleAdminTouchStart, { passive: true });
+  window.addEventListener('touchmove', handleAdminTouchMove, { passive: false });
+  window.addEventListener('wheel', handleAdminWheel, { passive: false });
+};
+
+const unlockAdminScroll = () => {
+  if (typeof window === 'undefined' || typeof document === 'undefined' || !isAdminScrollLocked) return;
+  const scrollYToRestore = savedAdminScrollY;
+  isAdminScrollLocked = false;
+
+  document.documentElement.classList.remove('mobile-nav-locked');
+  document.body.classList.remove('mobile-nav-locked');
+
+  document.documentElement.style.overflow = '';
+  document.documentElement.style.overscrollBehavior = '';
+
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.left = '';
+  document.body.style.right = '';
+  document.body.style.width = '';
+  document.body.style.overflow = '';
+  document.body.style.overscrollBehavior = '';
+
+  window.removeEventListener('touchstart', handleAdminTouchStart);
+  window.removeEventListener('touchmove', handleAdminTouchMove);
+  window.removeEventListener('wheel', handleAdminWheel);
+
+  window.scrollTo(0, scrollYToRestore);
 };
 
 watch(isMobileSidebarOpen, (isOpen) => {
-  if (typeof window !== 'undefined') {
-    if (isOpen) {
-      window.addEventListener('touchmove', preventBackgroundScroll, { passive: false });
-    } else {
-      window.removeEventListener('touchmove', preventBackgroundScroll);
-    }
+  if (isOpen) {
+    lockAdminScroll();
+  } else {
+    unlockAdminScroll();
   }
 });
 const globalAdminSearch = ref('');
@@ -6567,8 +6659,8 @@ onUnmounted(() => {
   }
   if (typeof window !== 'undefined') {
     window.removeEventListener('resize', updateAdminHeaderHeight);
-    window.removeEventListener('touchmove', preventBackgroundScroll);
   }
+  unlockAdminScroll();
 });
 </script>
 
