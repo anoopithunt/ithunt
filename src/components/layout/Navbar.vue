@@ -411,16 +411,10 @@ const isScrolled = ref(false);
 
 const toggleMobileNav = () => {
   isMobileNavOpen.value = !isMobileNavOpen.value;
-  if (typeof document !== 'undefined') {
-    document.body.style.overflow = isMobileNavOpen.value ? 'hidden' : '';
-  }
 };
 
 const closeMobileNav = () => {
   isMobileNavOpen.value = false;
-  if (typeof document !== 'undefined') {
-    document.body.style.overflow = '';
-  }
 };
 
 const handleNavScroll = () => {
