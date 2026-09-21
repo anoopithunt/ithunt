@@ -36,20 +36,15 @@
           <span>{{ isDarkMode ? '☀️' : '🌙' }}</span>
         </button>
         
-        <!-- Quick Apply CTA -->
-        <button class="cta-btn-header" @click="$emit('open-nielit-modal')">
-          <span>{{ content.navbar?.applyCtaText || 'Apply NIELIT Project' }}</span> {{ content.navbar?.applyCtaIcon || '✨' }}
-        </button>
-
         <!-- Unified Single Login / Portal Button (Desktop) -->
         <button 
           v-if="isAdminLoggedIn"
           class="cta-btn-header nav-action-desktop" 
-          style="background: linear-gradient(135deg, #10b981, #059669); border-color: #34d399; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);"
+          :style="isTeacher ? 'background: linear-gradient(135deg, #0284c7, #0369a1); border-color: #38bdf8; box-shadow: 0 0 15px rgba(2, 132, 199, 0.4);' : 'background: linear-gradient(135deg, #10b981, #059669); border-color: #34d399; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);'"
           @click="$emit('set-tab', 'superadmin')"
-          :title="'SuperAdmin Console Logged In'"
+          :title="isTeacher ? 'Teacher / Faculty Console Logged In' : 'SuperAdmin Console Logged In'"
         >
-          <span>⚡ SuperAdmin</span>
+          <span>{{ isTeacher ? '👨‍🏫 Teacher Console' : '⚡ SuperAdmin' }}</span>
         </button>
         <button 
           v-else-if="studentUser"
@@ -65,7 +60,7 @@
           class="theme-toggle-btn nav-action-desktop" 
           style="width: auto; padding: 0.45rem 1.15rem; border-radius: var(--radius-full); font-size: 0.85rem; font-weight: 700; border-color: rgba(249, 115, 22, 0.4); color: var(--color-ai-yellow);"
           @click="$emit('set-tab', 'login')"
-          title="Login to Student or Admin Portal"
+          title="Sign in to your account"
         >
           <span>🔐 Login</span>
         </button>
@@ -297,8 +292,8 @@
                 :class="{ active: activeTab === 'superadmin' }"
                 @click="$emit('set-tab', 'superadmin'); closeMobileNav();"
               >
-                <span class="sidebar-item-icon">⚡</span>
-                <span class="sidebar-item-label">SuperAdmin Dashboard</span>
+                <span class="sidebar-item-icon">{{ isTeacher ? '👨‍🏫' : '⚡' }}</span>
+                <span class="sidebar-item-label">{{ isTeacher ? 'Teacher Console' : 'SuperAdmin Dashboard' }}</span>
               </button>
             </li>
             <li v-if="studentUser">
@@ -324,7 +319,7 @@
           </ul>
         </div>
 
-        <!-- NIELIT Apply CTA Button -->
+        <!-- NIELIT Apply CTA Button (Mobile Sidebar) -->
         <div class="sidebar-cta-wrap">
           <button 
             class="sidebar-cta-btn" 
@@ -373,9 +368,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 
-defineProps({
+const props = defineProps({
   content: {
     type: Object,
     required: true
@@ -395,7 +390,18 @@ defineProps({
   isAdminLoggedIn: {
     type: Boolean,
     default: false
+  },
+  adminUser: {
+    type: Object,
+    default: () => ({})
   }
+});
+
+const isTeacher = computed(() => {
+  const roleType = props.adminUser?.roleType || '';
+  const role = props.adminUser?.role || '';
+  return roleType === 'teacher' || roleType === 'faculty' || 
+         role.toLowerCase().includes('teacher') || role.toLowerCase().includes('faculty');
 });
 
 defineEmits(['set-tab', 'toggle-theme', 'open-nielit-modal']);
