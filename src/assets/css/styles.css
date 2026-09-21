@@ -204,8 +204,6 @@ button, input, select, textarea {
   align-items: center;
   justify-content: space-between;
   height: var(--navbar-height, 72px);
-  position: relative;
-  z-index: 2001;
 }
 
 .brand-logo {
@@ -358,14 +356,14 @@ body.light-theme .nav-item-btn:hover {
   width: min(350px, 86vw);
   height: 100dvh;
   max-height: 100dvh;
-  background: rgba(11, 15, 25, 0.97);
+  background: #0b0f19;
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
   border-left: 1px solid var(--border-cyber);
   box-shadow: -15px 0 50px rgba(0, 0, 0, 0.75);
   display: flex;
   flex-direction: column;
-  z-index: 2000;
+  z-index: 99999;
   transform: translateX(105%);
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
@@ -381,7 +379,7 @@ body.light-theme .nav-item-btn:hover {
 }
 
 body.light-theme .mobile-nav-sidebar {
-  background: rgba(255, 255, 255, 0.98);
+  background: #ffffff !important;
   border-left: 1px solid rgba(15, 23, 42, 0.12);
   box-shadow: -15px 0 50px rgba(15, 23, 42, 0.15);
 }
@@ -400,7 +398,7 @@ body.light-theme .mobile-nav-sidebar {
 
 body.light-theme .sidebar-header {
   border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  background: rgba(15, 23, 42, 0.02);
+  background: #ffffff !important;
 }
 
 .sidebar-brand {
@@ -8191,7 +8189,7 @@ body.light-theme .toast-item {
   background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  z-index: 1999;
+  z-index: 99998;
   opacity: 0;
   pointer-events: none;
   visibility: hidden;

@@ -92,6 +92,7 @@
       class="mobile-nav-backdrop" 
       :class="{ open: isMobileNavOpen }" 
       @click="closeMobileNav"
+      @touchmove.prevent
       aria-hidden="true"
     ></div>
 
@@ -368,7 +369,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 
 const props = defineProps({
   content: {
@@ -417,6 +418,23 @@ const closeMobileNav = () => {
   isMobileNavOpen.value = false;
 };
 
+const preventNavBodyScroll = (e) => {
+  if (e.target && e.target.closest && e.target.closest('.sidebar-nav-body')) {
+    return;
+  }
+  e.preventDefault();
+};
+
+watch(isMobileNavOpen, (isOpen) => {
+  if (typeof window !== 'undefined') {
+    if (isOpen) {
+      window.addEventListener('touchmove', preventNavBodyScroll, { passive: false });
+    } else {
+      window.removeEventListener('touchmove', preventNavBodyScroll);
+    }
+  }
+});
+
 const handleNavScroll = () => {
   isScrolled.value = window.scrollY > 20;
 };
@@ -436,8 +454,8 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('scroll', handleNavScroll);
   window.removeEventListener('keydown', handleKeyDown);
-  if (typeof document !== 'undefined') {
-    document.body.style.overflow = '';
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('touchmove', preventNavBodyScroll);
   }
 });
 
