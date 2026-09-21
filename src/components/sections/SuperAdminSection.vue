@@ -2733,7 +2733,14 @@
               </div>
               <div class="form-group">
                 <label class="form-label">Fee Paid / UTR</label>
-                <input type="text" v-model="newNielitForm.utrNumber" class="form-control" placeholder="UTR Number or UPI Reference">
+                <input 
+                  type="text" 
+                  v-model="newNielitForm.utrNumber" 
+                  @input="newNielitForm.utrNumber = ($event.target.value || '').toUpperCase()"
+                  class="form-control font-mono" 
+                  placeholder="UTR Number or UPI Reference"
+                  style="text-transform: uppercase;"
+                >
               </div>
             </div>
 
@@ -2878,7 +2885,15 @@
               </div>
               <div class="form-group">
                 <label class="form-label">Transaction / UTR Number <span class="req">*</span></label>
-                <input type="text" v-model="editNielitForm.utrNumber" required class="form-control" placeholder="e.g. UTR123456789">
+                <input 
+                  type="text" 
+                  v-model="editNielitForm.utrNumber" 
+                  @input="editNielitForm.utrNumber = ($event.target.value || '').toUpperCase()"
+                  required 
+                  class="form-control font-mono" 
+                  placeholder="e.g. UTR123456789"
+                  style="text-transform: uppercase;"
+                >
               </div>
               <div class="form-group">
                 <label class="form-label">District / City</label>
@@ -5328,6 +5343,10 @@ const openEditNielitModal = (p) => {
 
 const handleSaveEditedProject = async () => {
   const updatedData = { ...editNielitForm.value };
+  if (updatedData.utrNumber) {
+    updatedData.utrNumber = updatedData.utrNumber.trim().toUpperCase();
+    updatedData.utrNo = updatedData.utrNumber;
+  }
   const targetId = updatedData.registrationNo || updatedData.nielitRegNo;
 
   // 1. Update local reactive state
@@ -6031,6 +6050,10 @@ const openAddNielitModal = () => {
 
 const handleSaveNewNielit = async () => {
   const p = { ...newNielitForm.value };
+  if (p.utrNumber) {
+    p.utrNumber = p.utrNumber.trim().toUpperCase();
+    p.utrNo = p.utrNumber;
+  }
   p.id = p.registrationNo;
   nielitProjectsList.value.unshift(p);
   emit('submit-nielit-project', p);
