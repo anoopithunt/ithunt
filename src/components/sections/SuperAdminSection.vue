@@ -5341,8 +5341,24 @@ const openEditNielitModal = (p) => {
   showEditNielitModal.value = true;
 };
 
+const toTitleCase = (val) => {
+  if (!val || typeof val !== 'string') return '';
+  return val.replace(/\b([a-zA-Z])([a-zA-Z0-9&/'-]*)\b/g, (match, first, rest) => {
+    const upper = match.toUpperCase();
+    if (['AI', 'ML', 'IT', 'MERN', 'MEAN', 'AWS', 'API', 'UI', 'UX', 'IOT', 'PHP', 'SQL', 'DBMS', 'MCA', 'BCA', 'NIELIT', 'PDF', 'QR', 'UP'].includes(upper)) {
+      return upper;
+    }
+    return first.toUpperCase() + rest.toLowerCase();
+  });
+};
+
 const handleSaveEditedProject = async () => {
   const updatedData = { ...editNielitForm.value };
+  if (updatedData.candidateName) updatedData.candidateName = toTitleCase(updatedData.candidateName);
+  if (updatedData.fatherName) updatedData.fatherName = toTitleCase(updatedData.fatherName);
+  if (updatedData.projectTitle) updatedData.projectTitle = toTitleCase(updatedData.projectTitle);
+  if (updatedData.district) updatedData.district = toTitleCase(updatedData.district);
+  if (updatedData.state) updatedData.state = toTitleCase(updatedData.state);
   if (updatedData.utrNumber) {
     updatedData.utrNumber = updatedData.utrNumber.trim().toUpperCase();
     updatedData.utrNo = updatedData.utrNumber;
@@ -6050,6 +6066,12 @@ const openAddNielitModal = () => {
 
 const handleSaveNewNielit = async () => {
   const p = { ...newNielitForm.value };
+  if (p.candidateName) p.candidateName = toTitleCase(p.candidateName);
+  if (p.fatherName) p.fatherName = toTitleCase(p.fatherName);
+  if (p.projectTitle) p.projectTitle = toTitleCase(p.projectTitle);
+  if (p.guideName) p.guideName = toTitleCase(p.guideName);
+  if (p.district) p.district = toTitleCase(p.district);
+  if (p.state) p.state = toTitleCase(p.state);
   if (p.utrNumber) {
     p.utrNumber = p.utrNumber.trim().toUpperCase();
     p.utrNo = p.utrNumber;

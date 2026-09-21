@@ -29,6 +29,17 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+function toTitleCase(val) {
+  if (!val || typeof val !== 'string') return '';
+  return val.replace(/\b([a-zA-Z])([a-zA-Z0-9&/'-]*)\b/g, (match, first, rest) => {
+    const upper = match.toUpperCase();
+    if (['AI', 'ML', 'IT', 'MERN', 'MEAN', 'AWS', 'API', 'UI', 'UX', 'IOT', 'PHP', 'SQL', 'DBMS', 'MCA', 'BCA', 'NIELIT', 'PDF', 'QR', 'UP'].includes(upper)) {
+      return upper;
+    }
+    return first.toUpperCase() + rest.toLowerCase();
+  });
+}
+
 /**
  * POST /api/nielit-projects
  * Saves record to DB, generates 4-page PDF and emails it with attachment.
@@ -37,7 +48,8 @@ router.post('/', async (req, res) => {
   try {
     const body = req.body || {};
     const regNo = String(body.nielitRegNo || body.registrationNo || body.regNo || `NIELIT-${Date.now()}`).trim();
-    const studentName = (body.studentName || body.candidateName || body.fullName || 'Candidate').trim();
+    const rawStudentName = (body.studentName || body.candidateName || body.fullName || 'Candidate').trim();
+    const studentName = toTitleCase(rawStudentName);
     const rawLevel = String(body.nielitLevel || body.level || 'O').trim();
     const cleanLevelCode = rawLevel.replace(/\s*Level/i, '').trim() || 'O';
     const cleanLevel = `${cleanLevelCode} Level`;
@@ -49,29 +61,29 @@ router.post('/', async (req, res) => {
       nielitRegNo: regNo,
       studentName,
       candidateName: studentName,
-      fatherName: body.fatherName || '—',
+      fatherName: toTitleCase(body.fatherName || '—'),
       email: (body.email || '').trim(),
       mobile: body.mobile || body.phone || '+91 9795771806',
       level: cleanLevel,
       nielitLevel: cleanLevelCode,
-      projectTitle: body.projectTitle || body.title || 'MERN Stack Web Development',
-      guideName: body.guideName || 'Mr. Sushil Kumar',
+      projectTitle: toTitleCase(body.projectTitle || body.title || 'MERN Stack Web Development'),
+      guideName: toTitleCase(body.guideName || 'Mr. Sushil Kumar'),
       guideQualification: body.guideQualification || 'MCA (Computer Science)',
       guideDesignation: body.guideDesignation || 'Laravel/NodeJS Developer',
-      guidePlace: body.guidePlace || 'Prayagraj',
-      guideAddress: body.guideAddress || 'Holagarh, Prayagraj, UP',
+      guidePlace: toTitleCase(body.guidePlace || 'Prayagraj'),
+      guideAddress: toTitleCase(body.guideAddress || 'Holagarh, Prayagraj, UP'),
       status: body.status || 'Submitted',
       feePaid: body.feePaid || (body.amount ? `₹${body.amount}` : '₹1,000'),
       amount: String(body.amount || body.feePaid || '1000').replace(/[^0-9]/g, '') || '1000',
       utrNo: String(body.utrNo || body.utrNumber || 'UPI/Verified').trim().toUpperCase(),
       utrNumber: String(body.utrNumber || body.utrNo || 'UPI/Verified').trim().toUpperCase(),
-      accountHolderName: body.accountHolderName || studentName,
+      accountHolderName: toTitleCase(body.accountHolderName || studentName),
       paymentRemark: 'Paid',
       projectDate: body.projectDate || body.date || new Date().toISOString(),
       paymentDate: body.paymentDate || body.date || new Date().toISOString(),
-      address: body.address || 'Holagarh',
-      district: body.district || 'Prayagraj',
-      state: body.state || 'Uttar Pradesh',
+      address: toTitleCase(body.address || 'Holagarh'),
+      district: toTitleCase(body.district || 'Prayagraj'),
+      state: toTitleCase(body.state || 'Uttar Pradesh'),
       pin: body.pin || '212503',
       date: body.date || new Date().toLocaleDateString('en-GB'),
       createdAt: new Date().toISOString()
