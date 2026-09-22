@@ -20,11 +20,13 @@
           </div>
         </div>
         <button 
+          type="button"
           class="sidebar-collapse-btn" 
-          @click="isSidebarCollapsed = !isSidebarCollapsed" 
+          @click.stop="isSidebarCollapsed = !isSidebarCollapsed" 
           :title="isSidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'"
+          :aria-label="isSidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'"
         >
-          <span>{{ isSidebarCollapsed ? '▶' : '◀' }}</span>
+          <span style="pointer-events: none;">{{ isSidebarCollapsed ? '▶' : '◀' }}</span>
         </button>
         <button 
           class="sidebar-mobile-close-btn" 
@@ -7072,73 +7074,125 @@ const handleSaveNewNielit = async () => {
   setTimeout(() => { emailActionMsg.value = ''; }, 4000);
 };
 
-let refreshTimer = null;
 const isRefreshing = ref(false);
 const lastRefreshedTime = ref('');
+const loadedTabsCache = ref(new Set());
 
-const refreshAllData = async () => {
+/**
+ * On-demand tab-specific database loader.
+ * Only calls the exact REST API endpoint required for the active tab.
+ * Caches loaded results so switching between tabs makes ZERO redundant network calls.
+ */
+const loadTabData = async (tabName = currentTab.value, force = false) => {
+  if (!tabName) return;
+  if (!force && loadedTabsCache.value.has(tabName)) {
+    return; // Already loaded and cached; skip redundant API call
+  }
+
   isRefreshing.value = true;
   try {
-    emit('refresh-data');
-    refreshDatabaseStatus();
-    const results = await Promise.allSettled([
-      fetchAdmissionsFromBackend(),
-      fetchStudentsFromBackend(),
-      fetchUsersFromBackend(),
-      fetchCoursesFromBackend(),
-      fetchNielitProjectsFromBackend(),
-      fetchFeesFromBackend(),
-      fetchCertificatesFromBackend(),
-      fetchProjectsFromBackend(),
-      fetchContactInquiriesFromBackend(),
-      fetchReviewsFromBackend(),
-      fetchJobApplicationsFromBackend(),
-      fetchRsvpsFromBackend(),
-      fetchInternshipsFromBackend(),
-      fetchEventsCatalogFromBackend()
-    ]);
-
-    const getVal = (idx) => {
-      const res = results[idx];
-      return (res && res.status === 'fulfilled' && Array.isArray(res.value)) ? res.value : null;
-    };
-
-    const adms = getVal(0);
-    const stus = getVal(1);
-    const usrs = getVal(2);
-    const crss = getVal(3);
-    const nielits = getVal(4);
-    const fees = getVal(5);
-    const certs = getVal(6);
-    const projs = getVal(7);
-    const inqs = getVal(8);
-    const revs = getVal(9);
-    const jobs = getVal(10);
-    const rsvps = getVal(11);
-    const interns = getVal(12);
-    const eventsCat = getVal(13);
-
-    if (adms && adms.length > 0) admissionsList.value = adms;
-    if (stus && stus.length > 0) studentsList.value = stus;
-    if (usrs && usrs.length > 0) usersList.value = usrs;
-    if (crss && crss.length > 0) coursesList.value = crss;
-    if (nielits && nielits.length > 0) nielitProjectsList.value = nielits;
-    if (fees && fees.length > 0) feesList.value = fees;
-    if (certs && certs.length > 0) certificatesList.value = certs;
-    if (projs && projs.length > 0) projectsList.value = projs;
-    if (inqs && inqs.length > 0) contactInquiriesList.value = inqs;
-    if (revs && revs.length > 0) reviewsList.value = revs;
-    if (jobs && jobs.length > 0) jobApplicationsList.value = jobs;
-    if (rsvps && rsvps.length > 0) rsvpsList.value = rsvps;
-    if (interns && interns.length > 0) internshipsList.value = interns;
-    if (eventsCat && eventsCat.length > 0) eventsCatalogList.value = eventsCat;
+    switch (tabName) {
+      case 'overview': {
+        const [adms] = await Promise.all([
+          fetchAdmissionsFromBackend(),
+          refreshDatabaseStatus()
+        ]);
+        if (adms && adms.length > 0) admissionsList.value = adms;
+        break;
+      }
+      case 'admissions': {
+        const adms = await fetchAdmissionsFromBackend();
+        if (adms && adms.length > 0) admissionsList.value = adms;
+        break;
+      }
+      case 'students': {
+        const stus = await fetchStudentsFromBackend();
+        if (stus && stus.length > 0) studentsList.value = stus;
+        break;
+      }
+      case 'student-exams': {
+        refreshStoredExamSubmissions();
+        break;
+      }
+      case 'users': {
+        const usrs = await fetchUsersFromBackend();
+        if (usrs && usrs.length > 0) usersList.value = usrs;
+        break;
+      }
+      case 'courses': {
+        const crss = await fetchCoursesFromBackend();
+        if (crss && crss.length > 0) coursesList.value = crss;
+        break;
+      }
+      case 'nielit': {
+        const nielits = await fetchNielitProjectsFromBackend();
+        if (nielits && nielits.length > 0) nielitProjectsList.value = nielits;
+        break;
+      }
+      case 'internships': {
+        const interns = await fetchInternshipsFromBackend();
+        if (interns && interns.length > 0) internshipsList.value = interns;
+        break;
+      }
+      case 'events': {
+        const eventsCat = await fetchEventsCatalogFromBackend();
+        if (eventsCat && eventsCat.length > 0) eventsCatalogList.value = eventsCat;
+        break;
+      }
+      case 'careers': {
+        const jobs = await fetchJobApplicationsFromBackend();
+        if (jobs && jobs.length > 0) jobApplicationsList.value = jobs;
+        break;
+      }
+      case 'reviews': {
+        const revs = await fetchReviewsFromBackend();
+        if (revs && revs.length > 0) reviewsList.value = revs;
+        break;
+      }
+      case 'fees': {
+        const fees = await fetchFeesFromBackend();
+        if (fees && fees.length > 0) feesList.value = fees;
+        break;
+      }
+      case 'certificates': {
+        const certs = await fetchCertificatesFromBackend();
+        if (certs && certs.length > 0) certificatesList.value = certs;
+        break;
+      }
+      case 'projects': {
+        const projs = await fetchProjectsFromBackend();
+        if (projs && projs.length > 0) projectsList.value = projs;
+        break;
+      }
+      case 'contact': {
+        const inqs = await fetchContactInquiriesFromBackend();
+        if (inqs && inqs.length > 0) contactInquiriesList.value = inqs;
+        break;
+      }
+      default:
+        break;
+    }
+    loadedTabsCache.value.add(tabName);
     lastRefreshedTime.value = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   } catch (err) {
-    console.warn('SuperAdmin refresh notice:', err.message);
+    console.warn(`Notice on-demand tab load for "${tabName}":`, err.message);
   } finally {
     isRefreshing.value = false;
   }
 };
+
+/**
+ * Manual Refresh Trigger (when user clicks 🔄 Refresh Data):
+ * Refreshes ONLY the currently viewed tab on-demand.
+ */
+const refreshAllData = async () => {
+  await loadTabData(currentTab.value, true);
+};
+
+// Automatically on-demand load data when the user switches tabs
+watch(currentTab, (newTab) => {
+  loadTabData(newTab);
+}, { immediate: true });
 
 // --- INTERNSHIP MANAGEMENT STATE & ACTIONS ---
 const showAddInternshipModal = ref(false);
@@ -7681,7 +7735,6 @@ let headerResizeObserver = null;
 onMounted(() => {
   sessionTime.value = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   refreshDatabaseStatus();
-  refreshAllData();
   refreshStoredExamSubmissions();
 
   // Dynamic header height measurement for mobile sticky alignment
@@ -7696,15 +7749,9 @@ onMounted(() => {
     window.addEventListener('resize', updateAdminHeaderHeight, { passive: true });
     window.addEventListener('ithunt_exam_submitted', onExamSubmittedHandler);
   }
-
-  // Live polling every 12 seconds so SuperAdmin gets new candidate registrations in real-time
-  refreshTimer = setInterval(() => {
-    refreshAllData();
-  }, 12000);
 });
 
 onUnmounted(() => {
-  if (refreshTimer) clearInterval(refreshTimer);
   if (headerResizeObserver) {
     headerResizeObserver.disconnect();
     headerResizeObserver = null;
@@ -8449,6 +8496,45 @@ body.light-theme .admin-data-table th {
   max-width: 76px;
 }
 
+.admin-shell.sidebar-collapsed .sidebar-brand {
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 0.95rem 0.25rem !important;
+  gap: 0.55rem !important;
+}
+
+.admin-shell.sidebar-collapsed .brand-badge-row {
+  justify-content: center !important;
+  margin: 0 auto !important;
+  overflow: visible !important;
+}
+
+.admin-shell.sidebar-collapsed .sidebar-collapse-btn {
+  margin: 0 auto !important;
+  width: 32px !important;
+  height: 30px !important;
+  position: relative !important;
+  z-index: 25 !important;
+  cursor: pointer !important;
+  display: flex !important;
+}
+
+.admin-shell.sidebar-collapsed .sidebar-nav-item,
+.admin-shell.sidebar-collapsed .nav-item-btn {
+  justify-content: center !important;
+  padding: 0.65rem 0.25rem !important;
+}
+
+.admin-shell.sidebar-collapsed .sidebar-user-pill {
+  justify-content: center !important;
+  padding: 0.5rem 0.25rem !important;
+}
+
+.admin-shell.sidebar-collapsed .sidebar-avatar-wrap {
+  margin: 0 auto !important;
+}
+
 .sidebar-brand {
   display: flex;
   align-items: center;
@@ -8515,8 +8601,8 @@ body.light-theme .admin-data-table th {
 }
 
 .sidebar-collapse-btn {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -8525,9 +8611,12 @@ body.light-theme .admin-data-table th {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   transition: all 0.2s;
   flex-shrink: 0;
+  position: relative;
+  z-index: 25;
+  user-select: none;
 }
 
 .admin-shell.light-theme .sidebar-collapse-btn {
