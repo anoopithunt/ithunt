@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { dbAdapter } from '../services/dbAdapter.js';
-import { generateToken, verifyToken, requireAdmin } from '../middleware/auth.js';
+import { generateToken, verifyToken, requireAdmin, optionalAuth } from '../middleware/auth.js';
 import bcrypt from 'bcryptjs';
 
 const router = Router();
@@ -211,6 +211,7 @@ router.get(['/users', '/'], async (req, res) => {
       name: u.name,
       email: u.email,
       role: u.role,
+      designation: u.designation || '',
       phone: u.phone,
       verified: u.verified,
       createdAt: u.createdAt
