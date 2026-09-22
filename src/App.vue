@@ -184,7 +184,6 @@
           :allContactInquiries="liveContactInquiriesList"
           :allReviews="liveReviewsList"
           :allUsers="liveUsersList"
-          @refresh-data="loadInitialData"
           @logout="handleAdminLogout"
           @toggle-theme="toggleTheme"
           @download-slip="downloadCustomAdmissionSlip"
@@ -701,9 +700,23 @@ const liveUsersList = ref([]);
 const liveCoursesList = ref([]);
 const liveEventsCatalogList = ref([]);
 
-// Primary dynamic database loader across all Swagger REST API endpoints
-const loadInitialData = async () => {
+// Primary dynamic database loader: loads public catalog data by default, avoiding redundant admin API calls
+const loadInitialData = async (loadAll = false) => {
   try {
+    if (!loadAll) {
+      const [crss, revs, evts, projs] = await Promise.allSettled([
+        fetchCoursesFromBackend(),
+        fetchReviewsFromBackend(),
+        fetchEventsCatalogFromBackend(),
+        fetchProjectsFromBackend()
+      ]);
+      if (crss.status === 'fulfilled' && Array.isArray(crss.value) && crss.value.length > 0) liveCoursesList.value = crss.value;
+      if (revs.status === 'fulfilled' && Array.isArray(revs.value) && revs.value.length > 0) liveReviewsList.value = revs.value;
+      if (evts.status === 'fulfilled' && Array.isArray(evts.value) && evts.value.length > 0) liveEventsCatalogList.value = evts.value;
+      if (projs.status === 'fulfilled' && Array.isArray(projs.value) && projs.value.length > 0) liveProjectsList.value = projs.value;
+      return;
+    }
+
     const results = await Promise.allSettled([
       fetchAdmissionsFromBackend(),
       fetchJobApplicationsFromBackend(),
@@ -1306,7 +1319,6 @@ const handleLoginSuccess = async (user) => {
   } else {
     showToast(`Welcome Administrator ${adminUser.value.name}! Logged into SuperAdmin Console.`, 'success');
   }
-  await loadInitialData();
 };
 
 const handleAdminLogout = () => {
@@ -1717,10 +1729,7 @@ onMounted(() => {
     });
   };
   initReveal();
-  watch(activeTab, (newTab) => {
-    if (newTab === 'superadmin') {
-      loadInitialData();
-    }
+  watch(activeTab, () => {
     setTimeout(initReveal, 300);
   });
 });
