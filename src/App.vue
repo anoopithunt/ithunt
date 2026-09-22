@@ -537,7 +537,6 @@ import NielitPdfPreviewModal from './components/modals/NielitPdfPreviewModal.vue
 import ConfirmationModal from './components/modals/ConfirmationModal.vue';
 
 const content = ref(CONTENT_DATA);
-const activeTab = ref('home');
 const isDarkMode = ref(false);
 const scrollProgress = ref(0);
 const showBackToTop = ref(false);
@@ -564,11 +563,18 @@ const getStoredAdminAuth = () => {
     const raw = sessionStorage.getItem('ithunt_superadmin_auth') || localStorage.getItem('ithunt_superadmin_auth');
     if (raw) {
       const parsed = JSON.parse(raw);
-      // Only restore sessions for users with superadmin role
-      if (parsed.roleType === 'superadmin' || parsed.role === 'Director & Chief Administrator' || parsed.email === 'admin@ithunt.com') {
+      const role = String(parsed.role || '').toLowerCase();
+      const roleType = String(parsed.roleType || '').toLowerCase();
+      const isPrivileged = [
+        'superadmin', 'admin', 'teacher', 'faculty', 'tech-lead', 'developer',
+        'senior-developer', 'intern', 'staff', 'accountant'
+      ].some(r => role.includes(r) || roleType === r) || 
+      parsed.email === 'admin@ithunt.com' ||
+      parsed.role === 'Director & Chief Administrator';
+
+      if (isPrivileged) {
         return parsed;
       }
-      // Non-superadmin session found - clear it
       sessionStorage.removeItem('ithunt_superadmin_auth');
       localStorage.removeItem('ithunt_superadmin_auth');
     }
@@ -587,11 +593,35 @@ const adminUser = ref(storedAdmin || {
 });
 
 // Student Session & Auth State
-const studentUser = ref(null);
-try {
-  const savedStudent = localStorage.getItem('ithunt_student_user');
-  if (savedStudent) studentUser.value = JSON.parse(savedStudent);
-} catch (e) {}
+const getStoredStudentAuth = () => {
+  try {
+    const saved = localStorage.getItem('ithunt_student_user');
+    if (saved) return JSON.parse(saved);
+  } catch (e) {}
+  return null;
+};
+const storedStudent = getStoredStudentAuth();
+const studentUser = ref(storedStudent);
+
+// Compute default initial tab based on logged in user session (persists across hard refresh)
+const computeInitialTab = () => {
+  if (typeof window !== 'undefined' && window.location.hash) {
+    const rawHash = window.location.hash.replace('#', '').toLowerCase().trim();
+    if (rawHash === 'admission' || rawHash === 'admisson') return 'admission';
+    if (rawHash === 'login') return 'login';
+    if (rawHash === 'superadmin' || rawHash === 'admin') return storedAdmin ? 'superadmin' : 'login';
+    if (rawHash === 'student-portal' || rawHash === 'student') return storedStudent ? 'student-portal' : 'login';
+    if (['home', 'internships', 'courses', 'careers', 'reviews', 'testimonials', 'events'].includes(rawHash)) {
+      return rawHash;
+    }
+  }
+  // If user is already logged in, default directly to their dedicated dashboard
+  if (storedAdmin) return 'superadmin';
+  if (storedStudent) return 'student-portal';
+  return 'home';
+};
+
+const activeTab = ref(computeInitialTab());
 
 const handleStudentLogin = async ({ email, password }, callback) => {
   try {
@@ -974,13 +1004,25 @@ const triggerConfetti = () => {
 
 // Methods
 const setTab = (tab) => {
-  // Prevent non-superadmin users from accessing the SuperAdmin console
+  // Prevent unauthorized users from accessing the SuperAdmin/Staff console
   if (tab === 'superadmin') {
     const user = adminUser.value;
-    const isSuperAdmin = user?.roleType === 'superadmin' || 
-                         user?.role === 'Director & Chief Administrator' || 
-                         user?.email === 'admin@ithunt.com';
-    if (!isAdminLoggedIn.value || !isSuperAdmin) {
+    const role = String(user?.role || '').toLowerCase();
+    const roleType = String(user?.roleType || '').toLowerCase();
+    const isAuthorized = [
+      'superadmin', 'admin', 'teacher', 'faculty', 'tech-lead', 'developer',
+      'senior-developer', 'intern', 'staff', 'accountant'
+    ].some(r => role.includes(r) || roleType === r) || 
+    user?.email === 'admin@ithunt.com' ||
+    user?.role === 'Director & Chief Administrator';
+
+    if (!isAdminLoggedIn.value || !isAuthorized) {
+      activeTab.value = 'login';
+      return;
+    }
+  }
+  if (tab === 'student-portal') {
+    if (!studentUser.value) {
       activeTab.value = 'login';
       return;
     }
@@ -1291,20 +1333,27 @@ const handleLoginAsStudent = (admission) => {
 };
 
 const handleLoginSuccess = async (user) => {
-  const isTeacher = user.roleType === 'teacher' || user.role === 'teacher' || user.role === 'faculty' || user.roleType === 'faculty' || String(user.role || '').toLowerCase().includes('faculty') || String(user.role || '').toLowerCase().includes('teacher');
-  const isAdmin = user.roleType === 'superadmin' || user.roleType === 'admin' || user.role === 'superadmin' || user.role === 'admin' || user.role === 'Director & Chief Administrator' || user.email === 'admin@ithunt.com';
+  const role = String(user.role || '').toLowerCase();
+  const roleType = String(user.roleType || '').toLowerCase();
+  const isTeacher = roleType.includes('teacher') || roleType.includes('faculty') || role.includes('teacher') || role.includes('faculty');
+  const isPrivileged = [
+    'superadmin', 'admin', 'teacher', 'faculty', 'tech-lead', 'developer',
+    'senior-developer', 'intern', 'staff', 'accountant'
+  ].some(r => role.includes(r) || roleType === r) || 
+  user.email === 'admin@ithunt.com' ||
+  user.role === 'Director & Chief Administrator';
 
-  if (!isTeacher && !isAdmin) {
-    showToast('Access Denied: You do not have administrator or faculty privileges.', 'error');
+  if (!isPrivileged) {
+    showToast('Access Denied: You do not have administrator or staff privileges.', 'error');
     return;
   }
   isAdminLoggedIn.value = true;
   adminUser.value = {
     ...user,
     name: user.name || (isTeacher ? 'Er. Sandeep Srivastava' : 'Mr. Lakshman Singh Chauhan'),
-    role: isTeacher ? (user.designation || user.role || 'Senior Faculty Lead & Teacher') : (user.role || 'Director & Chief Administrator'),
-    roleType: isTeacher ? 'teacher' : (user.roleType || 'superadmin'),
-    avatar: isTeacher ? (user.avatar || 'img/ithunt.jpg') : (user.avatar || 'img/ithunt.webp'),
+    role: user.designation || user.role || (isTeacher ? 'Senior Faculty Lead & Teacher' : 'Director & Chief Administrator'),
+    roleType: user.roleType || (isTeacher ? 'teacher' : 'superadmin'),
+    avatar: user.avatar || (isTeacher ? 'img/ithunt.jpg' : 'img/ithunt.webp'),
     email: user.email || (isTeacher ? 'teacher@ithunt.com' : 'admin@ithunt.com'),
     loginTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
   };
@@ -1317,7 +1366,7 @@ const handleLoginSuccess = async (user) => {
   if (isTeacher) {
     showToast(`Welcome Teacher ${adminUser.value.name}! Logged into Faculty Management Console.`, 'success');
   } else {
-    showToast(`Welcome Administrator ${adminUser.value.name}! Logged into SuperAdmin Console.`, 'success');
+    showToast(`Welcome ${adminUser.value.name}! Logged into Management Console.`, 'success');
   }
 };
 
@@ -1673,19 +1722,26 @@ onMounted(() => {
     const savedAdmin = sessionStorage.getItem('ithunt_superadmin_auth') || localStorage.getItem('ithunt_superadmin_auth');
     if (savedAdmin) {
       const parsedAdmin = JSON.parse(savedAdmin);
-      // Only restore session if user has superadmin role
-      if (parsedAdmin.roleType === 'superadmin' || parsedAdmin.role === 'Director & Chief Administrator' || parsedAdmin.email === 'admin@ithunt.com') {
+      const role = String(parsedAdmin.role || '').toLowerCase();
+      const roleType = String(parsedAdmin.roleType || '').toLowerCase();
+      const isPrivileged = [
+        'superadmin', 'admin', 'teacher', 'faculty', 'tech-lead', 'developer',
+        'senior-developer', 'intern', 'staff', 'accountant'
+      ].some(r => role.includes(r) || roleType === r) || 
+      parsedAdmin.email === 'admin@ithunt.com' ||
+      parsedAdmin.role === 'Director & Chief Administrator';
+
+      if (isPrivileged) {
         adminUser.value = parsedAdmin;
         isAdminLoggedIn.value = true;
       } else {
-        // Non-superadmin user trying to access admin session - clear it
         sessionStorage.removeItem('ithunt_superadmin_auth');
         localStorage.removeItem('ithunt_superadmin_auth');
       }
     }
   } catch (e) {}
 
-  // If user arrived with a hash (e.g. #admission, #login, #superadmin), open the corresponding view then immediately clear the hash from the URL bar
+  // If user arrived with a hash (e.g. #admission, #login, #superadmin), open corresponding view
   if (window.location.hash) {
     const rawHash = window.location.hash.replace('#', '').toLowerCase().trim();
     if (rawHash === 'admission' || rawHash === 'admisson') {
@@ -1694,11 +1750,20 @@ onMounted(() => {
       activeTab.value = 'login';
     } else if (rawHash === 'superadmin' || rawHash === 'admin') {
       activeTab.value = isAdminLoggedIn.value ? 'superadmin' : 'login';
+    } else if (rawHash === 'student-portal' || rawHash === 'student') {
+      activeTab.value = studentUser.value ? 'student-portal' : 'login';
     } else if (['home', 'internships', 'courses', 'careers', 'reviews', 'testimonials', 'events'].includes(rawHash)) {
       activeTab.value = rawHash;
     }
     if (window.history && window.history.replaceState) {
       window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+  } else {
+    // If no explicit hash in URL, ensure logged in users open their dashboard by default even on hard refresh
+    if (isAdminLoggedIn.value && activeTab.value === 'home') {
+      activeTab.value = 'superadmin';
+    } else if (studentUser.value && activeTab.value === 'home') {
+      activeTab.value = 'student-portal';
     }
   }
 
