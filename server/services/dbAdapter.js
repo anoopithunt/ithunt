@@ -83,6 +83,8 @@ export const dbAdapter = {
       $or: [
         { id: id },
         { id: idRegex },
+        { userId: id },
+        { userId: idRegex },
         { code: id },
         { code: idRegex },
         { slug: id },
@@ -191,6 +193,7 @@ export const dbAdapter = {
       : {
           $or: [
             { id: id },
+            { userId: id },
             { code: id },
             { slug: id },
             { registrationNo: id },
@@ -227,6 +230,7 @@ export const dbAdapter = {
       await Model.deleteMany({
         $or: [
           { id: id },
+          { userId: id },
           { code: id },
           { slug: id },
           { registrationNo: id },

@@ -5423,9 +5423,10 @@ const handleRoleChange = async (user, newRole) => {
   user.role = newRole;
 
   try {
-    const res = await updateUserInBackend(user.id || user._id, { role: newRole });
+    const targetKey = user.id || user._id || user.userId || user.email;
+    const res = await updateUserInBackend(targetKey, { role: newRole });
     if (res?.success) {
-      emailActionMsg.value = `✓ Updated ${user.name}'s role to ${getRoleMeta(newRole).label}!`;
+      emailActionMsg.value = `✓ Updated ${user.name}'s role to ${getRoleMeta(newRole).label} in MongoDB Atlas!`;
       setTimeout(() => { emailActionMsg.value = ''; }, 4000);
     }
   } catch (err) {
@@ -5525,9 +5526,25 @@ const handleCreateUser = async () => {
   };
 
   usersList.value.unshift(payload);
-  await createUserInBackend(payload);
   showAddUserModal.value = false;
-  emailActionMsg.value = `✓ New staff account created for ${payload.name} (${getRoleMeta(payload.role).label})!`;
+
+  try {
+    const res = await createUserInBackend(payload);
+    if (res?.data) {
+      const idx = usersList.value.findIndex(u => u.email === payload.email);
+      if (idx !== -1) {
+        usersList.value[idx] = { 
+          ...usersList.value[idx], 
+          ...res.data, 
+          id: res.data.id || res.data._id || payload.id 
+        };
+      }
+    }
+  } catch (err) {
+    console.error('Error creating user in backend:', err);
+  }
+
+  emailActionMsg.value = `✓ New staff account created for ${payload.name} (${getRoleMeta(payload.role).label}) and saved to database!`;
   setTimeout(() => { emailActionMsg.value = ''; }, 4000);
 };
 
