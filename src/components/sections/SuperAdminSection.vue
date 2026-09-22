@@ -92,6 +92,17 @@
 
           <button 
             class="sidebar-nav-item" 
+            :class="{ active: currentTab === 'student-exams' }" 
+            @click="currentTab = 'student-exams'; isMobileSidebarOpen = false"
+            title="Student Exam Sheets & Selected Options"
+          >
+            <span class="nav-item-icon">📝</span>
+            <span class="nav-item-label" v-if="!isSidebarCollapsed">Student Exam Sheets</span>
+            <span class="nav-badge-pill" v-if="!isSidebarCollapsed">{{ storedExamSubmissionsList.length }}</span>
+          </button>
+
+          <button 
+            class="sidebar-nav-item" 
             :class="{ active: currentTab === 'nielit' }" 
             @click="currentTab = 'nielit'; isMobileSidebarOpen = false"
             title="NIELIT Project Submissions"
@@ -546,17 +557,17 @@
               <span style="font-size: 0.78rem; color: var(--text-dim);">• {{ dbStatus.connected ? 'Cluster Live • All Collections Synced' : 'Connecting to Server...' }} <span v-if="dbStatus.latency" style="color: #38bdf8;">({{ dbStatus.latency }}ms ping)</span></span>
             </div>
             <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
-              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">📝 {{ admissionsList.length }} Admissions</span>
-              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">🎓 {{ unifiedStudentsList.length }} Students</span>
-              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">📜 {{ nielitProjectsList.length }} NIELIT</span>
-              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">📚 {{ coursesList.length }} Courses</span>
-              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">💳 {{ feesList.length }} Fees</span>
-              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">🏅 {{ certificatesList.length }} Certificates</span>
-              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">🚀 {{ internshipsList.length }} Internships</span>
-              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">🎪 {{ eventsCatalogList.length }} Events</span>
-              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">💻 {{ projectsList.length }} Projects</span>
-              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">⭐ {{ reviewsList.length }} Reviews</span>
-              <span class="nav-badge-pill" style="background: rgba(255,255,255,0.06); color: #fff; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.76rem;">👥 {{ usersList.length }} Users</span>
+              <span class="nav-badge-pill overview-stat-chip">📝 {{ admissionsList.length }} Admissions</span>
+              <span class="nav-badge-pill overview-stat-chip">🎓 {{ unifiedStudentsList.length }} Students</span>
+              <span class="nav-badge-pill overview-stat-chip">📜 {{ nielitProjectsList.length }} NIELIT</span>
+              <span class="nav-badge-pill overview-stat-chip">📚 {{ coursesList.length }} Courses</span>
+              <span class="nav-badge-pill overview-stat-chip">💳 {{ feesList.length }} Fees</span>
+              <span class="nav-badge-pill overview-stat-chip">🏅 {{ certificatesList.length }} Certificates</span>
+              <span class="nav-badge-pill overview-stat-chip">🚀 {{ internshipsList.length }} Internships</span>
+              <span class="nav-badge-pill overview-stat-chip">🎪 {{ eventsCatalogList.length }} Events</span>
+              <span class="nav-badge-pill overview-stat-chip">💻 {{ projectsList.length }} Projects</span>
+              <span class="nav-badge-pill overview-stat-chip">⭐ {{ reviewsList.length }} Reviews</span>
+              <span class="nav-badge-pill overview-stat-chip">👥 {{ usersList.length }} Users</span>
             </div>
           </div>
 
@@ -634,7 +645,7 @@
                 <div v-for="adm in recentAdmissions" :key="adm.registrationNo || adm.id" class="queue-item" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.05); gap: 1rem;">
                   <div class="queue-item-info" style="flex: 1; min-width: 0;">
                     <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-                      <div class="queue-item-name" style="font-weight: 700; color: #fff;">{{ adm.candidateName || adm.fullName || 'Candidate' }}</div>
+                      <div class="queue-item-name" style="font-weight: 700; color: var(--text-main);">{{ adm.candidateName || adm.fullName || 'Candidate' }}</div>
                       <span class="admin-status-chip" :class="(adm.status === 'Confirmed' || adm.status === 'Active Registered Student' || adm.admissionConfirmed) ? 'status-confirmed' : 'status-pending'" style="font-size: 0.7rem; padding: 0.15rem 0.5rem;">
                         {{ (adm.status === 'Confirmed' || adm.status === 'Active Registered Student' || adm.admissionConfirmed) ? 'Confirmed ✓' : 'Pending Review' }}
                       </span>
@@ -642,7 +653,7 @@
                     <div class="queue-item-meta" style="font-size: 0.78rem; color: var(--text-dim); margin-top: 0.25rem; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
                       <span class="queue-reg-pill" style="font-family: var(--font-mono); color: #38bdf8;">{{ adm.registrationNo || adm.id }}</span>
                       <span>•</span>
-                      <span style="color: #94a3b8;">{{ adm.course }}</span>
+                      <span style="color: var(--text-muted);">{{ adm.course }}</span>
                       <span>•</span>
                       <span>📞 {{ adm.mobile || adm.phone || '—' }}</span>
                       <span>•</span>
@@ -965,6 +976,14 @@
                     </button>
                     <button 
                       class="admin-icon-btn" 
+                      title="Inspect Student Online Exams & Selected Options"
+                      style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);"
+                      @click="goToStudentExams(stu)"
+                    >
+                      📝 Exams
+                    </button>
+                    <button 
+                      class="admin-icon-btn" 
                       style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3);"
                       title="Delete Student"
                       @click="$emit('delete-student', stu)"
@@ -979,7 +998,7 @@
               <tr v-if="filteredStudents.length === 0">
                 <td colspan="7" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
                   <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎓</div>
-                  <div style="font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 0.5rem;">
+                  <div style="font-weight: 700; font-size: 1rem; color: var(--text-main); margin-bottom: 0.5rem;">
                     {{ unifiedStudentsList.length > 0 ? 'No student records match current filter (' + studentStatusFilter + ').' : 'No student records found in database.' }}
                   </div>
                   <div style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem;">
@@ -1002,6 +1021,210 @@
                     @click="refreshAllData"
                   >
                     🔄 Sync from MongoDB Atlas
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- =============================================================== -->
+    <!-- TAB: STUDENT EXAM SHEETS & OPTION INSPECTOR (TEACHER CONSOLE)   -->
+    <!-- =============================================================== -->
+    <div v-else-if="currentTab === 'student-exams'" class="admin-tab-panel anim-stagger-3">
+      <div class="panel-header-controls">
+        <div>
+          <h3 class="panel-title">📝 Student Online Exam Submissions & Option Inspector</h3>
+          <p class="panel-subtitle">Comprehensive teacher evaluation suite. Inspect which exam each student gave, exactly which option they selected (A, B, C, D), correct answers, and final score.</p>
+        </div>
+
+        <div class="panel-filter-group" style="flex-wrap: wrap; gap: 0.75rem;">
+          <!-- Search input -->
+          <div class="events-search-box" style="margin: 0; min-width: 240px;">
+            <span class="events-search-icon">🔍</span>
+            <input 
+              type="text" 
+              v-model="examSearchQuery" 
+              placeholder="Search student, roll no, exam..." 
+              class="events-search-input"
+            >
+            <button v-if="examSearchQuery" class="clear-search-btn" @click="examSearchQuery = ''">✕</button>
+          </div>
+
+          <!-- Filter by Exam -->
+          <select v-model="selectedExamFilter" class="form-control" style="width: auto; min-width: 180px; font-size: 0.85rem; padding: 0.45rem 0.85rem;">
+            <option value="all">All Exam Modules</option>
+            <option v-for="bank in allExamBanks" :key="bank.id" :value="bank.id">
+              {{ bank.title }}
+            </option>
+          </select>
+
+          <!-- Filter by Status -->
+          <select v-model="selectedExamStatusFilter" class="form-control" style="width: auto; min-width: 130px; font-size: 0.85rem; padding: 0.45rem 0.85rem;">
+            <option value="all">All Results</option>
+            <option value="passed">Passed (≥ 50%)</option>
+            <option value="failed">Failed (&lt; 50%)</option>
+          </select>
+
+          <button class="btn-secondary" style="padding: 0.45rem 0.9rem; font-size: 0.85rem;" @click="refreshStoredExamSubmissions">
+            🔄 Refresh Submissions
+          </button>
+        </div>
+      </div>
+
+      <!-- Teacher Exam KPIs -->
+      <div class="overview-kpi-grid" style="margin-bottom: 2rem;">
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;">
+            📝
+          </div>
+          <div class="kpi-details">
+            <div class="kpi-label">Total Submissions</div>
+            <div class="kpi-val text-gradient">{{ storedExamSubmissionsList.length }} Attempts</div>
+            <div class="kpi-sub">Across All Exam Banks</div>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">
+            👥
+          </div>
+          <div class="kpi-details">
+            <div class="kpi-label">Students Evaluated</div>
+            <div class="kpi-val" style="color: #a855f7;">{{ examTeacherMetrics.uniqueStudents }} Students</div>
+            <div class="kpi-sub">Active Examinees</div>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+            ✅
+          </div>
+          <div class="kpi-details">
+            <div class="kpi-label">Pass Percentage</div>
+            <div class="kpi-val" style="color: #10b981;">{{ examTeacherMetrics.passRate }}%</div>
+            <div class="kpi-sub">{{ examTeacherMetrics.passedCount }} of {{ storedExamSubmissionsList.length }} Passed</div>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-wrap" style="background: rgba(249, 115, 22, 0.15); color: var(--color-ai-orange);">
+            🎯
+          </div>
+          <div class="kpi-details">
+            <div class="kpi-label">Class Average Score</div>
+            <div class="kpi-val">{{ examTeacherMetrics.avgScore }}%</div>
+            <div class="kpi-sub">Curriculum Benchmark</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submissions Table -->
+      <div class="admin-data-card">
+        <div class="data-table-container">
+          <table class="admin-data-table">
+            <thead>
+              <tr>
+                <th>Student Candidate</th>
+                <th>Enrolled Batch / Course</th>
+                <th>Exam Taken & Subject</th>
+                <th>Date & Time</th>
+                <th style="text-align: center;">Score</th>
+                <th style="text-align: center;">Result</th>
+                <th style="text-align: right;">Action: Options Inspection</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="sub in filteredExamSubmissions" :key="sub.id" class="table-row-hover">
+                <!-- Student -->
+                <td>
+                  <div style="display: flex; align-items: center; gap: 0.65rem;">
+                    <div style="width: 34px; height: 34px; border-radius: 50%; background: rgba(249, 115, 22, 0.15); border: 1px solid rgba(249, 115, 22, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                      🎓
+                    </div>
+                    <div>
+                      <strong class="table-primary-text" style="color: var(--text-main); font-size: 0.95rem;">{{ sub.studentName }}</strong>
+                      <div class="text-dim" style="font-size: 0.78rem; font-family: var(--font-mono); color: var(--text-muted);">
+                        Roll: {{ sub.studentRoll }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Batch / Course -->
+                <td>
+                  <span class="table-primary-text" style="font-size: 0.85rem; font-weight: 600; color: var(--text-main);">{{ sub.batch || 'MERN Stack Web Engineer' }}</span>
+                </td>
+
+                <!-- Exam Title -->
+                <td>
+                  <strong style="color: var(--color-ai-cyan); font-size: 0.9rem;">{{ sub.examTitle }}</strong>
+                  <div class="text-dim" style="font-size: 0.76rem; color: var(--text-muted);">{{ sub.examId }}</div>
+                </td>
+
+                <!-- Submission Date -->
+                <td>
+                  <div class="table-primary-text" style="font-size: 0.88rem; font-weight: 600; color: var(--text-main);">{{ new Date(sub.submittedAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) }}</div>
+                  <div class="text-dim" style="font-size: 0.75rem; color: var(--text-muted);">{{ new Date(sub.submittedAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) }}</div>
+                </td>
+
+                <!-- Score -->
+                <td style="text-align: center;">
+                  <strong class="table-primary-text" style="font-family: var(--font-mono); font-size: 0.95rem; color: var(--text-main);">{{ sub.totalScore }} / {{ sub.totalPossibleMarks }}</strong>
+                  <div style="font-size: 0.78rem; color: var(--text-muted);">{{ sub.percentage }}%</div>
+                </td>
+
+                <!-- Status Pill -->
+                <td style="text-align: center;">
+                  <span 
+                    class="punch-badge"
+                    :class="sub.passed ? 'p-badge-present' : 'p-badge-absent'"
+                  >
+                    {{ sub.passed ? '✓ PASSED' : '✗ FAILED' }}
+                  </span>
+                </td>
+
+                <!-- Action Button -->
+                <td style="text-align: right;">
+                  <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <button 
+                      class="btn-primary" 
+                      style="padding: 0.35rem 0.85rem; font-size: 0.82rem;"
+                      @click="openTeacherExamInspection(sub)"
+                      title="Inspect student's selected options question by question"
+                    >
+                      <span>Inspect Options 🔍</span>
+                    </button>
+                    <button 
+                      class="admin-icon-btn" 
+                      style="color: #ef4444;"
+                      @click="handleDeleteExamSubmission(sub.id)"
+                      title="Delete this submission"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Empty state -->
+              <tr v-if="filteredExamSubmissions.length === 0">
+                <td colspan="7" style="text-align: center; padding: 3rem 1.5rem; color: var(--text-muted);">
+                  <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📝</div>
+                  <h4 style="color: var(--text-main); margin-bottom: 0.35rem;">No Student Exam Submissions Found</h4>
+                  <p style="font-size: 0.88rem; max-width: 460px; margin: 0 auto 1rem;">
+                    {{ examSearchQuery || selectedExamFilter !== 'all' || selectedExamStatusFilter !== 'all' 
+                      ? 'No exam records match your current search and filters.' 
+                      : 'Students have not submitted any exams yet. Submissions made from the Student Portal will instantly appear here.' }}
+                  </p>
+                  <button 
+                    v-if="examSearchQuery || selectedExamFilter !== 'all' || selectedExamStatusFilter !== 'all'"
+                    class="btn-secondary" 
+                    @click="examSearchQuery = ''; selectedExamFilter = 'all'; selectedExamStatusFilter = 'all'"
+                  >
+                    Clear Search & Filters
                   </button>
                 </td>
               </tr>
@@ -1265,7 +1488,7 @@
               <tr v-if="filteredAdmissions.length === 0">
                 <td colspan="8" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
                   <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔍</div>
-                  <div style="font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 0.5rem;">
+                  <div style="font-weight: 700; font-size: 1rem; color: var(--text-main); margin-bottom: 0.5rem;">
                     {{ admissionsList.length > 0 ? 'No candidates match filter "' + admissionStatusFilter + '".' : 'No candidate admissions found.' }}
                   </div>
                   <div style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem;">
@@ -1553,7 +1776,7 @@
       <div class="admin-table-card" style="margin-bottom: 2rem;">
         <div class="table-card-header" style="padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
           <div>
-            <h4 style="font-size: 1rem; font-weight: 800; color: #fff; margin: 0;">📋 Registered Internship Applicants ({{ internshipsList.length }})</h4>
+            <h4 style="font-size: 1rem; font-weight: 800; color: var(--text-main); margin: 0;">📋 Registered Internship Applicants ({{ internshipsList.length }})</h4>
             <div style="font-size: 0.78rem; color: var(--text-dim); margin-top: 0.2rem;">Live records retrieved from MongoDB Atlas (internships collection)</div>
           </div>
           <button class="box-card-link" @click="refreshAllData">🔄 Refresh Data</button>
@@ -1687,7 +1910,7 @@
       <div class="admin-table-card" style="margin-bottom: 2rem;">
         <div class="table-card-header" style="padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
           <div>
-            <h4 style="font-size: 1rem; font-weight: 800; color: #fff; margin: 0;">📅 Scheduled Campus Events & Summits ({{ eventsCatalogList.length }})</h4>
+            <h4 style="font-size: 1rem; font-weight: 800; color: var(--text-main); margin: 0;">📅 Scheduled Campus Events & Summits ({{ eventsCatalogList.length }})</h4>
             <div style="font-size: 0.78rem; color: var(--text-dim); margin-top: 0.2rem;">Events directory stored in MongoDB Atlas (events collection)</div>
           </div>
           <button class="box-card-link" @click="refreshAllData">🔄 Refresh Data</button>
@@ -2232,45 +2455,202 @@
       </div>
     </div>
 
-    <!-- TAB: USER ACCOUNTS -->
+    <!-- =============================================================== -->
+    <!-- TAB: STAFF ACCOUNTS & ROLE MANAGEMENT SYSTEM                    -->
+    <!-- =============================================================== -->
     <div v-else-if="currentTab === 'users'" class="admin-tab-panel anim-stagger-3">
       <div class="panel-header-controls">
         <div>
-          <h3 class="panel-title">👥 Central Auth User Accounts & Roles</h3>
-          <p class="panel-subtitle">Registered system users, administrator accounts, and verified student credentials.</p>
+          <h3 class="panel-title">👥 Staff Accounts & User Role Management</h3>
+          <p class="panel-subtitle">Manage faculty mentors, tech leads, software developers, administrative staff, and student accounts. Change roles directly with instant database synchronization.</p>
+        </div>
+
+        <div class="panel-filter-group" style="flex-wrap: wrap; gap: 0.75rem;">
+          <!-- Search input -->
+          <div class="events-search-box" style="margin: 0; min-width: 250px;">
+            <span class="events-search-icon">🔍</span>
+            <input 
+              type="text" 
+              v-model="userSearchQuery" 
+              placeholder="Search by name, email, ID, role..." 
+              class="events-search-input"
+            >
+            <button v-if="userSearchQuery" class="clear-search-btn" @click="userSearchQuery = ''">✕</button>
+          </div>
+
+          <!-- Role Filter -->
+          <select v-model="userRoleFilter" class="form-control" style="width: auto; min-width: 170px; font-size: 0.85rem; padding: 0.45rem 0.85rem;">
+            <option value="all">All Accounts ({{ usersList.length }})</option>
+            <option value="staff">Staff & Faculty Only ({{ userStats.staffCount }})</option>
+            <option value="admin">🛡️ SuperAdmins</option>
+            <option value="teacher">👨‍🏫 Teachers & Mentors</option>
+            <option value="tech-lead">💻 Tech Leads</option>
+            <option value="developer">⚡ Software Developers</option>
+            <option value="senior-developer">🚀 Senior Developers</option>
+            <option value="student">🎓 Students</option>
+            <option value="intern">💼 Interns</option>
+            <option value="accountant">💳 Accountants</option>
+          </select>
+
+          <button class="btn-primary" style="padding: 0.5rem 1.1rem; font-size: 0.85rem;" @click="openAddUserModal">
+            <span>➕ Add Staff Account</span>
+          </button>
         </div>
       </div>
 
-      <div class="admin-table-card">
-        <div class="table-responsive">
+      <!-- Quick KPI Counters -->
+      <div class="overview-kpi-grid" style="margin-bottom: 2rem;">
+        <div class="kpi-card" @click="userRoleFilter = 'all'" style="cursor: pointer;">
+          <div class="kpi-icon-wrap" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;">
+            👥
+          </div>
+          <div class="kpi-details">
+            <div class="kpi-label">Total Accounts</div>
+            <div class="kpi-val text-gradient">{{ userStats.total }} Users</div>
+            <div class="kpi-sub">Central MongoDB Auth</div>
+          </div>
+        </div>
+
+        <div class="kpi-card" @click="userRoleFilter = 'staff'" style="cursor: pointer;">
+          <div class="kpi-icon-wrap" style="background: rgba(249, 115, 22, 0.15); color: var(--color-ai-orange);">
+            🛡️
+          </div>
+          <div class="kpi-details">
+            <div class="kpi-label">Staff & Faculty</div>
+            <div class="kpi-val" style="color: var(--color-ai-orange);">{{ userStats.staffCount }} Staff</div>
+            <div class="kpi-sub">Admins, Teachers, Devs</div>
+          </div>
+        </div>
+
+        <div class="kpi-card" @click="userRoleFilter = 'teacher'" style="cursor: pointer;">
+          <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+            👨‍🏫
+          </div>
+          <div class="kpi-details">
+            <div class="kpi-label">Teachers & Mentors</div>
+            <div class="kpi-val" style="color: #10b981;">{{ userStats.teachersCount }} Teachers</div>
+            <div class="kpi-sub">Exam & Evaluation Access</div>
+          </div>
+        </div>
+
+        <div class="kpi-card" @click="userRoleFilter = 'developer'" style="cursor: pointer;">
+          <div class="kpi-icon-wrap" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">
+            💻
+          </div>
+          <div class="kpi-details">
+            <div class="kpi-label">Tech Leads & Devs</div>
+            <div class="kpi-val" style="color: #a855f7;">{{ userStats.devsCount }} Engineers</div>
+            <div class="kpi-sub">Engineering Team</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Staff Accounts Table -->
+      <div class="admin-data-card">
+        <div class="data-table-container">
           <table class="admin-data-table">
             <thead>
               <tr>
-                <th>User ID</th>
-                <th>Full Name</th>
+                <th>User / Staff Member</th>
                 <th>Email Address</th>
-                <th>System Role</th>
-                <th>Status</th>
-                <th>Registered Date</th>
+                <th style="min-width: 250px;">Change Staff Role</th>
+                <th>Designation / Title</th>
+                <th style="text-align: center;">Status</th>
+                <th>Registered</th>
                 <th style="text-align: right;">Action</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="user in usersList" :key="user.id">
-                <td><span class="admin-reg-pill">{{ user.id }}</span></td>
-                <td style="font-weight: 800; color: var(--text-main);">{{ user.name }}</td>
-                <td style="color: var(--color-ai-cyan);">{{ user.email }}</td>
+              <tr v-for="user in filteredUsersList" :key="user.id || user.email" class="table-row-hover">
+                <!-- User Profile -->
                 <td>
-                  <span class="exp-badge-required" :style="{ background: user.role === 'admin' ? 'rgba(249, 115, 22, 0.2)' : 'rgba(56, 189, 248, 0.15)', color: user.role === 'admin' ? '#f97316' : '#38bdf8' }">
-                    {{ user.role === 'admin' ? '🛡️ SuperAdmin' : '🎓 Student' }}
+                  <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div 
+                      style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;"
+                      :style="{
+                        background: getRoleMeta(user.role).bg,
+                        border: '1px solid ' + getRoleMeta(user.role).border
+                      }"
+                    >
+                      {{ getRoleMeta(user.role).icon }}
+                    </div>
+                    <div>
+                      <div class="user-name-title table-primary-text" style="font-weight: 800; color: var(--text-main); font-size: 0.95rem;">{{ user.name }}</div>
+                      <div class="user-meta-id text-dim" style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--text-muted); opacity: 0.85; margin-top: 1px;">
+                        ID: {{ user.id || user.userId || 'USR-001' }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Email -->
+                <td>
+                  <span style="color: var(--color-ai-cyan); font-size: 0.88rem; font-family: var(--font-mono); font-weight: 500;">
+                    {{ user.email }}
                   </span>
                 </td>
+
+                <!-- Change Staff Role (Interactive Dropdown + Badge) -->
                 <td>
-                  <span class="admin-status-chip status-confirmed">✓ {{ user.verified ? 'Verified' : 'Active' }}</span>
+                  <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+                    <!-- Visual Role Badge -->
+                    <span 
+                      class="staff-role-badge" 
+                      :style="{ 
+                        background: getRoleMeta(user.role).bg, 
+                        color: getRoleMeta(user.role).color,
+                        border: '1px solid ' + getRoleMeta(user.role).border,
+                        fontWeight: '700',
+                        fontSize: '0.78rem'
+                      }"
+                    >
+                      {{ getRoleMeta(user.role).icon }} {{ getRoleMeta(user.role).label.split('/')[0].trim() }}
+                    </span>
+
+                    <!-- Role Switcher Select Dropdown -->
+                    <select 
+                      class="staff-role-changer-select"
+                      :value="user.role || 'student'"
+                      @change="handleRoleChange(user, $event.target.value)"
+                      title="SuperAdmin: Change role for this user account"
+                    >
+                      <option v-for="r in AVAILABLE_STAFF_ROLES" :key="r.value" :value="r.value">
+                        {{ r.icon }} {{ r.label }}
+                      </option>
+                    </select>
+                  </div>
                 </td>
-                <td style="font-family: var(--font-mono); font-size: 0.8rem;">{{ user.createdAt }}</td>
+
+                <!-- Designation / Title -->
+                <td>
+                  <span class="user-desig-text table-primary-text" style="font-size: 0.85rem; font-weight: 600; color: var(--text-main);">
+                    {{ user.designation || (user.role === 'admin' ? 'Executive Director' : (user.role === 'teacher' ? 'Technical Faculty' : (user.role === 'tech-lead' ? 'Tech Lead' : (user.role === 'developer' ? 'Software Engineer' : (user.course || 'Student'))))) }}
+                  </span>
+                </td>
+
+                <!-- Status -->
+                <td style="text-align: center;">
+                  <span class="admin-status-chip status-confirmed" style="font-size: 0.76rem;">
+                    ✓ {{ user.verified ? 'Verified' : 'Active' }}
+                  </span>
+                </td>
+
+                <!-- Registered Date -->
+                <td class="table-sub-text" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">
+                  {{ user.createdAt || 'Active' }}
+                </td>
+
+                <!-- Actions -->
                 <td style="text-align: right;">
                   <div style="display: flex; justify-content: flex-end; gap: 0.4rem;">
+                    <button 
+                      class="admin-icon-btn" 
+                      style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);"
+                      @click="openEditUserModal(user)"
+                      title="Edit Account Details & Permissions"
+                    >
+                      ✏️ Edit
+                    </button>
                     <button 
                       v-if="user.role !== 'admin'" 
                       class="admin-icon-btn" 
@@ -2278,14 +2658,39 @@
                       style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.4);" 
                       title="Reset User Password"
                     >
-                      🔑 Reset Pass
+                      🔑
                     </button>
-                    <button v-if="user.role !== 'admin'" class="admin-icon-btn" @click="handleDeleteUser(user)" style="color: #ef4444;" title="Delete User">🗑️</button>
+                    <button 
+                      v-if="user.role !== 'admin'" 
+                      class="admin-icon-btn" 
+                      @click="handleDeleteUser(user)" 
+                      style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3);" 
+                      title="Delete User Account"
+                    >
+                      🗑️
+                    </button>
                   </div>
                 </td>
               </tr>
-              <tr v-if="usersList.length === 0">
-                <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-dim);">No user accounts recorded yet.</td>
+
+              <!-- Empty state -->
+              <tr v-if="filteredUsersList.length === 0">
+                <td colspan="7" style="text-align: center; padding: 3rem 1.5rem; color: var(--text-muted);">
+                  <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">👥</div>
+                  <h4 style="color: var(--text-main); margin-bottom: 0.35rem;">No Accounts Found</h4>
+                  <p style="font-size: 0.88rem; max-width: 440px; margin: 0 auto 1rem;">
+                    {{ userSearchQuery || userRoleFilter !== 'all' 
+                      ? 'No user accounts match your current search and role filters.' 
+                      : 'No user accounts recorded in database roster.' }}
+                  </p>
+                  <button 
+                    v-if="userSearchQuery || userRoleFilter !== 'all'"
+                    class="btn-secondary" 
+                    @click="userSearchQuery = ''; userRoleFilter = 'all'"
+                  >
+                    Clear Filter
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -2998,7 +3403,7 @@
             <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.4rem;">
               Preview of Official Admission Letter
             </div>
-            <pre style="margin: 0; font-family: var(--font-mono); font-size: 0.78rem; color: #cbd5e1; white-space: pre-wrap; line-height: 1.45;">{{ emailLetterPreview }}</pre>
+            <pre style="margin: 0; font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-main); white-space: pre-wrap; line-height: 1.45;">{{ emailLetterPreview }}</pre>
           </div>
         </div>
 
@@ -3125,7 +3530,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0.85rem; background: rgba(0,0,0,0.4); border-radius: var(--radius-sm);">
               <div>
                 <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">Portal Login URL:</span>
-                <span style="font-family: var(--font-mono); font-size: 0.8rem; color: #cbd5e1;">
+                <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-main); font-weight: 500;">
                   https://ithunt.vercel.app/#login
                 </span>
               </div>
@@ -4012,6 +4417,291 @@
         </div>
       </div>
     </div>
+
+    <!-- ================================================================= -->
+    <!-- MODAL: INSPECT STUDENT EXAM OPTIONS (TEACHER / ADMIN CONSOLE)     -->
+    <!-- ================================================================= -->
+    <div class="modal-overlay" v-if="showInspectExamModal && selectedExamSubmissionForInspection" @click.self="showInspectExamModal = false">
+      <div class="modal-card" style="max-width: 900px; max-height: 90vh; display: flex; flex-direction: column;">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>📝</span> Student Exam Answer Sheet & Option Inspector
+          </div>
+          <button class="modal-close-btn" @click="showInspectExamModal = false">✕</button>
+        </div>
+
+        <!-- Student & Exam Details Banner -->
+        <div style="padding: 1.25rem 1.5rem; background: rgba(15, 23, 42, 0.7); border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.25rem;">
+              <span class="staff-role-badge" style="background: rgba(2, 132, 199, 0.12); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.35);">
+                ROLL: {{ selectedExamSubmissionForInspection.studentRoll }}
+              </span>
+              <strong style="font-size: 1.15rem; color: var(--text-main);">{{ selectedExamSubmissionForInspection.studentName }}</strong>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">
+              Exam: <strong style="color: var(--text-main);">{{ selectedExamSubmissionForInspection.examTitle }}</strong> • Submitted: {{ new Date(selectedExamSubmissionForInspection.submittedAt).toLocaleString('en-IN') }}
+            </div>
+          </div>
+
+          <!-- Score Card Pill -->
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="text-align: right;">
+              <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Score & Marks</div>
+              <div style="font-family: var(--font-mono); font-size: 1.3rem; font-weight: 800; color: var(--text-main);">
+                {{ selectedExamSubmissionForInspection.totalScore }} / {{ selectedExamSubmissionForInspection.totalPossibleMarks }}
+              </div>
+            </div>
+            <span 
+              class="punch-badge" 
+              :class="selectedExamSubmissionForInspection.passed ? 'p-badge-present' : 'p-badge-absent'"
+              style="padding: 0.4rem 1rem; font-size: 0.95rem; font-weight: 800;"
+            >
+              {{ selectedExamSubmissionForInspection.percentage }}% • {{ selectedExamSubmissionForInspection.passed ? 'PASSED' : 'FAILED' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Question-by-Question Evaluation Body -->
+        <div class="modal-body" style="padding: 1.5rem; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 1.25rem;">
+          <div 
+            v-for="(q, qIdx) in selectedExamSubmissionForInspection.questions" 
+            :key="q.id"
+            class="exam-modal-qcard"
+            style="background: rgba(15, 23, 42, 0.55); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-md); padding: 1.25rem;"
+            :style="{
+              borderLeft: q.isCorrect ? '4px solid #10b981' : (q.studentSelectedOption ? '4px solid #ef4444' : '4px solid #f59e0b')
+            }"
+          >
+            <!-- Question Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+              <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <span style="font-weight: 800; font-size: 0.85rem; color: #0284c7;">Question {{ qIdx + 1 }}</span>
+                <span 
+                  class="punch-badge"
+                  :class="q.isCorrect ? 'p-badge-present' : (q.studentSelectedOption ? 'p-badge-absent' : 'p-badge-leave')"
+                  style="font-size: 0.72rem; padding: 0.15rem 0.5rem;"
+                >
+                  {{ q.isCorrect ? '✓ Correct (+1 Mark)' : (q.studentSelectedOption ? '✗ Incorrect (0 Marks)' : '⚠️ Skipped (0 Marks)') }}
+                </span>
+              </div>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">+{{ q.marks || 1 }} Mark</span>
+            </div>
+
+            <h5 style="margin: 0 0 1rem; font-size: 1rem; font-weight: 600; color: var(--text-main); line-height: 1.45;">
+              {{ q.question }}
+            </h5>
+
+            <!-- 4 Options Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.65rem; margin-bottom: 0.85rem;">
+              <div 
+                v-for="opt in q.options" 
+                :key="opt.key"
+                class="exam-modal-option-box"
+                style="padding: 0.75rem 1rem; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 0.75rem; font-size: 0.86rem; transition: all 0.2s ease;"
+                :style="{
+                  background: q.studentSelectedOption === opt.key && q.correctOption === opt.key 
+                    ? 'rgba(16, 185, 129, 0.18)' 
+                    : (q.studentSelectedOption === opt.key 
+                        ? 'rgba(239, 68, 68, 0.18)' 
+                        : (q.correctOption === opt.key 
+                            ? 'rgba(16, 185, 129, 0.08)' 
+                            : 'rgba(15, 23, 42, 0.6)')),
+                  border: q.studentSelectedOption === opt.key && q.correctOption === opt.key 
+                    ? '1px solid #10b981' 
+                    : (q.studentSelectedOption === opt.key 
+                        ? '1px solid #ef4444' 
+                        : (q.correctOption === opt.key 
+                            ? '1px solid rgba(16, 185, 129, 0.5)' 
+                            : '1px solid rgba(255, 255, 255, 0.06)'))
+                }"
+              >
+                <!-- Key Bubble (A, B, C, D) -->
+                <div 
+                  style="width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.82rem; flex-shrink: 0;"
+                  :style="{
+                    background: q.studentSelectedOption === opt.key && q.correctOption === opt.key 
+                      ? '#10b981' 
+                      : (q.studentSelectedOption === opt.key 
+                          ? '#ef4444' 
+                          : (q.correctOption === opt.key 
+                              ? 'rgba(16, 185, 129, 0.3)' 
+                              : 'rgba(255, 255, 255, 0.08)')),
+                    color: q.studentSelectedOption === opt.key && q.correctOption === opt.key ? '#000' : '#fff'
+                  }"
+                >
+                  {{ opt.key }}
+                </div>
+
+                <!-- Option Text -->
+                <div style="flex: 1; color: var(--text-main); line-height: 1.4; font-weight: 500;">
+                  {{ opt.text }}
+                </div>
+
+                <!-- Indicator Tag -->
+                <div>
+                  <span v-if="q.studentSelectedOption === opt.key && q.correctOption === opt.key" style="font-size: 0.72rem; font-weight: 800; color: #10b981;">
+                    ✓ Student Selected (Correct)
+                  </span>
+                  <span v-else-if="q.studentSelectedOption === opt.key" style="font-size: 0.72rem; font-weight: 800; color: #ef4444;">
+                    ✗ Student Selected
+                  </span>
+                  <span v-else-if="q.correctOption === opt.key" style="font-size: 0.72rem; font-weight: 800; color: #10b981;">
+                    ✓ Correct Answer Key
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Explanation & Concept Note -->
+            <div v-if="q.explanation" class="exam-modal-exp-box" style="background: rgba(15, 23, 42, 0.8); border: 1px dashed rgba(56, 189, 248, 0.3); border-radius: var(--radius-sm); padding: 0.65rem 0.85rem; font-size: 0.82rem;">
+              <strong style="color: #0284c7;">💡 Concept & Solution Key: </strong>
+              <span style="color: var(--text-muted);">{{ q.explanation }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="modal-footer-actions" style="padding: 1rem 1.5rem; background: rgba(15, 23, 42, 0.85); border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: flex-end;">
+          <button type="button" class="btn-secondary" @click="showInspectExamModal = false">
+            Close Answer Sheet Inspection ✕
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- MODAL: EDIT STAFF ACCOUNT & SYSTEM ROLE                          -->
+    <!-- ================================================================= -->
+    <div class="modal-overlay" v-if="showEditUserModal && editingUser" @click.self="showEditUserModal = false">
+      <div class="modal-card" style="max-width: 580px;">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>✏️</span> Edit Staff Account & Change Role
+          </div>
+          <button class="modal-close-btn" @click="showEditUserModal = false">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 1.5rem;">
+          <form @submit.prevent="handleSaveUserEdit">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Full Name <span class="req">*</span></label>
+                <input type="text" v-model="editUserForm.name" required class="form-control" placeholder="e.g. Er. Sandeep Srivastava">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Email Address <span class="req">*</span></label>
+                <input type="email" v-model="editUserForm.email" required class="form-control" placeholder="name@ithunt.com">
+              </div>
+
+              <!-- Primary Role Selector -->
+              <div class="form-group full-width">
+                <label class="form-label">Assign System Role <span class="req">*</span></label>
+                <select v-model="editUserForm.role" class="form-control" required style="font-weight: 700;">
+                  <option v-for="r in AVAILABLE_STAFF_ROLES" :key="r.value" :value="r.value">
+                    {{ r.icon }} {{ r.label }}
+                  </option>
+                </select>
+                <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 0.35rem;">
+                  Controls dashboard privileges (SuperAdmin has full executive control, Teacher has student evaluation access, Developer/Tech Lead has engineering access, Student has course portal access).
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Official Designation / Title</label>
+                <input type="text" v-model="editUserForm.designation" class="form-control" placeholder="e.g. Lead Technical Architect">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Contact Phone</label>
+                <input type="text" v-model="editUserForm.phone" class="form-control" placeholder="e.g. 9876543210">
+              </div>
+
+              <div class="form-group full-width" style="display: flex; align-items: center; gap: 0.75rem; margin-top: 0.5rem;">
+                <input type="checkbox" id="editUserVerified" v-model="editUserForm.verified" style="width: 18px; height: 18px; cursor: pointer;">
+                <label for="editUserVerified" style="cursor: pointer; font-size: 0.9rem; font-weight: 600; color: var(--text-main); margin: 0;">
+                  Account Verified & Active Session Allowed
+                </label>
+              </div>
+            </div>
+
+            <div class="modal-footer-actions" style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
+              <button type="button" class="btn-secondary" @click="showEditUserModal = false">Cancel</button>
+              <button type="submit" class="btn-primary">
+                <span>Save Account Changes 💾</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- MODAL: ADD NEW STAFF / USER ACCOUNT                              -->
+    <!-- ================================================================= -->
+    <div class="modal-overlay" v-if="showAddUserModal" @click.self="showAddUserModal = false">
+      <div class="modal-card" style="max-width: 600px;">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>➕</span> Add New Staff Account
+          </div>
+          <button class="modal-close-btn" @click="showAddUserModal = false">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 1.5rem;">
+          <form @submit.prevent="handleCreateUser">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Full Name <span class="req">*</span></label>
+                <input type="text" v-model="newUserForm.name" required class="form-control" placeholder="e.g. Er. Anoop Mishra">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Email Address <span class="req">*</span></label>
+                <input type="email" v-model="newUserForm.email" required class="form-control" placeholder="e.g. anoop@ithunt.com">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Initial Password <span class="req">*</span></label>
+                <div style="display: flex; gap: 0.5rem;">
+                  <input type="text" v-model="newUserForm.password" required class="form-control" placeholder="Password">
+                  <button type="button" class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" @click="newUserForm.password = `ITH@${Math.floor(1000 + Math.random() * 9000)}`">
+                    🎲
+                  </button>
+                </div>
+              </div>
+
+              <!-- Assign Role Dropdown -->
+              <div class="form-group">
+                <label class="form-label">System Role <span class="req">*</span></label>
+                <select v-model="newUserForm.role" class="form-control" required style="font-weight: 700;">
+                  <option v-for="r in AVAILABLE_STAFF_ROLES" :key="r.value" :value="r.value">
+                    {{ r.icon }} {{ r.label }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Designation / Title</label>
+                <input type="text" v-model="newUserForm.designation" class="form-control" placeholder="e.g. Tech Lead & Full Stack Architect">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Contact Phone</label>
+                <input type="text" v-model="newUserForm.phone" class="form-control" placeholder="e.g. 9876543210">
+              </div>
+            </div>
+
+            <div class="modal-footer-actions" style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
+              <button type="button" class="btn-secondary" @click="showAddUserModal = false">Cancel</button>
+              <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); border-color: #10b981;">
+                <span>Create Staff Account 🚀</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
       </div> <!-- /.admin-canvas-content -->
     </main>
   </div>
@@ -4071,13 +4761,20 @@ import {
   saveProjectToBackend,
   updateProjectInBackend,
   deleteProjectFromBackend,
-  saveReviewToBackend
+  saveReviewToBackend,
+  updateUserInBackend,
+  createUserInBackend
 } from '../../utils/apiClient.js';
 import CertificatePreviewModal from '../modals/CertificatePreviewModal.vue';
 import { 
   generateCourseCertificatePdf, 
   generateExperienceCertificatePdf 
 } from '../../utils/certificatePdfGenerator.js';
+import { 
+  EXAM_QUESTION_BANKS, 
+  getStoredExamSubmissions, 
+  saveExamSubmission 
+} from '../../data/examQuestionsData.js';
 
 const props = defineProps({
   content: {
@@ -4566,6 +5263,274 @@ const studentsList = ref(props.allStudents && props.allStudents.length ? [...pro
 const selectedStudentDetail = ref(null);
 const showStudentDetailModal = ref(false);
 
+// --- STUDENT ONLINE EXAM EVALUATION & INSPECTOR STATE (TEACHER CONSOLE) ---
+const storedExamSubmissionsList = ref([]);
+const examSearchQuery = ref('');
+const selectedExamFilter = ref('all');
+const selectedExamStatusFilter = ref('all');
+const showInspectExamModal = ref(false);
+const selectedExamSubmissionForInspection = ref(null);
+
+const allExamBanks = computed(() => EXAM_QUESTION_BANKS);
+
+const refreshStoredExamSubmissions = () => {
+  storedExamSubmissionsList.value = getStoredExamSubmissions();
+};
+
+const onExamSubmittedHandler = () => {
+  refreshStoredExamSubmissions();
+};
+
+const filteredExamSubmissions = computed(() => {
+  let list = storedExamSubmissionsList.value || [];
+
+  if (selectedExamFilter.value !== 'all') {
+    list = list.filter(s => s.examId === selectedExamFilter.value);
+  }
+
+  if (selectedExamStatusFilter.value === 'passed') {
+    list = list.filter(s => s.passed);
+  } else if (selectedExamStatusFilter.value === 'failed') {
+    list = list.filter(s => !s.passed);
+  }
+
+  if (examSearchQuery.value.trim()) {
+    const q = examSearchQuery.value.toLowerCase().trim();
+    list = list.filter(s => {
+      const name = (s.studentName || '').toLowerCase();
+      const roll = (s.studentRoll || '').toLowerCase();
+      const exam = (s.examTitle || '').toLowerCase();
+      const batch = (s.batch || '').toLowerCase();
+      return name.includes(q) || roll.includes(q) || exam.includes(q) || batch.includes(q);
+    });
+  }
+
+  return list;
+});
+
+const examTeacherMetrics = computed(() => {
+  const list = storedExamSubmissionsList.value || [];
+  const uniqueRolls = new Set(list.map(s => s.studentRoll || s.studentId).filter(Boolean));
+  const passed = list.filter(s => s.passed).length;
+  const passRate = list.length > 0 ? Math.round((passed / list.length) * 100) : 0;
+  const avgScore = list.length > 0 ? Math.round(list.reduce((sum, s) => sum + (s.percentage || 0), 0) / list.length) : 0;
+  return {
+    uniqueStudents: uniqueRolls.size,
+    passedCount: passed,
+    passRate,
+    avgScore
+  };
+});
+
+const openTeacherExamInspection = (sub) => {
+  selectedExamSubmissionForInspection.value = sub;
+  showInspectExamModal.value = true;
+};
+
+const goToStudentExams = (stu) => {
+  if (!stu) return;
+  const term = stu.registrationNo || stu.candidateName || stu.name || '';
+  examSearchQuery.value = term;
+  currentTab.value = 'student-exams';
+};
+
+const handleDeleteExamSubmission = (subId) => {
+  if (confirm('Are you sure you want to remove this student exam attempt record?')) {
+    const updated = storedExamSubmissionsList.value.filter(s => s.id !== subId);
+    storedExamSubmissionsList.value = updated;
+    try {
+      localStorage.setItem('ithunt_exam_submissions', JSON.stringify(updated));
+    } catch (_) {}
+  }
+};
+
+// =========================================================================
+// STAFF ACCOUNT & ROLE MANAGEMENT SYSTEM
+// =========================================================================
+const AVAILABLE_STAFF_ROLES = [
+  { value: 'admin', label: 'SuperAdmin / Director', icon: '🛡️', color: '#ea580c', bg: 'rgba(234, 88, 12, 0.12)', border: 'rgba(234, 88, 12, 0.35)' },
+  { value: 'teacher', label: 'Teacher / Faculty Mentor', icon: '👨‍🏫', color: '#059669', bg: 'rgba(5, 150, 105, 0.12)', border: 'rgba(5, 150, 105, 0.35)' },
+  { value: 'tech-lead', label: 'Tech Lead / Architect', icon: '💻', color: '#9333ea', bg: 'rgba(147, 51, 234, 0.12)', border: 'rgba(147, 51, 234, 0.35)' },
+  { value: 'developer', label: 'Software Developer', icon: '⚡', color: '#0284c7', bg: 'rgba(2, 132, 199, 0.12)', border: 'rgba(2, 132, 199, 0.35)' },
+  { value: 'senior-developer', label: 'Senior Developer', icon: '🚀', color: '#2563eb', bg: 'rgba(37, 99, 235, 0.12)', border: 'rgba(37, 99, 235, 0.35)' },
+  { value: 'student', label: 'Student / Candidate', icon: '🎓', color: '#0284c7', bg: 'rgba(2, 132, 199, 0.12)', border: 'rgba(2, 132, 199, 0.35)' },
+  { value: 'intern', label: 'Developer Intern', icon: '💼', color: '#db2777', bg: 'rgba(219, 39, 119, 0.12)', border: 'rgba(219, 39, 119, 0.35)' },
+  { value: 'staff', label: 'Administrative Staff', icon: '👤', color: '#d97706', bg: 'rgba(217, 119, 6, 0.12)', border: 'rgba(217, 119, 6, 0.35)' },
+  { value: 'accountant', label: 'Accountant / Finance', icon: '💳', color: '#0d9488', bg: 'rgba(13, 148, 136, 0.12)', border: 'rgba(13, 148, 136, 0.35)' }
+];
+
+const getRoleMeta = (roleKey) => {
+  const norm = String(roleKey || '').toLowerCase().trim();
+  if (norm === 'superadmin') return AVAILABLE_STAFF_ROLES[0];
+  const found = AVAILABLE_STAFF_ROLES.find(r => r.value === norm);
+  return found || {
+    value: roleKey,
+    label: roleKey || 'Member',
+    icon: '👤',
+    color: '#94a3b8',
+    bg: 'rgba(148, 163, 184, 0.15)',
+    border: 'rgba(148, 163, 184, 0.35)'
+  };
+};
+
+const userSearchQuery = ref('');
+const userRoleFilter = ref('all');
+
+const filteredUsersList = computed(() => {
+  let list = usersList.value || [];
+
+  if (userRoleFilter.value === 'staff') {
+    list = list.filter(u => ['admin', 'superadmin', 'teacher', 'tech-lead', 'developer', 'senior-developer', 'staff', 'accountant'].includes(u.role));
+  } else if (userRoleFilter.value !== 'all') {
+    list = list.filter(u => u.role === userRoleFilter.value);
+  }
+
+  if (userSearchQuery.value.trim()) {
+    const q = userSearchQuery.value.toLowerCase().trim();
+    list = list.filter(u => {
+      const name = (u.name || '').toLowerCase();
+      const email = (u.email || '').toLowerCase();
+      const role = (u.role || '').toLowerCase();
+      const id = (u.id || '').toLowerCase();
+      const desig = (u.designation || '').toLowerCase();
+      return name.includes(q) || email.includes(q) || role.includes(q) || id.includes(q) || desig.includes(q);
+    });
+  }
+
+  return list;
+});
+
+const userStats = computed(() => {
+  const all = usersList.value || [];
+  const staff = all.filter(u => ['admin', 'superadmin', 'teacher', 'tech-lead', 'developer', 'senior-developer', 'staff', 'accountant'].includes(u.role));
+  const teachers = all.filter(u => u.role === 'teacher');
+  const developers = all.filter(u => ['developer', 'senior-developer', 'tech-lead', 'intern'].includes(u.role));
+  const students = all.filter(u => u.role === 'student');
+  return {
+    total: all.length,
+    staffCount: staff.length,
+    teachersCount: teachers.length,
+    devsCount: developers.length,
+    studentsCount: students.length
+  };
+});
+
+const handleRoleChange = async (user, newRole) => {
+  if (!user || !newRole) return;
+  if (user.role === newRole) return;
+
+  const oldRole = user.role;
+  user.role = newRole;
+
+  try {
+    const res = await updateUserInBackend(user.id || user._id, { role: newRole });
+    if (res?.success) {
+      emailActionMsg.value = `✓ Updated ${user.name}'s role to ${getRoleMeta(newRole).label}!`;
+      setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+    }
+  } catch (err) {
+    console.error('Failed to update role in backend:', err);
+  }
+
+  const idx = usersList.value.findIndex(u => u.id === user.id || u.email === user.email);
+  if (idx !== -1) {
+    usersList.value[idx].role = newRole;
+  }
+};
+
+const showEditUserModal = ref(false);
+const editingUser = ref(null);
+const editUserForm = ref({
+  id: '',
+  name: '',
+  email: '',
+  phone: '',
+  role: 'teacher',
+  designation: '',
+  verified: true
+});
+
+const openEditUserModal = (user) => {
+  editingUser.value = user;
+  editUserForm.value = {
+    id: user.id || user._id,
+    name: user.name || '',
+    email: user.email || '',
+    phone: user.phone || '',
+    role: user.role || 'student',
+    designation: user.designation || '',
+    verified: user.verified !== false
+  };
+  showEditUserModal.value = true;
+};
+
+const handleSaveUserEdit = async () => {
+  if (!editingUser.value) return;
+  const targetId = editUserForm.value.id;
+  const updateData = {
+    name: editUserForm.value.name,
+    email: editUserForm.value.email,
+    phone: editUserForm.value.phone,
+    role: editUserForm.value.role,
+    designation: editUserForm.value.designation,
+    verified: editUserForm.value.verified
+  };
+
+  const idx = usersList.value.findIndex(u => u.id === targetId || u.email === editingUser.value.email);
+  if (idx !== -1) {
+    usersList.value[idx] = { ...usersList.value[idx], ...updateData };
+  }
+
+  await updateUserInBackend(targetId, updateData);
+  showEditUserModal.value = false;
+  emailActionMsg.value = `✓ Successfully saved account changes for ${updateData.name}!`;
+  setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+};
+
+const showAddUserModal = ref(false);
+const newUserForm = ref({
+  name: '',
+  email: '',
+  password: '',
+  role: 'teacher',
+  designation: '',
+  phone: ''
+});
+
+const openAddUserModal = () => {
+  newUserForm.value = {
+    name: '',
+    email: '',
+    password: `ITH@${Math.floor(1000 + Math.random() * 9000)}`,
+    role: 'teacher',
+    designation: 'Faculty & Technical Mentor',
+    phone: ''
+  };
+  showAddUserModal.value = true;
+};
+
+const handleCreateUser = async () => {
+  if (!newUserForm.value.email || !newUserForm.value.name) return;
+
+  const payload = {
+    id: `USR-${Date.now()}`,
+    name: newUserForm.value.name.trim(),
+    email: newUserForm.value.email.toLowerCase().trim(),
+    password: newUserForm.value.password || 'Ithunt@123',
+    role: newUserForm.value.role,
+    designation: newUserForm.value.designation,
+    phone: newUserForm.value.phone,
+    verified: true,
+    createdAt: new Date().toLocaleDateString('en-GB')
+  };
+
+  usersList.value.unshift(payload);
+  await createUserInBackend(payload);
+  showAddUserModal.value = false;
+  emailActionMsg.value = `✓ New staff account created for ${payload.name} (${getRoleMeta(payload.role).label})!`;
+  setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+};
+
 // --- STUDENT DASHBOARD CONTROL CENTER (SUPERADMIN FULL CONTROL) ---
 const showDashboardControlModal = ref(false);
 const selectedStudentControl = ref(null);
@@ -4854,6 +5819,7 @@ const quickForm = ref({
 const defaultTabs = [
   { id: 'overview', label: '📊 Dashboard Overview', icon: '📊' },
   { id: 'students', label: '🎓 Students Directory', icon: '🎓' },
+  { id: 'student-exams', label: '📝 Student Exam Sheets', icon: '📝' },
   { id: 'admissions', label: '📝 Admissions Registry', icon: '📝' },
   { id: 'courses', label: '📚 Courses & Programs', icon: '📚' },
   { id: 'nielit', label: '📜 NIELIT Submissions', icon: '📜' },
@@ -6699,6 +7665,7 @@ onMounted(() => {
   sessionTime.value = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   refreshDatabaseStatus();
   refreshAllData();
+  refreshStoredExamSubmissions();
 
   // Dynamic header height measurement for mobile sticky alignment
   updateAdminHeaderHeight();
@@ -6710,6 +7677,7 @@ onMounted(() => {
   }
   if (typeof window !== 'undefined') {
     window.addEventListener('resize', updateAdminHeaderHeight, { passive: true });
+    window.addEventListener('ithunt_exam_submitted', onExamSubmittedHandler);
   }
 
   // Live polling every 12 seconds so SuperAdmin gets new candidate registrations in real-time
@@ -6726,6 +7694,7 @@ onUnmounted(() => {
   }
   if (typeof window !== 'undefined') {
     window.removeEventListener('resize', updateAdminHeaderHeight);
+    window.removeEventListener('ithunt_exam_submitted', onExamSubmittedHandler);
     document.removeEventListener('click', handleAdminOutsideClick, true);
     document.removeEventListener('touchstart', handleAdminOutsideClick, { capture: true });
   }
@@ -7419,8 +8388,20 @@ body.light-theme .admin-data-table th {
 }
 
 .admin-shell.light-theme {
+  --text-main: #0f172a;
+  --text-muted: #334155;
+  --text-dim: #475569;
+  --bg-cyber-dark: #f8fafc;
+  --bg-card-glass: #ffffff;
+  --bg-card-hover: #f1f5f9;
   background: #f4f6fb !important;
-  color: #000000 !important;
+  color: #0f172a !important;
+}
+
+.admin-shell.dark-theme {
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
 }
 
 /* --- SIDEBAR --- */
@@ -9077,8 +10058,22 @@ textarea.form-control {
 }
 
 .admin-shell.light-theme .admin-data-table td {
-  color: #000000 !important;
+  color: #0f172a !important;
   border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.admin-shell.light-theme .admin-data-table td strong,
+.admin-shell.light-theme .admin-data-table td .table-primary-text,
+.admin-shell.light-theme .admin-data-table td .user-name-title,
+.admin-shell.light-theme .admin-data-table td .user-desig-text {
+  color: #0f172a !important;
+}
+
+.admin-shell.light-theme .admin-data-table td .table-sub-text,
+.admin-shell.light-theme .admin-data-table td .user-meta-id,
+.admin-shell.light-theme .admin-data-table td .text-dim {
+  color: #475569 !important;
+  font-weight: 500;
 }
 
 .admin-data-table tbody tr:hover {
@@ -9087,6 +10082,102 @@ textarea.form-control {
 
 .admin-shell.light-theme .admin-data-table tbody tr:hover {
   background: #f8fafc !important;
+}
+
+/* Staff Role Badge */
+.staff-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.22rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+.admin-shell.light-theme .staff-role-badge {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Staff Role Changer Select Dropdown */
+.staff-role-changer-select {
+  width: auto;
+  padding: 0.28rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #0f172a;
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.staff-role-changer-select:hover {
+  border-color: #38bdf8;
+}
+
+.staff-role-changer-select:focus {
+  outline: none;
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+}
+
+.admin-shell.light-theme .staff-role-changer-select {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1.5px solid #cbd5e1 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.admin-shell.light-theme .staff-role-changer-select:hover {
+  border-color: #0284c7 !important;
+}
+
+.admin-shell.light-theme .staff-role-changer-select:focus {
+  border-color: #0284c7 !important;
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.2) !important;
+}
+
+.admin-shell.light-theme .staff-role-changer-select option {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+/* Overview Stat Chips */
+.overview-stat-chip {
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.admin-shell.light-theme .overview-stat-chip {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+/* Exam Inspection Modal Light Theme Contrast */
+.admin-shell.light-theme .exam-modal-qcard {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+.admin-shell.light-theme .exam-modal-option-box {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+.admin-shell.light-theme .exam-modal-exp-box {
+  background: #f0f9ff !important;
+  border-color: #bae6fd !important;
 }
 
 /* Badges & Pills in Tables */

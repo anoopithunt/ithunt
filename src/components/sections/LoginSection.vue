@@ -296,26 +296,40 @@ const routeUserByRole = (user) => {
     return;
   }
 
-  // 2. TEACHER / FACULTY ROLE
-  if (role === 'teacher' || role === 'faculty' || role.includes('teacher') || role.includes('faculty')) {
-    const teacherUser = {
-      name: user.name || 'Er. Sandeep Srivastava (Teacher)',
-      role: user.designation || user.role || 'Senior Faculty Lead & Technical Mentor',
-      roleType: 'teacher',
+  // 2. STAFF / TEACHER / TECH LEAD / DEVELOPER ROLES
+  if (
+    role === 'teacher' || role === 'faculty' || 
+    role === 'tech-lead' || role === 'developer' || 
+    role === 'senior-developer' || role === 'staff' || 
+    role === 'accountant' || role === 'intern' ||
+    role.includes('teacher') || role.includes('faculty') || 
+    role.includes('lead') || role.includes('dev')
+  ) {
+    const staffRoleTitle = role === 'tech-lead' ? 'Tech Lead & Software Architect' 
+      : (role === 'developer' ? 'Software Developer' 
+      : (role === 'senior-developer' ? 'Senior Software Engineer' 
+      : (role === 'accountant' ? 'Accounts & Finance Lead'
+      : (role === 'staff' ? 'Administrative Staff' 
+      : (user.designation || user.role || 'Senior Faculty Lead & Technical Mentor')))));
+
+    const staffUser = {
+      name: user.name || 'Staff Member',
+      role: staffRoleTitle,
+      roleType: role,
       email: email,
-      avatar: user.avatar || 'img/ithunt.jpg',
+      avatar: user.avatar || 'img/ithunt.webp',
       loginTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
     };
 
     if (rememberMe.value) {
       try {
-        sessionStorage.setItem('ithunt_superadmin_auth', JSON.stringify(teacherUser));
-        localStorage.setItem('ithunt_superadmin_auth', JSON.stringify(teacherUser));
+        sessionStorage.setItem('ithunt_superadmin_auth', JSON.stringify(staffUser));
+        localStorage.setItem('ithunt_superadmin_auth', JSON.stringify(staffUser));
       } catch (e) {}
     }
 
-    emit('role-change', 'teacher');
-    emit('login-success', teacherUser);
+    emit('role-change', role);
+    emit('login-success', staffUser);
     return;
   }
 

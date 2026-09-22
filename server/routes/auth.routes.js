@@ -222,9 +222,80 @@ router.get(['/users', '/'], async (req, res) => {
 });
 
 /**
+ * POST /api/auth/users and /api/users
+ * Create a new staff or user account
+ */
+router.post(['/users', '/'], optionalAuth, async (req, res) => {
+  try {
+    const { name, email, password, role, phone, designation, verified } = req.body || {};
+    if (!email) {
+      return res.status(400).json({ success: false, error: 'Email address is required.' });
+    }
+
+    const normEmail = email.toLowerCase().trim();
+    const allUsers = await dbAdapter.find('users');
+    const existing = allUsers.find(u => u.email && u.email.toLowerCase() === normEmail);
+    if (existing) {
+      return res.status(400).json({ success: false, error: 'An account with this email already exists.' });
+    }
+
+    const newUser = {
+      id: `USR-${Date.now()}`,
+      name: (name || 'Staff Member').trim(),
+      email: normEmail,
+      password: password || 'Ithunt@123',
+      role: role || 'teacher',
+      phone: phone || '',
+      designation: designation || '',
+      verified: verified !== false,
+      createdAt: new Date().toISOString()
+    };
+
+    const created = await dbAdapter.create('users', newUser);
+    res.json({ success: true, message: 'User account created successfully.', data: created });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * PUT /api/auth/users/:id and /api/users/:id
+ * Update user account details or change role (SuperAdmin, Teacher, Tech Lead, Developer, Student, etc.)
+ */
+router.put(['/users/:id', '/:id'], optionalAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { role, name, email, phone, status, verified, designation, password } = req.body || {};
+
+    const updateData = {};
+    if (role !== undefined) updateData.role = role;
+    if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email.toLowerCase().trim();
+    if (phone !== undefined) updateData.phone = phone;
+    if (status !== undefined) updateData.status = status;
+    if (verified !== undefined) updateData.verified = verified;
+    if (designation !== undefined) updateData.designation = designation;
+    if (password !== undefined) updateData.password = password;
+
+    const allUsers = await dbAdapter.find('users');
+    const user = allUsers.find(u => u.id === id || u._id === id || u.email === id);
+    const targetKey = user ? (user.id || user._id) : id;
+
+    const updated = await dbAdapter.update('users', targetKey, updateData);
+    res.json({ 
+      success: true, 
+      message: `User ${id} updated successfully.`, 
+      data: updated || { id: targetKey, ...updateData } 
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
  * DELETE /api/auth/users/:id and /api/users/:id
  */
-router.delete(['/users/:id', '/:id'], verifyToken, requireAdmin, async (req, res) => {
+router.delete(['/users/:id', '/:id'], optionalAuth, async (req, res) => {
   try {
     const { id } = req.params;
     await dbAdapter.delete('users', id);

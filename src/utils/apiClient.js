@@ -255,6 +255,7 @@ export const normalizeUser = (u) => ({
   role: u.role || 'student',
   phone: u.phone || '',
   course: u.course || '',
+  designation: u.designation || '',
   verified: u.verified !== undefined ? u.verified : true,
   createdAt: u.createdAt ? (String(u.createdAt).includes('/') ? u.createdAt : new Date(u.createdAt).toLocaleDateString('en-GB')) : new Date().toLocaleDateString('en-GB')
 });
@@ -426,6 +427,8 @@ export const API = {
   // Auth & Admin Users
   login: (credentials) => apiRequest('/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),
   getUsers: () => apiRequest('/auth/users'),
+  createUser: (data) => apiRequest('/auth/users', { method: 'POST', body: JSON.stringify(data) }),
+  updateUser: (id, data) => apiRequest(`/auth/users/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteUser: (id) => apiRequest(`/auth/users/${id}`, { method: 'DELETE' }),
   getDashboardStats: () => apiRequest('/admin/stats'),
   syncDatabase: () => apiRequest('/admin/stats')
@@ -1699,6 +1702,33 @@ export async function deleteUserFromBackend(userId, token = '') {
   } catch (e) { }
 
   return { success: true, localOnly: true };
+}
+
+/**
+ * Update user account & role in MongoDB (ithunt) via REST API
+ */
+export async function updateUserInBackend(userId, updateData) {
+  if (!userId) return { success: false, error: 'User ID is required' };
+  try {
+    const res = await API.updateUser(userId, updateData);
+    if (res?.success) return { success: true, data: res.data };
+  } catch (err) {
+    console.warn('API update user notice:', err.message);
+  }
+  return { success: true, localOnly: true, data: updateData };
+}
+
+/**
+ * Create a new user account in MongoDB (ithunt) via REST API
+ */
+export async function createUserInBackend(userData) {
+  try {
+    const res = await API.createUser(userData);
+    if (res?.success) return { success: true, data: res.data };
+  } catch (err) {
+    console.warn('API create user notice:', err.message);
+  }
+  return { success: true, localOnly: true, data: userData };
 }
 
 /**

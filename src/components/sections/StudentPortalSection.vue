@@ -1269,6 +1269,214 @@
           </div>
         </div>
       </section>
+
+      <!-- =============================================================== -->
+      <!-- TAB 8: ONLINE EXAM & ASSESSMENT CENTER                           -->
+      <!-- =============================================================== -->
+      <section v-else-if="currentTab === 'exams'" class="dash-tab-content anim-stagger-2">
+        <!-- Top Exam Center KPI Summary -->
+        <div class="overview-kpi-grid" style="margin-bottom: 2rem;">
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;">
+              📝
+            </div>
+            <div class="kpi-details">
+              <div class="kpi-label">Available Exams</div>
+              <div class="kpi-val text-gradient">{{ examStats.totalAvailable }} Tests</div>
+              <div class="kpi-sub">Curriculum Benchmarked</div>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+              ✅
+            </div>
+            <div class="kpi-details">
+              <div class="kpi-label">Completed Tests</div>
+              <div class="kpi-val" style="color: #10b981;">{{ examStats.totalCompleted }} / {{ examStats.totalAvailable }}</div>
+              <div class="kpi-sub">{{ examStats.passedCount }} Passed Assessments</div>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap" style="background: rgba(249, 115, 22, 0.15); color: var(--color-ai-orange);">
+              🎯
+            </div>
+            <div class="kpi-details">
+              <div class="kpi-label">Average Score</div>
+              <div class="kpi-val">{{ examStats.avgScore }}%</div>
+              <div class="kpi-sub">Across All Submissions</div>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">
+              🏅
+            </div>
+            <div class="kpi-details">
+              <div class="kpi-label">Certification Status</div>
+              <div class="kpi-val" style="color: #a855f7;">{{ examStats.passedCount >= 2 ? 'Eligible' : 'In Progress' }}</div>
+              <div class="kpi-sub">Min 50% Pass Mark</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Available Exams Catalog Grid -->
+        <div class="dash-panel" style="margin-bottom: 2.5rem;">
+          <div class="panel-header">
+            <div>
+              <h3 class="panel-title">
+                <span>💻</span> Online Module Assessments & Tests
+              </h3>
+              <p class="panel-subtitle">
+                Select an exam module below to test your technical competency. Your chosen options, scores, and timestamps are recorded and visible to your mentors and teachers.
+              </p>
+            </div>
+          </div>
+
+          <div class="exam-grid-container">
+            <div 
+              v-for="exam in examList" 
+              :key="exam.id" 
+              class="exam-catalog-card anim-hover-glow"
+            >
+              <div class="exam-card-top-row">
+                <span class="exam-subject-badge">{{ exam.subject }}</span>
+                <span 
+                  v-if="getExamProgressForStudent(exam.id).status === 'Completed'"
+                  class="exam-status-pill completed"
+                >
+                  ✓ Score: {{ getExamProgressForStudent(exam.id).bestScore }}%
+                </span>
+                <span v-else class="exam-status-pill pending">
+                  ● Ready to Take
+                </span>
+              </div>
+
+              <h4 class="exam-card-title">{{ exam.title }}</h4>
+              <p class="exam-card-desc">{{ exam.description }}</p>
+
+              <div class="exam-specs-row">
+                <span class="spec-item" title="Exam Duration">⏱️ {{ exam.durationMinutes }} Mins</span>
+                <span class="spec-item" title="Total Questions">❓ {{ exam.totalQuestions }} MCQs</span>
+                <span class="spec-item" title="Passing Marks">🎯 {{ exam.passingPercentage }}% Pass</span>
+                <span class="spec-item" title="Total Marks">💯 {{ exam.totalPossibleMarks }} Marks</span>
+              </div>
+
+              <div class="exam-actions-row">
+                <button 
+                  v-if="getExamProgressForStudent(exam.id).status !== 'Completed'"
+                  class="btn-primary start-exam-btn" 
+                  @click="startExam(exam)"
+                >
+                  <span>Start Online Exam 🚀</span>
+                </button>
+                <template v-else>
+                  <button 
+                    class="btn-secondary retake-exam-btn" 
+                    @click="startExam(exam)" 
+                    title="Retake this assessment to improve score"
+                  >
+                    <span>🔁 Retake</span>
+                  </button>
+                  <button 
+                    class="btn-primary review-exam-btn" 
+                    @click="openSubmissionReview(getExamProgressForStudent(exam.id).latest)"
+                  >
+                    <span>Inspect Answers 👁️</span>
+                  </button>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Student Exam History & Selected Options Table -->
+        <div class="dash-panel">
+          <div class="panel-header">
+            <div>
+              <h3 class="panel-title">
+                <span>📋</span> My Exam Submission History & Answer Sheets
+              </h3>
+              <p class="panel-subtitle">
+                Review your submitted exams, scores, and question-by-question option selections.
+              </p>
+            </div>
+            <span class="badge-accent">{{ studentSubmissions.length }} Submissions on Record</span>
+          </div>
+
+          <div v-if="studentSubmissions.length === 0" class="empty-state-box" style="text-align: center; padding: 3rem 1.5rem;">
+            <div style="font-size: 3rem; margin-bottom: 0.75rem;">📝</div>
+            <h4 style="margin-bottom: 0.5rem; font-size: 1.15rem;">No Exam Submissions Yet</h4>
+            <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 480px; margin: 0 auto 1.5rem;">
+              You have not attempted any online tests yet. Choose an exam from the modules above to assess your programming skills.
+            </p>
+            <button class="btn-primary" @click="startExam(examList[0])">
+              <span>Start First Exam: {{ examList[0]?.title }} 🚀</span>
+            </button>
+          </div>
+
+          <div v-else class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Exam Title & Subject</th>
+                  <th>Submitted At</th>
+                  <th style="text-align: center;">Score</th>
+                  <th style="text-align: center;">Percentage</th>
+                  <th style="text-align: center;">Status</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="sub in studentSubmissions" :key="sub.id">
+                  <td>
+                    <strong style="color: var(--color-white); font-size: 0.95rem;">{{ sub.examTitle }}</strong>
+                    <div class="text-dim" style="font-size: 0.8rem;">Attempt ID: {{ sub.id }}</div>
+                  </td>
+                  <td>
+                    <div style="font-size: 0.9rem; font-weight: 600;">{{ new Date(sub.submittedAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) }}</div>
+                    <div class="text-dim" style="font-size: 0.78rem;">{{ new Date(sub.submittedAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) }}</div>
+                  </td>
+                  <td style="text-align: center; font-family: var(--font-mono); font-weight: 700; font-size: 0.95rem;">
+                    {{ sub.totalScore }} / {{ sub.totalPossibleMarks }}
+                  </td>
+                  <td style="text-align: center;">
+                    <span 
+                      class="score-pill"
+                      :style="{
+                        background: sub.passed ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                        color: sub.passed ? '#10b981' : '#ef4444',
+                        border: '1px solid ' + (sub.passed ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)')
+                      }"
+                    >
+                      {{ sub.percentage }}%
+                    </span>
+                  </td>
+                  <td style="text-align: center;">
+                    <span 
+                      class="punch-badge"
+                      :class="sub.passed ? 'p-badge-present' : 'p-badge-absent'"
+                    >
+                      {{ sub.passed ? 'PASSED' : 'FAILED' }}
+                    </span>
+                  </td>
+                  <td style="text-align: right;">
+                    <button 
+                      class="btn-secondary" 
+                      style="padding: 0.35rem 0.85rem; font-size: 0.82rem;"
+                      @click="openSubmissionReview(sub)"
+                      title="Inspect questions and selected options"
+                    >
+                      <span>Inspect Options 👁️</span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
       </template>
     </div>
 
@@ -1357,6 +1565,243 @@
       @close="showCertPreviewModal = false"
     />
 
+    <!-- ================================================================= -->
+    <!-- MODAL 1: LIVE INTERACTIVE ONLINE EXAM PLAYER                      -->
+    <!-- ================================================================= -->
+    <div v-if="activeExamModal && activeExam" class="modal-backdrop exam-player-backdrop">
+      <div class="exam-player-modal anim-scale-up">
+        <!-- Exam Top Header -->
+        <div class="exam-player-header">
+          <div class="exam-header-meta">
+            <span class="exam-header-badge">LIVE TEST IN PROGRESS</span>
+            <h3 class="exam-header-title">{{ activeExam.title }}</h3>
+            <span class="exam-header-sub">{{ activeExam.subject }} • Passing Criteria: {{ activeExam.passingPercentage }}%</span>
+          </div>
+
+          <!-- Countdown Timer -->
+          <div class="exam-timer-widget" :class="{ 'timer-warning': examSecondsRemaining <= 120 }">
+            <div class="timer-label">TIME LEFT</div>
+            <div class="timer-digits">⏱️ {{ formatExamTimer }}</div>
+          </div>
+
+          <button class="exam-close-btn" @click="closeExamModal" title="Cancel and Exit Test">✕</button>
+        </div>
+
+        <!-- Question Number Navigation Palette -->
+        <div class="exam-palette-bar">
+          <div class="palette-label">Question Palette:</div>
+          <div class="palette-btn-row">
+            <button 
+              v-for="(q, idx) in activeExam.questions" 
+              :key="q.id"
+              class="palette-btn"
+              :class="{
+                'current': currentQIndex === idx,
+                'answered': !!selectedAnswers[q.id],
+                'unanswered': !selectedAnswers[q.id] && currentQIndex !== idx
+              }"
+              @click="currentQIndex = idx"
+              :title="selectedAnswers[q.id] ? `Question ${idx + 1}: Answered (${selectedAnswers[q.id]})` : `Question ${idx + 1}: Not Answered`"
+            >
+              {{ idx + 1 }}
+            </button>
+          </div>
+          <div class="palette-legend">
+            <span class="pal-leg"><span class="leg-dot dot-current"></span> Current</span>
+            <span class="pal-leg"><span class="leg-dot dot-answered"></span> Answered ({{ answeredCount }})</span>
+            <span class="pal-leg"><span class="leg-dot dot-unanswered"></span> Left ({{ activeExam.questions.length - answeredCount }})</span>
+          </div>
+        </div>
+
+        <!-- Question Content Body -->
+        <div class="exam-player-body" v-if="currentQuestion">
+          <div class="question-stem-card">
+            <div class="question-index-row">
+              <span class="q-num-chip">Question {{ currentQIndex + 1 }} of {{ activeExam.questions.length }}</span>
+              <span class="q-mark-chip">+{{ currentQuestion.marks || 1 }} Mark</span>
+            </div>
+            <h4 class="question-text">{{ currentQuestion.question }}</h4>
+          </div>
+
+          <!-- 4 Multiple Choice Options (A, B, C, D) -->
+          <div class="options-grid">
+            <div 
+              v-for="opt in currentQuestion.options" 
+              :key="opt.key"
+              class="option-card"
+              :class="{ 'selected': selectedAnswers[currentQuestion.id] === opt.key }"
+              @click="selectAnswer(currentQuestion.id, opt.key)"
+            >
+              <div class="option-key-bubble">{{ opt.key }}</div>
+              <div class="option-content-text">{{ opt.text }}</div>
+              <div class="option-radio-check">
+                <span v-if="selectedAnswers[currentQuestion.id] === opt.key">✓</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Player Bottom Controls -->
+        <div class="exam-player-footer">
+          <div class="footer-left-actions">
+            <button 
+              class="btn-secondary nav-arrow-btn" 
+              :disabled="currentQIndex === 0"
+              @click="currentQIndex--"
+            >
+              <span>← Previous</span>
+            </button>
+            <button 
+              v-if="currentQuestion && selectedAnswers[currentQuestion.id]"
+              class="btn-text-clear"
+              @click="clearAnswer(currentQuestion.id)"
+            >
+              Clear Choice ↺
+            </button>
+          </div>
+
+          <div class="footer-right-actions">
+            <button 
+              v-if="currentQIndex < activeExam.questions.length - 1"
+              class="btn-secondary nav-arrow-btn"
+              @click="currentQIndex++"
+            >
+              <span>Next →</span>
+            </button>
+
+            <button 
+              class="btn-primary submit-final-btn"
+              :disabled="isSubmittingExam"
+              @click="confirmAndSubmitExam(false)"
+            >
+              <span>{{ isSubmittingExam ? 'Submitting...' : `Submit Exam (${answeredCount}/${activeExam.questions.length} Answered) ✅` }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- MODAL 2: DETAILED EXAM REVIEW & SELECTED OPTIONS INSPECTION        -->
+    <!-- ================================================================= -->
+    <div v-if="showReviewModal && selectedSubmissionForReview" class="modal-backdrop review-modal-backdrop" @click.self="showReviewModal = false">
+      <div class="exam-review-modal anim-scale-up">
+        <!-- Header -->
+        <div class="review-modal-header">
+          <div>
+            <span class="exam-header-badge">EVALUATION & ANSWER SHEET</span>
+            <h3 class="review-title">{{ selectedSubmissionForReview.examTitle }}</h3>
+            <p class="review-sub">
+              Candidate: <strong>{{ selectedSubmissionForReview.studentName }}</strong> (Roll No: {{ selectedSubmissionForReview.studentRoll }}) • Submitted: {{ new Date(selectedSubmissionForReview.submittedAt).toLocaleString('en-IN') }}
+            </p>
+          </div>
+          <button class="exam-close-btn" @click="showReviewModal = false">✕</button>
+        </div>
+
+        <!-- Score Banner -->
+        <div class="review-score-banner" :class="selectedSubmissionForReview.passed ? 'banner-passed' : 'banner-failed'">
+          <div class="score-banner-left">
+            <div class="score-percentage">{{ selectedSubmissionForReview.percentage }}%</div>
+            <div class="score-label">Overall Exam Score</div>
+          </div>
+          <div class="score-banner-right">
+            <div class="score-stat-row">
+              <span>Total Score:</span>
+              <strong>{{ selectedSubmissionForReview.totalScore }} / {{ selectedSubmissionForReview.totalPossibleMarks }} Marks</strong>
+            </div>
+            <div class="score-stat-row">
+              <span>Result Status:</span>
+              <strong :style="{ color: selectedSubmissionForReview.passed ? '#10b981' : '#ef4444' }">
+                {{ selectedSubmissionForReview.passed ? '✓ PASSED (Benchmark Met)' : '✗ FAILED (Retake Recommended)' }}
+              </strong>
+            </div>
+            <div class="score-stat-row">
+              <span>Passing Threshold:</span>
+              <span>50% Required</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question Breakdown with Selected Option Highlights -->
+        <div class="review-questions-list">
+          <div class="review-list-header">
+            <h4 style="margin: 0; font-size: 1.1rem; color: #fff;">Detailed Question & Option Breakdown</h4>
+            <span class="badge-accent">{{ selectedSubmissionForReview.questions?.length }} Questions Evaluated</span>
+          </div>
+
+          <div 
+            v-for="(q, qIdx) in selectedSubmissionForReview.questions" 
+            :key="q.id"
+            class="review-question-card"
+            :class="{
+              'q-correct': q.isCorrect,
+              'q-incorrect': !q.isCorrect && q.studentSelectedOption,
+              'q-skipped': !q.studentSelectedOption
+            }"
+          >
+            <div class="review-q-top">
+              <div class="review-q-num">
+                <span class="q-badge">Q{{ qIdx + 1 }}</span>
+                <span class="q-status-tag" v-if="q.isCorrect" style="color: #10b981; background: rgba(16, 185, 129, 0.15);">
+                  ✓ Correct (+{{ q.marksEarned || q.marks }} Marks)
+                </span>
+                <span class="q-status-tag" v-else-if="q.studentSelectedOption" style="color: #ef4444; background: rgba(239, 68, 68, 0.15);">
+                  ✗ Incorrect (0 Marks)
+                </span>
+                <span class="q-status-tag" v-else style="color: #f59e0b; background: rgba(245, 158, 11, 0.15);">
+                  ⚠️ Not Attempted (0 Marks)
+                </span>
+              </div>
+              <span class="q-mark-tag">{{ q.marks || 1 }} Mark</span>
+            </div>
+
+            <div class="review-q-title">{{ q.question }}</div>
+
+            <!-- Options Grid with Clear Indicators -->
+            <div class="review-options-grid">
+              <div 
+                v-for="opt in q.options" 
+                :key="opt.key"
+                class="review-opt-box"
+                :class="{
+                  'student-chosen-correct': q.studentSelectedOption === opt.key && q.correctOption === opt.key,
+                  'student-chosen-wrong': q.studentSelectedOption === opt.key && q.correctOption !== opt.key,
+                  'is-correct-target': q.correctOption === opt.key && q.studentSelectedOption !== opt.key
+                }"
+              >
+                <div class="opt-box-key">{{ opt.key }}</div>
+                <div class="opt-box-text">{{ opt.text }}</div>
+                <div class="opt-box-indicator">
+                  <span v-if="q.studentSelectedOption === opt.key && q.correctOption === opt.key" class="tag-opt-match">
+                    ✓ Your Answer (Correct)
+                  </span>
+                  <span v-else-if="q.studentSelectedOption === opt.key" class="tag-opt-wrong">
+                    ✗ Your Selected Option
+                  </span>
+                  <span v-else-if="q.correctOption === opt.key" class="tag-opt-target">
+                    ✓ Correct Answer
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Concept Explanation Box -->
+            <div v-if="q.explanation" class="review-explanation-card">
+              <div class="exp-title">💡 Explanation & Technical Concept:</div>
+              <div class="exp-body">{{ q.explanation }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review Footer -->
+        <div class="review-modal-footer">
+          <button class="btn-secondary" @click="showReviewModal = false">
+            Close Answer Sheet ✕
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Success Toast Notification -->
     <div v-if="successMsg" class="success-toast anim-fade-in" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 9999; background: #10b981; color: white; padding: 0.85rem 1.5rem; border-radius: var(--radius-md); box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-weight: 600; font-size: 0.9rem;">
       {{ successMsg }}
@@ -1365,7 +1810,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch, onMounted } from 'vue';
+import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue';
 import QRCode from 'qrcode';
 import { changeStudentPassword, API } from '../../utils/apiClient.js';
 import CertificatePreviewModal from '../modals/CertificatePreviewModal.vue';
@@ -1379,6 +1824,12 @@ import {
   DAILY_ATTENDANCE_LOG,
   DEFAULT_DEMO_STUDENT
 } from '../../data/studentAcademicData.js';
+import {
+  EXAM_QUESTION_BANKS,
+  getStoredExamSubmissions,
+  saveExamSubmission,
+  gradeExam
+} from '../../data/examQuestionsData.js';
 
 const props = defineProps({
   content: { type: Object, required: true },
@@ -1396,6 +1847,7 @@ const emit = defineEmits([
 // Sub-Navigation Master Tabs
 const masterStudentTabs = [
   { id: 'overview', label: 'Overview', icon: '📊' },
+  { id: 'exams', label: 'Online Exam', icon: '📝', badge: 'Active' },
   { id: 'certificates', label: 'Certificates & QR', icon: '🏅', badge: 'Verified' },
   { id: 'profile', label: 'Student Details', icon: '👤' },
   { id: 'course', label: 'Course & Syllabus', icon: '📚' },
@@ -1431,6 +1883,7 @@ const studentTabs = computed(() => {
 
   return masterStudentTabs.filter(tab => {
     if (tab.id === 'overview') return controls.overview !== false;
+    if (tab.id === 'exams') return controls.exams !== false;
     if (tab.id === 'certificates') return controls.certificates !== false;
     if (tab.id === 'profile') return true; // Profile is always accessible
     if (tab.id === 'course') return controls.syllabus !== false;
@@ -1958,6 +2411,193 @@ const handlePasswordChange = async () => {
   } finally {
     isChangingPass.value = false;
   }
+};
+
+// =========================================================================
+// ONLINE EXAM SYSTEM STATE & LOGIC
+// =========================================================================
+const examList = ref(EXAM_QUESTION_BANKS);
+const storedSubmissions = ref([]);
+
+const refreshExamSubmissions = () => {
+  storedSubmissions.value = getStoredExamSubmissions();
+};
+
+const onExamSubmittedGlobalEvent = () => {
+  refreshExamSubmissions();
+};
+
+onMounted(() => {
+  refreshExamSubmissions();
+  window.addEventListener('ithunt_exam_submitted', onExamSubmittedGlobalEvent);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('ithunt_exam_submitted', onExamSubmittedGlobalEvent);
+  if (examTimerInterval.value) {
+    clearInterval(examTimerInterval.value);
+  }
+});
+
+// Current student identifiers
+const currentStudentRoll = computed(() => {
+  return activeStudent.value?.registrationNo || props.studentUser?.registrationNo || 'ITH-2026-001';
+});
+
+const currentStudentName = computed(() => {
+  return activeStudent.value?.candidateName || props.studentUser?.candidateName || 'Student';
+});
+
+// All submissions by this student
+const studentSubmissions = computed(() => {
+  const roll = currentStudentRoll.value.toLowerCase().trim();
+  const email = (activeStudent.value?.email || props.studentUser?.email || '').toLowerCase().trim();
+  return storedSubmissions.value.filter(s => {
+    const sRoll = (s.studentRoll || s.studentId || '').toLowerCase().trim();
+    const sEmail = (s.studentEmail || '').toLowerCase().trim();
+    return (roll && sRoll === roll) || (email && sEmail === email);
+  }).sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+});
+
+// Overview exam stats for KPI cards
+const examStats = computed(() => {
+  const totalAvailable = examList.value.length;
+  const submissions = studentSubmissions.value;
+  const completedExamIds = new Set(submissions.map(s => s.examId));
+  const totalCompleted = completedExamIds.size;
+  const passedCount = submissions.filter(s => s.passed).length;
+  const avgScore = submissions.length > 0 
+    ? Math.round(submissions.reduce((acc, s) => acc + s.percentage, 0) / submissions.length)
+    : 0;
+
+  return {
+    totalAvailable,
+    totalCompleted,
+    passedCount,
+    avgScore
+  };
+});
+
+// Exam Player State
+const activeExamModal = ref(false);
+const activeExam = ref(null);
+const currentQIndex = ref(0);
+const selectedAnswers = ref({}); // { [questionId]: 'A' | 'B' | 'C' | 'D' }
+const examSecondsRemaining = ref(0);
+const examTimerInterval = ref(null);
+const isSubmittingExam = ref(false);
+
+// Exam Review Modal State
+const showReviewModal = ref(false);
+const selectedSubmissionForReview = ref(null);
+
+const formatExamTimer = computed(() => {
+  const mins = Math.floor(examSecondsRemaining.value / 60);
+  const secs = examSecondsRemaining.value % 60;
+  return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+});
+
+const currentQuestion = computed(() => {
+  if (!activeExam.value || !activeExam.value.questions) return null;
+  return activeExam.value.questions[currentQIndex.value] || null;
+});
+
+const answeredCount = computed(() => {
+  return Object.keys(selectedAnswers.value).filter(k => !!selectedAnswers.value[k]).length;
+});
+
+const getExamProgressForStudent = (examId) => {
+  const attempts = studentSubmissions.value.filter(s => s.examId === examId);
+  if (attempts.length === 0) return { status: 'Not Attempted', attempts: 0, bestScore: null, latest: null };
+  const best = attempts.reduce((max, curr) => curr.percentage > (max?.percentage || 0) ? curr : max, attempts[0]);
+  return {
+    status: 'Completed',
+    attempts: attempts.length,
+    bestScore: best.percentage,
+    passed: best.passed,
+    latest: attempts[0]
+  };
+};
+
+const startExam = (exam) => {
+  activeExam.value = exam;
+  currentQIndex.value = 0;
+  selectedAnswers.value = {};
+  examSecondsRemaining.value = exam.durationMinutes * 60;
+  activeExamModal.value = true;
+
+  if (examTimerInterval.value) clearInterval(examTimerInterval.value);
+  examTimerInterval.value = setInterval(() => {
+    if (examSecondsRemaining.value > 0) {
+      examSecondsRemaining.value--;
+    } else {
+      clearInterval(examTimerInterval.value);
+      alert('Time is up! Submitting exam automatically.');
+      confirmAndSubmitExam(true);
+    }
+  }, 1000);
+};
+
+const selectAnswer = (questionId, optionKey) => {
+  selectedAnswers.value[questionId] = optionKey;
+};
+
+const clearAnswer = (questionId) => {
+  delete selectedAnswers.value[questionId];
+};
+
+const confirmAndSubmitExam = (force = false) => {
+  if (!activeExam.value) return;
+
+  const totalQuestions = activeExam.value.questions.length;
+  const answered = answeredCount.value;
+
+  if (!force && answered < totalQuestions) {
+    const proceed = confirm(`You have answered ${answered} out of ${totalQuestions} questions. Are you sure you want to finish and submit now?`);
+    if (!proceed) return;
+  }
+
+  isSubmittingExam.value = true;
+  if (examTimerInterval.value) {
+    clearInterval(examTimerInterval.value);
+    examTimerInterval.value = null;
+  }
+
+  const studentInfo = {
+    studentId: currentStudentRoll.value,
+    studentName: currentStudentName.value,
+    studentEmail: activeStudent.value?.email || props.studentUser?.email || '',
+    studentRoll: currentStudentRoll.value,
+    batch: activeStudent.value?.batchTiming || props.studentUser?.batchTiming || activeStudent.value?.course || 'MERN Stack Web Engineer'
+  };
+
+  const graded = gradeExam(activeExam.value, selectedAnswers.value, studentInfo);
+  saveExamSubmission(graded);
+  refreshExamSubmissions();
+
+  isSubmittingExam.value = false;
+  activeExamModal.value = false;
+  activeExam.value = null;
+
+  // Immediately display the results and answer options review
+  selectedSubmissionForReview.value = graded;
+  showReviewModal.value = true;
+};
+
+const closeExamModal = () => {
+  if (confirm('Are you sure you want to exit the exam? Your progress will be discarded.')) {
+    if (examTimerInterval.value) {
+      clearInterval(examTimerInterval.value);
+      examTimerInterval.value = null;
+    }
+    activeExamModal.value = false;
+    activeExam.value = null;
+  }
+};
+
+const openSubmissionReview = (submission) => {
+  selectedSubmissionForReview.value = submission;
+  showReviewModal.value = true;
 };
 
 const handleLogout = () => {
@@ -4096,5 +4736,790 @@ const handleLogout = () => {
   justify-content: center;
   gap: 1rem;
   flex-wrap: wrap;
+}
+
+/* ========================================================================= */
+/* ONLINE EXAM & ASSESSMENT CENTER STYLES                                    */
+/* ========================================================================= */
+.exam-grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.exam-catalog-card {
+  background: var(--bg-card-glass);
+  border: 1px solid var(--border-cyber);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.exam-catalog-card:hover {
+  border-color: var(--color-ai-orange);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(249, 115, 22, 0.15);
+  transform: translateY(-2px);
+}
+
+.exam-card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.exam-subject-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-ai-orange);
+  background: rgba(249, 115, 22, 0.12);
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+}
+
+.exam-status-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-full);
+}
+
+.exam-status-pill.completed {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.exam-status-pill.pending {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.exam-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 0.5rem;
+  line-height: 1.35;
+}
+
+.exam-card-desc {
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0 0 1.25rem;
+  flex-grow: 1;
+}
+
+.exam-specs-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: 0.75rem;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  margin-bottom: 1.25rem;
+}
+
+.spec-item {
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  font-weight: 600;
+}
+
+.exam-actions-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.start-exam-btn, .review-exam-btn, .retake-exam-btn {
+  flex: 1;
+  padding: 0.65rem 1rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.score-pill {
+  display: inline-block;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-full);
+}
+
+/* ========================================================================= */
+/* LIVE EXAM PLAYER MODAL                                                    */
+/* ========================================================================= */
+.exam-player-backdrop {
+  z-index: 10000;
+  background: rgba(4, 8, 18, 0.88);
+  padding: 1rem;
+}
+
+.exam-player-modal {
+  width: 100%;
+  max-width: 860px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(145deg, #0b1120, #131d33);
+  border: 1px solid var(--border-cyber-glow);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85), 0 0 35px rgba(249, 115, 22, 0.25);
+  overflow: hidden;
+  color: #fff;
+}
+
+.exam-player-header {
+  padding: 1.25rem 1.75rem;
+  background: rgba(15, 23, 42, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.exam-header-meta {
+  flex: 1;
+  min-width: 240px;
+}
+
+.exam-header-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--color-ai-orange);
+  background: rgba(249, 115, 22, 0.15);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-full);
+  margin-bottom: 0.35rem;
+}
+
+.exam-header-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 0.2rem;
+}
+
+.exam-header-sub {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.exam-timer-widget {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  text-align: center;
+  min-width: 140px;
+}
+
+.exam-timer-widget.timer-warning {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  animation: pulse-border 1s infinite alternate;
+}
+
+@keyframes pulse-border {
+  from { box-shadow: 0 0 5px rgba(239, 68, 68, 0.4); }
+  to { box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); }
+}
+
+.timer-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.timer-digits {
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #38bdf8;
+}
+
+.exam-timer-widget.timer-warning .timer-digits {
+  color: #ef4444;
+}
+
+.exam-close-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
+}
+
+.exam-close-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+  color: #fff;
+  border-color: #ef4444;
+}
+
+/* Palette Strip */
+.exam-palette-bar {
+  padding: 0.75rem 1.75rem;
+  background: rgba(10, 15, 28, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.palette-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.palette-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.palette-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.85rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.palette-btn.current {
+  background: var(--color-ai-orange);
+  color: #fff;
+  border-color: var(--color-ai-orange);
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
+}
+
+.palette-btn.answered {
+  background: rgba(16, 185, 129, 0.25);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.5);
+}
+
+.palette-btn.unanswered {
+  background: rgba(255, 255, 255, 0.06);
+  color: #94a3b8;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.palette-legend {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.pal-leg {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.leg-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dot-current { background: var(--color-ai-orange); }
+.dot-answered { background: #10b981; }
+.dot-unanswered { background: #64748b; }
+
+/* Question Body */
+.exam-player-body {
+  padding: 1.75rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.question-stem-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.question-index-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.65rem;
+}
+
+.q-num-chip {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #38bdf8;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.q-mark-chip {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.15);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
+}
+
+.question-text {
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #fff;
+  margin: 0;
+}
+
+/* Options Grid */
+.options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.option-card {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.option-card:hover {
+  border-color: rgba(59, 130, 246, 0.5);
+  background: rgba(30, 41, 59, 0.7);
+  transform: translateX(4px);
+}
+
+.option-card.selected {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+}
+
+.option-key-bubble {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.option-card.selected .option-key-bubble {
+  background: #10b981;
+  border-color: #10b981;
+  color: #000;
+}
+
+.option-content-text {
+  flex: 1;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: #e2e8f0;
+}
+
+.option-radio-check {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+.option-card.selected .option-radio-check {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.25);
+}
+
+/* Exam Player Footer */
+.exam-player-footer {
+  padding: 1rem 1.75rem;
+  background: rgba(15, 23, 42, 0.9);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.footer-left-actions, .footer-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.nav-arrow-btn {
+  padding: 0.6rem 1.15rem;
+  font-size: 0.85rem;
+}
+
+.btn-text-clear {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.82rem;
+  text-decoration: underline;
+  padding: 0.25rem 0.5rem;
+}
+
+.btn-text-clear:hover {
+  color: #ef4444;
+}
+
+.submit-final-btn {
+  padding: 0.65rem 1.4rem;
+  font-size: 0.9rem;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-color: #10b981;
+}
+
+/* ========================================================================= */
+/* EXAM REVIEW & INSPECTION MODAL                                            */
+/* ========================================================================= */
+.review-modal-backdrop {
+  z-index: 10000;
+  background: rgba(4, 8, 18, 0.9);
+  padding: 1rem;
+}
+
+.exam-review-modal {
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(145deg, #0f172a, #1a253c);
+  border: 1px solid var(--border-cyber-glow);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 25px 75px rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+  color: #fff;
+}
+
+.review-modal-header {
+  padding: 1.25rem 1.75rem;
+  background: rgba(15, 23, 42, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.review-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 0.25rem 0;
+  color: #fff;
+}
+
+.review-sub {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.review-score-banner {
+  padding: 1.25rem 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-wrap: wrap;
+}
+
+.review-score-banner.banner-passed {
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+  border-left: 5px solid #10b981;
+}
+
+.review-score-banner.banner-failed {
+  background: linear-gradient(90deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05));
+  border-left: 5px solid #ef4444;
+}
+
+.score-banner-left {
+  text-align: left;
+}
+
+.score-percentage {
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.banner-passed .score-percentage { color: #10b981; }
+.banner-failed .score-percentage { color: #ef4444; }
+
+.score-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 0.35rem;
+}
+
+.score-banner-right {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.score-stat-row {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.88rem;
+}
+
+.score-stat-row span {
+  color: var(--text-muted);
+}
+
+.review-questions-list {
+  padding: 1.5rem 1.75rem;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.review-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.review-question-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+}
+
+.review-question-card.q-correct {
+  border-left: 4px solid #10b981;
+}
+
+.review-question-card.q-incorrect {
+  border-left: 4px solid #ef4444;
+}
+
+.review-question-card.q-skipped {
+  border-left: 4px solid #f59e0b;
+}
+
+.review-q-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+
+.review-q-num {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.q-badge {
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #38bdf8;
+}
+
+.q-status-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
+}
+
+.q-mark-tag {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.review-q-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 1rem;
+  line-height: 1.45;
+}
+
+.review-options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.65rem;
+  margin-bottom: 0.85rem;
+}
+
+.review-opt-box {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.86rem;
+  position: relative;
+}
+
+.opt-box-key {
+  font-weight: 800;
+  font-size: 0.82rem;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.opt-box-text {
+  flex: 1;
+  color: #cbd5e1;
+}
+
+.review-opt-box.student-chosen-correct {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.15);
+}
+
+.review-opt-box.student-chosen-correct .opt-box-key {
+  background: #10b981;
+  color: #000;
+}
+
+.review-opt-box.student-chosen-wrong {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.review-opt-box.student-chosen-wrong .opt-box-key {
+  background: #ef4444;
+  color: #fff;
+}
+
+.review-opt-box.is-correct-target {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.review-opt-box.is-correct-target .opt-box-key {
+  border: 1px solid #10b981;
+  color: #10b981;
+}
+
+.tag-opt-match {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #10b981;
+}
+
+.tag-opt-wrong {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #ef4444;
+}
+
+.tag-opt-target {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #10b981;
+}
+
+.review-explanation-card {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px dashed rgba(59, 130, 246, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+}
+
+.exp-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #38bdf8;
+  margin-bottom: 0.25rem;
+}
+
+.exp-body {
+  font-size: 0.84rem;
+  color: #94a3b8;
+  line-height: 1.45;
+}
+
+.review-modal-footer {
+  padding: 1rem 1.75rem;
+  background: rgba(15, 23, 42, 0.9);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: flex-end;
 }
 </style>
