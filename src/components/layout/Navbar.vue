@@ -40,11 +40,11 @@
         <button 
           v-if="isAdminLoggedIn"
           class="cta-btn-header nav-action-desktop" 
-          :style="isTeacher ? 'background: linear-gradient(135deg, #0284c7, #0369a1); border-color: #38bdf8; box-shadow: 0 0 15px rgba(2, 132, 199, 0.4);' : 'background: linear-gradient(135deg, #10b981, #059669); border-color: #34d399; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);'"
+          :style="staffConsoleMeta.style"
           @click="$emit('set-tab', 'superadmin')"
-          :title="isTeacher ? 'Teacher / Faculty Console Logged In' : 'SuperAdmin Console Logged In'"
+          :title="staffConsoleMeta.tooltip"
         >
-          <span>{{ isTeacher ? '👨‍🏫 Teacher Console' : '⚡ SuperAdmin' }}</span>
+          <span>{{ staffConsoleMeta.title }}</span>
         </button>
         <button 
           v-else-if="studentUser"
@@ -400,6 +400,43 @@ const props = defineProps({
     type: Object,
     default: () => ({})
   }
+});
+
+const staffConsoleMeta = computed(() => {
+  const roleType = (props.adminUser?.roleType || props.adminUser?.role || '').toLowerCase();
+  if (roleType.includes('teacher') || roleType.includes('faculty')) {
+    return {
+      title: '👨‍🏫 Teacher Console',
+      tooltip: 'Teacher & Faculty Console Logged In',
+      style: 'background: linear-gradient(135deg, #0284c7, #0369a1); border-color: #38bdf8; box-shadow: 0 0 15px rgba(2, 132, 199, 0.4);'
+    };
+  }
+  if (roleType.includes('tech-lead') || roleType.includes('lead')) {
+    return {
+      title: '💻 Tech Lead Console',
+      tooltip: 'Tech Lead & Software Architect Console Logged In',
+      style: 'background: linear-gradient(135deg, #7c3aed, #6d28d9); border-color: #a855f7; box-shadow: 0 0 15px rgba(124, 58, 237, 0.4);'
+    };
+  }
+  if (roleType.includes('developer') || roleType.includes('dev')) {
+    return {
+      title: '⚡ Developer Console',
+      tooltip: 'Software Developer Console Logged In',
+      style: 'background: linear-gradient(135deg, #0891b2, #0e7490); border-color: #06b6d4; box-shadow: 0 0 15px rgba(8, 145, 178, 0.4);'
+    };
+  }
+  if (roleType.includes('staff')) {
+    return {
+      title: '👤 Staff Console',
+      tooltip: 'Staff Console Logged In',
+      style: 'background: linear-gradient(135deg, #ca8a04, #a16207); border-color: #eab308; box-shadow: 0 0 15px rgba(202, 138, 4, 0.4);'
+    };
+  }
+  return {
+    title: '⚡ SuperAdmin',
+    tooltip: 'SuperAdmin Console Logged In',
+    style: 'background: linear-gradient(135deg, #10b981, #059669); border-color: #34d399; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);'
+  };
 });
 
 const isTeacher = computed(() => {
