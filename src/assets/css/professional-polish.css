@@ -1,0 +1,7 @@
+.service-icon--whatsapp { color: #25d366; }
+.service-icon--email { color: #38bdf8; }
+.service-icon--phone { color: #a78bfa; }
+
+/* Consistent icon-only action affordances */
+.icon-only-action { display: inline-flex; align-items: center; justify-content: center; min-width: 2.5rem; min-height: 2.5rem; border-radius: 999px; }
+.icon-only-action:focus-visible, .service-icon:focus-visible { outline: 3px solid rgba(56, 189, 248, .55); outline-offset: 3px; }
