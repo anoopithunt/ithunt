@@ -294,7 +294,10 @@
                 Inspect, download, and verify your official course completion & experience credentials. Each certificate is linked to the live IT HUNT cloud registry.
               </p>
             </div>
-            <div style="display: flex; gap: 0.5rem;">
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <button type="button" class="btn-primary" @click="$emit('open-cv-modal')">
+                <span>📄 Generate Professional CV</span>
+              </button>
               <button type="button" class="btn-secondary" @click="loadStudentCertificates">
                 <span>🔄 Refresh Records</span>
               </button>
@@ -1841,7 +1844,8 @@ const emit = defineEmits([
   'student-signup', 
   'update-student-profile', 
   'student-logout',
-  'go-to-login'
+  'go-to-login',
+  'open-cv-modal'
 ]);
 
 // Sub-Navigation Master Tabs

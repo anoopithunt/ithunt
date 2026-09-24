@@ -38,6 +38,7 @@
           <li><a href="#" @click.prevent="$emit('set-tab', 'careers')">💼 Careers & Faculty Openings</a></li>
           <li><a href="#" @click.prevent="$emit('set-tab', 'reviews')">⭐ Reviews & Feedback</a></li>
           <li><a href="#" @click.prevent="$emit('set-tab', 'admission')">Admission Portal</a></li>
+          <li><a href="#" @click.prevent="$emit('open-cv-modal')" style="color: var(--color-ai-orange); font-weight: 700;">📄 Generate Professional CV (PDF)</a></li>
           <li><a href="/api/certificates/verify" target="_blank" class="footer-qr-verify-link">🔍 Verify Certificate (QR Registry)</a></li>
         </ul>
       </div>
@@ -95,7 +96,7 @@ defineProps({
   }
 });
 
-defineEmits(['set-tab', 'open-privacy-policy', 'open-terms-conditions']);
+defineEmits(['set-tab', 'open-privacy-policy', 'open-terms-conditions', 'open-cv-modal']);
 
 const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });

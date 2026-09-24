@@ -59,6 +59,15 @@
               <span class="quick-tag-icon">{{ tag.icon }}</span>
               <span>{{ tag.name }}</span>
             </button>
+            <button 
+              class="quick-tag-btn"
+              style="border-color: rgba(249, 115, 22, 0.5); background: rgba(249, 115, 22, 0.12); color: var(--color-ai-orange); font-weight: 700;"
+              @click="$emit('open-cv-modal')"
+              title="Generate Professional ATS Student CV in PDF Format"
+            >
+              <span class="quick-tag-icon">📄</span>
+              <span>Generate CV (PDF)</span>
+            </button>
           </div>
 
           <!-- Trust Badges & Guarantee Row (AIPost Style) -->
@@ -747,6 +756,9 @@
               <button class="aipost-btn-primary aipost-btn-lg" @click="$emit('set-tab', 'admission')">
                 <span>Start Free Application ➜</span>
               </button>
+              <button class="aipost-btn-secondary aipost-btn-lg" @click="$emit('open-cv-modal')">
+                <span>📄 Generate Professional CV</span>
+              </button>
               <button class="aipost-btn-secondary aipost-btn-lg" @click="$emit('set-tab', 'internships')">
                 <span>Explore All Tracks</span>
               </button>
@@ -794,7 +806,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['set-tab', 'apply-course', 'open-job-modal']);
+const emit = defineEmits(['set-tab', 'apply-course', 'open-job-modal', 'open-cv-modal']);
 
 // Interactive Search Input State
 const searchQuery = ref('');
