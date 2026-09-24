@@ -1055,7 +1055,7 @@ const toggleFaq = (idx) => {
   openFaqIdx.value = openFaqIdx.value === idx ? -1 : idx;
 };
 
-// Syntax Highlighting Tokens for Terminal
+// Syntax Highlighting Tokens for Terminal (Safe placeholder tokenizer)
 const escapeHtml = (text) => {
   return String(text || '')
     .replace(/&/g, '&amp;')
@@ -1071,12 +1071,30 @@ const highlightCode = (line) => {
   if (trimmed.startsWith('//') || trimmed.startsWith('#') || trimmed.startsWith('/*')) {
     return `<span class="code-comment">${escapeHtml(line)}</span>`;
   }
-  let escaped = escapeHtml(line);
-  escaped = escaped.replace(/(&#39;.*?&#39;|&#34;.*?&#34;|'.*?'|".*?")/g, '<span class="code-str">$1</span>');
-  escaped = escaped.replace(/\b(import|from|export|default|function|const|let|var|return|class|async|await|def)\b/g, '<span class="code-kw">$1</span>');
-  escaped = escaped.replace(/\b(executePayment|acquireLock|processSecureIntent|emit|generate_post|extract_brand_dna|synthesize_carousel|build)\b/g, '<span class="code-fn">$1</span>');
-  escaped = escaped.replace(/\b(status|transactionId|title|isEncrypted|channelId|appointmentId)\b/g, '<span class="code-prop">$1</span>');
-  return escaped;
+  
+  let text = escapeHtml(line);
+
+  // Step 1: Extract string literals and replace with non-word symbol placeholders
+  const stringLiterals = [];
+  text = text.replace(/(&#39;.*?&#39;|&quot;.*?&quot;|'.*?'|".*?")/g, (match) => {
+    const key = `§§STR_${stringLiterals.length}§§`;
+    stringLiterals.push(match);
+    return key;
+  });
+
+  // Step 2: Highlight keywords
+  text = text.replace(/\b(import|from|export|default|function|const|let|var|return|class|async|await|def|if|else)\b/g, '<span class="code-kw">$1</span>');
+
+  // Step 3: Highlight functions
+  text = text.replace(/\b(executePayment|acquireLock|processSecureIntent|emit|generate_post|extract_brand_dna|synthesize_carousel|build|process)\b/g, '<span class="code-fn">$1</span>');
+
+  // Step 4: Highlight properties / object keys
+  text = text.replace(/\b(status|transactionId|title|isEncrypted|channelId|appointmentId|idempotencyKey)\b/g, '<span class="code-prop">$1</span>');
+
+  // Step 5: Restore string literals cleanly
+  text = text.replace(/§§STR_(\d+)§§/g, (_, idx) => `<span class="code-str">${stringLiterals[idx]}</span>`);
+
+  return text;
 };
 
 const onImgError = (event) => {
@@ -2635,12 +2653,16 @@ onUnmounted(() => {
 }
 
 /* ==========================================================================
-   LIGHT THEME SUPPORT
+   LIGHT THEME SUPPORT (High-Contrast, Crisp, Clean & Polished)
    ========================================================================== */
 
 :global(body.light-theme) .aipost-wrapper {
-  background-color: var(--bg-cyber-dark, #f8fafc);
-  color: var(--text-main, #000000);
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+:global(body.light-theme) .aipost-hero {
+  background: radial-gradient(circle at 50% 0%, rgba(249, 115, 22, 0.1) 0%, transparent 60%), #f8fafc;
 }
 
 :global(body.light-theme) .aipost-hero-headline,
@@ -2654,9 +2676,10 @@ onUnmounted(() => {
 :global(body.light-theme) .model-name,
 :global(body.light-theme) .founder-name,
 :global(body.light-theme) .faq-question-text,
-:global(body.light-theme) .cta-main-title,
+:global(body.light-theme) .stat-label-title,
+:global(body.light-theme) .metrics-panel-header h4,
 :global(body.light-theme) .codemaya-brand-text {
-  color: #000000 !important;
+  color: #0f172a !important;
 }
 
 :global(body.light-theme) .aipost-hero-subtitle,
@@ -2669,12 +2692,210 @@ onUnmounted(() => {
 :global(body.light-theme) .bento-card-desc,
 :global(body.light-theme) .model-desc,
 :global(body.light-theme) .faq-answer-text,
-:global(body.light-theme) .cta-subtitle {
+:global(body.light-theme) .founder-quote,
+:global(body.light-theme) .acc-list li,
+:global(body.light-theme) .model-feature-list li,
+:global(body.light-theme) .step-subpoint-item {
   color: #334155 !important;
 }
 
-:global(body.light-theme) .aipost-input-box,
-:global(body.light-theme) .aipost-showcase-card,
+:global(body.light-theme) .stat-micro-note,
+:global(body.light-theme) .example-meta-text,
+:global(body.light-theme) .example-engagement-stats,
+:global(body.light-theme) .feature-bullet,
+:global(body.light-theme) .quick-tag-label,
+:global(body.light-theme) .guarantee-item,
+:global(body.light-theme) .founder-role,
+:global(body.light-theme) .acc-cost-line,
+:global(body.light-theme) .codemaya-tagline,
+:global(body.light-theme) .codemaya-subtext {
+  color: #64748b !important;
+}
+
+:global(body.light-theme) .aipost-pill-badge {
+  background: #ffffff !important;
+  border-color: rgba(249, 115, 22, 0.4) !important;
+  color: #ea580c !important;
+  box-shadow: 0 2px 10px rgba(249, 115, 22, 0.08) !important;
+}
+
+/* Input Bar & Filter Tags */
+:global(body.light-theme) .aipost-input-box {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+}
+
+:global(body.light-theme) .aipost-hero-input {
+  color: #0f172a !important;
+}
+
+:global(body.light-theme) .aipost-hero-input::placeholder {
+  color: #94a3b8 !important;
+}
+
+:global(body.light-theme) .quick-tag-btn {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #475569 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02) !important;
+}
+
+:global(body.light-theme) .quick-tag-btn:hover,
+:global(body.light-theme) .quick-tag-btn.active {
+  background: rgba(249, 115, 22, 0.12) !important;
+  border-color: rgba(249, 115, 22, 0.5) !important;
+  color: #ea580c !important;
+}
+
+/* Showcase Card & Tabs */
+:global(body.light-theme) .aipost-showcase-card {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.07) !important;
+}
+
+:global(body.light-theme) .showcase-card-header {
+  background: #f8fafc !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+:global(body.light-theme) .showcase-tab-btn {
+  color: #64748b !important;
+}
+
+:global(body.light-theme) .showcase-tab-btn:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+:global(body.light-theme) .showcase-tab-btn.active {
+  background: rgba(249, 115, 22, 0.12) !important;
+  border-color: rgba(249, 115, 22, 0.4) !important;
+  color: #ea580c !important;
+}
+
+:global(body.light-theme) .project-track-chip {
+  background: rgba(249, 115, 22, 0.12) !important;
+  color: #ea580c !important;
+}
+
+:global(body.light-theme) .stack-badge {
+  background: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #1e293b !important;
+  font-weight: 700 !important;
+}
+
+/* Terminal Stays Dark & High-Contrast */
+:global(body.light-theme) .showcase-terminal-box {
+  background: #0d1117 !important;
+  border-color: #30363d !important;
+}
+
+:global(body.light-theme) .terminal-titlebar {
+  color: #8b949e !important;
+  border-bottom-color: #21262d !important;
+}
+
+:global(body.light-theme) .line-num {
+  color: #6e7681 !important;
+}
+
+:global(body.light-theme) .terminal-code code {
+  color: #e6edf3 !important;
+}
+
+/* Metrics Panel (Right Pane) */
+:global(body.light-theme) .metrics-panel-card {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+:global(body.light-theme) .metrics-panel-header {
+  border-bottom-color: #e2e8f0 !important;
+}
+
+:global(body.light-theme) .branch-tag {
+  background: rgba(249, 115, 22, 0.12) !important;
+  color: #ea580c !important;
+}
+
+:global(body.light-theme) .metric-item {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+}
+
+:global(body.light-theme) .metric-val {
+  color: #0f172a !important;
+}
+
+:global(body.light-theme) .metric-val.text-brand {
+  color: #ea580c !important;
+}
+
+:global(body.light-theme) .metric-val.text-green {
+  color: #059669 !important;
+}
+
+:global(body.light-theme) .metric-lbl {
+  color: #64748b !important;
+  font-weight: 600 !important;
+}
+
+:global(body.light-theme) .review-status-card {
+  background: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
+}
+
+:global(body.light-theme) .reviewer-name {
+  color: #065f46 !important;
+  font-weight: 700 !important;
+}
+
+:global(body.light-theme) .reviewer-comment {
+  color: #1e293b !important;
+}
+
+:global(body.light-theme) .aipost-btn-secondary {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+:global(body.light-theme) .aipost-btn-secondary:hover {
+  background: #f8fafc !important;
+  border-color: #ea580c !important;
+  color: #ea580c !important;
+}
+
+/* Stats Counter Band */
+:global(body.light-theme) .aipost-stats-band {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+:global(body.light-theme) .stat-pill-card {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important;
+}
+
+:global(body.light-theme) .stat-num {
+  color: #ea580c !important;
+}
+
+/* Sections 2 - 9 Backgrounds & Cards */
+:global(body.light-theme) .aipost-section-base {
+  background: #ffffff !important;
+}
+
+:global(body.light-theme) .aipost-section-alt {
+  background: #f8fafc !important;
+}
+
 :global(body.light-theme) .homework-card,
 :global(body.light-theme) .accelerator-card,
 :global(body.light-theme) .example-card,
@@ -2682,27 +2903,99 @@ onUnmounted(() => {
 :global(body.light-theme) .bento-card,
 :global(body.light-theme) .tech-model-card,
 :global(body.light-theme) .founder-card,
-:global(body.light-theme) .faq-accordion-item,
-:global(body.light-theme) .aipost-cta-banner,
-:global(body.light-theme) .stat-pill-card {
+:global(body.light-theme) .faq-accordion-item {
   background: #ffffff !important;
-  border-color: rgba(0, 0, 0, 0.1) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
 }
 
-:global(body.light-theme) .aipost-hero-input {
-  color: #000000 !important;
+:global(body.light-theme) .accelerator-card.featured,
+:global(body.light-theme) .tech-model-card.featured-model {
+  border-color: #ea580c !important;
+  box-shadow: 0 12px 35px rgba(234, 88, 12, 0.12) !important;
 }
 
-:global(body.light-theme) .showcase-card-header {
-  background: #f8fafc !important;
-  border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+:global(body.light-theme) .card-icon-wrap,
+:global(body.light-theme) .step-icon-box {
+  background: rgba(249, 115, 22, 0.1) !important;
+  color: #ea580c !important;
 }
 
-:global(body.light-theme) .aipost-btn-secondary {
+:global(body.light-theme) .pill-chip,
+:global(body.light-theme) .example-platform-pill {
   background: #f1f5f9 !important;
-  border-color: #cbd5e1 !important;
-  color: #0f172a !important;
+  color: #ea580c !important;
+  font-weight: 700 !important;
+}
+
+:global(body.light-theme) .acc-deliverables-title {
+  color: #1e293b !important;
+}
+
+:global(body.light-theme) .example-card-footer {
+  border-top-color: #e2e8f0 !important;
+}
+
+:global(body.light-theme) .example-view-btn {
+  color: #ea580c !important;
+}
+
+:global(body.light-theme) .pipeline-line {
+  background: #cbd5e1 !important;
+}
+
+:global(body.light-theme) .skill-tag {
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
+:global(body.light-theme) .faq-accordion-item.open {
+  border-color: #ea580c !important;
+  box-shadow: 0 4px 15px rgba(234, 88, 12, 0.1) !important;
+}
+
+:global(body.light-theme) .faq-chevron-icon {
+  color: #ea580c !important;
+}
+
+:global(body.light-theme) .faq-answer-container {
+  border-top-color: #f1f5f9 !important;
+}
+
+/* Section 10: Final CTA Stays Striking Midnight Luxury in Both Modes */
+:global(body.light-theme) .aipost-cta-section {
+  background: #f8fafc !important;
+}
+
+:global(body.light-theme) .aipost-cta-banner {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+  border-color: rgba(249, 115, 22, 0.4) !important;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25) !important;
+}
+
+:global(body.light-theme) .cta-main-title {
+  color: #ffffff !important;
+}
+
+:global(body.light-theme) .cta-subtitle {
+  color: #cbd5e1 !important;
+}
+
+:global(body.light-theme) .cta-micro-guarantee {
+  color: #94a3b8 !important;
+}
+
+:global(body.light-theme) .cta-buttons-group .aipost-btn-secondary {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+}
+
+/* Section 11: CodeMaya */
+:global(body.light-theme) .aipost-codemaya-section {
+  background: #f8fafc !important;
+  border-top-color: #e2e8f0 !important;
 }
 
 /* ==========================================================================
