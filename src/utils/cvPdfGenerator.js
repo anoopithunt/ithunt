@@ -1,421 +1,465 @@
 import { jsPDF } from 'jspdf';
 
 /**
- * Color palettes for Professional CV
+ * Clean & Minimalist Color Themes for Single-Page Professional CV
  */
 const CV_THEMES = {
-  orange: {
-    primary: [234, 88, 12],    // #ea580c Warm Brand Orange
-    secondary: [15, 23, 42],   // #0f172a Deep Navy Slate
-    accent: [217, 119, 6],     // #d97706 Amber
-    text: [30, 41, 59],        // #1e293b Dark Slate
-    muted: [100, 116, 139],    // #64748b Slate Muted
-    line: [226, 232, 240],     // #e2e8f0 Soft Border
-    bgLight: [255, 247, 237]   // #fff7ed Warm Light
-  },
-  blue: {
-    primary: [29, 78, 216],    // #1d4ed8 Tech Blue
-    secondary: [15, 23, 42],   // #0f172a Deep Navy Slate
-    accent: [2, 132, 199],     // #0284c7 Ocean Blue
-    text: [30, 41, 59],
-    muted: [100, 116, 139],
-    line: [226, 232, 240],
-    bgLight: [239, 246, 255]
-  },
-  green: {
-    primary: [5, 150, 105],    // #059669 Emerald
-    secondary: [15, 23, 42],
-    accent: [16, 185, 129],
-    text: [30, 41, 59],
-    muted: [100, 116, 139],
-    line: [226, 232, 240],
-    bgLight: [236, 253, 245]
-  },
   classic: {
-    primary: [51, 65, 85],     // #334155 Graphite
-    secondary: [15, 23, 42],
-    accent: [71, 85, 105],
-    text: [30, 41, 59],
-    muted: [100, 116, 139],
-    line: [226, 232, 240],
-    bgLight: [248, 250, 252]
+    name: 'Classic Minimalist',
+    heading: [34, 34, 34],        // Deep Charcoal #222222
+    body: [50, 50, 50],           // Charcoal #323232
+    muted: [100, 100, 100],       // Medium Slate Gray #646464
+    barFilled: [50, 50, 50],      // Dark Charcoal Bar
+    barTrack: [225, 228, 232]     // Clean Light Gray Track
+  },
+  slate: {
+    name: 'Executive Slate',
+    heading: [15, 23, 42],        // Deep Navy Slate #0f172a
+    body: [51, 65, 85],           // Slate Body #334155
+    muted: [100, 116, 139],       // Slate Muted #64748b
+    barFilled: [30, 41, 59],      // Dark Slate Bar
+    barTrack: [226, 232, 240]
+  },
+  orange: {
+    name: 'IT HUNT Warm',
+    heading: [30, 30, 30],
+    body: [50, 50, 50],
+    muted: [100, 100, 100],
+    barFilled: [234, 88, 12],     // Warm Brand Orange
+    barTrack: [254, 215, 170]
+  },
+  emerald: {
+    name: 'Emerald Clean',
+    heading: [20, 30, 25],
+    body: [45, 55, 50],
+    muted: [90, 105, 98],
+    barFilled: [5, 150, 105],     // Emerald
+    barTrack: [209, 250, 229]
   }
 };
 
 /**
- * Generate a high-impact, ATS-optimized Professional CV / Resume in PDF format
- * @param {Object} cvData - The student / candidate details
- * @param {string} themeKey - Theme choice ('orange', 'blue', 'green', 'classic')
- * @returns {jsPDF} The jsPDF document instance
+ * Generate a clean, minimalist 1-page Professional CV matching the classic editorial standard
+ * (Left-aligned serif typography, clean whitespace, 2-column skills, languages with progress bars, fits 1 full page)
+ * @param {Object} cvData - The candidate details
+ * @param {string} themeKey - Theme choice ('classic', 'slate', 'orange', 'emerald')
+ * @returns {jsPDF} The jsPDF document instance (guaranteed 1 page)
  */
-export function generateProfessionalCvPdf(cvData, themeKey = 'orange') {
-  const theme = CV_THEMES[themeKey] || CV_THEMES.orange;
+export function generateProfessionalCvPdf(cvData, themeKey = 'classic') {
+  const theme = CV_THEMES[themeKey] || CV_THEMES.classic;
+
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
-    format: 'a4'
+    format: 'a4',
+    compress: true
   });
 
   const pageWidth = 210;
   const pageHeight = 297;
-  const marginX = 14;
-  const contentWidth = pageWidth - (marginX * 2);
-  let currentY = 12;
+  const marginX = 18;
+  const contentWidth = pageWidth - (marginX * 2); // 174mm
+  const colWidth = (contentWidth - 8) / 2;         // 83mm per column
 
-  // Helper: check page overflow and add new page
-  const checkPageBreak = (neededHeight) => {
-    if (currentY + neededHeight > pageHeight - 16) {
-      doc.addPage();
-      currentY = 16;
-      // Draw top subtle accent bar on page 2+
-      doc.setFillColor(...theme.primary);
-      doc.rect(0, 0, pageWidth, 2.5, 'F');
-      return true;
-    }
-    return false;
+  // 1. Prepare & Sanitize Data
+  const fullName = (cvData.fullName || 'Candidate Name').trim();
+  const summary = (cvData.summary || '').trim();
+
+  // Contact info
+  const contactParts = [];
+  if (cvData.phone) contactParts.push(cvData.phone.trim());
+  if (cvData.email) contactParts.push(cvData.email.trim());
+  if (cvData.location) contactParts.push(cvData.location.trim());
+  if (cvData.linkedin) contactParts.push(cvData.linkedin.replace(/^https?:\/\/(www\.)?/, '').trim());
+  if (cvData.portfolio) contactParts.push(cvData.portfolio.replace(/^https?:\/\/(www\.)?/, '').trim());
+  else if (cvData.github) contactParts.push(cvData.github.replace(/^https?:\/\/(www\.)?/, '').trim());
+
+  // Skills: list of individual bullet skills
+  let skillItems = [];
+  if (Array.isArray(cvData.skills)) {
+    cvData.skills.forEach(s => {
+      if (typeof s === 'string') {
+        const parts = s.split(/[,;\n]/).map(x => x.trim()).filter(Boolean);
+        skillItems.push(...parts);
+      } else if (s && s.items) {
+        const parts = (typeof s.items === 'string' ? s.items.split(/[,;\n]/) : s.items).map(x => x.trim()).filter(Boolean);
+        skillItems.push(...parts);
+      }
+    });
+  } else if (typeof cvData.skills === 'string') {
+    skillItems = cvData.skills.split(/[,;\n]/).map(s => s.trim()).filter(Boolean);
+  }
+
+  // Deduplicate and trim skills
+  skillItems = Array.from(new Set(skillItems)).filter(Boolean);
+
+  // Experience
+  const experiences = Array.isArray(cvData.experience) ? cvData.experience : [];
+
+  // Featured Projects (if any)
+  const projects = Array.isArray(cvData.projects) ? cvData.projects : [];
+
+  // Education
+  const educations = Array.isArray(cvData.education) ? cvData.education : [];
+
+  // Languages & Certifications
+  const languages = Array.isArray(cvData.languages) && cvData.languages.length > 0 
+    ? cvData.languages 
+    : [
+        { name: 'Hindi', levelText: 'Native speaker', isNative: true },
+        { name: 'English', code: 'C2', proficiency: 'Proficient', percent: 92 },
+        { name: 'Bengali', code: 'B2', proficiency: 'Upper-intermediate', percent: 70 }
+      ];
+
+  // 2. Budget Height Calculation & Adaptive Scaling
+  // We calculate total required height at standard spacing, then scale to gracefully fit exactly 1 page.
+  const targetBottom = pageHeight - 14; // 283mm
+  const startY = 16;
+  const availableHeight = targetBottom - startY; // ~267mm
+
+  // Rough estimation of height needed at standard size:
+  // Header: 18mm
+  // Summary: ~20mm
+  // Skills: ceil(items / 2) * 4.5 + 10mm
+  // Experience: expCount * 8 + totalBullets * 4 + 10mm
+  // Education: eduCount * 10 + 8mm
+  // Projects: projCount * 12 + 8mm
+  // Languages: 20mm
+  const estimatedSkillsRows = Math.ceil(Math.min(skillItems.length || 8, 12) / 2);
+  let totalBullets = 0;
+  experiences.slice(0, 2).forEach(e => {
+    totalBullets += Math.min(e.points ? e.points.length : 2, 4);
+  });
+  let totalProjectLines = projects.slice(0, 1).length * 3;
+
+  const estimatedTotalHeight = 
+    18 + // Header
+    (summary ? 22 : 0) +
+    (skillItems.length ? (estimatedSkillsRows * 4.5 + 10) : 0) +
+    (experiences.length ? (experiences.slice(0, 2).length * 8 + totalBullets * 4 + 10) : 0) +
+    (projects.length ? (totalProjectLines * 4 + 10) : 0) +
+    (educations.length ? (educations.slice(0, 2).length * 9 + 10) : 0) +
+    (languages.length ? 22 : 0);
+
+  // Derive optimal vertical scaling parameters so CV fills the page cleanly without overflow
+  let sectionGap = 6.5;
+  let bodyFontSize = 8.8;
+  let bodyLineHeight = 4.0;
+  let titleFontSize = 25;
+
+  if (estimatedTotalHeight > availableHeight) {
+    // Dense content -> compress slightly
+    const compression = Math.max(0.78, availableHeight / estimatedTotalHeight);
+    sectionGap = Math.max(3.8, 6.5 * compression);
+    bodyFontSize = Math.max(8.0, 8.8 * compression);
+    bodyLineHeight = Math.max(3.4, 4.0 * compression);
+    titleFontSize = Math.max(22, 25 * compression);
+  } else if (estimatedTotalHeight < availableHeight * 0.75) {
+    // Sparse content -> expand gaps gracefully so it fills the full page
+    sectionGap = 8.5;
+    bodyFontSize = 9.2;
+    bodyLineHeight = 4.5;
+    titleFontSize = 27;
+  }
+
+  let currentY = startY;
+
+  // Helper: Draw Section Header (matching the attached image: uppercase, bold serif, clean space)
+  const drawSectionHeader = (title) => {
+    currentY += (currentY === startY ? 0 : sectionGap);
+    doc.setFont('times', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(...theme.heading);
+    doc.text(title.toUpperCase(), marginX, currentY);
+    currentY += 4.5;
   };
 
-  // 1. Top Decorative Brand Accent Strip
-  doc.setFillColor(...theme.primary);
-  doc.rect(0, 0, pageWidth, 4, 'F');
-  doc.setFillColor(...theme.secondary);
-  doc.rect(0, 4, pageWidth, 1.2, 'F');
-
-  currentY = 16;
-
-  // 2. Candidate Header (Name & Headline)
-  const fullName = (cvData.fullName || 'CANDIDATE NAME').trim().toUpperCase();
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(21);
-  doc.setTextColor(...theme.secondary);
+  // -------------------------------------------------------------
+  // 1. CANDIDATE HEADER (Name & Single-Line Contact Details)
+  // -------------------------------------------------------------
+  doc.setFont('times', 'bold');
+  doc.setFontSize(titleFontSize);
+  doc.setTextColor(...theme.heading);
   doc.text(fullName, marginX, currentY);
-  currentY += 6.5;
+  currentY += (titleFontSize * 0.35) + 1.5;
 
-  const headline = cvData.title || 'Full-Stack Software Engineer | Production Systems & Cloud';
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10.5);
-  doc.setTextColor(...theme.primary);
-  doc.text(headline, marginX, currentY);
-  currentY += 5.5;
-
-  // 3. Contact & Social Link Row
-  const contactParts = [];
-  if (cvData.email) contactParts.push(cvData.email);
-  if (cvData.phone) contactParts.push(cvData.phone);
-  if (cvData.location) contactParts.push(cvData.location);
-  if (cvData.linkedin) contactParts.push(cvData.linkedin.replace(/^https?:\/\/(www\.)?/, ''));
-  if (cvData.github) contactParts.push(cvData.github.replace(/^https?:\/\/(www\.)?/, ''));
-  if (cvData.portfolio) contactParts.push(cvData.portfolio.replace(/^https?:\/\/(www\.)?/, ''));
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8.5);
-  doc.setTextColor(...theme.muted);
-
-  const contactString = contactParts.join('  •  ');
-  const contactLines = doc.splitTextToSize(contactString, contentWidth);
-  contactLines.forEach(line => {
-    doc.text(line, marginX, currentY);
-    currentY += 4;
-  });
+  if (contactParts.length > 0) {
+    doc.setFont('times', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(...theme.muted);
+    const contactLine = contactParts.join(' | ');
+    const lines = doc.splitTextToSize(contactLine, contentWidth);
+    lines.slice(0, 2).forEach(line => {
+      doc.text(line, marginX, currentY);
+      currentY += 3.8;
+    });
+  }
   currentY += 1.5;
 
-  // Divider Line
-  doc.setDrawColor(...theme.line);
-  doc.setLineWidth(0.5);
-  doc.line(marginX, currentY, marginX + contentWidth, currentY);
-  currentY += 5;
+  // -------------------------------------------------------------
+  // 2. SUMMARY SECTION
+  // -------------------------------------------------------------
+  if (summary) {
+    drawSectionHeader('Summary');
+    doc.setFont('times', 'normal');
+    doc.setFontSize(bodyFontSize);
+    doc.setTextColor(...theme.body);
 
-  // Helper: Section Header Generator
-  const drawSectionHeader = (title) => {
-    checkPageBreak(12);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10.5);
-    doc.setTextColor(...theme.primary);
-    doc.text(title.toUpperCase(), marginX, currentY);
-    
-    // Bottom accent underline
-    const textWidth = doc.getTextWidth(title.toUpperCase());
-    doc.setDrawColor(...theme.primary);
-    doc.setLineWidth(0.8);
-    doc.line(marginX, currentY + 1.5, marginX + textWidth + 4, currentY + 1.5);
-    
-    doc.setDrawColor(...theme.line);
-    doc.setLineWidth(0.3);
-    doc.line(marginX + textWidth + 6, currentY + 1.5, marginX + contentWidth, currentY + 1.5);
-    
-    currentY += 6.5;
-  };
-
-  // 4. Professional Summary Section
-  if (cvData.summary && cvData.summary.trim()) {
-    drawSectionHeader('Professional Summary');
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor(...theme.text);
-
-    const summaryLines = doc.splitTextToSize(cvData.summary.trim(), contentWidth);
-    summaryLines.forEach(line => {
-      checkPageBreak(5);
+    const summaryLines = doc.splitTextToSize(summary, contentWidth);
+    // Limit to max 4-5 lines to preserve 1-page budget
+    summaryLines.slice(0, 5).forEach(line => {
       doc.text(line, marginX, currentY);
-      currentY += 4.2;
+      currentY += bodyLineHeight;
     });
-    currentY += 3;
   }
 
-  // 5. Technical Skills & Core Competencies
-  if (cvData.skills && (cvData.skills.length > 0 || typeof cvData.skills === 'string')) {
-    drawSectionHeader('Technical Skills & Competencies');
-    
-    // Format skills: either array of categories or raw string
-    let skillCategories = [];
-    if (Array.isArray(cvData.skills)) {
-      skillCategories = cvData.skills;
-    } else if (typeof cvData.skills === 'string') {
-      const lines = cvData.skills.split('\n').filter(l => l.trim());
-      skillCategories = lines.map(line => {
-        const parts = line.split(':');
-        if (parts.length > 1) {
-          return { category: parts[0].trim(), items: parts.slice(1).join(':').trim() };
-        }
-        return { category: 'Core Stack', items: line.trim() };
+  // -------------------------------------------------------------
+  // 3. SKILLS SECTION (2-Column Bulleted List, exactly like image)
+  // -------------------------------------------------------------
+  if (skillItems.length > 0) {
+    drawSectionHeader('Skills');
+
+    // Take top 8-12 skills to preserve clean 2-column aesthetic
+    const displaySkills = skillItems.slice(0, 10);
+    const half = Math.ceil(displaySkills.length / 2);
+    const col1 = displaySkills.slice(0, half);
+    const col2 = displaySkills.slice(half);
+
+    const skillsStartY = currentY;
+    const col2X = marginX + colWidth + 8;
+
+    doc.setFont('times', 'normal');
+    doc.setFontSize(bodyFontSize);
+    doc.setTextColor(...theme.body);
+
+    // Left Column
+    col1.forEach((item, idx) => {
+      const y = skillsStartY + (idx * bodyLineHeight);
+      doc.text(`•   ${item}`, marginX + 2, y);
+    });
+
+    // Right Column
+    col2.forEach((item, idx) => {
+      const y = skillsStartY + (idx * bodyLineHeight);
+      doc.text(`•   ${item}`, col2X + 2, y);
+    });
+
+    currentY = skillsStartY + (half * bodyLineHeight) + 1.5;
+  }
+
+  // -------------------------------------------------------------
+  // 4. EXPERIENCE SECTION
+  // -------------------------------------------------------------
+  if (experiences.length > 0) {
+    drawSectionHeader('Experience');
+
+    // Fit 1-2 major roles
+    experiences.slice(0, 2).forEach((exp, eIdx) => {
+      if (currentY > targetBottom - 35) return; // safeguard
+
+      // Role, Company, Duration line
+      doc.setFont('times', 'bold');
+      doc.setFontSize(9.2);
+      doc.setTextColor(...theme.heading);
+
+      const roleCompanyDate = [
+        exp.role || 'Software Engineering Intern',
+        exp.company || 'IT HUNT Software Studio',
+        exp.duration || '2026'
+      ].filter(Boolean).join(', ');
+
+      const headerLines = doc.splitTextToSize(roleCompanyDate, contentWidth);
+      headerLines.forEach(hl => {
+        doc.text(hl, marginX, currentY);
+        currentY += 4.0;
       });
-    }
 
-    doc.setFontSize(9);
-    skillCategories.forEach(skill => {
-      checkPageBreak(5);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...theme.secondary);
-      const catLabel = `•  ${skill.category}: `;
-      doc.text(catLabel, marginX, currentY);
-
-      const labelWidth = doc.getTextWidth(catLabel);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...theme.text);
-
-      const itemsStr = Array.isArray(skill.items) ? skill.items.join(', ') : skill.items;
-      const itemsLines = doc.splitTextToSize(itemsStr, contentWidth - labelWidth);
-
-      if (itemsLines.length > 0) {
-        doc.text(itemsLines[0], marginX + labelWidth, currentY);
-        for (let i = 1; i < itemsLines.length; i++) {
-          currentY += 4;
-          checkPageBreak(4);
-          doc.text(itemsLines[i], marginX + labelWidth, currentY);
-        }
+      // Location line
+      if (exp.location) {
+        doc.setFont('times', 'normal');
+        doc.setFontSize(8.4);
+        doc.setTextColor(...theme.muted);
+        doc.text(exp.location, marginX, currentY);
+        currentY += 3.8;
       }
-      currentY += 4.5;
-    });
-    currentY += 2;
-  }
 
-  // 6. Experience & Software Internships
-  if (cvData.experience && cvData.experience.length > 0) {
-    drawSectionHeader('Professional Experience & Internships');
-
-    cvData.experience.forEach(exp => {
-      checkPageBreak(18);
-
-      // Title & Dates
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.setTextColor(...theme.secondary);
-      doc.text(exp.role || 'Software Engineering Intern', marginX, currentY);
-
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8.5);
-      doc.setTextColor(...theme.primary);
-      const durationStr = exp.duration || '2026';
-      doc.text(durationStr, marginX + contentWidth, currentY, { align: 'right' });
-      currentY += 4.5;
-
-      // Organization & Location
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(...theme.muted);
-      const companyLocation = `${exp.company || 'IT HUNT Software Studio & Tech Academy'}${exp.location ? '  |  ' + exp.location : ''}`;
-      doc.text(companyLocation, marginX, currentY);
-      currentY += 4.5;
-
-      // Bullet Points / Responsibilities
+      // Bullet points
       if (exp.points && exp.points.length > 0) {
-        doc.setFontSize(8.7);
-        doc.setTextColor(...theme.text);
+        doc.setFont('times', 'normal');
+        doc.setFontSize(bodyFontSize);
+        doc.setTextColor(...theme.body);
 
-        exp.points.forEach(point => {
-          checkPageBreak(6);
-          const bullet = '•';
-          doc.setFont('helvetica', 'bold');
-          doc.setTextColor(...theme.primary);
-          doc.text(bullet, marginX + 2, currentY);
+        const points = exp.points.slice(0, 3); // Max 3 concise impact bullets
+        points.forEach(pt => {
+          if (currentY > targetBottom - 18) return;
 
-          doc.setFont('helvetica', 'normal');
-          doc.setTextColor(...theme.text);
-          const pointLines = doc.splitTextToSize(point, contentWidth - 8);
-          doc.text(pointLines[0], marginX + 6, currentY);
+          const bulletText = `•   ${pt}`;
+          const wrapped = doc.splitTextToSize(bulletText, contentWidth - 4);
+          doc.text(wrapped[0], marginX + 3, currentY);
+          currentY += bodyLineHeight;
 
-          for (let i = 1; i < pointLines.length; i++) {
-            currentY += 3.8;
-            checkPageBreak(4);
-            doc.text(pointLines[i], marginX + 6, currentY);
+          for (let k = 1; k < wrapped.length; k++) {
+            if (currentY > targetBottom - 14) break;
+            doc.text(wrapped[k], marginX + 7, currentY);
+            currentY += bodyLineHeight;
           }
-          currentY += 4.2;
         });
       }
-      currentY += 2.5;
+
+      if (eIdx < experiences.length - 1) {
+        currentY += 2;
+      }
     });
   }
 
-  // 7. Featured Production Projects
-  if (cvData.projects && cvData.projects.length > 0) {
-    drawSectionHeader('Featured Software Projects');
+  // -------------------------------------------------------------
+  // 5. FEATURED PROJECTS (Compact, if available and space allows)
+  // -------------------------------------------------------------
+  if (projects.length > 0 && currentY < targetBottom - 38) {
+    drawSectionHeader('Featured Projects');
 
-    cvData.projects.forEach(proj => {
-      checkPageBreak(16);
+    projects.slice(0, 1).forEach(proj => {
+      doc.setFont('times', 'bold');
+      doc.setFontSize(9.2);
+      doc.setTextColor(...theme.heading);
 
-      // Project Name & Stack
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9.8);
-      doc.setTextColor(...theme.secondary);
-      doc.text(proj.name || 'Project Title', marginX, currentY);
+      const titleLine = [proj.name, proj.stack].filter(Boolean).join(' — ');
+      doc.text(titleLine, marginX, currentY);
+      currentY += 4.0;
 
-      if (proj.link) {
-        const nameW = doc.getTextWidth(proj.name || 'Project Title');
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(8);
-        doc.setTextColor(...theme.primary);
-        doc.text(`[${proj.link.replace(/^https?:\/\//, '')}]`, marginX + nameW + 3, currentY);
-      }
-
-      if (proj.stack) {
-        doc.setFont('helvetica', 'italic');
-        doc.setFontSize(8.5);
-        doc.setTextColor(...theme.muted);
-        doc.text(proj.stack, marginX + contentWidth, currentY, { align: 'right' });
-      }
-      currentY += 4.5;
-
-      // Project Description
       if (proj.description) {
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(8.8);
-        doc.setTextColor(...theme.text);
+        doc.setFont('times', 'normal');
+        doc.setFontSize(bodyFontSize);
+        doc.setTextColor(...theme.body);
 
         const descLines = doc.splitTextToSize(proj.description, contentWidth);
-        descLines.forEach(dl => {
-          checkPageBreak(4.5);
+        descLines.slice(0, 2).forEach(dl => {
           doc.text(dl, marginX, currentY);
-          currentY += 4;
+          currentY += bodyLineHeight;
         });
       }
-
-      // Highlights / Outcomes
-      if (proj.highlights && proj.highlights.length > 0) {
-        doc.setFontSize(8.5);
-        proj.highlights.forEach(hl => {
-          checkPageBreak(4.5);
-          doc.setFont('helvetica', 'bold');
-          doc.setTextColor(...theme.primary);
-          doc.text('–', marginX + 3, currentY);
-
-          doc.setFont('helvetica', 'normal');
-          doc.setTextColor(...theme.text);
-          const hlLines = doc.splitTextToSize(hl, contentWidth - 8);
-          doc.text(hlLines[0], marginX + 7, currentY);
-          for (let k = 1; k < hlLines.length; k++) {
-            currentY += 3.8;
-            checkPageBreak(4);
-            doc.text(hlLines[k], marginX + 7, currentY);
-          }
-          currentY += 4;
-        });
-      }
-      currentY += 2.5;
     });
   }
 
-  // 8. Education
-  if (cvData.education && cvData.education.length > 0) {
-    drawSectionHeader('Education');
+  // -------------------------------------------------------------
+  // 6. EDUCATION AND TRAINING SECTION
+  // -------------------------------------------------------------
+  if (educations.length > 0 && currentY < targetBottom - 30) {
+    drawSectionHeader('Education and Training');
 
-    cvData.education.forEach(edu => {
-      checkPageBreak(12);
+    educations.slice(0, 2).forEach((edu, eduIdx) => {
+      if (currentY > targetBottom - 15) return;
 
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9.5);
-      doc.setTextColor(...theme.secondary);
-      doc.text(edu.degree || 'Degree / Diploma', marginX, currentY);
+      doc.setFont('times', 'bold');
+      doc.setFontSize(9.2);
+      doc.setTextColor(...theme.heading);
+      doc.text(edu.degree || 'Degree / Diploma in Engineering', marginX, currentY);
+      currentY += 3.8;
 
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8.5);
-      doc.setTextColor(...theme.primary);
-      const yearScore = [edu.year, edu.score].filter(Boolean).join('  |  ');
-      doc.text(yearScore, marginX + contentWidth, currentY, { align: 'right' });
+      doc.setFont('times', 'normal');
+      doc.setFontSize(8.4);
+      doc.setTextColor(...theme.body);
+      const eduDetail = [
+        edu.institution || 'University / Institute Name',
+        edu.year || '',
+        edu.score || ''
+      ].filter(Boolean).join(', ');
+
+      doc.text(eduDetail, marginX, currentY);
       currentY += 4.2;
+    });
+  }
 
-      doc.setFont('helvetica', 'normal');
+  // -------------------------------------------------------------
+  // 7. LANGUAGES SECTION (With visual progress bars as attached)
+  // -------------------------------------------------------------
+  if (languages.length > 0 && currentY < targetBottom - 24) {
+    drawSectionHeader('Languages');
+
+    // 1. Native speaker text if any
+    const nativeLangs = languages.filter(l => l.isNative || l.levelText === 'Native speaker' || l.proficiency?.toLowerCase().includes('native'));
+    if (nativeLangs.length > 0) {
+      doc.setFont('times', 'bold');
       doc.setFontSize(8.8);
-      doc.setTextColor(...theme.muted);
-      doc.text(edu.institution || 'University / Institute', marginX, currentY);
-      currentY += 5;
-    });
-    currentY += 1.5;
+      doc.setTextColor(...theme.heading);
+      const nativeNames = nativeLangs.map(l => l.name).join(', ');
+      doc.text(`${nativeNames}: `, marginX, currentY);
+
+      const nWidth = doc.getTextWidth(`${nativeNames}: `);
+      doc.setFont('times', 'normal');
+      doc.setTextColor(...theme.body);
+      doc.text('Native speaker', marginX + nWidth, currentY);
+      currentY += 5.5;
+    }
+
+    // 2. Proficiency bar languages (e.g. English C2, Bengali B2)
+    const barLangs = languages.filter(l => !l.isNative && l.levelText !== 'Native speaker' && !l.proficiency?.toLowerCase().includes('native'));
+    
+    if (barLangs.length > 0 && currentY < targetBottom - 14) {
+      const langColWidth = (contentWidth - 10) / 2; // ~82mm
+      const barHeight = 2.0;
+
+      // Render 2 side-by-side language meters
+      barLangs.slice(0, 2).forEach((lang, lIdx) => {
+        const langX = marginX + (lIdx * (langColWidth + 10));
+        const langY = currentY;
+
+        // Top line: "English:" on left, "C2" on right
+        doc.setFont('times', 'normal');
+        doc.setFontSize(8.4);
+        doc.setTextColor(...theme.heading);
+        doc.text(`${lang.name}:`, langX, langY);
+
+        if (lang.code) {
+          doc.text(lang.code, langX + langColWidth, langY, { align: 'right' });
+        }
+
+        // Progress bar: track + filled
+        const barY = langY + 1.8;
+        const fillPercent = Math.min(Math.max(lang.percent || 80, 20), 100) / 100;
+        const filledWidth = langColWidth * fillPercent;
+
+        // Background Track
+        doc.setFillColor(...theme.barTrack);
+        doc.rect(langX, barY, langColWidth, barHeight, 'F');
+
+        // Filled Portion
+        doc.setFillColor(...theme.barFilled);
+        doc.rect(langX, barY, filledWidth, barHeight, 'F');
+
+        // Bottom label: "Proficient" / "Upper-intermediate"
+        if (lang.proficiency) {
+          doc.setFont('times', 'normal');
+          doc.setFontSize(7.8);
+          doc.setTextColor(...theme.muted);
+          doc.text(lang.proficiency, langX, barY + barHeight + 3.2);
+        }
+      });
+
+      currentY += 12;
+    }
   }
 
-  // 9. Verified Certifications & Honors
-  if (cvData.certifications && cvData.certifications.length > 0) {
-    drawSectionHeader('Certifications & Verified Credentials');
-
-    doc.setFontSize(8.8);
-    cvData.certifications.forEach(cert => {
-      checkPageBreak(5);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...theme.primary);
-      doc.text('✓', marginX + 1, currentY);
-
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...theme.text);
-      const certText = typeof cert === 'string' ? cert : `${cert.title} — ${cert.issuer || 'IT HUNT'}`;
-      doc.text(certText, marginX + 5.5, currentY);
-      currentY += 4.2;
-    });
-    currentY += 3;
-  }
-
-  // 10. Professional Footer
-  const totalPages = doc.getNumberOfPages();
-  for (let i = 1; i <= totalPages; i++) {
-    doc.setPage(i);
-
-    // Bottom subtle border
-    doc.setDrawColor(...theme.line);
-    doc.setLineWidth(0.4);
-    doc.line(marginX, pageHeight - 11, marginX + contentWidth, pageHeight - 11);
-
-    // Footer text
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7.5);
-    doc.setTextColor(...theme.muted);
-    const footerNote = 'Official Candidate CV  •  Verified through IT HUNT Software Studio & Tech Academy';
-    doc.text(footerNote, marginX, pageHeight - 7);
-
-    // Page indicator
-    const pageNumText = `Page ${i} of ${totalPages}`;
-    doc.text(pageNumText, marginX + contentWidth, pageHeight - 7, { align: 'right' });
+  // -------------------------------------------------------------
+  // GUARANTEE STRICT SINGLE PAGE
+  // -------------------------------------------------------------
+  // If jsPDF accidentally created a second page, remove all extra pages
+  while (doc.getNumberOfPages() > 1) {
+    doc.deletePage(doc.getNumberOfPages());
   }
 
   return doc;
 }
 
 /**
- * Trigger immediate browser download of the generated PDF CV
+ * Trigger immediate browser download of the generated single-page PDF CV
  */
-export function downloadProfessionalCvPdf(cvData, themeKey = 'orange') {
+export function downloadProfessionalCvPdf(cvData, themeKey = 'classic') {
   const doc = generateProfessionalCvPdf(cvData, themeKey);
-  const cleanName = (cvData.fullName || 'Student')
+  const cleanName = (cvData.fullName || 'Candidate')
     .trim()
     .replace(/[^a-zA-Z0-9_-]/g, '_');
-  const filename = `${cleanName}_Professional_CV.pdf`;
+  const filename = `${cleanName}_CV.pdf`;
   doc.save(filename);
   return filename;
 }
