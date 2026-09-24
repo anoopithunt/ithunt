@@ -220,7 +220,7 @@ export function generateProfessionalCvPdf(cvData, themeKey = 'classic') {
     drawSectionHeader('Skills');
 
     // Take top 8-12 skills to preserve clean 2-column aesthetic
-    const displaySkills = skillItems.slice(0, 10);
+    const displaySkills = skillItems.slice(0, 12);
     const half = Math.ceil(displaySkills.length / 2);
     const col1 = displaySkills.slice(0, half);
     const col2 = displaySkills.slice(half);
@@ -289,7 +289,7 @@ export function generateProfessionalCvPdf(cvData, themeKey = 'classic') {
         doc.setFontSize(bodyFontSize);
         doc.setTextColor(...theme.body);
 
-        const points = exp.points.slice(0, 3); // Max 3 concise impact bullets
+        const points = exp.points.slice(0, 4); // Up to 4 concise impact bullets
         points.forEach(pt => {
           if (currentY > targetBottom - 18) return;
 
