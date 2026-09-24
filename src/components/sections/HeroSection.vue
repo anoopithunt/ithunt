@@ -1083,15 +1083,24 @@ const highlightCode = (line) => {
   });
 
   // Step 2: Highlight keywords
-  text = text.replace(/\b(import|from|export|default|function|const|let|var|return|class|async|await|def|if|else)\b/g, '<span class="code-kw">$1</span>');
+  text = text.replace(/\b(import|from|export|default|function|const|let|var|return|class|async|await|def|if|else|extends|final|required)\b/g, '<span class="code-kw">$1</span>');
 
-  // Step 3: Highlight functions
+  // Step 3: Highlight decorators / annotations
+  text = text.replace(/(@\w+)/g, '<span class="code-dec">$1</span>');
+
+  // Step 4: Highlight types, classes & interfaces (Capitalized identifiers)
+  text = text.replace(/\b([A-Z][a-zA-Z0-9_]*)\b/g, '<span class="code-type">$1</span>');
+
+  // Step 5: Highlight functions
   text = text.replace(/\b(executePayment|acquireLock|processSecureIntent|emit|generate_post|extract_brand_dna|synthesize_carousel|build|process)\b/g, '<span class="code-fn">$1</span>');
 
-  // Step 4: Highlight properties / object keys
-  text = text.replace(/\b(status|transactionId|title|isEncrypted|channelId|appointmentId|idempotencyKey)\b/g, '<span class="code-prop">$1</span>');
+  // Step 6: Highlight properties / object keys
+  text = text.replace(/\b(status|transactionId|title|isEncrypted|channelId|appointmentId|idempotencyKey|payload|charge|lock|context)\b/g, '<span class="code-prop">$1</span>');
 
-  // Step 5: Restore string literals cleanly
+  // Step 7: Highlight booleans & special literals
+  text = text.replace(/\b(true|false|null|undefined)\b/g, '<span class="code-bool">$1</span>');
+
+  // Step 8: Restore string literals cleanly
   text = text.replace(/§§STR_(\d+)§§/g, (_, idx) => `<span class="code-str">${stringLiterals[idx]}</span>`);
 
   return text;
@@ -1583,7 +1592,7 @@ onUnmounted(() => {
 
 /* Terminal Box */
 .showcase-terminal-box {
-  background: #020617;
+  background: #090d16;
   border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
   border-radius: 12px;
   padding: 0.85rem 1rem;
@@ -1596,8 +1605,8 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.4rem;
   font-size: 0.75rem;
-  color: #64748b;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   padding-bottom: 0.5rem;
   margin-bottom: 0.75rem;
 }
@@ -1607,16 +1616,18 @@ onUnmounted(() => {
   font-size: 0.8rem;
   line-height: 1.6;
   overflow-x: auto;
+  color: #f1f5f9;
 }
 
 .terminal-line {
   display: flex;
   align-items: baseline;
+  color: #f1f5f9;
 }
 
 .line-num {
   width: 25px;
-  color: #475569;
+  color: #64748b;
   font-size: 0.72rem;
   user-select: none;
   flex-shrink: 0;
@@ -1625,13 +1636,17 @@ onUnmounted(() => {
 .line-content {
   flex: 1;
   white-space: pre;
+  color: #f1f5f9;
 }
 
-/* Syntax Token Colors */
-:deep(.code-kw) { color: #f43f5e; font-weight: 600; }
-:deep(.code-fn) { color: #38bdf8; }
-:deep(.code-str) { color: #34d399; }
-:deep(.code-prop) { color: #fbbf24; }
+/* Syntax Token Colors (Dark Mode) */
+:deep(.code-kw) { color: #fb7185; font-weight: 700; }
+:deep(.code-type) { color: #c084fc; font-weight: 600; }
+:deep(.code-fn) { color: #38bdf8; font-weight: 600; }
+:deep(.code-str) { color: #34d399; font-weight: 500; }
+:deep(.code-prop) { color: #fbbf24; font-weight: 600; }
+:deep(.code-bool) { color: #f97316; font-weight: 700; }
+:deep(.code-dec) { color: #e879f9; font-style: italic; }
 :deep(.code-comment) { color: #64748b; font-style: italic; }
 
 /* Stack Badges */
@@ -2787,23 +2802,68 @@ onUnmounted(() => {
   font-weight: 700 !important;
 }
 
-/* Terminal Stays Dark & High-Contrast */
+/* Terminal in Light Theme: Crisp Modern Light IDE Window */
 :global(body.light-theme) .showcase-terminal-box {
-  background: #0d1117 !important;
-  border-color: #30363d !important;
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04) !important;
 }
 
 :global(body.light-theme) .terminal-titlebar {
-  color: #8b949e !important;
-  border-bottom-color: #21262d !important;
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+  border-bottom-color: #e2e8f0 !important;
 }
 
 :global(body.light-theme) .line-num {
-  color: #6e7681 !important;
+  color: #94a3b8 !important;
 }
 
-:global(body.light-theme) .terminal-code code {
-  color: #e6edf3 !important;
+:global(body.light-theme) .terminal-code,
+:global(body.light-theme) .terminal-line,
+:global(body.light-theme) .line-content {
+  color: #334155 !important;
+}
+
+/* Light Theme Syntax Highlighting - Vibrant, High-Contrast Jewel Tones */
+:global(body.light-theme) :deep(.code-kw) {
+  color: #e11d48 !important;
+  font-weight: 700 !important;
+}
+
+:global(body.light-theme) :deep(.code-type) {
+  color: #7c3aed !important;
+  font-weight: 700 !important;
+}
+
+:global(body.light-theme) :deep(.code-fn) {
+  color: #0284c7 !important;
+  font-weight: 700 !important;
+}
+
+:global(body.light-theme) :deep(.code-str) {
+  color: #15803d !important;
+  font-weight: 600 !important;
+}
+
+:global(body.light-theme) :deep(.code-prop) {
+  color: #c2410c !important;
+  font-weight: 600 !important;
+}
+
+:global(body.light-theme) :deep(.code-bool) {
+  color: #d97706 !important;
+  font-weight: 700 !important;
+}
+
+:global(body.light-theme) :deep(.code-dec) {
+  color: #a21caf !important;
+  font-style: italic !important;
+}
+
+:global(body.light-theme) :deep(.code-comment) {
+  color: #64748b !important;
+  font-style: italic !important;
 }
 
 /* Metrics Panel (Right Pane) */
