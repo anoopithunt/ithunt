@@ -1,7 +1,7 @@
 <template>
   <div class="aipost-wrapper">
     <!-- =====================================================================
-         1. HERO SECTION (AIPost Signature Style)
+         1. HERO SECTION (AIPost Signature Style with Native Brand Palette)
          ===================================================================== -->
     <section class="aipost-hero">
       <div class="aipost-hero-glow aipost-hero-glow-1"></div>
@@ -46,7 +46,7 @@
             </button>
           </div>
 
-          <!-- Quick Interactive Stack Tags (Like AIPost's LinkedIn, Instagram, TikTok tags) -->
+          <!-- Quick Interactive Stack Tags (Like AIPost's platform chips) -->
           <div class="aipost-quick-tags">
             <span class="quick-tag-label">Supported Specializations:</span>
             <button 
@@ -147,7 +147,7 @@
 
                   <div class="metrics-grid">
                     <div class="metric-item">
-                      <span class="metric-val text-cyan">{{ currentProject.metrics.coverage }}</span>
+                      <span class="metric-val text-brand">{{ currentProject.metrics.coverage }}</span>
                       <span class="metric-lbl">Test Coverage</span>
                     </div>
                     <div class="metric-item">
@@ -159,7 +159,7 @@
                       <span class="metric-lbl">Merged Client PRs</span>
                     </div>
                     <div class="metric-item">
-                      <span class="metric-val text-cyan">{{ currentProject.metrics.interns }}</span>
+                      <span class="metric-val text-brand">{{ currentProject.metrics.interns }}</span>
                       <span class="metric-lbl">Engineers on Team</span>
                     </div>
                   </div>
@@ -196,7 +196,7 @@
         <div class="stats-card-grid">
           <div class="stat-pill-card" v-for="(stat, idx) in content.stats" :key="idx">
             <div class="stat-number-box">
-              <span class="stat-num text-cyan">{{ animatedStats[idx] || stat.number }}</span>
+              <span class="stat-num text-brand">{{ animatedStats[idx] || stat.number }}</span>
             </div>
             <div class="stat-desc-box">
               <div class="stat-label-title">{{ stat.label }}</div>
@@ -208,9 +208,9 @@
     </div>
 
     <!-- =====================================================================
-         3. SECTION 2: "It Did The Homework Before It Taught A Class" (AIPost Section 2 Style)
+         3. SECTION 2: "We build real software before we teach a class" (AIPost Section 2 Style)
          ===================================================================== -->
-    <section class="aipost-section aipost-section-cream">
+    <section class="aipost-section aipost-section-alt">
       <div class="container">
         <div class="section-title-wrap text-center">
           <div class="aipost-pill-badge small">
@@ -286,19 +286,19 @@
     </section>
 
     <!-- =====================================================================
-         4. SECTION 3: "Three Platforms. One Credit." -> "One Ecosystem. 3 Career Accelerators." (AIPost Section 3 Style)
+         4. SECTION 3: "Three Core Tracks. One Integrated Studio." (AIPost Section 3 Style)
          ===================================================================== -->
-    <section class="aipost-section aipost-section-dark">
+    <section class="aipost-section aipost-section-base">
       <div class="container">
         <div class="section-title-wrap text-center">
-          <div class="aipost-pill-badge small dark">
+          <div class="aipost-pill-badge small">
             <span class="aipost-badge-dot"></span>
             <span>MULTI-FORMAT ACCELERATION</span>
           </div>
-          <h2 class="aipost-section-heading text-white">
+          <h2 class="aipost-section-heading">
             Three Core Tracks. One Integrated Studio.
           </h2>
-          <p class="aipost-section-desc text-muted">
+          <p class="aipost-section-desc">
             Most bootcamps charge separately for theory, projects, and interviews. At IT HUNT, one comprehensive track equips you with full-stack mastery, live client code, and career placement.
           </p>
         </div>
@@ -383,17 +383,17 @@
     <!-- =====================================================================
          5. SECTION 4: "See in Action" Live Projects Showcase (AIPost Section 4 Style)
          ===================================================================== -->
-    <section class="aipost-section aipost-section-darker">
+    <section class="aipost-section aipost-section-alt">
       <div class="container">
         <div class="section-title-wrap text-center">
-          <div class="aipost-pill-badge small dark">
+          <div class="aipost-pill-badge small">
             <span class="aipost-badge-dot"></span>
             <span>EXAMPLES</span>
           </div>
-          <h2 class="aipost-section-heading text-white">
+          <h2 class="aipost-section-heading">
             See IT HUNT in Action
           </h2>
-          <p class="aipost-section-desc text-muted">
+          <p class="aipost-section-desc">
             A quick preview of real software products designed, engineered, and shipped by our students and leads. Each live project below runs in active production.
           </p>
         </div>
@@ -442,7 +442,7 @@
     <!-- =====================================================================
          6. SECTION 5: "From Zero to Hired" 4-Stage Pipeline (AIPost Section 6 "How It Works" Style)
          ===================================================================== -->
-    <section class="aipost-section aipost-section-cream">
+    <section class="aipost-section aipost-section-base">
       <div class="container">
         <div class="section-title-wrap text-center">
           <div class="aipost-pill-badge small">
@@ -487,17 +487,17 @@
     <!-- =====================================================================
          7. SECTION 6: "Why Choose IT HUNT?" Bento Grid (AIPost Section 7 Benefits Style)
          ===================================================================== -->
-    <section class="aipost-section aipost-section-dark">
+    <section class="aipost-section aipost-section-alt">
       <div class="container">
         <div class="section-title-wrap text-center">
-          <div class="aipost-pill-badge small dark">
+          <div class="aipost-pill-badge small">
             <span class="aipost-badge-dot"></span>
             <span>BENEFITS & ADVANTAGES</span>
           </div>
-          <h2 class="aipost-section-heading text-white">
+          <h2 class="aipost-section-heading">
             Why Choose IT HUNT?
           </h2>
-          <p class="aipost-section-desc text-muted">
+          <p class="aipost-section-desc">
             Join thousands of software engineers who stopped wasting time on disconnected tutorials and launched high-paying careers through real code.
           </p>
         </div>
@@ -510,7 +510,7 @@
             <p class="bento-card-desc">
               Stop spending weeks getting stuck in tutorial purgatory. Build production applications in structured client sprints from week one.
             </p>
-            <div class="bento-highlight-pill text-cyan">100+ Hours Saved</div>
+            <div class="bento-highlight-pill text-brand">100+ Hours Saved</div>
           </div>
 
           <!-- Card 2 -->
@@ -530,7 +530,7 @@
             <p class="bento-card-desc">
               Direct recruitment referrals to 50+ hiring partner companies across Noida, Gurugram, Delhi, Bengaluru, and Remote.
             </p>
-            <div class="bento-highlight-pill text-cyan">94%+ Placement Rate</div>
+            <div class="bento-highlight-pill text-brand">94%+ Placement Rate</div>
           </div>
 
           <!-- Card 4 -->
@@ -550,7 +550,7 @@
             <p class="bento-card-desc">
               ISO 9001:2015 certification and official NIELIT accreditation that adds undeniable credibility to your engineering resume.
             </p>
-            <div class="bento-highlight-pill text-cyan">Govt. Verified</div>
+            <div class="bento-highlight-pill text-brand">Govt. Verified</div>
           </div>
 
           <!-- Card 6 -->
@@ -569,7 +569,7 @@
     <!-- =====================================================================
          8. SECTION 7: "Powered by Cutting-Edge Tech" (AIPost Section 9 AI Models Showcase Style)
          ===================================================================== -->
-    <section class="aipost-section aipost-section-cream">
+    <section class="aipost-section aipost-section-base">
       <div class="container">
         <div class="section-title-wrap text-center">
           <div class="aipost-pill-badge small">
@@ -634,19 +634,19 @@
     </section>
 
     <!-- =====================================================================
-         9. SECTION 8: EXECUTIVE LEADERSHIP & FOUNDERS (Clean AIPost Studio Style)
+         9. SECTION 8: EXECUTIVE LEADERSHIP & FOUNDERS (Clean Studio Style)
          ===================================================================== -->
-    <section class="aipost-section aipost-section-dark">
+    <section class="aipost-section aipost-section-alt">
       <div class="container">
         <div class="section-title-wrap text-center">
-          <div class="aipost-pill-badge small dark">
+          <div class="aipost-pill-badge small">
             <span class="aipost-badge-dot"></span>
             <span>EXECUTIVE LEADERSHIP</span>
           </div>
-          <h2 class="aipost-section-heading text-white">
+          <h2 class="aipost-section-heading">
             Led by Active Industry Architects
           </h2>
-          <p class="aipost-section-desc text-muted">
+          <p class="aipost-section-desc">
             Meet the senior founders and directors steering technical direction, client partnerships, and hands-on developer training.
           </p>
         </div>
@@ -690,7 +690,7 @@
     <!-- =====================================================================
          10. SECTION 9: FREQUENTLY ASKED QUESTIONS (AIPost Section 10 Accordion)
          ===================================================================== -->
-    <section class="aipost-section aipost-section-cream">
+    <section class="aipost-section aipost-section-base">
       <div class="container">
         <div class="section-title-wrap text-center">
           <div class="aipost-pill-badge small">
@@ -772,11 +772,11 @@
         <div class="codemaya-banner text-center">
           <p class="codemaya-tagline">Proudly powered by innovative engineering by</p>
           <a href="https://www.codemaya.com" target="_blank" rel="noopener noreferrer" class="codemaya-logo-link">
-            <span class="codemaya-brand-text">Code<span class="text-cyan">Maya</span></span>
+            <span class="codemaya-brand-text">Code<span class="text-brand">Maya</span></span>
           </a>
           <p class="codemaya-subtext">
             Discover cutting-edge software solutions and digital transformation services at 
-            <a href="https://www.codemaya.com" target="_blank" rel="noopener noreferrer" class="text-cyan font-bold">www.codemaya.com</a>
+            <a href="https://www.codemaya.com" target="_blank" rel="noopener noreferrer" class="text-brand font-bold">www.codemaya.com</a>
           </p>
         </div>
       </div>
@@ -1113,14 +1113,13 @@ onUnmounted(() => {
 
 <style scoped>
 /* ==========================================================================
-   AIPOST.SOCIAL SIGNATURE DESIGN SYSTEM FOR IT HUNT
+   AIPOST LAYOUT & INTERACTION STRUCTURE WITH NATIVE IT HUNT BRAND PALETTE
    ==========================================================================
-   Color Tokens:
-   - Primary Accent: #26BDEC (Vibrant Electric Cyan)
-   - Secondary Accent: #0891B2 (Deep Cyan)
-   - Cream Canvas: #EFECE3 (Warm luxury linen background)
-   - Dark Sections: #0B0F19 & #0F172A (Obsidian slate)
-   - Borders: #E5E2D9 / rgba(255, 255, 255, 0.08)
+   Uses the project's original CSS variables:
+   - Primary Accent: var(--color-ai-orange, #f97316) & var(--color-ai-yellow, #f59e0b)
+   - Gradients: var(--gradient-ai-hero) & var(--gradient-ai-btn)
+   - Surfaces: var(--bg-cyber-dark), var(--bg-card-glass), var(--border-cyber)
+   - Supports both dark mode and light mode naturally via CSS variables!
    ========================================================================== */
 
 .aipost-wrapper {
@@ -1133,14 +1132,14 @@ onUnmounted(() => {
 }
 
 /* ==========================================================================
-   1. HERO SECTION (AIPost Style)
+   1. HERO SECTION
    ========================================================================== */
 
 .aipost-hero {
   position: relative;
   padding: 5rem 1rem 4rem;
   overflow: hidden;
-  background: radial-gradient(circle at 50% 0%, rgba(38, 189, 236, 0.12) 0%, transparent 60%);
+  background: radial-gradient(circle at 50% 0%, var(--glow-orange, rgba(249, 115, 22, 0.14)) 0%, transparent 60%);
 }
 
 .aipost-hero-glow {
@@ -1156,7 +1155,7 @@ onUnmounted(() => {
   left: 20%;
   width: 500px;
   height: 500px;
-  background: rgba(38, 189, 236, 0.15);
+  background: var(--glow-orange, rgba(249, 115, 22, 0.18));
 }
 
 .aipost-hero-glow-2 {
@@ -1164,7 +1163,7 @@ onUnmounted(() => {
   right: 15%;
   width: 450px;
   height: 450px;
-  background: rgba(2, 132, 199, 0.1);
+  background: var(--glow-yellow, rgba(245, 158, 11, 0.15));
 }
 
 .aipost-hero-container {
@@ -1175,7 +1174,7 @@ onUnmounted(() => {
   text-align: center;
 }
 
-/* Pill Badge (AIPost Dot Style) */
+/* Pill Badge */
 .aipost-badge-wrapper {
   display: flex;
   justify-content: center;
@@ -1187,10 +1186,10 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.5rem;
   padding: 0.45rem 1.1rem;
-  border-radius: 9999px;
-  background: rgba(38, 189, 236, 0.08);
-  border: 1px solid rgba(38, 189, 236, 0.3);
-  color: #26BDEC;
+  border-radius: var(--radius-full, 9999px);
+  background: rgba(249, 115, 22, 0.08);
+  border: 1px solid var(--border-cyber-glow, rgba(249, 115, 22, 0.35));
+  color: var(--color-ai-orange, #f97316);
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -1204,18 +1203,12 @@ onUnmounted(() => {
   margin-bottom: 1rem;
 }
 
-.aipost-pill-badge.dark {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(38, 189, 236, 0.25);
-  color: #38bdf8;
-}
-
 .aipost-badge-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #26BDEC;
-  box-shadow: 0 0 10px #26BDEC;
+  background-color: var(--color-ai-orange, #f97316);
+  box-shadow: 0 0 10px var(--color-ai-orange, #f97316);
   animation: pulse-dot-anim 2s infinite ease-in-out;
 }
 
@@ -1239,13 +1232,13 @@ onUnmounted(() => {
 }
 
 .aipost-gradient-text {
-  background: linear-gradient(135deg, #26BDEC 0%, #38bdf8 50%, #0284c7 100%);
+  background: var(--gradient-ai-hero, linear-gradient(135deg, #f97316 0%, #fbbf24 50%, #f59e0b 100%));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.text-cyan {
-  color: #26BDEC !important;
+.text-brand, .text-cyan {
+  color: var(--color-ai-orange, #f97316) !important;
 }
 
 .text-green {
@@ -1262,7 +1255,7 @@ onUnmounted(() => {
 }
 
 /* ==========================================================================
-   INTERACTIVE INPUT BAR (Signature AIPost URL Bar Widget)
+   INTERACTIVE INPUT BAR
    ========================================================================== */
 
 .aipost-input-box-wrapper {
@@ -1273,22 +1266,22 @@ onUnmounted(() => {
 .aipost-input-box {
   display: flex;
   align-items: center;
-  background: rgba(15, 23, 42, 0.85);
-  border: 1.5px solid rgba(38, 189, 236, 0.45);
-  border-radius: 9999px;
+  background: var(--bg-card-glass, rgba(15, 23, 42, 0.85));
+  border: 1.5px solid var(--border-cyber-glow, rgba(249, 115, 22, 0.45));
+  border-radius: var(--radius-full, 9999px);
   padding: 0.5rem 0.5rem 0.5rem 1.4rem;
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35), 0 0 25px rgba(38, 189, 236, 0.2);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35), 0 0 25px var(--glow-orange, rgba(249, 115, 22, 0.2));
   backdrop-filter: blur(12px);
   transition: all 0.3s ease;
 }
 
 .aipost-input-box:focus-within {
-  border-color: #26BDEC;
-  box-shadow: 0 14px 45px rgba(38, 189, 236, 0.3);
+  border-color: var(--color-ai-orange, #f97316);
+  box-shadow: 0 14px 45px var(--glow-orange, rgba(249, 115, 22, 0.35));
 }
 
 .aipost-input-icon {
-  color: #26BDEC;
+  color: var(--color-ai-orange, #f97316);
   display: flex;
   align-items: center;
   margin-right: 0.75rem;
@@ -1301,12 +1294,12 @@ onUnmounted(() => {
   outline: none;
   font-size: 1rem;
   font-weight: 500;
-  color: #ffffff;
+  color: var(--text-main, #f8fafc);
   padding: 0.5rem 0;
 }
 
 .aipost-hero-input::placeholder {
-  color: #64748b;
+  color: var(--text-dim, #64748b);
   font-weight: 400;
 }
 
@@ -1316,23 +1309,23 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, #26BDEC 0%, #0284c7 100%);
+  background: var(--gradient-ai-btn, linear-gradient(135deg, #ea580c 0%, #f97316 50%, #fbbf24 100%));
   color: #ffffff;
   border: none;
   font-family: var(--font-heading, 'Outfit', sans-serif);
   font-weight: 700;
   font-size: 0.95rem;
   padding: 0.85rem 1.6rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-full, 9999px);
   cursor: pointer;
-  box-shadow: 0 4px 18px rgba(38, 189, 236, 0.4);
+  box-shadow: 0 4px 18px var(--glow-orange, rgba(249, 115, 22, 0.4));
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
 }
 
 .aipost-btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(38, 189, 236, 0.55);
+  box-shadow: 0 8px 25px var(--glow-orange, rgba(249, 115, 22, 0.6));
 }
 
 .aipost-btn-secondary {
@@ -1341,13 +1334,13 @@ onUnmounted(() => {
   justify-content: center;
   gap: 0.5rem;
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.15));
   color: var(--text-main, #f8fafc);
   font-family: var(--font-heading, 'Outfit', sans-serif);
   font-weight: 600;
   font-size: 0.95rem;
   padding: 0.85rem 1.6rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-full, 9999px);
   cursor: pointer;
   transition: all 0.25s ease;
   white-space: nowrap;
@@ -1355,7 +1348,7 @@ onUnmounted(() => {
 
 .aipost-btn-secondary:hover {
   background: rgba(255, 255, 255, 0.12);
-  border-color: #26BDEC;
+  border-color: var(--color-ai-orange, #f97316);
   color: #ffffff;
 }
 
@@ -1389,9 +1382,9 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.35rem;
   padding: 0.35rem 0.8rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-full, 9999px);
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
   color: var(--text-muted, #94a3b8);
   font-size: 0.82rem;
   font-weight: 600;
@@ -1401,9 +1394,9 @@ onUnmounted(() => {
 
 .quick-tag-btn:hover,
 .quick-tag-btn.active {
-  background: rgba(38, 189, 236, 0.15);
-  border-color: rgba(38, 189, 236, 0.5);
-  color: #26BDEC;
+  background: rgba(249, 115, 22, 0.15);
+  border-color: rgba(249, 115, 22, 0.5);
+  color: var(--color-ai-orange, #f97316);
 }
 
 /* Guarantees Row */
@@ -1434,7 +1427,7 @@ onUnmounted(() => {
 }
 
 /* ==========================================================================
-   HERO INTERACTIVE SHOWCASE CARD (AIPost Live Preview Style)
+   HERO INTERACTIVE SHOWCASE CARD
    ========================================================================== */
 
 .aipost-showcase-container {
@@ -1444,10 +1437,10 @@ onUnmounted(() => {
 }
 
 .aipost-showcase-card {
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid rgba(38, 189, 236, 0.35);
-  border-radius: 20px;
-  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.5), 0 0 35px rgba(38, 189, 236, 0.15);
+  background: var(--bg-card-glass, rgba(15, 23, 42, 0.9));
+  border: 1px solid var(--border-cyber-glow, rgba(249, 115, 22, 0.35));
+  border-radius: var(--radius-lg, 20px);
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.5), 0 0 35px var(--glow-orange, rgba(249, 115, 22, 0.12));
   overflow: hidden;
   backdrop-filter: blur(20px);
 }
@@ -1459,7 +1452,7 @@ onUnmounted(() => {
   justify-content: space-between;
   padding: 0.85rem 1.25rem;
   background: rgba(2, 6, 23, 0.7);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
   flex-wrap: wrap;
   gap: 0.75rem;
 }
@@ -1508,9 +1501,9 @@ onUnmounted(() => {
 }
 
 .showcase-tab-btn.active {
-  color: #26BDEC;
-  background: rgba(38, 189, 236, 0.12);
-  border-color: rgba(38, 189, 236, 0.3);
+  color: var(--color-ai-orange, #f97316);
+  background: rgba(249, 115, 22, 0.12);
+  border-color: rgba(249, 115, 22, 0.35);
 }
 
 .showcase-badge-status {
@@ -1548,8 +1541,8 @@ onUnmounted(() => {
   display: inline-block;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #26BDEC;
-  background: rgba(38, 189, 236, 0.1);
+  color: var(--color-ai-orange, #f97316);
+  background: rgba(249, 115, 22, 0.12);
   padding: 0.2rem 0.6rem;
   border-radius: 4px;
   margin-bottom: 0.5rem;
@@ -1560,7 +1553,7 @@ onUnmounted(() => {
   font-family: var(--font-heading, 'Outfit', sans-serif);
   font-size: 1.25rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-main, #ffffff);
   margin-bottom: 0.4rem;
 }
 
@@ -1573,7 +1566,7 @@ onUnmounted(() => {
 /* Terminal Box */
 .showcase-terminal-box {
   background: #020617;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
   border-radius: 12px;
   padding: 0.85rem 1rem;
   margin-bottom: 1rem;
@@ -1632,7 +1625,7 @@ onUnmounted(() => {
 
 .stack-badge {
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
   padding: 0.25rem 0.6rem;
   border-radius: 6px;
   font-size: 0.75rem;
@@ -1643,7 +1636,7 @@ onUnmounted(() => {
 /* Right Pane */
 .metrics-panel-card {
   background: rgba(2, 6, 23, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.06));
   border-radius: 14px;
   padding: 1.25rem;
   display: flex;
@@ -1669,8 +1662,8 @@ onUnmounted(() => {
 
 .branch-tag {
   font-size: 0.7rem;
-  background: rgba(38, 189, 236, 0.15);
-  color: #38bdf8;
+  background: rgba(249, 115, 22, 0.15);
+  color: var(--color-ai-orange, #f97316);
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
 }
@@ -1684,7 +1677,7 @@ onUnmounted(() => {
 
 .metric-item {
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.05));
   padding: 0.85rem;
   border-radius: 10px;
 }
@@ -1744,8 +1737,8 @@ onUnmounted(() => {
 
 .aipost-stats-band {
   background: rgba(15, 23, 42, 0.6);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.06));
+  border-bottom: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.06));
   padding: 2.5rem 1rem;
 }
 
@@ -1761,23 +1754,22 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--bg-card-glass, rgba(255, 255, 255, 0.02));
+  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.06));
   padding: 1rem 1.25rem;
   border-radius: 16px;
   transition: all 0.2s ease;
 }
 
 .stat-pill-card:hover {
-  border-color: rgba(38, 189, 236, 0.4);
-  background: rgba(38, 189, 236, 0.05);
+  border-color: rgba(249, 115, 22, 0.4);
+  background: rgba(249, 115, 22, 0.05);
 }
 
 .stat-num {
   font-family: var(--font-heading, 'Outfit', sans-serif);
   font-size: 2rem;
   font-weight: 800;
-  color: #26BDEC;
   line-height: 1;
 }
 
@@ -1802,19 +1794,14 @@ onUnmounted(() => {
   position: relative;
 }
 
-.aipost-section-cream {
-  background: #EFECE3;
-  color: #0f172a;
+.aipost-section-base {
+  background: var(--bg-cyber-dark, #070a12);
+  color: var(--text-main, #f8fafc);
 }
 
-.aipost-section-dark {
-  background: #0B0F19;
-  color: #f8fafc;
-}
-
-.aipost-section-darker {
-  background: #070A12;
-  color: #f8fafc;
+.aipost-section-alt {
+  background: rgba(15, 23, 42, 0.4);
+  color: var(--text-main, #f8fafc);
 }
 
 .section-title-wrap {
@@ -1833,20 +1820,14 @@ onUnmounted(() => {
   letter-spacing: -0.02em;
   line-height: 1.2;
   margin-bottom: 1rem;
-}
-
-.aipost-section-cream .aipost-section-heading {
-  color: #0f172a;
+  color: var(--text-main, #f8fafc);
 }
 
 .aipost-section-desc {
   font-size: 1.05rem;
   line-height: 1.65;
-  color: #475569;
+  color: var(--text-muted, #94a3b8);
 }
-
-.text-white { color: #ffffff !important; }
-.text-muted { color: #94a3b8 !important; }
 
 /* ==========================================================================
    3. HOMEWORK CARDS (AIPost Section 2)
@@ -1861,11 +1842,11 @@ onUnmounted(() => {
 }
 
 .homework-card {
-  background: #ffffff;
-  border: 1px solid #E5E2D9;
+  background: var(--bg-card-glass, rgba(15, 23, 42, 0.7));
+  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
   border-radius: 16px;
   padding: 2rem 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
@@ -1873,16 +1854,16 @@ onUnmounted(() => {
 
 .homework-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.08);
-  border-color: #26BDEC;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.35);
+  border-color: rgba(249, 115, 22, 0.4);
 }
 
 .card-icon-wrap {
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: rgba(38, 189, 236, 0.12);
-  color: #0891B2;
+  background: rgba(249, 115, 22, 0.12);
+  color: var(--color-ai-orange, #f97316);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1893,13 +1874,13 @@ onUnmounted(() => {
   font-family: var(--font-heading, 'Outfit', sans-serif);
   font-size: 1.15rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-main, #ffffff);
   margin-bottom: 0.75rem;
 }
 
 .homework-card-desc {
   font-size: 0.92rem;
-  color: #475569;
+  color: var(--text-muted, #94a3b8);
   line-height: 1.6;
   margin-bottom: 1.5rem;
   flex-grow: 1;
@@ -1913,8 +1894,8 @@ onUnmounted(() => {
   display: inline-block;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #0891B2;
-  background: #f1f5f9;
+  color: var(--color-ai-orange, #f97316);
+  background: rgba(249, 115, 22, 0.1);
   padding: 0.25rem 0.65rem;
   border-radius: 9999px;
 }
@@ -1932,8 +1913,8 @@ onUnmounted(() => {
 }
 
 .accelerator-card {
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-card-glass, rgba(15, 23, 42, 0.7));
+  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.1));
   border-radius: 20px;
   padding: 2.25rem 1.75rem;
   position: relative;
@@ -1943,14 +1924,14 @@ onUnmounted(() => {
 }
 
 .accelerator-card:hover {
-  border-color: rgba(38, 189, 236, 0.4);
+  border-color: rgba(249, 115, 22, 0.4);
   transform: translateY(-4px);
 }
 
 .accelerator-card.featured {
-  background: rgba(15, 23, 42, 0.95);
-  border: 2px solid #26BDEC;
-  box-shadow: 0 15px 40px rgba(38, 189, 236, 0.2);
+  background: var(--bg-card-glass, rgba(15, 23, 42, 0.95));
+  border: 2px solid var(--color-ai-orange, #f97316);
+  box-shadow: 0 15px 40px var(--glow-orange, rgba(249, 115, 22, 0.25));
 }
 
 .acc-popular-badge {
@@ -1958,18 +1939,18 @@ onUnmounted(() => {
   top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  background: #26BDEC;
+  background: var(--color-ai-orange, #f97316);
   color: #ffffff;
   font-size: 0.72rem;
   font-weight: 800;
   padding: 0.2rem 0.8rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-full, 9999px);
   letter-spacing: 0.08em;
 }
 
 .acc-format-badge {
   font-size: 0.75rem;
-  color: #38bdf8;
+  color: var(--color-ai-orange, #f97316);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -1979,13 +1960,13 @@ onUnmounted(() => {
   font-family: var(--font-heading, 'Outfit', sans-serif);
   font-size: 1.4rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--text-main, #ffffff);
   margin: 0.4rem 0 0.2rem;
 }
 
 .acc-sub {
   font-size: 0.88rem;
-  color: #94a3b8;
+  color: var(--text-muted, #94a3b8);
   margin-bottom: 1.5rem;
 }
 
@@ -2025,7 +2006,7 @@ onUnmounted(() => {
 .acc-cost-line {
   text-align: center;
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: var(--text-muted, #94a3b8);
   margin-bottom: 1rem;
   font-weight: 600;
 }
@@ -2043,8 +2024,8 @@ onUnmounted(() => {
 }
 
 .example-card {
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-card-glass, rgba(15, 23, 42, 0.75));
+  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
   border-radius: 16px;
   padding: 1.75rem;
   display: flex;
@@ -2053,7 +2034,7 @@ onUnmounted(() => {
 }
 
 .example-card:hover {
-  border-color: rgba(38, 189, 236, 0.45);
+  border-color: rgba(249, 115, 22, 0.45);
   transform: translateY(-4px);
 }
 
@@ -2079,20 +2060,20 @@ onUnmounted(() => {
 .example-client-name {
   font-size: 0.98rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-main, #ffffff);
   margin: 0;
 }
 
 .example-meta-text {
   font-size: 0.72rem;
-  color: #94a3b8;
+  color: var(--text-muted, #94a3b8);
 }
 
 .example-platform-pill {
   font-size: 0.72rem;
   font-weight: 700;
-  color: #38bdf8;
-  background: rgba(38, 189, 236, 0.12);
+  color: var(--color-ai-orange, #f97316);
+  background: rgba(249, 115, 22, 0.12);
   padding: 0.25rem 0.6rem;
   border-radius: 9999px;
 }
@@ -2113,7 +2094,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.5rem;
   font-size: 0.82rem;
-  color: #94a3b8;
+  color: var(--text-muted, #94a3b8);
   margin-bottom: 0.4rem;
 }
 
@@ -2121,7 +2102,7 @@ onUnmounted(() => {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: #26BDEC;
+  background: var(--color-ai-orange, #f97316);
 }
 
 .example-card-footer {
@@ -2137,14 +2118,14 @@ onUnmounted(() => {
   display: flex;
   gap: 0.75rem;
   font-size: 0.78rem;
-  color: #94a3b8;
+  color: var(--text-muted, #94a3b8);
   font-weight: 600;
 }
 
 .example-view-btn {
   background: transparent;
   border: none;
-  color: #26BDEC;
+  color: var(--color-ai-orange, #f97316);
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
@@ -2153,7 +2134,7 @@ onUnmounted(() => {
 
 .example-view-btn:hover {
   text-decoration: underline;
-  color: #38bdf8;
+  color: var(--color-ai-yellow, #f59e0b);
 }
 
 /* ==========================================================================
@@ -2184,7 +2165,7 @@ onUnmounted(() => {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: #26BDEC;
+  background: var(--gradient-ai-btn, linear-gradient(135deg, #ea580c 0%, #f97316 100%));
   color: #ffffff;
   font-family: var(--font-heading, 'Outfit', sans-serif);
   font-weight: 800;
@@ -2192,24 +2173,24 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(38, 189, 236, 0.35);
+  box-shadow: 0 4px 15px var(--glow-orange, rgba(249, 115, 22, 0.35));
   z-index: 2;
 }
 
 .pipeline-line {
   flex: 1;
   width: 2px;
-  background: #cbd5e1;
+  background: rgba(255, 255, 255, 0.1);
   margin: 0.5rem 0;
 }
 
 .pipeline-step-card {
-  background: #ffffff;
-  border: 1px solid #E5E2D9;
+  background: var(--bg-card-glass, rgba(15, 23, 42, 0.75));
+  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
   border-radius: 16px;
   padding: 1.75rem;
   flex: 1;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .step-card-header {
@@ -2223,7 +2204,8 @@ onUnmounted(() => {
   width: 44px;
   height: 44px;
   border-radius: 10px;
-  background: rgba(38, 189, 236, 0.1);
+  background: rgba(249, 115, 22, 0.12);
+  color: var(--color-ai-orange, #f97316);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2233,7 +2215,7 @@ onUnmounted(() => {
 .step-phase-badge {
   font-size: 0.7rem;
   font-weight: 800;
-  color: #0891B2;
+  color: var(--color-ai-orange, #f97316);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -2242,13 +2224,13 @@ onUnmounted(() => {
   font-family: var(--font-heading, 'Outfit', sans-serif);
   font-size: 1.2rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-main, #ffffff);
   margin: 0;
 }
 
 .step-desc {
   font-size: 0.92rem;
-  color: #475569;
+  color: var(--text-muted, #94a3b8);
   line-height: 1.6;
   margin-bottom: 1rem;
 }
@@ -2264,7 +2246,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.4rem;
   font-size: 0.82rem;
-  color: #334155;
+  color: #cbd5e1;
   font-weight: 600;
 }
 
@@ -2286,8 +2268,8 @@ onUnmounted(() => {
 }
 
 .bento-card {
-  background: rgba(15, 23, 42, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-card-glass, rgba(15, 23, 42, 0.65));
+  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
   border-radius: 16px;
   padding: 2rem 1.75rem;
   display: flex;
@@ -2296,7 +2278,7 @@ onUnmounted(() => {
 }
 
 .bento-card:hover {
-  border-color: rgba(38, 189, 236, 0.4);
+  border-color: rgba(249, 115, 22, 0.4);
   transform: translateY(-4px);
 }
 
@@ -2309,13 +2291,13 @@ onUnmounted(() => {
   font-family: var(--font-heading, 'Outfit', sans-serif);
   font-size: 1.2rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-main, #ffffff);
   margin-bottom: 0.75rem;
 }
 
 .bento-card-desc {
   font-size: 0.92rem;
-  color: #94a3b8;
+  color: var(--text-muted, #94a3b8);
   line-height: 1.6;
   margin-bottom: 1.5rem;
   flex-grow: 1;
@@ -2341,31 +2323,31 @@ onUnmounted(() => {
 }
 
 .tech-model-card {
-  background: #ffffff;
-  border: 1px solid #E5E2D9;
+  background: var(--bg-card-glass, rgba(15, 23, 42, 0.7));
+  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
   border-radius: 20px;
   padding: 2.25rem 1.75rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
 }
 
 .tech-model-card:hover {
-  border-color: #26BDEC;
+  border-color: rgba(249, 115, 22, 0.5);
   transform: translateY(-4px);
-  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.35);
 }
 
 .tech-model-card.featured-model {
-  border: 2px solid #26BDEC;
-  background: linear-gradient(180deg, #ffffff 0%, #f0fdfa 100%);
+  border: 2px solid var(--color-ai-orange, #f97316);
+  background: var(--bg-card-glass, rgba(15, 23, 42, 0.9));
 }
 
 .model-badge {
   font-size: 0.72rem;
   font-weight: 800;
-  color: #0891B2;
+  color: var(--color-ai-orange, #f97316);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.5rem;
@@ -2375,13 +2357,13 @@ onUnmounted(() => {
   font-family: var(--font-heading, 'Outfit', sans-serif);
   font-size: 1.35rem;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--text-main, #ffffff);
   margin-bottom: 0.75rem;
 }
 
 .model-desc {
   font-size: 0.9rem;
-  color: #475569;
+  color: var(--text-muted, #94a3b8);
   line-height: 1.6;
   margin-bottom: 1.5rem;
 }
@@ -2397,7 +2379,7 @@ onUnmounted(() => {
   align-items: baseline;
   gap: 0.5rem;
   font-size: 0.88rem;
-  color: #334155;
+  color: #cbd5e1;
   margin-bottom: 0.6rem;
 }
 
@@ -2414,8 +2396,8 @@ onUnmounted(() => {
 }
 
 .founder-card {
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-card-glass, rgba(15, 23, 42, 0.75));
+  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
   border-radius: 20px;
   padding: 2rem;
   display: flex;
@@ -2425,7 +2407,7 @@ onUnmounted(() => {
 }
 
 .founder-card:hover {
-  border-color: rgba(38, 189, 236, 0.4);
+  border-color: rgba(249, 115, 22, 0.4);
 }
 
 .founder-avatar-box {
@@ -2433,7 +2415,7 @@ onUnmounted(() => {
   height: 90px;
   border-radius: 16px;
   overflow: hidden;
-  border: 2px solid rgba(38, 189, 236, 0.5);
+  border: 2px solid var(--border-cyber-glow, rgba(249, 115, 22, 0.5));
   flex-shrink: 0;
 }
 
@@ -2446,7 +2428,7 @@ onUnmounted(() => {
 .founder-badge {
   font-size: 0.7rem;
   font-weight: 800;
-  color: #38bdf8;
+  color: var(--color-ai-orange, #f97316);
   letter-spacing: 0.05em;
 }
 
@@ -2454,13 +2436,13 @@ onUnmounted(() => {
   font-family: var(--font-heading, 'Outfit', sans-serif);
   font-size: 1.25rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--text-main, #ffffff);
   margin: 0.2rem 0;
 }
 
 .founder-role {
   font-size: 0.82rem;
-  color: #94a3b8;
+  color: var(--text-muted, #94a3b8);
   margin-bottom: 0.75rem;
 }
 
@@ -2480,7 +2462,7 @@ onUnmounted(() => {
 
 .skill-tag {
   background: rgba(255, 255, 255, 0.06);
-  color: #94a3b8;
+  color: var(--text-muted, #94a3b8);
   font-size: 0.72rem;
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
@@ -2496,8 +2478,8 @@ onUnmounted(() => {
 }
 
 .faq-accordion-item {
-  background: #ffffff;
-  border: 1px solid #E5E2D9;
+  background: var(--bg-card-glass, rgba(15, 23, 42, 0.75));
+  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
   border-radius: 12px;
   margin-bottom: 1rem;
   overflow: hidden;
@@ -2505,8 +2487,8 @@ onUnmounted(() => {
 }
 
 .faq-accordion-item.open {
-  border-color: #26BDEC;
-  box-shadow: 0 4px 15px rgba(38, 189, 236, 0.1);
+  border-color: var(--color-ai-orange, #f97316);
+  box-shadow: 0 4px 15px var(--glow-orange, rgba(249, 115, 22, 0.15));
 }
 
 .faq-question-bar {
@@ -2525,24 +2507,24 @@ onUnmounted(() => {
   font-family: var(--font-heading, 'Outfit', sans-serif);
   font-size: 1.05rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-main, #ffffff);
   padding-right: 1rem;
 }
 
 .faq-chevron-icon {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #0891B2;
+  color: var(--color-ai-orange, #f97316);
 }
 
 .faq-answer-container {
   padding: 0 1.5rem 1.25rem;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .faq-answer-text {
   font-size: 0.94rem;
-  color: #475569;
+  color: var(--text-muted, #94a3b8);
   line-height: 1.65;
   margin: 0.75rem 0 0;
 }
@@ -2557,13 +2539,13 @@ onUnmounted(() => {
 }
 
 .aipost-cta-banner {
-  background: rgba(15, 23, 42, 0.85);
-  border: 1.5px solid rgba(38, 189, 236, 0.45);
+  background: var(--bg-card-glass, rgba(15, 23, 42, 0.85));
+  border: 1.5px solid var(--border-cyber-glow, rgba(249, 115, 22, 0.45));
   border-radius: 24px;
   padding: 4.5rem 2rem;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(38, 189, 236, 0.2);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px var(--glow-orange, rgba(249, 115, 22, 0.2));
   backdrop-filter: blur(16px);
   max-width: 1100px;
   margin: 0 auto;
@@ -2576,7 +2558,7 @@ onUnmounted(() => {
   transform: translateX(-50%);
   width: 600px;
   height: 300px;
-  background: radial-gradient(circle, rgba(38, 189, 236, 0.25) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--glow-orange, rgba(249, 115, 22, 0.25)) 0%, transparent 70%);
   filter: blur(50px);
   pointer-events: none;
 }
@@ -2592,7 +2574,7 @@ onUnmounted(() => {
 
 .cta-subtitle {
   font-size: 1.1rem;
-  color: #94a3b8;
+  color: var(--text-muted, #94a3b8);
   max-width: 650px;
   margin: 0 auto 2.5rem;
   line-height: 1.6;
@@ -2613,7 +2595,7 @@ onUnmounted(() => {
   justify-content: center;
   gap: 0.75rem;
   font-size: 0.82rem;
-  color: #64748b;
+  color: var(--text-dim, #64748b);
   flex-wrap: wrap;
 }
 
@@ -2623,8 +2605,8 @@ onUnmounted(() => {
 
 .aipost-codemaya-section {
   padding: 3rem 1rem 4rem;
-  background: #EFECE3;
-  border-top: 1px solid #E5E2D9;
+  background: var(--bg-cyber-dark, #070a12);
+  border-top: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
 }
 
 .codemaya-banner {
@@ -2634,7 +2616,7 @@ onUnmounted(() => {
 
 .codemaya-tagline {
   font-size: 0.88rem;
-  color: #64748b;
+  color: var(--text-dim, #64748b);
   margin-bottom: 0.5rem;
 }
 
@@ -2642,14 +2624,85 @@ onUnmounted(() => {
   font-family: var(--font-heading, 'Outfit', sans-serif);
   font-size: 1.8rem;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--text-main, #ffffff);
   letter-spacing: -0.02em;
 }
 
 .codemaya-subtext {
   font-size: 0.8rem;
-  color: #64748b;
+  color: var(--text-dim, #64748b);
   margin-top: 0.5rem;
+}
+
+/* ==========================================================================
+   LIGHT THEME SUPPORT
+   ========================================================================== */
+
+:global(body.light-theme) .aipost-wrapper {
+  background-color: var(--bg-cyber-dark, #f8fafc);
+  color: var(--text-main, #000000);
+}
+
+:global(body.light-theme) .aipost-hero-headline,
+:global(body.light-theme) .aipost-section-heading,
+:global(body.light-theme) .project-main-title,
+:global(body.light-theme) .homework-card-title,
+:global(body.light-theme) .acc-title,
+:global(body.light-theme) .example-client-name,
+:global(body.light-theme) .step-title,
+:global(body.light-theme) .bento-card-title,
+:global(body.light-theme) .model-name,
+:global(body.light-theme) .founder-name,
+:global(body.light-theme) .faq-question-text,
+:global(body.light-theme) .cta-main-title,
+:global(body.light-theme) .codemaya-brand-text {
+  color: #000000 !important;
+}
+
+:global(body.light-theme) .aipost-hero-subtitle,
+:global(body.light-theme) .aipost-section-desc,
+:global(body.light-theme) .project-brief,
+:global(body.light-theme) .homework-card-desc,
+:global(body.light-theme) .acc-sub,
+:global(body.light-theme) .example-desc-text,
+:global(body.light-theme) .step-desc,
+:global(body.light-theme) .bento-card-desc,
+:global(body.light-theme) .model-desc,
+:global(body.light-theme) .faq-answer-text,
+:global(body.light-theme) .cta-subtitle {
+  color: #334155 !important;
+}
+
+:global(body.light-theme) .aipost-input-box,
+:global(body.light-theme) .aipost-showcase-card,
+:global(body.light-theme) .homework-card,
+:global(body.light-theme) .accelerator-card,
+:global(body.light-theme) .example-card,
+:global(body.light-theme) .pipeline-step-card,
+:global(body.light-theme) .bento-card,
+:global(body.light-theme) .tech-model-card,
+:global(body.light-theme) .founder-card,
+:global(body.light-theme) .faq-accordion-item,
+:global(body.light-theme) .aipost-cta-banner,
+:global(body.light-theme) .stat-pill-card {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+}
+
+:global(body.light-theme) .aipost-hero-input {
+  color: #000000 !important;
+}
+
+:global(body.light-theme) .showcase-card-header {
+  background: #f8fafc !important;
+  border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+:global(body.light-theme) .aipost-btn-secondary {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
 }
 
 /* ==========================================================================
