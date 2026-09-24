@@ -847,26 +847,44 @@ const handleTrackSearch = () => {
 // Interactive Showcase Card Data (Mac-style App & Terminal view)
 const showcaseProjects = [
   {
-    id: 'cloudpay',
-    title: 'FinTech Billing Gateway',
-    icon: '💳',
-    track: 'MERN Stack & Cloud',
-    name: 'CloudPay — Multi-Tenant High-Throughput Billing Engine',
-    desc: 'Engineered by IT HUNT interns for enterprise SaaS billing: webhooks, auto-invoicing, idempotency keys, and sub-50ms latency.',
-    file: 'paymentEngine.service.ts',
-    stack: ['React 19', 'Node.js', 'Express', 'Redis', 'PostgreSQL', 'Docker'],
-    metrics: { coverage: '99.4%', uptime: '99.98%', prs: '48 Merged', interns: '6 Engineers' },
+    id: 'cloudpay-ios',
+    title: 'iOS Swift & UIKit',
+    icon: '🍎',
+    track: 'iOS Native App Development (Swift & SwiftUI)',
+    name: 'CloudPay iOS — Native SwiftUI & UIKit High-Throughput Checkout Engine',
+    desc: 'Engineered by IT HUNT iOS interns: declarative SwiftUI payment sheet, UIKit view controller bridge, Apple Pay PassKit, Face ID biometrics, and Swift 6 concurrency.',
+    file: 'PaymentEngineView.swift',
+    stack: ['Swift 6', 'SwiftUI', 'UIKit Interop', 'PassKit (Apple Pay)', 'LocalAuthentication', 'Swift Concurrency'],
+    metrics: { coverage: '99.4%', uptime: '99.99%', prs: '54 Merged', interns: '6 iOS Engineers' },
     codeSnippet: [
-      "import { PaymentGateway, WebhookDispatcher } from '@cloudpay/core';",
-      "import { RedisCache } from '@cloudpay/cache';",
+      "import SwiftUI",
+      "import UIKit",
+      "import PassKit",
       "",
-      "export class TransactionManager {",
-      "  async executePayment(payload: CheckoutPayload) {",
-      "    const lock = await RedisCache.acquireLock(payload.idempotencyKey);",
-      "    const charge = await PaymentGateway.processSecureIntent(payload);",
-      "    await WebhookDispatcher.emit('payment.succeeded', charge);",
-      "    return { status: 'COMPLETED', transactionId: charge.id };",
+      "// 1. SwiftUI Payment Sheet with FaceID & PassKit Bridge",
+      "struct PaymentEngineView: View {",
+      "  @StateObject private var coordinator = PaymentCoordinator()",
+      "  @State private var isProcessing = false",
+      "",
+      "  var body: some View {",
+      "    VStack(spacing: 16) {",
+      "      ApplePayButtonRepresentable(action: coordinator.startApplePay)",
+      "        .frame(height: 50)",
+      "        .cornerRadius(12)",
+      "    }",
+      "    .task { await coordinator.verifyBiometrics() }",
       "  }",
+      "}",
+      "",
+      "// 2. UIKit UIViewRepresentable Integration Bridge",
+      "struct ApplePayButtonRepresentable: UIViewRepresentable {",
+      "  var action: () -> Void",
+      "  func makeUIView(context: Context) -> PKPaymentButton {",
+      "    let button = PKPaymentButton(paymentButtonType: .buy, paymentButtonStyle: .black)",
+      "    button.addTarget(context.coordinator, action: #selector(Coordinator.tapped), for: .touchUpInside)",
+      "    return button",
+      "  }",
+      "  func updateUIView(_ uiView: PKPaymentButton, context: Context) {}",
       "}"
     ]
   },
@@ -912,6 +930,30 @@ const showcaseProjects = [
       "  @override",
       "  Widget build(BuildContext context) {",
       "    return WebRTCStreamView(channelId: appointmentId, isEncrypted: true);",
+      "  }",
+      "}"
+    ]
+  },
+  {
+    id: 'cloudpay-backend',
+    title: 'FinTech Cloud Backend',
+    icon: '💳',
+    track: 'MERN Stack & Cloud DevOps',
+    name: 'CloudPay — Multi-Tenant High-Throughput Billing Engine',
+    desc: 'Engineered by IT HUNT interns for enterprise SaaS billing: webhooks, auto-invoicing, idempotency keys, and sub-50ms latency.',
+    file: 'paymentEngine.service.ts',
+    stack: ['React 19', 'Node.js', 'Express', 'Redis', 'PostgreSQL', 'Docker'],
+    metrics: { coverage: '99.4%', uptime: '99.98%', prs: '48 Merged', interns: '6 Engineers' },
+    codeSnippet: [
+      "import { PaymentGateway, WebhookDispatcher } from '@cloudpay/core';",
+      "import { RedisCache } from '@cloudpay/cache';",
+      "",
+      "export class TransactionManager {",
+      "  async executePayment(payload: CheckoutPayload) {",
+      "    const lock = await RedisCache.acquireLock(payload.idempotencyKey);",
+      "    const charge = await PaymentGateway.processSecureIntent(payload);",
+      "    await WebhookDispatcher.emit('payment.succeeded', charge);",
+      "    return { status: 'COMPLETED', transactionId: charge.id };",
       "  }",
       "}"
     ]
@@ -1094,23 +1136,25 @@ const highlightCode = (line) => {
     return key;
   });
 
-  // Step 2: Highlight keywords
-  text = text.replace(/\b(import|from|export|default|function|const|let|var|return|class|async|await|def|if|else|extends|final|required)\b/g, '<span class="code-kw">$1</span>');
+  // Step 2: Highlight keywords (Swift, TypeScript, Python, Dart)
+  text = text.replace(/\b(import|from|export|default|function|const|let|var|return|class|struct|protocol|extension|func|some|self|Self|async|await|def|if|else|extends|final|required|private|public|mutating|actor|override|for|in|typealias)\b/g, '<span class="code-kw">$1</span>');
 
-  // Step 3: Highlight decorators / annotations
+  // Step 3: Highlight decorators / property wrappers (@State, @StateObject, @Binding, @objc)
   text = text.replace(/(@\w+)/g, '<span class="code-dec">$1</span>');
 
   // Step 4: Highlight types, classes & interfaces (Capitalized identifiers)
   text = text.replace(/\b([A-Z][a-zA-Z0-9_]*)\b/g, '<span class="code-type">$1</span>');
 
-  // Step 5: Highlight functions
-  text = text.replace(/\b(executePayment|acquireLock|processSecureIntent|emit|generate_post|extract_brand_dna|synthesize_carousel|build|process)\b/g, '<span class="code-fn">$1</span>');
+  // Step 5: Highlight functions & modifiers
+  text = text.replace(/\b(makeUIView|updateUIView|startApplePay|verifyBiometrics|frame|cornerRadius|task|addTarget|executePayment|acquireLock|processSecureIntent|emit|generate_post|extract_brand_dna|synthesize_carousel|build|process)\b/g, '<span class="code-fn">$1</span>');
 
-  // Step 6: Highlight properties / object keys
-  text = text.replace(/\b(status|transactionId|title|isEncrypted|channelId|appointmentId|idempotencyKey|payload|charge|lock|context)\b/g, '<span class="code-prop">$1</span>');
+  // Step 6: Highlight properties / selectors / dot enums
+  text = text.replace(/\b(body|action|coordinator|context|uiView|status|transactionId|title|isEncrypted|channelId|appointmentId|idempotencyKey|payload|charge|lock|spacing|height|paymentButtonType|paymentButtonStyle)\b/g, '<span class="code-prop">$1</span>');
+  text = text.replace(/(#(?:selector|keyPath)\([^)]*\))/g, '<span class="code-prop">$1</span>');
+  text = text.replace(/(\.[a-zA-Z_]\w*)/g, '<span class="code-prop">$1</span>');
 
   // Step 7: Highlight booleans & special literals
-  text = text.replace(/\b(true|false|null|undefined)\b/g, '<span class="code-bool">$1</span>');
+  text = text.replace(/\b(true|false|null|undefined|nil)\b/g, '<span class="code-bool">$1</span>');
 
   // Step 8: Restore string literals cleanly
   text = text.replace(/§§STR_(\d+)§§/g, (_, idx) => `<span class="code-str">${stringLiterals[idx]}</span>`);
