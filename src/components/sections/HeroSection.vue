@@ -858,33 +858,14 @@ const showcaseProjects = [
     metrics: { coverage: '99.4%', uptime: '99.99%', prs: '54 Merged', interns: '6 iOS Engineers' },
     codeSnippet: [
       "import SwiftUI",
-      "import UIKit",
-      "import PassKit",
+      "import UIKit // PassKit Bridge",
       "",
-      "// 1. SwiftUI Payment Sheet with FaceID & PassKit Bridge",
       "struct PaymentEngineView: View {",
-      "  @StateObject private var coordinator = PaymentCoordinator()",
-      "  @State private var isProcessing = false",
-      "",
       "  var body: some View {",
-      "    VStack(spacing: 16) {",
-      "      ApplePayButtonRepresentable(action: coordinator.startApplePay)",
-      "        .frame(height: 50)",
-      "        .cornerRadius(12)",
-      "    }",
-      "    .task { await coordinator.verifyBiometrics() }",
+      "    ApplePayButtonBridge(type: .buy)",
+      "      .frame(height: 48)",
+      "      .task { await processPayment() }",
       "  }",
-      "}",
-      "",
-      "// 2. UIKit UIViewRepresentable Integration Bridge",
-      "struct ApplePayButtonRepresentable: UIViewRepresentable {",
-      "  var action: () -> Void",
-      "  func makeUIView(context: Context) -> PKPaymentButton {",
-      "    let button = PKPaymentButton(paymentButtonType: .buy, paymentButtonStyle: .black)",
-      "    button.addTarget(context.coordinator, action: #selector(Coordinator.tapped), for: .touchUpInside)",
-      "    return button",
-      "  }",
-      "  func updateUIView(_ uiView: PKPaymentButton, context: Context) {}",
       "}"
     ]
   },
@@ -1611,48 +1592,58 @@ onUnmounted(() => {
 /* Card Body */
 .showcase-card-body {
   display: grid;
-  grid-template-columns: 1.3fr 0.9fr;
-  gap: 1.5rem;
-  padding: 1.5rem;
+  grid-template-columns: minmax(0, 1.22fr) minmax(0, 0.98fr);
+  gap: 1.25rem;
+  padding: 1.25rem;
+  box-sizing: border-box;
+  align-items: stretch;
+}
+
+.showcase-left-pane,
+.showcase-right-pane {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .project-headline-wrap {
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.75rem;
 }
 
 .project-track-chip {
   display: inline-block;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: var(--color-ai-orange, #f97316);
   background: rgba(249, 115, 22, 0.12);
-  padding: 0.2rem 0.6rem;
+  padding: 0.15rem 0.5rem;
   border-radius: 4px;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.35rem;
   text-transform: uppercase;
 }
 
 .project-main-title {
   font-family: var(--font-heading, 'Outfit', sans-serif);
-  font-size: 1.25rem;
+  font-size: 1.12rem;
   font-weight: 700;
   color: var(--text-main, #ffffff);
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.3rem;
+  line-height: 1.35;
 }
 
 .project-brief {
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   color: var(--text-muted, #94a3b8);
-  line-height: 1.55;
+  line-height: 1.45;
 }
 
 /* Terminal Box */
 .showcase-terminal-box {
   background: #090d16;
   border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
-  border-radius: 12px;
-  padding: 0.85rem 1rem;
-  margin-bottom: 1rem;
+  border-radius: 10px;
+  padding: 0.65rem 0.85rem;
+  margin-bottom: 0.75rem;
   font-family: var(--font-mono, 'Fira Code', monospace);
 }
 
@@ -1660,17 +1651,17 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: #94a3b8;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  padding-bottom: 0.5rem;
-  margin-bottom: 0.75rem;
+  padding-bottom: 0.4rem;
+  margin-bottom: 0.5rem;
 }
 
 .terminal-code {
   margin: 0;
-  font-size: 0.8rem;
-  line-height: 1.6;
+  font-size: 0.74rem;
+  line-height: 1.5;
   overflow-x: auto;
   color: #f1f5f9;
 }
@@ -1682,9 +1673,9 @@ onUnmounted(() => {
 }
 
 .line-num {
-  width: 25px;
+  width: 24px;
   color: #64748b;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   user-select: none;
   flex-shrink: 0;
 }
@@ -1709,15 +1700,15 @@ onUnmounted(() => {
 .project-stack-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.35rem;
 }
 
 .stack-badge {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
-  padding: 0.25rem 0.6rem;
+  padding: 0.2rem 0.5rem;
   border-radius: 6px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: #cbd5e1;
   font-weight: 600;
 }
@@ -1726,62 +1717,68 @@ onUnmounted(() => {
 .metrics-panel-card {
   background: rgba(2, 6, 23, 0.6);
   border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.06));
-  border-radius: 14px;
-  padding: 1.25rem;
+  border-radius: 12px;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   height: 100%;
+  box-sizing: border-box;
 }
 
 .metrics-panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.75rem;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-wrap: wrap;
+  gap: 0.4rem;
 }
 
 .metrics-panel-header h4 {
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: #ffffff;
   margin: 0;
 }
 
 .branch-tag {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   background: rgba(249, 115, 22, 0.15);
   color: var(--color-ai-orange, #f97316);
-  padding: 0.2rem 0.5rem;
+  padding: 0.15rem 0.45rem;
   border-radius: 4px;
+  white-space: nowrap;
 }
 
 .metrics-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
+  gap: 0.65rem;
+  margin-bottom: 0.85rem;
 }
 
 .metric-item {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.05));
-  padding: 0.85rem;
-  border-radius: 10px;
+  padding: 0.6rem 0.65rem;
+  border-radius: 8px;
+  min-width: 0;
 }
 
 .metric-val {
   font-family: var(--font-heading, 'Outfit', sans-serif);
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 800;
   display: block;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.15rem;
   color: #ffffff;
+  word-break: break-word;
 }
 
 .metric-lbl {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   color: #94a3b8;
   font-weight: 600;
 }
@@ -1789,26 +1786,26 @@ onUnmounted(() => {
 .review-status-card {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.6rem;
   background: rgba(16, 185, 129, 0.08);
   border: 1px solid rgba(16, 185, 129, 0.25);
-  border-radius: 10px;
-  padding: 0.75rem;
-  margin-bottom: 1.25rem;
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  margin-bottom: 0.85rem;
 }
 
 .reviewer-avatar {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
 }
 
 .reviewer-name {
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: #10B981;
 }
 
 .reviewer-comment {
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   color: #cbd5e1;
   font-style: italic;
 }
@@ -1816,7 +1813,7 @@ onUnmounted(() => {
 .showcase-actions {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.5rem;
   margin-top: auto;
 }
 
@@ -3217,6 +3214,23 @@ onUnmounted(() => {
   }
 }
 
+@media (max-width: 960px) {
+  .showcase-card-body {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    padding: 1.15rem;
+  }
+
+  .metrics-panel-card {
+    max-width: 100%;
+  }
+
+  .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+}
+
 @media (max-width: 640px) {
   /* Hero Spacing & Typography */
   .aipost-hero {
@@ -3376,6 +3390,7 @@ onUnmounted(() => {
   }
 
   .showcase-card-body {
+    grid-template-columns: 1fr;
     padding: 0.85rem;
     gap: 1rem;
   }
