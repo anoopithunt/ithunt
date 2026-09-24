@@ -66,6 +66,7 @@
       @set-tab="setTab" 
       @toggle-theme="toggleTheme" 
       @open-nielit-modal="showNielitModal = true"
+      @open-cv-modal="showCvModal = true"
     />
 
     <!-- Main Dynamic Views with Animated Morph Transition -->
@@ -79,6 +80,7 @@
           @set-tab="setTab" 
           @apply-course="applyForCourse" 
           @open-job-modal="openJobModal" 
+          @open-cv-modal="showCvModal = true"
         />
 
         <!-- 2. Dedicated Internships View -->
@@ -227,6 +229,7 @@
           @student-signup="handleStudentSignup"
           @update-student-profile="handleUpdateStudentProfile"
           @student-logout="handleStudentLogout"
+          @open-cv-modal="showCvModal = true"
           @go-to-login="setTab('login')"
         />
       </Transition>
@@ -285,6 +288,15 @@
       v-if="showNielitPreviewModal" 
       :projectData="submittedNielitData" 
       @close="showNielitPreviewModal = false" 
+    />
+
+    <CvBuilderModal
+      v-if="showCvModal"
+      :isOpen="showCvModal"
+      :studentUser="studentUser"
+      :content="content"
+      @close="showCvModal = false"
+      @cv-generated="handleCvGenerated"
     />
 
     <ConfirmationModal 
@@ -441,6 +453,7 @@
       @set-tab="setTab" 
       @open-privacy-policy="openPrivacyPolicyPdf"
       @open-terms-conditions="openTermsConditionsPdf"
+      @open-cv-modal="showCvModal = true"
     />
 
     <!-- Floating Back to Top Action Button -->
@@ -538,6 +551,7 @@ const JobApplicationModal = defineAsyncComponent(() => import('./components/moda
 const NielitProjectModal = defineAsyncComponent(() => import('./components/modals/NielitProjectModal.vue'));
 const NielitPdfPreviewModal = defineAsyncComponent(() => import('./components/modals/NielitPdfPreviewModal.vue'));
 const ConfirmationModal = defineAsyncComponent(() => import('./components/modals/ConfirmationModal.vue'));
+const CvBuilderModal = defineAsyncComponent(() => import('./components/modals/CvBuilderModal.vue'));
 
 const content = ref(CONTENT_DATA);
 const isDarkMode = ref(false);
@@ -962,6 +976,12 @@ const selectedJob = ref({});
 const showNielitModal = ref(false);
 const showNielitPreviewModal = ref(false);
 const submittedNielitData = ref(null);
+
+const showCvModal = ref(false);
+
+const handleCvGenerated = ({ filename, candidateName }) => {
+  showToast(`📄 Professional CV for ${candidateName} has been downloaded successfully!`, 'success');
+};
 
 const showModal = ref(false);
 const modalTitle = ref('');

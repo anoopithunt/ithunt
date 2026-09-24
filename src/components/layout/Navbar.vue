@@ -65,6 +65,15 @@
           <span>🔐 Login</span>
         </button>
 
+        <button 
+          class="theme-toggle-btn nav-action-desktop" 
+          style="width: auto; padding: 0.45rem 1rem; border-radius: var(--radius-full); font-size: 0.82rem; font-weight: 700; border-color: rgba(249, 115, 22, 0.45); color: var(--color-ai-orange); display: inline-flex; align-items: center; gap: 0.35rem;"
+          @click="$emit('open-cv-modal')"
+          title="Generate Professional ATS Student CV in PDF Format"
+        >
+          <span>📄 Generate CV</span>
+        </button>
+
         <a 
           href="/api/certificates/verify"
           target="_blank"
@@ -244,6 +253,17 @@
                 <span class="sidebar-item-icon">📝</span>
                 <span class="sidebar-item-label">Direct Admission 2026</span>
                 <span class="sidebar-item-pill pulse">Open</span>
+              </button>
+            </li>
+            <li>
+              <button 
+                class="sidebar-nav-item" 
+                style="background: rgba(249, 115, 22, 0.1); border-color: rgba(249, 115, 22, 0.3); color: var(--color-ai-orange);"
+                @click="$emit('open-cv-modal'); closeMobileNav();"
+              >
+                <span class="sidebar-item-icon">📄</span>
+                <span class="sidebar-item-label" style="font-weight: 700;">Generate Professional CV</span>
+                <span class="sidebar-item-pill orange" style="background: var(--color-ai-orange); color: white;">PDF</span>
               </button>
             </li>
           </ul>
@@ -446,7 +466,7 @@ const isTeacher = computed(() => {
          role.toLowerCase().includes('teacher') || role.toLowerCase().includes('faculty');
 });
 
-defineEmits(['set-tab', 'toggle-theme', 'open-nielit-modal']);
+defineEmits(['set-tab', 'toggle-theme', 'open-nielit-modal', 'open-cv-modal']);
 
 const isMobileNavOpen = ref(false);
 const isScrolled = ref(false);
