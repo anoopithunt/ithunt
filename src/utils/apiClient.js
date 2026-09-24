@@ -279,7 +279,15 @@ export async function apiRequest(endpoint, options = {}, isRetry = false) {
 
   if (!token && memoryToken) token = memoryToken;
 
-  if (!token && !endpoint.includes('/auth/login')) {
+  const isPublicGet = (!options.method || options.method === 'GET') && (
+    endpoint.includes('/courses') ||
+    endpoint.includes('/events') ||
+    endpoint.includes('/reviews') ||
+    endpoint.includes('/projects') ||
+    endpoint.includes('/certificates/verify')
+  );
+
+  if (!token && !isPublicGet && !endpoint.includes('/auth/login')) {
     token = await ensureAuthToken();
   }
 
@@ -294,18 +302,24 @@ export async function apiRequest(endpoint, options = {}, isRetry = false) {
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   const url = endpoint.startsWith('http') ? endpoint : `${baseUrl}${cleanEndpoint}`;
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3500);
+
   try {
     let response;
     try {
-      response = await fetch(url, { ...options, headers });
+      response = await fetch(url, { ...options, headers, signal: options.signal || controller.signal });
     } catch (netErr) {
-      // If relative URL failed on localhost, retry directly against port 3000
+      // If relative URL failed on localhost, retry directly against port 3000 if dev server exists
       if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
         const directUrl = `http://127.0.0.1:3000${cleanEndpoint.startsWith('/api') ? cleanEndpoint : '/api' + cleanEndpoint}`;
-        response = await fetch(directUrl, { ...options, headers });
+        response = await fetch(directUrl, { ...options, headers, signal: options.signal || controller.signal }).catch(() => null);
+        if (!response) throw netErr;
       } else {
         throw netErr;
       }
+    } finally {
+      clearTimeout(timeoutId);
     }
 
     // Handle token expiration / 401 unauthorized gracefully

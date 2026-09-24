@@ -458,7 +458,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, watch, onMounted, onUnmounted, nextTick, defineAsyncComponent } from 'vue';
 import CONTENT_DATA from './data/contentData.js';
 import { DEFAULT_DEMO_STUDENT } from './data/studentAcademicData.js';
 import { generateAdmissionPdf, generatePrivacyPolicyPdf, generateTermsConditionsPdf, getAdmissionPdfBlob } from './utils/pdfGenerator.js';
@@ -516,25 +516,28 @@ import { sendNielitProjectEmailNotification } from './utils/emailNotifier.js';
 import Navbar from './components/layout/Navbar.vue';
 import Footer from './components/layout/Footer.vue';
 import HeroSection from './components/sections/HeroSection.vue';
-import InternshipsSection from './components/sections/InternshipsSection.vue';
-import EventsSection from './components/sections/EventsSection.vue';
-import CoursesSection from './components/sections/CoursesSection.vue';
-import TestimonialsSection from './components/sections/TestimonialsSection.vue';
-import ReviewsSection from './components/sections/ReviewsSection.vue';
-import CareersSection from './components/sections/CareersSection.vue';
-import AdmissionSection from './components/sections/AdmissionSection.vue';
-import LoginSection from './components/sections/LoginSection.vue';
-import SuperAdminSection from './components/sections/SuperAdminSection.vue';
-import StudentPortalSection from './components/sections/StudentPortalSection.vue';
 
-import CourseDetailModal from './components/modals/CourseDetailModal.vue';
-import EventDetailModal from './components/modals/EventDetailModal.vue';
-import EventLightbox from './components/modals/EventLightbox.vue';
-import EventRsvpModal from './components/modals/EventRsvpModal.vue';
-import JobApplicationModal from './components/modals/JobApplicationModal.vue';
-import NielitProjectModal from './components/modals/NielitProjectModal.vue';
-import NielitPdfPreviewModal from './components/modals/NielitPdfPreviewModal.vue';
-import ConfirmationModal from './components/modals/ConfirmationModal.vue';
+// Lazy-loaded secondary view sections (splits bundle & makes Home page load instantly)
+const InternshipsSection = defineAsyncComponent(() => import('./components/sections/InternshipsSection.vue'));
+const EventsSection = defineAsyncComponent(() => import('./components/sections/EventsSection.vue'));
+const CoursesSection = defineAsyncComponent(() => import('./components/sections/CoursesSection.vue'));
+const TestimonialsSection = defineAsyncComponent(() => import('./components/sections/TestimonialsSection.vue'));
+const ReviewsSection = defineAsyncComponent(() => import('./components/sections/ReviewsSection.vue'));
+const CareersSection = defineAsyncComponent(() => import('./components/sections/CareersSection.vue'));
+const AdmissionSection = defineAsyncComponent(() => import('./components/sections/AdmissionSection.vue'));
+const LoginSection = defineAsyncComponent(() => import('./components/sections/LoginSection.vue'));
+const SuperAdminSection = defineAsyncComponent(() => import('./components/sections/SuperAdminSection.vue'));
+const StudentPortalSection = defineAsyncComponent(() => import('./components/sections/StudentPortalSection.vue'));
+
+// Lazy-loaded modals (only downloaded when user triggers interaction)
+const CourseDetailModal = defineAsyncComponent(() => import('./components/modals/CourseDetailModal.vue'));
+const EventDetailModal = defineAsyncComponent(() => import('./components/modals/EventDetailModal.vue'));
+const EventLightbox = defineAsyncComponent(() => import('./components/modals/EventLightbox.vue'));
+const EventRsvpModal = defineAsyncComponent(() => import('./components/modals/EventRsvpModal.vue'));
+const JobApplicationModal = defineAsyncComponent(() => import('./components/modals/JobApplicationModal.vue'));
+const NielitProjectModal = defineAsyncComponent(() => import('./components/modals/NielitProjectModal.vue'));
+const NielitPdfPreviewModal = defineAsyncComponent(() => import('./components/modals/NielitPdfPreviewModal.vue'));
+const ConfirmationModal = defineAsyncComponent(() => import('./components/modals/ConfirmationModal.vue'));
 
 const content = ref(CONTENT_DATA);
 const isDarkMode = ref(false);
@@ -1767,8 +1770,12 @@ onMounted(() => {
     }
   }
 
-  // Load 100% live database records across all Swagger API endpoints from ithunt-api REST API
-  loadInitialData();
+  // Defer background API synchronization to background idle cycles so the Home page loads instantly
+  if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+    window.requestIdleCallback(() => loadInitialData(), { timeout: 2000 });
+  } else {
+    setTimeout(() => loadInitialData(), 300);
+  }
 
   // Initialize SEO Metadata for active view
   updateSeoMetadata(activeTab.value);
