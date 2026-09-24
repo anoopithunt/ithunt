@@ -2998,9 +2998,48 @@ onUnmounted(() => {
   border-top-color: #e2e8f0 !important;
 }
 
+/* Light Theme Enhancements for Complete Contrast & Polish */
+:global(body.light-theme) .check,
+:global(body.light-theme) .point-check {
+  color: #059669 !important;
+}
+
+:global(body.light-theme) .bento-highlight-pill.text-green {
+  color: #059669 !important;
+}
+
+:global(body.light-theme) .bento-highlight-pill.text-brand {
+  color: #ea580c !important;
+}
+
+:global(body.light-theme) .founder-avatar-box {
+  border-color: rgba(249, 115, 22, 0.45) !important;
+}
+
+:global(body.light-theme) .stat-pill-card:hover {
+  border-color: #ea580c !important;
+  background: #ffffff !important;
+}
+
+:global(body.light-theme) .homework-card:hover,
+:global(body.light-theme) .example-card:hover,
+:global(body.light-theme) .bento-card:hover,
+:global(body.light-theme) .tech-model-card:hover,
+:global(body.light-theme) .founder-card:hover {
+  border-color: rgba(234, 88, 12, 0.5) !important;
+  box-shadow: 0 10px 30px rgba(234, 88, 12, 0.08) !important;
+}
+
 /* ==========================================================================
-   ANIMATIONS & RESPONSIVE
+   ANIMATIONS & RESPONSIVE (Deep Mobile-First Orientation)
    ========================================================================== */
+
+/* Wrapper safety for mobile viewports to prevent horizontal overflow */
+.aipost-wrapper {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
 
 .anim-fade-in { animation: fadeIn 0.8s ease forwards; }
 .anim-fade-in-up { animation: fadeInUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
@@ -3018,18 +3057,43 @@ onUnmounted(() => {
 }
 
 @media (max-width: 900px) {
-  .showcase-card-body {
-    grid-template-columns: 1fr;
+  .aipost-hero {
+    padding: 3.5rem 1.25rem 3rem;
   }
 
-  .aipost-hero {
-    padding: 3.5rem 1rem 3rem;
+  .showcase-card-body {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1.25rem;
+  }
+
+  .accelerators-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .examples-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .bento-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .tech-models-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .founders-grid {
+    grid-template-columns: 1fr;
+    max-width: 650px;
   }
 
   .founder-card {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    padding: 1.75rem;
   }
 
   .founder-skills {
@@ -3038,43 +3102,677 @@ onUnmounted(() => {
 }
 
 @media (max-width: 640px) {
+  /* Hero Spacing & Typography */
+  .aipost-hero {
+    padding: 2.25rem 0.85rem 2.25rem;
+    overflow: hidden;
+  }
+
+  .aipost-badge-wrapper {
+    margin-bottom: 1.1rem;
+  }
+
+  .aipost-pill-badge {
+    padding: 0.35rem 0.85rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+  }
+
+  .aipost-hero-headline {
+    font-size: clamp(1.65rem, 6.2vw, 2.25rem);
+    line-height: 1.22;
+    margin-bottom: 1rem;
+    padding: 0 0.25rem;
+    word-break: break-word;
+  }
+
+  .aipost-hero-subtitle {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    margin-bottom: 1.75rem;
+    padding: 0 0.4rem;
+  }
+
+  /* Interactive Input Box */
+  .aipost-input-box-wrapper {
+    margin-bottom: 2.25rem;
+    padding: 0;
+  }
+
   .aipost-input-box {
-    border-radius: 16px;
+    border-radius: 18px;
     flex-direction: column;
     padding: 0.75rem;
     gap: 0.75rem;
+    align-items: stretch;
+  }
+
+  .aipost-input-icon {
+    display: none;
+  }
+
+  .aipost-hero-input {
+    width: 100%;
+    text-align: center;
+    font-size: 0.92rem;
+    padding: 0.4rem 0.25rem;
   }
 
   .aipost-hero-cta {
     width: 100%;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0.8rem 1.25rem;
+    font-size: 0.92rem;
+  }
+
+  /* Specialization Quick Pills */
+  .aipost-quick-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-top: 1rem;
+    padding: 0 0.25rem;
+  }
+
+  .quick-tag-label {
+    width: 100%;
+    text-align: center;
+    font-size: 0.75rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .quick-tag-btn {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.76rem;
+    border-radius: 8px;
+  }
+
+  /* Guarantees 2x2 Grid on Mobile */
+  .aipost-guarantee-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 0.75rem;
+    margin-top: 1.25rem;
+    text-align: left;
+    padding: 0 0.5rem;
+  }
+
+  .guarantee-sep {
+    display: none;
+  }
+
+  .guarantee-item {
+    font-size: 0.76rem;
+    line-height: 1.35;
+  }
+
+  /* Interactive Showcase Card Mobile Ergonomics */
+  .aipost-showcase-container {
+    width: 100%;
+    padding: 0;
+  }
+
+  .aipost-showcase-card {
+    border-radius: 16px;
   }
 
   .showcase-card-header {
-    flex-direction: column;
-    align-items: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0.85rem;
+    gap: 0.5rem;
   }
 
+  .mac-dots {
+    order: 1;
+  }
+
+  .showcase-badge-status {
+    order: 2;
+    font-size: 0.68rem;
+  }
+
+  .showcase-tabs {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-top: 0.25rem;
+    gap: 0.35rem;
+  }
+
+  .showcase-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .showcase-tab-btn {
+    flex-shrink: 0;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.76rem;
+    white-space: nowrap;
+  }
+
+  .showcase-card-body {
+    padding: 0.85rem;
+    gap: 1rem;
+  }
+
+  .project-headline-wrap {
+    margin-bottom: 0.85rem;
+  }
+
+  .project-main-title {
+    font-size: 1.1rem;
+  }
+
+  .project-brief {
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+
+  .showcase-terminal-box {
+    padding: 0.65rem 0.75rem;
+    border-radius: 10px;
+    margin-bottom: 0.85rem;
+  }
+
+  .terminal-titlebar {
+    font-size: 0.7rem;
+    padding-bottom: 0.4rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .terminal-code {
+    font-size: 0.72rem;
+    line-height: 1.5;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .line-num {
+    width: 20px;
+    font-size: 0.68rem;
+  }
+
+  .stack-badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+  }
+
+  .metrics-panel-card {
+    padding: 0.9rem 0.8rem;
+    border-radius: 12px;
+  }
+
+  .metrics-panel-header {
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.65rem;
+  }
+
+  .metrics-panel-header h4 {
+    font-size: 0.82rem;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .metric-item {
+    padding: 0.65rem 0.5rem;
+    text-align: center;
+    border-radius: 8px;
+  }
+
+  .metric-val {
+    font-size: 1.1rem;
+  }
+
+  .metric-lbl {
+    font-size: 0.68rem;
+  }
+
+  .review-status-card {
+    padding: 0.65rem 0.75rem;
+    gap: 0.6rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .reviewer-avatar {
+    font-size: 1.25rem;
+  }
+
+  .reviewer-name {
+    font-size: 0.74rem;
+  }
+
+  .reviewer-comment {
+    font-size: 0.7rem;
+  }
+
+  .showcase-actions {
+    gap: 0.5rem;
+  }
+
+  .showcase-actions button {
+    min-height: 46px;
+    font-size: 0.88rem;
+  }
+
+  /* Stats Band 2-Column Mobile Layout */
+  .aipost-stats-band {
+    padding: 1.75rem 0.75rem;
+  }
+
+  .stats-card-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+  }
+
+  .stat-pill-card {
+    padding: 0.85rem 0.75rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+    border-radius: 12px;
+  }
+
+  .stat-num {
+    font-size: 1.45rem;
+  }
+
+  .stat-label-title {
+    font-size: 0.78rem;
+    line-height: 1.3;
+  }
+
+  .stat-micro-note {
+    display: none;
+  }
+
+  /* Sections Generic */
+  .aipost-section {
+    padding: 3rem 0.85rem;
+  }
+
+  .section-title-wrap {
+    margin: 0 auto 2rem;
+  }
+
+  .aipost-section-heading {
+    font-size: clamp(1.55rem, 5.5vw, 2.15rem);
+    margin-bottom: 0.75rem;
+    line-height: 1.22;
+  }
+
+  .aipost-section-desc {
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+
+  /* Section 2: Homework Cards */
+  .homework-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .homework-card {
+    padding: 1.35rem 1.15rem;
+    border-radius: 14px;
+  }
+
+  .card-icon-wrap {
+    width: 42px;
+    height: 42px;
+    margin-bottom: 1rem;
+  }
+
+  .homework-card-title {
+    font-size: 1.05rem;
+  }
+
+  .homework-card-desc {
+    font-size: 0.88rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Section 3: Accelerators */
+  .accelerators-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .accelerator-card {
+    padding: 1.5rem 1.2rem;
+    border-radius: 16px;
+  }
+
+  .acc-title {
+    font-size: 1.25rem;
+  }
+
+  .acc-sub {
+    font-size: 0.82rem;
+    margin-bottom: 1.1rem;
+  }
+
+  .acc-deliverables-title {
+    font-size: 0.75rem;
+  }
+
+  .acc-list {
+    margin-bottom: 1.5rem;
+  }
+
+  .acc-list li {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .accelerator-card button {
+    min-height: 46px;
+  }
+
+  /* Section 4: Live Examples */
+  .examples-grid {
+    grid-template-columns: 1fr;
+    gap: 1.1rem;
+  }
+
+  .example-card {
+    padding: 1.25rem 1.1rem;
+    border-radius: 14px;
+  }
+
+  .example-card-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .example-client-name {
+    font-size: 0.92rem;
+  }
+
+  .example-desc-text {
+    font-size: 0.86rem;
+    margin-bottom: 1rem;
+  }
+
+  .example-card-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding-top: 0.85rem;
+  }
+
+  .example-engagement-stats {
+    font-size: 0.74rem;
+    gap: 0.5rem;
+  }
+
+  .example-view-btn {
+    align-self: flex-start;
+    font-size: 0.82rem;
+  }
+
+  /* Section 5: Pipeline */
   .pipeline-step-item {
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
   }
 
   .pipeline-step-number-wrap {
     flex-direction: row;
     width: 100%;
     align-items: center;
+    gap: 0.5rem;
+  }
+
+  .pipeline-step-number {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
   }
 
   .pipeline-line {
     display: none;
   }
 
+  .pipeline-step-card {
+    padding: 1.15rem 1rem;
+    border-radius: 14px;
+  }
+
+  .step-card-header {
+    gap: 0.75rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .step-icon-box {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+
+  .step-title {
+    font-size: 1.05rem;
+  }
+
+  .step-desc {
+    font-size: 0.86rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .step-subpoints {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .step-subpoint-item {
+    font-size: 0.78rem;
+  }
+
+  /* Section 6: Bento Grid */
+  .bento-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .bento-card {
+    padding: 1.25rem 1.1rem;
+    border-radius: 14px;
+  }
+
+  .bento-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .bento-card-title {
+    font-size: 1.05rem;
+  }
+
+  .bento-card-desc {
+    font-size: 0.86rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Section 7: Tech Models */
+  .tech-models-grid {
+    grid-template-columns: 1fr;
+    gap: 1.1rem;
+  }
+
+  .tech-model-card {
+    padding: 1.35rem 1.15rem;
+    border-radius: 16px;
+  }
+
+  .model-name {
+    font-size: 1.2rem;
+  }
+
+  .model-desc {
+    font-size: 0.86rem;
+    margin-bottom: 1.1rem;
+  }
+
+  .model-feature-list li {
+    font-size: 0.84rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Section 8: Founders */
+  .founders-grid {
+    grid-template-columns: 1fr;
+    gap: 1.1rem;
+  }
+
+  .founder-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.35rem 1.15rem;
+    gap: 1rem;
+    border-radius: 16px;
+  }
+
+  .founder-avatar-box {
+    width: 80px;
+    height: 80px;
+    border-radius: 14px;
+  }
+
+  .founder-name {
+    font-size: 1.15rem;
+  }
+
+  .founder-quote {
+    font-size: 0.84rem;
+  }
+
+  .founder-skills {
+    justify-content: center;
+  }
+
+  /* Section 9: FAQ */
+  .faq-question-bar {
+    padding: 1rem 1.1rem;
+  }
+
+  .faq-question-text {
+    font-size: 0.94rem;
+  }
+
+  .faq-chevron-icon {
+    font-size: 1.3rem;
+  }
+
+  .faq-answer-container {
+    padding: 0 1.1rem 1rem;
+  }
+
+  .faq-answer-text {
+    font-size: 0.86rem;
+  }
+
+  /* Section 10: CTA Banner */
+  .aipost-cta-section {
+    padding: 2.5rem 0.85rem;
+  }
+
+  .aipost-cta-banner {
+    padding: 2.25rem 1.15rem;
+    border-radius: 18px;
+  }
+
+  .cta-main-title {
+    font-size: clamp(1.5rem, 5.8vw, 2rem);
+    line-height: 1.22;
+  }
+
+  .cta-subtitle {
+    font-size: 0.92rem;
+    margin-bottom: 1.75rem;
+  }
+
   .cta-buttons-group {
     flex-direction: column;
+    width: 100%;
+    gap: 0.65rem;
   }
 
   .cta-buttons-group button {
     width: 100%;
+    min-height: 48px;
+    font-size: 0.95rem;
+  }
+
+  .cta-micro-guarantee {
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.76rem;
+  }
+
+  .cta-micro-guarantee span:nth-child(2),
+  .cta-micro-guarantee span:nth-child(4) {
+    display: none;
+  }
+
+  /* Section 11: CodeMaya */
+  .aipost-codemaya-section {
+    padding: 2rem 0.85rem 3rem;
+  }
+
+  .codemaya-tagline {
+    font-size: 0.82rem;
+  }
+
+  .codemaya-brand-text {
+    font-size: 1.45rem;
+  }
+
+  .codemaya-subtext {
+    font-size: 0.78rem;
+  }
+}
+
+/* Ultra-Compact Mobile (< 400px, e.g. iPhone SE, Fold) */
+@media (max-width: 400px) {
+  .aipost-hero-headline {
+    font-size: 1.55rem;
+  }
+
+  .stats-card-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .stat-pill-card {
+    padding: 0.75rem 0.6rem;
+  }
+
+  .stat-num {
+    font-size: 1.3rem;
+  }
+
+  .stat-label-title {
+    font-size: 0.72rem;
+  }
+
+  .aipost-guarantee-row {
+    grid-template-columns: 1fr;
+    text-align: center;
+    justify-items: center;
   }
 }
 </style>
