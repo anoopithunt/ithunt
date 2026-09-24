@@ -6,20 +6,24 @@
         <div class="cv-header-title-box">
           <div class="cv-header-badge">
             <span class="pulse-dot"></span>
-            <span>CLASSIC 1-PAGE ATS RESUME ENGINE</span>
+            <span>PROFESSIONAL 1-PAGE ATS RESUME ENGINE</span>
           </div>
-          <h2 class="cv-header-title">Generate 1-Page Professional CV</h2>
+          <h2 class="cv-header-title">Professional 1-Page CV Generator</h2>
           <p class="cv-header-subtitle">
-            Minimalist, high-impact single-page format formatted for ATS systems and top recruiters. Fits exactly 1 full page.
+            Market-aligned, high-impact single-page resume formatted for top tech recruiters and ATS compliance.
           </p>
         </div>
 
         <div class="cv-header-actions">
-          <button type="button" class="cv-preset-btn specimen-btn" @click="loadSpecimenData" title="Load sample from specimen photo">
-            <span>📋 Load Specimen (Diya Agarwal)</span>
+          <button type="button" class="cv-preset-btn ios-preset-btn" @click="loadIosDeveloperData(false)" title="Auto-Fill High-Impact Professional iOS Developer CV">
+            <span class="apple-icon">🍎</span>
+            <span>Auto-Fill iOS Developer</span>
           </button>
-          <button type="button" class="cv-preset-btn" @click="loadTechSampleData" title="Load IT HUNT Tech Graduate Profile">
-            <span>💻 Tech Profile</span>
+          <button type="button" class="cv-preset-btn" @click="loadTechSampleData" title="Load MERN Tech Graduate Profile">
+            <span>💻 MERN Stack</span>
+          </button>
+          <button type="button" class="cv-preset-btn specimen-btn" @click="loadSpecimenData" title="Load sample from specimen photo">
+            <span>📋 Retail (Diya)</span>
           </button>
           <button type="button" class="modal-close-icon cv-close-btn" @click="$emit('close')" title="Close Modal">✕</button>
         </div>
@@ -43,32 +47,35 @@
       <div class="cv-modal-body">
         <!-- TAB 1: Personal & Contact Particulars -->
         <div v-show="currentTab === 'personal'" class="cv-form-section">
-          <h3 class="section-title">1. Candidate Identity & Contact Info</h3>
-          <p class="section-sub">Standard single-line contact header with full name and clean pipe separators.</p>
+          <div class="flex-between mb-1">
+            <h3 class="section-title">1. Candidate Identity & Contact Details</h3>
+            <span class="market-tag">Target: High-Growth Tech & Mobile Engineering</span>
+          </div>
+          <p class="section-sub">Standard single-line header with candidate name and clean pipe-delimited contact coordinates.</p>
           <div class="form-grid-2">
             <div class="form-group">
               <label class="form-label">Full Name <span class="req">*</span></label>
-              <input type="text" v-model="cvForm.fullName" class="form-control" placeholder="e.g. Diya Agarwal" required />
+              <input type="text" v-model="cvForm.fullName" class="form-control" placeholder="e.g. Arjun Mehta" required />
             </div>
             <div class="form-group">
-              <label class="form-label">Phone Number <span class="req">*</span></label>
-              <input type="tel" v-model="cvForm.phone" class="form-control" placeholder="e.g. +91 11 5555 3345" required />
+              <label class="form-label">Mobile Number <span class="req">*</span></label>
+              <input type="tel" v-model="cvForm.phone" class="form-control" placeholder="e.g. +91 98765 43210" required />
             </div>
             <div class="form-group">
               <label class="form-label">Email Address <span class="req">*</span></label>
-              <input type="email" v-model="cvForm.email" class="form-control" placeholder="e.g. d.agarwal@sample.in" required />
+              <input type="email" v-model="cvForm.email" class="form-control" placeholder="e.g. arjun.mehta.ios@example.com" required />
             </div>
             <div class="form-group">
-              <label class="form-label">Location (City, Country & PIN) <span class="req">*</span></label>
-              <input type="text" v-model="cvForm.location" class="form-control" placeholder="e.g. New Delhi, India 110034" />
+              <label class="form-label">Location (City, State & PIN) <span class="req">*</span></label>
+              <input type="text" v-model="cvForm.location" class="form-control" placeholder="e.g. Noida, Uttar Pradesh, India 201301" />
             </div>
             <div class="form-group">
-              <label class="form-label">LinkedIn (Optional)</label>
-              <input type="text" v-model="cvForm.linkedin" class="form-control" placeholder="e.g. linkedin.com/in/diya-agarwal" />
+              <label class="form-label">LinkedIn Profile</label>
+              <input type="text" v-model="cvForm.linkedin" class="form-control" placeholder="e.g. linkedin.com/in/arjun-ios-engineer" />
             </div>
             <div class="form-group">
-              <label class="form-label">Portfolio / GitHub (Optional)</label>
-              <input type="text" v-model="cvForm.portfolio" class="form-control" placeholder="e.g. diyaagarwal.me" />
+              <label class="form-label">GitHub / Portfolio URL</label>
+              <input type="text" v-model="cvForm.portfolio" class="form-control" placeholder="e.g. github.com/arjun-swift-labs" />
             </div>
           </div>
         </div>
@@ -76,37 +83,42 @@
         <!-- TAB 2: Professional Summary -->
         <div v-show="currentTab === 'summary'" class="cv-form-section">
           <div class="flex-between">
-            <h3 class="section-title">2. Professional Summary</h3>
+            <h3 class="section-title">2. Executive Career Summary</h3>
             <div class="preset-chips">
-              <span class="chip-label">Fill Sample:</span>
-              <button type="button" class="mini-chip-btn" @click="applySummaryPreset('specimen')">📋 Retail & Sales</button>
+              <span class="chip-label">Quick Roles:</span>
+              <button type="button" class="mini-chip-btn ios-chip" @click="applySummaryPreset('ios')">🍎 iOS (Swift 6 / SwiftUI)</button>
               <button type="button" class="mini-chip-btn" @click="applySummaryPreset('mern')">⚡ Full-Stack Web</button>
               <button type="button" class="mini-chip-btn" @click="applySummaryPreset('ai')">🤖 Python & AI</button>
+              <button type="button" class="mini-chip-btn" @click="applySummaryPreset('specimen')">📋 Retail & Sales</button>
             </div>
           </div>
-          <p class="section-sub">A punchy 3-4 sentence summary highlighting dynamics, background, and proven records.</p>
+          <p class="section-sub">A concise, metrics-driven professional summary highlighting architecture, platform capabilities, and performance achievements.</p>
           <div class="form-group">
             <textarea 
               v-model="cvForm.summary" 
-              rows="6" 
+              rows="5" 
               class="form-control" 
-              placeholder="Customer-focused Retail Sales professional with solid understanding of retail dynamics, marketing and customer service. Offering 5 years of experience providing quality product recommendations..."
+              placeholder="Results-driven iOS Software Engineer with specialized experience architecting native Apple applications using Swift 6, SwiftUI, and UIKit..."
             ></textarea>
+            <span class="field-hint">Optimized for ATS parser keyword density (Swift 6, SwiftUI, Concurrency, Instruments, Fastlane).</span>
           </div>
         </div>
 
-        <!-- TAB 3: Skills (2-Column Bulleted Layout) -->
+        <!-- TAB 3: Skills (2-Column Bulleted Format) -->
         <div v-show="currentTab === 'skills'" class="cv-form-section">
-          <h3 class="section-title">3. Skills (2-Column Bulleted Format)</h3>
-          <p class="section-sub">List your key skills (separated by commas or new lines). They will automatically align into 2 balanced columns with bullets.</p>
+          <div class="flex-between">
+            <h3 class="section-title">3. Technical Competencies (2-Column Layout)</h3>
+            <button type="button" class="mini-chip-btn ios-chip" @click="populateIosSkills">🍎 Load iOS Core Competencies</button>
+          </div>
+          <p class="section-sub">Enter skills separated by commas or new lines. They automatically balance into 2 clean columns matching the classic format.</p>
           
           <div class="form-group">
-            <label class="form-label">Skills List (Comma or newline separated)</label>
+            <label class="form-label">Competencies List (Comma or newline separated)</label>
             <textarea 
               v-model="skillsInputText" 
               rows="4" 
               class="form-control" 
-              placeholder="Cash register operation, POS system operation, Sales expertise, Teamwork, Inventory management, Accurate money handling, Documentation and recordkeeping, Retail merchandising expertise"
+              placeholder="Swift 6, SwiftUI & UIKit Interop, MVVM-C & Modular Clean Architecture, Swift Concurrency (async/await & Actors), SwiftData & CoreData Sync, Combine & Reactive Event Streams..."
               @input="syncSkillsFromText"
             ></textarea>
           </div>
@@ -134,10 +146,10 @@
         <!-- TAB 4: Experience -->
         <div v-show="currentTab === 'experience'" class="cv-form-section">
           <div class="flex-between">
-            <h3 class="section-title">4. Professional Experience & Internships</h3>
+            <h3 class="section-title">4. Professional Experience & Studio Projects</h3>
             <button type="button" class="btn-add-mini" @click="addExperience">+ Add Position</button>
           </div>
-          <p class="section-sub">Role, Organization, Duration, Location, and concise bullet points.</p>
+          <p class="section-sub">Quantified accomplishments (App Store ratings, latency reductions, memory optimizations, and CI/CD automation).</p>
 
           <div v-for="(exp, expIdx) in cvForm.experience" :key="expIdx" class="dynamic-item-card">
             <div class="item-card-header">
@@ -146,31 +158,31 @@
             </div>
             <div class="form-grid-2">
               <div class="form-group">
-                <label class="form-label">Job Title / Role <span class="req">*</span></label>
-                <input type="text" v-model="exp.role" class="form-control" placeholder="e.g. Retail Sales Associate" />
+                <label class="form-label">Job Title / Designation <span class="req">*</span></label>
+                <input type="text" v-model="exp.role" class="form-control" placeholder="e.g. iOS Software Engineer" />
               </div>
               <div class="form-group">
-                <label class="form-label">Company / Organization <span class="req">*</span></label>
-                <input type="text" v-model="exp.company" class="form-control" placeholder="e.g. ZARA" />
+                <label class="form-label">Organization / Studio <span class="req">*</span></label>
+                <input type="text" v-model="exp.company" class="form-control" placeholder="e.g. IT HUNT Mobile Studio & Tech Academy" />
               </div>
               <div class="form-group">
-                <label class="form-label">Duration / Dates <span class="req">*</span></label>
-                <input type="text" v-model="exp.duration" class="form-control" placeholder="e.g. February 2017-Current" />
+                <label class="form-label">Duration / Period <span class="req">*</span></label>
+                <input type="text" v-model="exp.duration" class="form-control" placeholder="e.g. January 2024-Present" />
               </div>
               <div class="form-group">
                 <label class="form-label">Location (City, Country)</label>
-                <input type="text" v-model="exp.location" class="form-control" placeholder="e.g. New Delhi, India" />
+                <input type="text" v-model="exp.location" class="form-control" placeholder="e.g. Noida, India" />
               </div>
             </div>
 
             <div class="form-group mt-2">
-              <label class="form-label">Key Responsibilities / Impact (One bullet per line)</label>
+              <label class="form-label">Key Responsibilities & Quantified Impact (One bullet per line)</label>
               <textarea 
                 :value="Array.isArray(exp.points) ? exp.points.join('\n') : exp.points" 
                 @input="updateExpPoints(expIdx, $event.target.value)"
-                rows="3" 
+                rows="4" 
                 class="form-control" 
-                placeholder="Increased monthly sales 10% by effectively upselling and cross-selling products...&#10;Prevented store losses by leveraging awareness, attention to detail, and integrity...&#10;Processed payments and maintained accurate drawers to meet financial targets."
+                placeholder="Architected and deployed 2 native consumer applications on the Apple App Store, scaling to 120,000+ active users with a 4.9-star rating...&#10;Refactored asynchronous networking layer to Swift 6 Concurrency (async/await, Actors), eliminating race conditions...&#10;Conducted memory profiling via Xcode Instruments (Leaks & Allocations), resolving retain cycles and reducing app RAM footprint by 35%."
               ></textarea>
             </div>
           </div>
@@ -180,8 +192,8 @@
         <div v-show="currentTab === 'education'" class="cv-form-section">
           <!-- Education -->
           <div class="flex-between">
-            <h3 class="section-title">5. Education and Training</h3>
-            <button type="button" class="btn-add-mini" @click="addEducation">+ Add Degree / Training</button>
+            <h3 class="section-title">5. Education & Certified Training</h3>
+            <button type="button" class="btn-add-mini" @click="addEducation">+ Add Qualification</button>
           </div>
 
           <div v-for="(edu, eduIdx) in cvForm.education" :key="'edu-' + eduIdx" class="dynamic-item-card">
@@ -191,24 +203,24 @@
             </div>
             <div class="form-grid-2">
               <div class="form-group">
-                <label class="form-label">Degree / Diploma Title <span class="req">*</span></label>
-                <input type="text" v-model="edu.degree" class="form-control" placeholder="e.g. Diploma in Financial Accounting" />
+                <label class="form-label">Degree / Masterclass Title <span class="req">*</span></label>
+                <input type="text" v-model="edu.degree" class="form-control" placeholder="e.g. Bachelor of Technology (B.Tech) in Computer Science & Engineering" />
               </div>
               <div class="form-group">
                 <label class="form-label">Year / Duration</label>
-                <input type="text" v-model="edu.year" class="form-control" placeholder="e.g. 2016" />
+                <input type="text" v-model="edu.year" class="form-control" placeholder="e.g. 2019-2023" />
               </div>
             </div>
             <div class="form-group mt-2">
               <label class="form-label">Institute / University & Location <span class="req">*</span></label>
-              <input type="text" v-model="edu.institution" class="form-control" placeholder="e.g. Oxford Software Institute & Oxford School of English, New Delhi, India" />
+              <input type="text" v-model="edu.institution" class="form-control" placeholder="e.g. Dr. A.P.J. Abdul Kalam Technical University (AKTU)" />
             </div>
           </div>
 
           <!-- Languages with progress bars -->
           <div class="mt-4">
             <h3 class="section-title">6. Languages & Proficiency</h3>
-            <p class="section-sub">Matches the specimen: Native speaker label + visual proficiency meter bars.</p>
+            <p class="section-sub">Matches the classic layout: Native speaker label + visual proficiency meter bars.</p>
 
             <div class="form-grid-2">
               <div class="form-group">
@@ -245,13 +257,13 @@
               <div class="lang-edit-card">
                 <div class="form-group">
                   <label class="form-label">Language 3</label>
-                  <input type="text" v-model="cvForm.languages[2].name" class="form-control" placeholder="Bengali" />
+                  <input type="text" v-model="cvForm.languages[2].name" class="form-control" placeholder="German" />
                 </div>
                 <div class="form-group mt-1">
                   <label class="form-label">CEFR Code & Label</label>
                   <div class="flex-gap">
-                    <input type="text" v-model="cvForm.languages[2].code" class="form-control flex-1" placeholder="B2" />
-                    <input type="text" v-model="cvForm.languages[2].proficiency" class="form-control flex-2" placeholder="Upper-intermediate" />
+                    <input type="text" v-model="cvForm.languages[2].code" class="form-control flex-1" placeholder="B1" />
+                    <input type="text" v-model="cvForm.languages[2].proficiency" class="form-control flex-2" placeholder="Intermediate" />
                   </div>
                 </div>
                 <div class="form-group mt-1">
@@ -280,6 +292,7 @@
                 <span v-if="cvForm.email"> | {{ cvForm.email }}</span>
                 <span v-if="cvForm.location"> | {{ cvForm.location }}</span>
                 <span v-if="cvForm.linkedin"> | {{ cvForm.linkedin }}</span>
+                <span v-if="cvForm.portfolio"> | {{ cvForm.portfolio }}</span>
               </div>
 
               <!-- Summary -->
@@ -383,10 +396,10 @@
               class="palette-btn slate" 
               :class="{ active: selectedTheme === 'slate' }" 
               @click="selectedTheme = 'slate'"
-              title="Executive Slate"
+              title="Executive Slate (Apple Tech)"
             >
               <span class="color-dot slate"></span>
-              <span>Slate</span>
+              <span>Executive Slate</span>
             </button>
             <button 
               type="button" 
@@ -435,7 +448,7 @@ const props = defineProps({
 const emit = defineEmits(['close', 'cv-generated']);
 
 const currentTab = ref('personal');
-const selectedTheme = ref('classic'); // Default to classic monochrome matching specimen
+const selectedTheme = ref('classic');
 const isGenerating = ref(false);
 
 const tabs = [
@@ -452,50 +465,55 @@ const skillsInputText = ref('');
 
 // CV Form Data
 const cvForm = ref({
-  fullName: 'Diya Agarwal',
-  phone: '+91 11 5555 3345',
-  email: 'd.agarwal@sample.in',
-  location: 'New Delhi, India 110034',
-  linkedin: '',
-  portfolio: '',
-  summary: 'Customer-focused Retail Sales professional with solid understanding of retail dynamics, marketing and customer service. Offering 5 years of experience providing quality product recommendations and solutions to meet customer needs and exceed expectations. Demonstrated record of exceeding revenue targets by leveraging communication skills and sales expertise.',
+  fullName: 'Arjun Mehta',
+  phone: '+91 98765 43210',
+  email: 'arjun.mehta.ios@example.com',
+  location: 'Noida, Uttar Pradesh, India 201301',
+  linkedin: 'linkedin.com/in/arjun-ios-engineer',
+  portfolio: 'github.com/arjun-swift-labs',
+  summary: 'Results-driven iOS Software Engineer with specialized experience architecting native Apple applications using Swift 6, SwiftUI, and UIKit. Proven track record of shipping top-rated App Store applications with 100K+ downloads, maintaining sub-second launch times and fluid 60fps animations. Deep expertise in Swift Concurrency (async/await, Actors, Sendable), offline-first SwiftData/CoreData synchronization, and memory optimization via Xcode Instruments (ARC, leaks, time profiling). Accomplished in driving CI/CD automation with Fastlane and TestFlight, crafting modular Clean MVVM-C architectures, and integrating StoreKit 2 subscriptions.',
   skills: [],
   experience: [
     {
-      role: 'Retail Sales Associate',
-      company: 'ZARA',
-      duration: 'February 2017-Current',
-      location: 'New Delhi, India',
+      role: 'iOS Software Engineer',
+      company: 'IT HUNT Mobile Studio & Tech Academy',
+      duration: 'January 2024-Present',
+      location: 'Noida, India',
       points: [
-        'Increased monthly sales 10% by effectively upselling and cross-selling products to maximize profitability.',
-        'Prevented store losses by leveraging awareness, attention to detail, and integrity to identify and investigate concerns.',
-        'Processed payments and maintained accurate drawers to meet financial targets.'
+        'Architected and deployed 2 native consumer applications on the Apple App Store, scaling to 120,000+ active users with a 4.9-star average rating.',
+        'Refactored asynchronous networking layer to Swift 6 Concurrency (async/await, Actors), eliminating race conditions and reducing API fetch latency by 42%.',
+        'Conducted memory profiling via Xcode Instruments (Leaks & Allocations), resolving retain cycles and reducing app RAM footprint by 35%.',
+        'Configured automated deployment pipelines using Fastlane, TestFlight, and GitHub Actions, cutting staging release cycles from 6 hours to 18 minutes.'
       ]
     },
     {
-      role: 'Barista',
-      company: 'Dunkin\' Donuts',
-      duration: 'March 2015-January 2017',
+      role: 'Junior iOS Developer',
+      company: 'Apex Mobility Labs',
+      duration: 'June 2022-December 2023',
       location: 'New Delhi, India',
       points: [
-        'Upsold seasonal drinks and pastries, boosting average store sales by ₹1500 weekly.',
-        'Managed morning rush of over 300 customers daily with efficient, levelheaded customer service.',
-        'Trained entire staff of 15 baristas in new smoothie program offerings and procedures.',
-        'Developed creative and appealing latte art techniques and instructed coworkers in method.'
+        'Built fluid, accessible SwiftUI components adhering to Apple Human Interface Guidelines, Dynamic Type, and System Dark Mode.',
+        'Implemented offline-first synchronization using CoreData and background URLSession tasks, ensuring seamless offline functionality.',
+        'Authored over 80 unit and integration test suites using XCTest, elevating codebase test coverage from 68% to 92%.'
       ]
     }
   ],
   education: [
     {
-      degree: 'Diploma in Financial Accounting',
-      institution: 'Oxford Software Institute & Oxford School of English, New Delhi, India',
-      year: '2016'
+      degree: 'Bachelor of Technology (B.Tech) in Computer Science & Engineering',
+      institution: 'Dr. A.P.J. Abdul Kalam Technical University (AKTU)',
+      year: '2019-2023'
+    },
+    {
+      degree: 'Advanced iOS Architecture & SwiftUI Masterclass (ISO 9001:2015 Verified)',
+      institution: 'IT HUNT Software Studio & Tech Academy, Prayagraj / Noida',
+      year: '2024'
     }
   ],
   languages: [
     { name: 'Hindi', levelText: 'Native speaker', isNative: true },
-    { name: 'English', code: 'C2', proficiency: 'Proficient', percent: 92 },
-    { name: 'Bengali', code: 'B2', proficiency: 'Upper-intermediate', percent: 70 }
+    { name: 'English', code: 'C2', proficiency: 'Proficient', percent: 94 },
+    { name: 'German', code: 'B1', proficiency: 'Intermediate', percent: 65 }
   ]
 });
 
@@ -524,7 +542,73 @@ function syncSkillsFromText() {
   cvForm.value.skills = parsedSkillsList.value;
 }
 
-// Load Specimen (Diya Agarwal - exactly matching the attached image)
+// 🍎 AUTO-FILL PROFESSIONAL iOS DEVELOPER PROFILE (Analyzed for modern tech market scenario)
+function loadIosDeveloperData(preserveIdentity = false) {
+  if (!preserveIdentity) {
+    cvForm.value.fullName = 'Arjun Mehta';
+    cvForm.value.phone = '+91 98765 43210';
+    cvForm.value.email = 'arjun.mehta.ios@example.com';
+    cvForm.value.location = 'Noida, Uttar Pradesh, India 201301';
+  }
+  cvForm.value.linkedin = 'linkedin.com/in/arjun-ios-engineer';
+  cvForm.value.portfolio = 'github.com/arjun-swift-labs';
+  cvForm.value.summary = 'Results-driven iOS Software Engineer with specialized experience architecting native Apple applications using Swift 6, SwiftUI, and UIKit. Proven track record of shipping top-rated App Store applications with 100K+ downloads, maintaining sub-second launch times and fluid 60fps animations. Deep expertise in Swift Concurrency (async/await, Actors, Sendable), offline-first SwiftData/CoreData synchronization, and memory optimization via Xcode Instruments (ARC, leaks, time profiling). Accomplished in driving CI/CD automation with Fastlane and TestFlight, crafting modular Clean MVVM-C architectures, and integrating StoreKit 2 subscriptions.';
+  
+  skillsInputText.value = 'Swift 6, SwiftUI & UIKit Interop, MVVM-C & Modular Clean Architecture, Swift Concurrency (async/await & Actors), SwiftData & CoreData Sync, Combine & Reactive Event Streams, Xcode Instruments & ARC Profiling, XCTest Unit & UI Test Automation, StoreKit 2 & In-App Subscriptions, APNs & Background Tasks, Fastlane, TestFlight & CI/CD Pipelines, Git & Modular Swift Packages (SPM)';
+  syncSkillsFromText();
+
+  cvForm.value.experience = [
+    {
+      role: 'iOS Software Engineer',
+      company: 'IT HUNT Mobile Studio & Tech Academy',
+      duration: 'January 2024-Present',
+      location: 'Noida, India',
+      points: [
+        'Architected and deployed 2 native consumer applications on the Apple App Store, scaling to 120,000+ active users with a 4.9-star average rating.',
+        'Refactored asynchronous networking layer to Swift 6 Concurrency (async/await, Actors), eliminating race conditions and reducing API fetch latency by 42%.',
+        'Conducted memory profiling via Xcode Instruments (Leaks & Allocations), resolving retain cycles and reducing app RAM footprint by 35%.',
+        'Configured automated deployment pipelines using Fastlane, TestFlight, and GitHub Actions, cutting staging release cycles from 6 hours to 18 minutes.'
+      ]
+    },
+    {
+      role: 'Junior iOS Developer',
+      company: 'Apex Mobility Labs',
+      duration: 'June 2022-December 2023',
+      location: 'New Delhi, India',
+      points: [
+        'Built fluid, accessible SwiftUI components adhering to Apple Human Interface Guidelines, Dynamic Type, and System Dark Mode.',
+        'Implemented offline-first synchronization using CoreData and background URLSession tasks, ensuring seamless offline functionality.',
+        'Authored over 80 unit and integration test suites using XCTest, elevating codebase test coverage from 68% to 92%.'
+      ]
+    }
+  ];
+
+  cvForm.value.education = [
+    {
+      degree: 'Bachelor of Technology (B.Tech) in Computer Science & Engineering',
+      institution: 'Dr. A.P.J. Abdul Kalam Technical University (AKTU)',
+      year: '2019-2023'
+    },
+    {
+      degree: 'Advanced iOS Architecture & SwiftUI Masterclass (ISO 9001:2015 Verified)',
+      institution: 'IT HUNT Software Studio & Tech Academy, Prayagraj / Noida',
+      year: '2024'
+    }
+  ];
+
+  cvForm.value.languages = [
+    { name: 'Hindi', levelText: 'Native speaker', isNative: true },
+    { name: 'English', code: 'C2', proficiency: 'Proficient', percent: 94 },
+    { name: 'German', code: 'B1', proficiency: 'Intermediate', percent: 65 }
+  ];
+}
+
+function populateIosSkills() {
+  skillsInputText.value = 'Swift 6, SwiftUI & UIKit Interop, MVVM-C & Modular Clean Architecture, Swift Concurrency (async/await & Actors), SwiftData & CoreData Sync, Combine & Reactive Event Streams, Xcode Instruments & ARC Profiling, XCTest Unit & UI Test Automation, StoreKit 2 & In-App Subscriptions, APNs & Background Tasks, Fastlane, TestFlight & CI/CD Pipelines, Git & Modular Swift Packages (SPM)';
+  syncSkillsFromText();
+}
+
+// Load Specimen (Diya Agarwal - matching the retail specimen photo)
 function loadSpecimenData() {
   cvForm.value.fullName = 'Diya Agarwal';
   cvForm.value.phone = '+91 11 5555 3345';
@@ -578,7 +662,7 @@ function loadSpecimenData() {
   ];
 }
 
-// Load Tech Profile (Rahul Sharma)
+// Load Tech Profile (Rahul Sharma - MERN Stack)
 function loadTechSampleData() {
   cvForm.value.fullName = 'Rahul Sharma';
   cvForm.value.phone = '+91 98765 43210';
@@ -622,23 +706,25 @@ function loadTechSampleData() {
 
 // Apply Preset Summaries
 function applySummaryPreset(type) {
-  if (type === 'specimen') {
-    cvForm.value.summary = 'Customer-focused Retail Sales professional with solid understanding of retail dynamics, marketing and customer service. Offering 5 years of experience providing quality product recommendations and solutions to meet customer needs and exceed expectations. Demonstrated record of exceeding revenue targets by leveraging communication skills and sales expertise.';
+  if (type === 'ios') {
+    cvForm.value.summary = 'Results-driven iOS Software Engineer with specialized experience architecting native Apple applications using Swift 6, SwiftUI, and UIKit. Proven track record of shipping top-rated App Store applications with 100K+ downloads, maintaining sub-second launch times and fluid 60fps animations. Deep expertise in Swift Concurrency (async/await, Actors, Sendable), offline-first SwiftData/CoreData synchronization, and memory optimization via Xcode Instruments (ARC, leaks, time profiling). Accomplished in driving CI/CD automation with Fastlane and TestFlight, crafting modular Clean MVVM-C architectures, and integrating StoreKit 2 subscriptions.';
   } else if (type === 'mern') {
     cvForm.value.summary = 'Proactive Full-Stack Engineer with comprehensive hands-on internship experience in MERN stack development at IT HUNT. Proficient in crafting component-driven UIs with React 19, building scalable Node/Express microservices, and modeling optimized MongoDB databases. Adept in Agile methodologies and automated CI/CD deployments.';
   } else if (type === 'ai') {
     cvForm.value.summary = 'AI & Backend Developer skilled in building intelligent software applications utilizing Python 3.12, FastAPI, and modern LLM APIs (Gemini 2.0 / OpenAI). Experienced in designing vector embeddings search, automating business workflows, and deploying containerized cloud services with rigorous automated tests.';
+  } else if (type === 'specimen') {
+    cvForm.value.summary = 'Customer-focused Retail Sales professional with solid understanding of retail dynamics, marketing and customer service. Offering 5 years of experience providing quality product recommendations and solutions to meet customer needs and exceed expectations. Demonstrated record of exceeding revenue targets by leveraging communication skills and sales expertise.';
   }
 }
 
 // Dynamic Helpers
 function addExperience() {
   cvForm.value.experience.push({
-    role: 'Associate Position',
-    company: 'Company / Studio',
-    duration: '2025-Current',
+    role: 'iOS Application Developer',
+    company: 'Mobile Engineering Studio',
+    duration: '2024-Present',
     location: 'City, Country',
-    points: ['Delivered key business tasks and collaborated with multi-disciplinary team members.']
+    points: ['Designed modular SwiftUI screens and implemented Swift Concurrency networking protocols.']
   });
 }
 
@@ -654,7 +740,7 @@ function updateExpPoints(idx, text) {
 
 function addEducation() {
   cvForm.value.education.push({
-    degree: 'Higher Secondary / Diploma',
+    degree: 'Higher Secondary / Diploma / Specialization',
     institution: 'Institute Name, City',
     year: '2024'
   });
@@ -668,11 +754,22 @@ function removeEducation(idx) {
 
 // Pre-fill from studentUser if present
 const initFromStudentUser = () => {
-  if (!props.studentUser) return;
+  if (!props.studentUser) {
+    loadIosDeveloperData(false);
+    return;
+  }
   const su = props.studentUser;
   if (su.candidateName || su.name) cvForm.value.fullName = su.candidateName || su.name;
   if (su.email) cvForm.value.email = su.email;
   if (su.phone || su.mobile) cvForm.value.phone = su.phone || su.mobile;
+  
+  // If student course is iOS or mobile, load professional iOS particulars preserving their personal identity
+  const courseStr = (su.course || '').toLowerCase();
+  if (courseStr.includes('ios') || courseStr.includes('mobile') || courseStr.includes('swift') || courseStr.includes('apple')) {
+    loadIosDeveloperData(true);
+  } else {
+    loadIosDeveloperData(true);
+  }
 };
 
 watch(() => props.studentUser, () => {
@@ -683,10 +780,9 @@ onMounted(() => {
   if (props.studentUser) {
     initFromStudentUser();
   } else {
-    loadSpecimenData();
+    // Default directly to the high-impact iOS Developer profile requested
+    loadIosDeveloperData(false);
   }
-  skillsInputText.value = 'Cash register operation, Inventory management, POS system operation, Accurate money handling, Sales expertise, Documentation and recordkeeping, Teamwork, Retail merchandising expertise';
-  syncSkillsFromText();
 });
 
 // Download 1-Page PDF
@@ -729,7 +825,7 @@ function handleDownloadCv() {
   border: 1px solid var(--border-color, #e2e8f0);
   border-radius: 18px;
   width: 100%;
-  max-width: 920px;
+  max-width: 930px;
   max-height: 92vh;
   display: flex;
   flex-direction: column;
@@ -804,10 +900,32 @@ function handleDownloadCv() {
   border-radius: 9999px;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .cv-preset-btn:hover {
   background: rgba(234, 88, 12, 0.2);
+}
+
+.ios-preset-btn {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(99, 102, 241, 0.15));
+  border: 1.5px solid rgba(14, 165, 233, 0.5);
+  color: #0369a1;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.15);
+}
+
+.ios-preset-btn:hover {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.22), rgba(99, 102, 241, 0.25));
+  border-color: #0284c7;
+  color: #0284c7;
+  transform: translateY(-1px);
+}
+
+.apple-icon {
+  font-size: 0.9rem;
 }
 
 .specimen-btn {
@@ -907,6 +1025,16 @@ function handleDownloadCv() {
   margin: 0 0 0.2rem;
 }
 
+.market-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #0284c7;
+  background: rgba(14, 165, 233, 0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(14, 165, 233, 0.25);
+}
+
 .section-sub {
   font-size: 0.8rem;
   color: var(--text-muted, #64748b);
@@ -952,6 +1080,12 @@ function handleDownloadCv() {
   border-color: var(--color-ai-orange, #ea580c);
 }
 
+.field-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted, #64748b);
+  margin-top: 0.2rem;
+}
+
 .flex-between {
   display: flex;
   align-items: center;
@@ -964,6 +1098,7 @@ function handleDownloadCv() {
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  flex-wrap: wrap;
 }
 
 .chip-label {
@@ -980,11 +1115,24 @@ function handleDownloadCv() {
   border-radius: 6px;
   cursor: pointer;
   color: var(--text-main, #334155);
+  transition: all 0.15s ease;
 }
 
 .mini-chip-btn:hover {
   border-color: var(--color-ai-orange, #ea580c);
   color: var(--color-ai-orange, #ea580c);
+}
+
+.mini-chip-btn.ios-chip {
+  background: rgba(14, 165, 233, 0.1);
+  border-color: rgba(14, 165, 233, 0.35);
+  color: #0369a1;
+  font-weight: 700;
+}
+
+.mini-chip-btn.ios-chip:hover {
+  background: rgba(14, 165, 233, 0.2);
+  border-color: #0284c7;
 }
 
 /* Skills 2-Column Preview */
@@ -1227,6 +1375,10 @@ function handleDownloadCv() {
 
 .theme-orange .paper-bar-fill {
   background: #ea580c;
+}
+
+.theme-slate .paper-bar-fill {
+  background: #0f172a;
 }
 
 .paper-lang-label {
