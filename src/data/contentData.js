@@ -134,8 +134,10 @@ const CONTENT_DATA = {
   // Header Navigation Items
   navigation: [
     { id: "home", label: "Home", icon: "🏠" },
-    { id: "events", label: "Events & Gallery", icon: "🎪" },
-    { id: "courses", label: "Courses", icon: "📚" }
+    { id: "internships", label: "Internships", icon: "💼" },
+    { id: "courses", label: "Courses", icon: "📚" },
+    { id: "reviews", label: "Reviews", icon: "⭐" },
+    { id: "events", label: "Events", icon: "🎪" }
   ],
 
   // Hero Section Copy
