@@ -311,8 +311,8 @@ body.light-theme .nav-item-btn:hover {
   background: var(--gradient-ai-btn);
   color: #fff;
   font-weight: 700;
-  padding: 0.55rem 1.15rem;
-  border-radius: var(--radius-full);
+  padding: 0.55rem 1.25rem;
+  border-radius: 12px;
   border: none;
   cursor: pointer;
   box-shadow: 0 2px 10px rgba(249, 115, 22, 0.25);
@@ -327,6 +327,46 @@ body.light-theme .nav-item-btn:hover {
 .cta-btn-header:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+}
+
+.nav-outline-btn {
+  background: var(--bg-card-glass);
+  border: 1px solid var(--border-cyber);
+  color: var(--text-main);
+  padding: 0.5rem 1.1rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.nav-outline-btn:hover {
+  border-color: var(--color-ai-orange);
+  color: var(--color-ai-orange);
+  transform: translateY(-1px);
+}
+
+body.light-theme .nav-outline-btn {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.15);
+  color: #0f172a;
+}
+
+body.light-theme .nav-outline-btn:hover {
+  border-color: #f97316;
+  color: #ea580c;
+  background: #fff7ed;
+}
+
+@media (min-width: 1081px) {
+  .nav-item-icon {
+    display: none;
+  }
 }
 
 
@@ -6984,12 +7024,13 @@ body.light-theme input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* --------------------------------------------------------------------------
-   3. Tablet & Mobile Switch (<= 960px)
+   3. Tablet & Mobile Switch (<= 1080px)
    -------------------------------------------------------------------------- */
-@media (max-width: 960px) {
+@media (max-width: 1080px) {
   .nav-links,
   .cta-btn-header,
-  .nav-action-desktop {
+  .nav-action-desktop,
+  .nav-outline-btn {
     display: none !important;
   }
 
