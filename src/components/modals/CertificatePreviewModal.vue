@@ -140,9 +140,9 @@
                     <div class="sig-role">Director & Founder, IT HUNT</div>
                   </div>
                   <div class="sig-column">
-                    <div class="signature-ink">Sushil Kumar</div>
+                    <div class="signature-ink">Anup Mishra</div>
                     <div class="sig-line"></div>
-                    <div class="sig-name">Er. Sushil Kumar</div>
+                    <div class="sig-name">Er. Anup Mishra</div>
                     <div class="sig-role">Lead Mentor & Academic Head</div>
                   </div>
                 </div>
