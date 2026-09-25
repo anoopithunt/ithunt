@@ -273,6 +273,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
 import { saveReviewRecord } from '../../utils/apiClient.js';
+import { sanitizeInput } from '../../utils/security.js';
 
 const props = defineProps({
   content: {
@@ -365,15 +366,28 @@ const scrollToReviewForm = () => {
 };
 
 const handleSubmitReview = async () => {
+  const cleanName = sanitizeInput(newReview.value.name);
+  const cleanRole = sanitizeInput(newReview.value.role) || 'Student / Alumni';
+  const cleanComment = sanitizeInput(newReview.value.comment);
+
+  if (!cleanName || cleanName.length < 2) {
+    alert('Please enter your candidate or student name.');
+    return;
+  }
+  if (!cleanComment || cleanComment.length < 5) {
+    alert('Please share your brief review feedback (at least 5 characters).');
+    return;
+  }
+
   const reviewObj = {
     id: 'rev-' + Date.now(),
-    name: newReview.value.name.trim(),
-    role: newReview.value.role.trim(),
+    name: cleanName,
+    role: cleanRole,
     avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=60',
     date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-    rating: newReview.value.rating,
-    category: newReview.value.category.replace(/^[^\w]+/, '').trim(),
-    comment: newReview.value.comment.trim(),
+    rating: Number(newReview.value.rating) || 5,
+    category: sanitizeInput(newReview.value.category.replace(/^[^\w]+/, '')),
+    comment: cleanComment,
     createdAt: new Date().toISOString()
   };
 

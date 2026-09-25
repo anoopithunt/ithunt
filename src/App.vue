@@ -529,6 +529,7 @@ import { sendNielitProjectEmailNotification } from './utils/emailNotifier.js';
 import Navbar from './components/layout/Navbar.vue';
 import Footer from './components/layout/Footer.vue';
 import HeroSection from './components/sections/HeroSection.vue';
+import { initSessionInactivityMonitor, sanitizeInput, isValidEmail, isValidPhone } from './utils/security.js';
 
 // Lazy-loaded secondary view sections (splits bundle & makes Home page load instantly)
 const InternshipsSection = defineAsyncComponent(() => import('./components/sections/InternshipsSection.vue'));
@@ -1268,34 +1269,56 @@ const handleReviewSubmitted = async (review) => {
 };
 
 const submitAdmission = async (formData) => {
+  const candidateName = sanitizeInput(formData.candidateName || formData.fullName || '');
+  const fatherName = sanitizeInput(formData.fatherName || '');
+  const motherName = sanitizeInput(formData.motherName || '');
+  const mobile = sanitizeInput(formData.mobile || formData.phone || '');
+  const email = sanitizeInput(formData.email || '').toLowerCase();
+  const district = sanitizeInput(formData.district || 'PRAYAGRAJ');
+  const address = sanitizeInput(formData.address || '');
+  const course = sanitizeInput(formData.course || '');
+  const track = sanitizeInput(formData.track || formData.course || '');
+  const qualification = sanitizeInput(formData.qualification || '');
+  const studentPassword = (formData.password || '').trim() || 'Ithunt@123';
+
+  if (!candidateName || candidateName.length < 2) {
+    showToast('Please enter your full legal candidate name.', 'error');
+    return;
+  }
+  if (!isValidEmail(email)) {
+    showToast('Please provide a valid email address (e.g. name@example.com).', 'error');
+    return;
+  }
+  if (!isValidPhone(mobile)) {
+    showToast('Please provide a valid 10-digit mobile number.', 'error');
+    return;
+  }
+
   const randomRegId = 'ITH-' + Math.floor(100000 + Math.random() * 900000);
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
-  const normEmail = (formData.email || '').toLowerCase().trim();
-  const studentPassword = (formData.password || '').trim() || 'Ithunt@123';
-
   const newAdmissionRecord = {
     registrationNo: randomRegId,
     date: dateStr,
     time: timeStr,
-    candidateName: formData.candidateName || formData.fullName || '',
-    fullName: formData.fullName || formData.candidateName || '',
-    fatherName: formData.fatherName || '',
-    motherName: formData.motherName || '',
+    candidateName,
+    fullName: candidateName,
+    fatherName,
+    motherName,
     dob: formData.dob || '',
     gender: formData.gender || 'Male',
-    course: formData.course || '',
-    track: formData.track || formData.course || '',
-    qualification: formData.qualification || '',
-    mobile: formData.mobile || formData.phone || '',
-    phone: formData.phone || formData.mobile || '',
-    email: normEmail,
-    userId: normEmail,
+    course,
+    track,
+    qualification,
+    mobile,
+    phone: mobile,
+    email,
+    userId: email,
     password: studentPassword,
-    district: formData.district || 'PRAYAGRAJ',
-    address: formData.address || '',
+    district,
+    address,
     status: formData.status || 'Pending Verification',
     feeStatus: formData.feeStatus || 'Pending Verification',
     role: 'student'
@@ -1823,6 +1846,17 @@ onMounted(() => {
   initReveal();
   watch(activeTab, () => {
     setTimeout(initReveal, 300);
+  });
+
+  // Enterprise Security: Initialize automatic session timeout guard (30 min inactivity)
+  initSessionInactivityMonitor(() => {
+    if (isAdminLoggedIn.value) {
+      handleAdminLogout();
+      showToast('🔒 Session closed automatically after 30 minutes of inactivity for your security.', 'info');
+    } else if (studentUser.value) {
+      handleStudentLogout();
+      showToast('🔒 Session closed automatically after 30 minutes of inactivity for your security.', 'info');
+    }
   });
 });
 

@@ -210,6 +210,7 @@
 import { ref, reactive } from 'vue';
 import { loginUserWithBackend, loginStudentUser, registerStudentUser } from '../../utils/apiClient.js';
 import { DEFAULT_DEMO_STUDENT } from '../../data/studentAcademicData.js';
+import { sanitizeInput, checkLoginRateLimit, recordLoginAttempt, isValidEmail, isValidPhone } from '../../utils/security.js';
 
 const props = defineProps({
   content: {
@@ -360,9 +361,17 @@ const routeUserByRole = (user) => {
 const handleUnifiedLogin = async () => {
   errorMessage.value = '';
   successMessage.value = '';
+
+  // 0. Brute-Force Rate Limiting Guard
+  const rateCheck = checkLoginRateLimit();
+  if (rateCheck.isLocked) {
+    errorMessage.value = `🔒 Security Protection Active: Too many failed login attempts. Please wait ${rateCheck.remainingSeconds} seconds before attempting to sign in.`;
+    return;
+  }
+
   isLoading.value = true;
 
-  const rawIdentifier = loginIdentifier.value.trim();
+  const rawIdentifier = sanitizeInput(loginIdentifier.value);
   const rawPassword = loginPassword.value.trim();
   const norm = rawIdentifier.toLowerCase();
 
@@ -376,6 +385,7 @@ const handleUnifiedLogin = async () => {
   try {
     const apiRes = await loginUserWithBackend(rawIdentifier, rawPassword);
     if (apiRes && apiRes.success) {
+      recordLoginAttempt(true);
       const userData = apiRes.data?.user || apiRes.data || {};
       const token = apiRes.data?.token || '';
       if (token) {
@@ -404,6 +414,7 @@ const handleUnifiedLogin = async () => {
   const validAdminPass = props.content.superAdminData?.adminAuth?.defaultPassword || 'admin@ithunt2026';
   if ((norm === validAdminUser || norm === 'admin') &&
       (rawPassword === validAdminPass || rawPassword === 'admin' || rawPassword === 'admin123' || rawPassword === 'admin@ithunt2026')) {
+    recordLoginAttempt(true);
     routeUserByRole({
       name: props.content.superAdminData?.adminAuth?.superAdminName || 'Mr. Lakshman Singh Chauhan',
       email: validAdminUser,
@@ -416,6 +427,7 @@ const handleUnifiedLogin = async () => {
   // 2.B Check Teacher fallback
   if ((norm === 'teacher@ithunt.com' || norm === 'teacher' || norm === 'faculty@ithunt.com' || norm === 'faculty') &&
       (rawPassword === 'teacher@ithunt2026' || rawPassword === 'teacher@123' || rawPassword === 'teacher' || rawPassword === 'faculty@123' || rawPassword === 'faculty')) {
+    recordLoginAttempt(true);
     routeUserByRole({
       name: 'Er. Sandeep Srivastava (Teacher)',
       email: 'teacher@ithunt.com',
@@ -430,6 +442,7 @@ const handleUnifiedLogin = async () => {
   try {
     const stuRes = await loginStudentUser(rawIdentifier, rawPassword);
     if (stuRes && stuRes.success && stuRes.user) {
+      recordLoginAttempt(true);
       routeUserByRole({
         ...stuRes.user,
         role: 'student',
@@ -441,6 +454,7 @@ const handleUnifiedLogin = async () => {
 
   // 2.D Default demo student fallback
   if (norm === 'student@ithunt.com' && (rawPassword === 'Ithunt@123' || rawPassword === 'student123' || rawPassword === 'student' || rawPassword === 'password')) {
+    recordLoginAttempt(true);
     routeUserByRole({
       ...DEFAULT_DEMO_STUDENT,
       role: 'student',
@@ -449,8 +463,14 @@ const handleUnifiedLogin = async () => {
     return;
   }
 
+  // Failed login attempt: record in rate limiter
+  const attemptResult = recordLoginAttempt(false);
   isLoading.value = false;
-  errorMessage.value = 'Invalid credentials. Please verify your User ID / Email and password, or use the quick demo shortcuts below.';
+  if (attemptResult.isLocked) {
+    errorMessage.value = `🔒 Security Lockout: Multiple failed login attempts detected. For your account security, authentication is temporarily locked for ${attemptResult.remainingSeconds} seconds.`;
+  } else {
+    errorMessage.value = `Invalid credentials. Please verify your credentials or use the demo shortcuts below (${attemptResult.attemptsLeft} attempts remaining).`;
+  }
 };
 
 // ==========================================
@@ -458,6 +478,33 @@ const handleUnifiedLogin = async () => {
 // ==========================================
 const handleStudentSignupSubmit = async () => {
   errorMessage.value = '';
+
+  const cleanName = sanitizeInput(studentSignup.candidateName);
+  const cleanEmail = sanitizeInput(studentSignup.email).toLowerCase();
+  const cleanMobile = sanitizeInput(studentSignup.mobile);
+  const cleanCourse = sanitizeInput(studentSignup.course);
+  const cleanPassword = (studentSignup.password || '').trim();
+
+  if (!cleanName || cleanName.length < 2) {
+    errorMessage.value = 'Please enter your full legal candidate name.';
+    return;
+  }
+
+  if (!isValidEmail(cleanEmail)) {
+    errorMessage.value = 'Please enter a valid email address (e.g. name@example.com).';
+    return;
+  }
+
+  if (!isValidPhone(cleanMobile)) {
+    errorMessage.value = 'Please enter a valid 10-digit mobile number.';
+    return;
+  }
+
+  if (!cleanPassword || cleanPassword.length < 6) {
+    errorMessage.value = 'For your security, please create a password of at least 6 characters.';
+    return;
+  }
+
   isLoading.value = true;
 
   try {
@@ -466,21 +513,24 @@ const handleStudentSignupSubmit = async () => {
     const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
     const signupPayload = {
-      ...studentSignup,
-      userId: studentSignup.email,
-      password: studentSignup.password || 'Ithunt@123',
+      candidateName: cleanName,
+      email: cleanEmail,
+      mobile: cleanMobile,
+      course: cleanCourse,
+      userId: cleanEmail,
+      password: cleanPassword,
       date: dateStr,
       time: timeStr
     };
     const res = await registerStudentUser(signupPayload);
     const studentUser = (res && res.user) ? { ...res.user, admission: res.admission } : {
       ...DEFAULT_DEMO_STUDENT,
-      candidateName: studentSignup.candidateName,
-      userId: studentSignup.email,
-      email: studentSignup.email,
-      password: studentSignup.password || 'Ithunt@123',
-      mobile: studentSignup.mobile,
-      course: studentSignup.course,
+      candidateName: cleanName,
+      userId: cleanEmail,
+      email: cleanEmail,
+      password: cleanPassword,
+      mobile: cleanMobile,
+      course: cleanCourse,
       date: dateStr,
       time: timeStr,
       registrationNo: 'ITH-2026-' + Math.floor(100 + Math.random() * 900)
