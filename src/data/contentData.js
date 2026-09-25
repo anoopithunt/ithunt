@@ -136,7 +136,6 @@ const CONTENT_DATA = {
     { id: "home", label: "Home", icon: "🏠" },
     { id: "internships", label: "Internships", icon: "💼" },
     { id: "courses", label: "Courses", icon: "📚" },
-    { id: "reviews", label: "Reviews", icon: "⭐" },
     { id: "events", label: "Events", icon: "🎪" }
   ],
 

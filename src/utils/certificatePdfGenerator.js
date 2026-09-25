@@ -134,6 +134,151 @@ function drawOfficialStamp(doc, cx, cy, radius, label1, label2, centerText) {
 }
 
 /**
+ * Creates an authentic calligraphic handwritten ink signature as a high-DPI PNG data URL
+ * Renders identical styling to the modal preview (Dancing Script / Brush Script in #1e3a8a navy ink)
+ */
+export function createSignatureCanvasDataUrl(nameText, options = {}) {
+  if (typeof document === 'undefined') return null;
+
+  try {
+    const width = options.width || 480;
+    const height = options.height || 140;
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    const inkColor = options.color || '#1e3a8a'; // Deep authentic blue signature ink
+    ctx.fillStyle = inkColor;
+    ctx.strokeStyle = inkColor;
+
+    // Handwritten cursive font stack matching preview modal
+    ctx.font = 'italic 700 44px "Brush Script MT", "Dancing Script", "Caveat", "Segoe Script", cursive';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    const centerX = width / 2;
+    const centerY = height * 0.42;
+    ctx.fillText(nameText, centerX, centerY);
+
+    // Calligraphic pen flourish underline
+    const textMetrics = ctx.measureText(nameText);
+    const textWidth = Math.min(textMetrics.width, width - 40);
+    const startX = centerX - (textWidth * 0.48);
+    const endX = centerX + (textWidth * 0.52);
+    const startY = centerY + 18;
+
+    ctx.lineWidth = 2.4;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.bezierCurveTo(
+      startX + (textWidth * 0.3), startY + 4,
+      centerX + (textWidth * 0.2), startY - 3,
+      endX, startY + 2
+    );
+    // Trailing upward swirl loop
+    ctx.bezierCurveTo(
+      endX + 14, startY + 5,
+      endX + 8, startY - 9,
+      endX - 8, startY - 4
+    );
+    ctx.stroke();
+
+    return canvas.toDataURL('image/png');
+  } catch (err) {
+    console.warn('Canvas signature generation failed:', err);
+    return null;
+  }
+}
+
+/**
+ * Creates an authentic official circular corporate stamp as a high-DPI PNG data URL
+ * Renders identical styling to the modal preview (IT HUNT SOFTWARE / AUTHORIZED / PRAYAGRAJ, UP)
+ */
+export function createCorporateStampDataUrl(options = {}) {
+  if (typeof document === 'undefined') return null;
+
+  try {
+    const size = 320;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+
+    ctx.clearRect(0, 0, size, size);
+    const center = size / 2;
+
+    // Outer solid circle (Brand Orange #ea580c)
+    ctx.strokeStyle = '#ea580c';
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.arc(center, center, 146, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Intermediate thin circle (Amber #f59e0b)
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(center, center, 134, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Inner dashed circle (Amber/Orange #d97706)
+    ctx.strokeStyle = '#d97706';
+    ctx.lineWidth = 3.5;
+    ctx.setLineDash([9, 6]);
+    ctx.beginPath();
+    ctx.arc(center, center, 122, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Text styling
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // Top Arc / Header
+    ctx.fillStyle = '#ea580c';
+    ctx.font = '800 24px "Outfit", "Plus Jakarta Sans", sans-serif';
+    ctx.fillText(options.company || 'IT HUNT SOFTWARE', center, center - 48);
+
+    // Stars divider
+    ctx.font = '700 16px sans-serif';
+    ctx.fillStyle = '#d97706';
+    ctx.fillText('★ ★ ★', center, center - 22);
+
+    // Center badge: AUTHORIZED
+    ctx.fillStyle = '#c2410c';
+    ctx.font = '900 28px "Outfit", "Plus Jakarta Sans", sans-serif';
+    ctx.fillText(options.status || 'AUTHORIZED', center, center + 4);
+
+    // Divider line under AUTHORIZED
+    ctx.strokeStyle = '#ea580c';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(center - 70, center + 26);
+    ctx.lineTo(center + 70, center + 26);
+    ctx.stroke();
+
+    // Bottom Location: PRAYAGRAJ, UP
+    ctx.fillStyle = '#ea580c';
+    ctx.font = '800 20px "Outfit", "Plus Jakarta Sans", sans-serif';
+    ctx.fillText(options.location || 'PRAYAGRAJ, UP', center, center + 50);
+
+    return canvas.toDataURL('image/png');
+  } catch (err) {
+    console.warn('Canvas corporate stamp generation failed:', err);
+    return null;
+  }
+}
+
+/**
  * =========================================================================
  * 1. COURSE COMPLETION CERTIFICATE (A4 LANDSCAPE: 297mm x 210mm)
  * =========================================================================
@@ -297,11 +442,16 @@ export async function createCourseCertificateDoc(data = {}) {
   doc.setLineWidth(0.5);
   doc.line(sigX1 - 25, sigLineY, sigX1 + 25, sigLineY);
 
-  // Handwritten flourish representation
-  doc.setFont('helvetica', 'bolditalic');
-  doc.setFontSize(13);
-  doc.setTextColor(30, 58, 138); // Blue signature ink
-  doc.text('Lakshman S. Chauhan', sigX1, sigLineY - 3, { align: 'center' });
+  // Handwritten flourish representation using high-res calligraphic canvas
+  const sigDirectorUrl = createSignatureCanvasDataUrl('Lakshman S. Chauhan');
+  if (sigDirectorUrl) {
+    doc.addImage(sigDirectorUrl, 'PNG', sigX1 - 22, sigLineY - 14, 44, 13);
+  } else {
+    doc.setFont('helvetica', 'bolditalic');
+    doc.setFontSize(13);
+    doc.setTextColor(30, 58, 138); // Blue signature ink
+    doc.text('Lakshman S. Chauhan', sigX1, sigLineY - 3, { align: 'center' });
+  }
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
@@ -317,10 +467,15 @@ export async function createCourseCertificateDoc(data = {}) {
   doc.setLineWidth(0.5);
   doc.line(sigX2 - 25, sigLineY, sigX2 + 25, sigLineY);
 
-  doc.setFont('helvetica', 'bolditalic');
-  doc.setFontSize(13);
-  doc.setTextColor(30, 58, 138);
-  doc.text('Sushil Kumar', sigX2, sigLineY - 3, { align: 'center' });
+  const sigMentorUrl = createSignatureCanvasDataUrl('Sushil Kumar');
+  if (sigMentorUrl) {
+    doc.addImage(sigMentorUrl, 'PNG', sigX2 - 22, sigLineY - 14, 44, 13);
+  } else {
+    doc.setFont('helvetica', 'bolditalic');
+    doc.setFontSize(13);
+    doc.setTextColor(30, 58, 138);
+    doc.text('Sushil Kumar', sigX2, sigLineY - 3, { align: 'center' });
+  }
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
@@ -444,79 +599,112 @@ export async function createExperienceCertificateDoc(data = {}) {
   doc.line((pageW / 2) - 40, curY + 2.5, (pageW / 2) + 40, curY + 2.5);
 
   // 4. Body Paragraphs
-  curY += 14;
+  curY += 13;
   doc.setTextColor(30, 41, 59);
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(10.2);
+  doc.setFontSize(9.8);
 
   const para1 = `This is to certify that Mr. / Ms. ${candidateName} has successfully completed their software engineering tenure / internship with IT HUNT Software Solutions in the capacity of "${role}" in the ${department} department from ${startDate} to ${endDate} (Tenure Duration: ${duration}).`;
   const p1Lines = doc.splitTextToSize(para1, contentW);
   doc.text(p1Lines, margin, curY);
-  curY += (p1Lines.length * 5.8) + 6;
+  curY += (p1Lines.length * 5.2) + 5;
 
   const para2 = `During their tenure with us, ${candidateName} was actively engaged in production-grade software development, system design, and engineering delivery. They demonstrated commendable practical command across modern web & cloud technologies including ${techStack}.`;
   const p2Lines = doc.splitTextToSize(para2, contentW);
   doc.text(p2Lines, margin, curY);
-  curY += (p2Lines.length * 5.8) + 6;
+  curY += (p2Lines.length * 5.2) + 5;
 
   const para3 = `Their professional conduct, problem-solving mindset, and dedication to high code quality and architectural integrity were evaluated as "${performance}". They exhibited remarkable teamwork, punctuality, and an exemplary work ethic throughout their engagement.`;
   const p3Lines = doc.splitTextToSize(para3, contentW);
   doc.text(p3Lines, margin, curY);
-  curY += (p3Lines.length * 5.8) + 6;
+  curY += (p3Lines.length * 5.2) + 5;
 
   const para4 = `We appreciate their sincere contributions to our software development division and take pride in their technical accomplishments. We strongly recommend them for upcoming software engineering and technology opportunities and wish them outstanding success in all their future career pursuits.`;
   const p4Lines = doc.splitTextToSize(para4, contentW);
   doc.text(p4Lines, margin, curY);
-  curY += (p4Lines.length * 5.8) + 14;
 
-  // 5. Verification Badge & QR Box
-  const qrSize = 24;
-  const qrX = margin + 4;
-  const qrY = curY;
+  // 5. Bottom Section: Anchored safely near bottom of page so it NEVER overflows onto page 2
+  const bottomSectionY = pageH - margin - 52; // ~227mm
+
+  // QR Code Verification (Left)
+  const qrSize = 25;
+  const qrX = margin + 2;
+  const qrY = bottomSectionY + 2;
   await drawScannableQr(doc, qrX, qrY, qrSize, verifyUrl);
 
   doc.setFontSize(7.5);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(15, 23, 42);
-  doc.text('OFFICIAL VERIFICATION QR', qrX + qrSize + 6, qrY + 6);
+  doc.text('OFFICIAL VERIFICATION QR', qrX + qrSize + 5, qrY + 5);
 
-  doc.setFontSize(7.2);
+  doc.setFontSize(7.0);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(100, 116, 139);
-  const verifyLines = doc.splitTextToSize(`Scan this code to verify document authenticity online in the official IT HUNT credential registry. Serial: ${certNo}`, 75);
-  doc.text(verifyLines, qrX + qrSize + 6, qrY + 11);
+  const verifyLines = doc.splitTextToSize(`Scan this code to verify document authenticity online in the official IT HUNT credential registry. Serial: ${certNo}`, 54);
+  doc.text(verifyLines, qrX + qrSize + 5, qrY + 9.5);
 
-  // 6. Signatory & Official Stamp
-  const sigX = pageW - margin - 40;
-  const sigY = curY + 18;
+  // Signatory & Stamp Section (Right Side)
+  const stampSize = 25;
+  const stampX = pageW - margin - 78;
+  const stampY = bottomSectionY + 1;
 
-  // Circular Stamp
-  drawOfficialStamp(doc, sigX - 35, sigY - 2, 14, '★ IT HUNT SOFTWARE SOLUTIONS ★', 'AUTHORIZED STAMP', 'OFFICIAL');
+  // Draw Corporate Stamp
+  const stampDataUrl = createCorporateStampDataUrl({
+    company: 'IT HUNT SOFTWARE',
+    status: 'AUTHORIZED',
+    location: 'PRAYAGRAJ, UP'
+  });
+  if (stampDataUrl) {
+    doc.addImage(stampDataUrl, 'PNG', stampX, stampY, stampSize, stampSize);
+  } else {
+    drawOfficialStamp(doc, stampX + (stampSize / 2), stampY + (stampSize / 2), stampSize / 2, '★ IT HUNT SOFTWARE SOLUTIONS ★', 'AUTHORIZED STAMP', 'OFFICIAL');
+  }
 
-  // Signature representation
-  doc.setFont('helvetica', 'bolditalic');
-  doc.setFontSize(14);
-  doc.setTextColor(30, 58, 138); // Blue ink
-  doc.text('Lakshman S. Chauhan', sigX, sigY - 4, { align: 'center' });
+  // Director Signature Block
+  const sigCenterX = pageW - margin - 25;
+  const sigTopY = bottomSectionY - 4;
 
-  // Signature line
+  // "For IT HUNT SOFTWARE SOLUTIONS" (Matches preview)
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.2);
+  doc.setTextColor(71, 85, 105);
+  doc.text('For IT HUNT SOFTWARE SOLUTIONS', sigCenterX, sigTopY + 2, { align: 'center' });
+
+  // Authentic Cursive Signature Image
+  const sigDataUrl = createSignatureCanvasDataUrl('Lakshman S. Chauhan');
+  const sigImgW = 46;
+  const sigImgH = 14;
+  const sigImgX = sigCenterX - (sigImgW / 2);
+  const sigImgY = sigTopY + 4;
+
+  if (sigDataUrl) {
+    doc.addImage(sigDataUrl, 'PNG', sigImgX, sigImgY, sigImgW, sigImgH);
+  } else {
+    doc.setFont('helvetica', 'bolditalic');
+    doc.setFontSize(13);
+    doc.setTextColor(30, 58, 138);
+    doc.text('Lakshman S. Chauhan', sigCenterX, sigTopY + 13, { align: 'center' });
+  }
+
+  // Signature Line
+  const sigLineY = sigTopY + 19;
   doc.setDrawColor(148, 163, 184);
   doc.setLineWidth(0.5);
-  doc.line(sigX - 32, sigY, sigX + 32, sigY);
+  doc.line(sigCenterX - 24, sigLineY, sigCenterX + 24, sigLineY);
 
+  // Director Name & Designation
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
+  doc.setFontSize(8.5);
   doc.setTextColor(15, 23, 42);
-  doc.text('Er. Lakshman Singh Chauhan', sigX, sigY + 5, { align: 'center' });
+  doc.text('Er. Lakshman Singh Chauhan', sigCenterX, sigLineY + 4.5, { align: 'center' });
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.8);
+  doc.setFontSize(7.5);
   doc.setTextColor(100, 116, 139);
-  doc.text('Director & Founder', sigX, sigY + 9, { align: 'center' });
-  doc.text('IT HUNT Software Solutions', sigX, sigY + 12.8, { align: 'center' });
+  doc.text('Director & Founder', sigCenterX, sigLineY + 8.5, { align: 'center' });
 
   // Bottom Security Footer
-  doc.setFontSize(7.0);
+  doc.setFontSize(6.8);
   doc.setTextColor(148, 163, 184);
   doc.text('This is an official document of IT HUNT Software Solutions. Any alteration or tampering voids validity.', pageW / 2, pageH - margin + 2, { align: 'center' });
 
