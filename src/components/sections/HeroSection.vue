@@ -22,75 +22,43 @@
           <span class="aipost-gradient-text">Ours starts with real client code.</span>
         </h1>
 
-        <!-- Subtitle -->
+        <!-- Subtitle with Signature Hand-Drawn Brush Stroke Underline -->
         <p class="aipost-hero-subtitle anim-fade-in-up-delay">
-          {{ content.hero?.subtitle || 'IT HUNT builds production-ready software solutions while empowering engineers with 3-Month & 6-Month hands-on internships in MERN Stack, iOS, Android, AI, and Cloud DevOps.' }}
+          Premier software studio &amp; tech academy in Prayagraj. Build production-grade web, mobile, and AI applications with 1-on-1 industry mentorship — 
+          <span class="aipost-brush-wrap">on real client code.<svg class="aipost-brush-stroke" viewBox="0 0 120 12" fill="none" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8c20-4 40-2 60 1s40 3 56-1" stroke="var(--color-ai-orange)" stroke-width="2.8" stroke-linecap="round" opacity="0.9"></path><path d="M4 10c18-3 38-1 58 1s38 2 54-1" stroke="var(--color-ai-yellow)" stroke-width="2" stroke-linecap="round" opacity="0.65"></path></svg></span>
         </p>
 
-        <!-- Interactive Website/Track Input Box (Signature AIPost widget) -->
-        <div class="aipost-input-box-wrapper anim-fade-in-up-delay-2">
-          <div class="aipost-input-box">
-            <div class="aipost-input-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-            </div>
-            <input 
-              type="text" 
-              v-model="searchQuery" 
-              :placeholder="activePlaceholder" 
-              class="aipost-hero-input"
-              @keydown.enter="handleTrackSearch"
-            />
-            <button class="aipost-btn-primary aipost-hero-cta" @click="handleTrackSearch">
-              <span>{{ content.hero?.primaryCtaText || 'Explore Tracks & Syllabus' }}</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </button>
-          </div>
+        <!-- Dual CTA Buttons (AIPost Style) -->
+        <div class="aipost-hero-cta-group anim-fade-in-up-delay">
+          <button class="aipost-btn-primary aipost-hero-main-cta" @click="$emit('set-tab', 'admission')">
+            <span>Apply for 2026 Batch</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+          <button class="aipost-btn-secondary aipost-hero-main-cta" @click="$emit('set-tab', 'internships')">
+            <span>Explore Programs ➜</span>
+          </button>
+        </div>
 
-          <!-- Quick Interactive Stack Tags (Like AIPost's platform chips) -->
-          <div class="aipost-quick-tags">
-            <span class="quick-tag-label">Supported Specializations:</span>
-            <button 
-              v-for="tag in stackPills" 
-              :key="tag.id"
-              class="quick-tag-btn"
-              :class="{ active: selectedTrackId === tag.id }"
-              @click="selectTrackPill(tag)"
-            >
-              <span class="quick-tag-icon">{{ tag.icon }}</span>
-              <span>{{ tag.name }}</span>
-            </button>
-            <button 
-              class="quick-tag-btn"
-              style="border-color: rgba(249, 115, 22, 0.5); background: rgba(249, 115, 22, 0.12); color: var(--color-ai-orange); font-weight: 700;"
-              @click="$emit('open-cv-modal')"
-              title="Generate Professional ATS Student CV in PDF Format"
-            >
-              <span class="quick-tag-icon">📄</span>
-              <span>Generate CV (PDF)</span>
-            </button>
+        <!-- Trust Badges & Guarantee Row (AIPost Style) -->
+        <div class="aipost-guarantee-row anim-fade-in-up-delay">
+          <div class="guarantee-item">
+            <span class="guarantee-icon">✓</span>
+            <span>ISO 9001:2015 Certified</span>
           </div>
-
-          <!-- Trust Badges & Guarantee Row (AIPost Style) -->
-          <div class="aipost-guarantee-row">
-            <div class="guarantee-item">
-              <span class="guarantee-icon">✓</span>
-              <span>ISO 9001:2015 & Govt Certified</span>
-            </div>
-            <span class="guarantee-sep">·</span>
-            <div class="guarantee-item">
-              <span class="guarantee-icon">✓</span>
-              <span>100% Practical Client Sprints</span>
-            </div>
-            <span class="guarantee-sep">·</span>
-            <div class="guarantee-item">
-              <span class="guarantee-icon">✓</span>
-              <span>1-on-1 Senior Tech Mentorship</span>
-            </div>
-            <span class="guarantee-sep">·</span>
-            <div class="guarantee-item">
-              <span class="guarantee-icon">✓</span>
-              <span>Direct Hiring Placement Support</span>
-            </div>
+          <span class="guarantee-sep">·</span>
+          <div class="guarantee-item">
+            <span class="guarantee-icon">✓</span>
+            <span>100% Practical Client Sprints</span>
+          </div>
+          <span class="guarantee-sep">·</span>
+          <div class="guarantee-item">
+            <span class="guarantee-icon">✓</span>
+            <span>1-on-1 Senior Tech Mentorship</span>
+          </div>
+          <span class="guarantee-sep">·</span>
+          <div class="guarantee-item">
+            <span class="guarantee-icon">✓</span>
+            <span>Direct Hiring Placements</span>
           </div>
         </div>
 
@@ -392,7 +360,7 @@
     <!-- =====================================================================
          5. SECTION 4: "See in Action" Live Projects Showcase (AIPost Section 4 Style)
          ===================================================================== -->
-    <section class="aipost-section aipost-section-alt">
+    <section class="aipost-section aipost-section-alt" id="examples">
       <div class="container">
         <div class="section-title-wrap text-center">
           <div class="aipost-pill-badge small">
@@ -400,15 +368,31 @@
             <span>EXAMPLES</span>
           </div>
           <h2 class="aipost-section-heading">
-            See IT HUNT in Action
+            See IT HUNT <span class="text-brand">in Action</span>
           </h2>
           <p class="aipost-section-desc">
             A quick preview of real software products designed, engineered, and shipped by our students and leads. Each live project below runs in active production.
           </p>
         </div>
 
+        <!-- AIPost Category Filter Tabs Pill -->
+        <div class="aipost-cat-tabs-wrapper">
+          <div class="aipost-cat-tabs-pill">
+            <button 
+              v-for="cat in projectCategories" 
+              :key="cat.id"
+              class="aipost-cat-tab-btn"
+              :class="{ active: selectedProjectCategory === cat.id }"
+              @click="selectedProjectCategory = cat.id"
+            >
+              <span class="cat-tab-icon">{{ cat.icon }}</span>
+              <span>{{ cat.name }}</span>
+            </button>
+          </div>
+        </div>
+
         <div class="examples-grid">
-          <div class="example-card" v-for="item in liveProjectsList" :key="item.id">
+          <div class="example-card" v-for="item in filteredProjects" :key="item.id">
             <div class="example-card-header">
               <div class="example-brand-row">
                 <span class="example-avatar">{{ item.logo }}</span>
@@ -443,6 +427,55 @@
                 <span>Inspect Architecture ↗</span>
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         6. SECTION 5: SIGNUP / HIGHLIGHT CARD (AIPost Section 5 Style)
+         ===================================================================== -->
+    <section class="aipost-section aipost-section-base aipost-signup-highlight-section">
+      <div class="container">
+        <div class="aipost-highlight-card">
+          <div class="aipost-highlight-glow"></div>
+          <div class="aipost-pill-badge small">
+            <span class="aipost-badge-dot"></span>
+            <span>✨ ADMISSIONS OPEN FOR 2026 COHORTS</span>
+          </div>
+          <h2 class="highlight-title">
+            Ready to build production-grade software with real client code?
+          </h2>
+          <p class="highlight-desc">
+            Join hundreds of ambitious students, BCA, MCA, and B.Tech engineers building scalable software, deploying live cloud apps, and cracking top tech placements.
+          </p>
+          
+          <div class="highlight-features-grid">
+            <div class="highlight-feat-item">
+              <div class="feat-val">From ₹0</div>
+              <div class="feat-sub">1-on-1 Career Counseling · Cancel anytime</div>
+            </div>
+            <div class="highlight-feat-item">
+              <div class="feat-val">100% Client Code</div>
+              <div class="feat-sub">Zero dummy todo apps · Live Git PRs</div>
+            </div>
+            <div class="highlight-feat-item">
+              <div class="feat-val">Govt. Verified</div>
+              <div class="feat-sub">ISO 9001:2015 &amp; NIELIT Accredited</div>
+            </div>
+          </div>
+
+          <div class="highlight-cta-row">
+            <button class="aipost-btn-primary aipost-btn-lg" @click="$emit('set-tab', 'admission')">
+              <span>Start Free Application ➜</span>
+            </button>
+            <button class="aipost-btn-secondary aipost-btn-lg" @click="$emit('open-cv-modal')">
+              <span>📄 Generate Professional ATS CV (PDF)</span>
+            </button>
+          </div>
+
+          <div class="highlight-guarantee-note">
+            Setup takes under 2 minutes · Shift batches anytime · 1-on-1 Senior Mentor Guidance
           </div>
         </div>
       </div>
@@ -570,6 +603,34 @@
               We are not just a coaching center. IT HUNT is an active software consultancy delivering real products to global clients.
             </p>
             <div class="bento-highlight-pill text-green">Active Client Studio</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         8. SECTION 8: "Everything You Need to Master Modern Engineering" (AIPost Section 8 Features Style)
+         ===================================================================== -->
+    <section class="aipost-section aipost-section-base" id="features">
+      <div class="container">
+        <div class="section-title-wrap text-center">
+          <div class="aipost-pill-badge small">
+            <span class="aipost-badge-dot"></span>
+            <span>FEATURES</span>
+          </div>
+          <h2 class="aipost-section-heading">
+            Everything You Need to <span class="text-brand">Accelerate Your Tech Career</span>
+          </h2>
+          <p class="aipost-section-desc">
+            From production codebases to automated cloud deployment pipelines, we've got all the tools, architecture standards, and mentorship you need to thrive.
+          </p>
+        </div>
+
+        <div class="features-bento-grid">
+          <div class="feature-bento-card" v-for="feat in featureItems" :key="feat.title">
+            <div class="feature-icon-box">{{ feat.icon }}</div>
+            <h3 class="feature-card-title">{{ feat.title }}</h3>
+            <p class="feature-card-desc">{{ feat.desc }}</p>
           </div>
         </div>
       </div>
@@ -808,42 +869,6 @@ const props = defineProps({
 
 const emit = defineEmits(['set-tab', 'apply-course', 'open-job-modal', 'open-cv-modal']);
 
-// Interactive Search Input State
-const searchQuery = ref('');
-const placeholders = [
-  'e.g. MERN Fullstack Internship',
-  'e.g. Python & AI Agent Engineering',
-  'e.g. Flutter & iOS Mobile Development',
-  'e.g. NIELIT O-Level & A-Level Certification',
-  'e.g. Cloud DevOps & Microservices'
-];
-const placeholderIdx = ref(0);
-let placeholderTimer = null;
-
-const activePlaceholder = computed(() => {
-  return placeholders[placeholderIdx.value] || placeholders[0];
-});
-
-// Interactive Specialization Pills
-const stackPills = [
-  { id: 'mern', name: 'MERN Stack', icon: '⚡' },
-  { id: 'ai', name: 'Python & AI', icon: '🤖' },
-  { id: 'mobile', name: 'Flutter & iOS', icon: '📱' },
-  { id: 'devops', name: 'Cloud & DevOps', icon: '☁️' },
-  { id: 'nextjs', name: 'Next.js 15', icon: '🌐' }
-];
-const selectedTrackId = ref('mern');
-
-const selectTrackPill = (tag) => {
-  selectedTrackId.value = tag.id;
-  searchQuery.value = tag.name;
-  handleTrackSearch();
-};
-
-const handleTrackSearch = () => {
-  emit('set-tab', 'internships');
-};
-
 // Interactive Showcase Card Data (Mac-style App & Terminal view)
 const showcaseProjects = [
   {
@@ -991,13 +1016,24 @@ const startStatsAnimation = () => {
   requestAnimationFrame(step);
 };
 
-// Section 4 Live Projects Data
+// Section 4 Live Projects Data & Filter Categories (AIPost Style)
+const projectCategories = [
+  { id: 'all', name: 'All Solutions', icon: '⚡' },
+  { id: 'mern', name: 'MERN & Web', icon: '🌐' },
+  { id: 'ai', name: 'AI & Python', icon: '🤖' },
+  { id: 'mobile', name: 'Mobile Apps', icon: '📱' },
+  { id: 'cloud', name: 'Cloud & DevOps', icon: '☁️' }
+];
+
+const selectedProjectCategory = ref('all');
+
 const liveProjectsList = [
   {
     id: 1,
     name: 'SaaS Billing & Invoice Engine',
     logo: '💳',
     category: 'FinTech Engineering',
+    categoryKey: 'mern',
     platform: 'MERN Stack',
     description: 'Enterprise multi-tenant payment gateway processing recurring client subscriptions, webhooks, and automated PDF tax invoices.',
     features: ['High-throughput Redis cache', 'Stripe & Razorpay integrations', 'Sub-45ms average response time'],
@@ -1008,6 +1044,7 @@ const liveProjectsList = [
     name: 'AI Post & Carousel Generator',
     logo: '🤖',
     category: 'Autonomous AI Platform',
+    categoryKey: 'ai',
     platform: 'Python & Vue 3',
     description: 'Intelligent social media autopilot that reads website URLs, analyzes tone, and generates multi-slide carousels automatically.',
     features: ['Gemini 2.0 Pro Multimodal API', 'Dynamic Canvas visual engine', 'Automated social scheduling'],
@@ -1018,10 +1055,83 @@ const liveProjectsList = [
     name: 'Logistics Fleet Tracking Portal',
     logo: '🚚',
     category: 'IoT & Real-Time Tracking',
+    categoryKey: 'cloud',
     platform: 'Full-Stack Node.js',
     description: 'Live GPS vehicle telemetry dashboard with geospatial geofencing alerts, route analytics, and driver dispatch coordination.',
     features: ['WebSockets realtime stream', 'PostGIS spatial queries', 'Driver mobile companion app'],
     stats: { speed: 'Realtime', users: '250+ Trucks', rating: '4.8 ★' }
+  },
+  {
+    id: 4,
+    name: 'HealthPulse Telemedicine App',
+    logo: '📱',
+    category: 'Mobile & HealthTech',
+    categoryKey: 'mobile',
+    platform: 'Flutter & Dart',
+    description: 'Cross-platform mobile application with WebRTC end-to-end encrypted video appointments, instant digital prescriptions, and EHR sync.',
+    features: ['Peer-to-peer WebRTC video', 'Secure HIPAA-ready storage', 'Realtime socket messaging'],
+    stats: { speed: '<80ms Video', users: '12k+ Pts', rating: '4.9 ★' }
+  },
+  {
+    id: 5,
+    name: 'Next.js 15 HyperStore & CMS',
+    logo: '🌐',
+    category: 'Modern Web Platform',
+    categoryKey: 'mern',
+    platform: 'Next.js 15 & TS',
+    description: 'Blazing fast headless e-commerce store with incremental static regeneration, server actions, faceted search filters, and checkout flow.',
+    features: ['Next.js 15 React Server Components', 'Tailored Algolia search', 'Sub-second page loads'],
+    stats: { speed: '99/100 LCP', users: '35k+ Orders', rating: '5.0 ★' }
+  },
+  {
+    id: 6,
+    name: 'Central QR Credential Registry',
+    logo: '📜',
+    category: 'Govt & Cloud Registry',
+    categoryKey: 'cloud',
+    platform: 'Python & Cloud',
+    description: 'Centralized public verification gateway with cryptographic QR verification for diplomas, marksheets, and internship letters.',
+    features: ['SHA-256 tamper-proof seals', 'Sub-30ms verification API', 'Automated PDF generator engine'],
+    stats: { speed: 'Instant', users: '50k+ Verify', rating: '5.0 ★' }
+  }
+];
+
+const filteredProjects = computed(() => {
+  if (selectedProjectCategory.value === 'all') return liveProjectsList;
+  return liveProjectsList.filter(p => p.categoryKey === selectedProjectCategory.value);
+});
+
+// Section 8 Features Bento Grid Data (AIPost Section 8 Style)
+const featureItems = [
+  {
+    icon: '⚡',
+    title: 'Live Git PR & Branch Workflows',
+    desc: 'Never push to main blindly. Work with feature branches, code reviews, automated CI checks, and merge approvals exactly like senior engineers.'
+  },
+  {
+    icon: '🌐',
+    title: 'Modern Reactive Frameworks',
+    desc: 'Master React 19, Next.js 15 App Router, and Vue 3 Composition API to build stateful, lightning-fast, and responsive applications.'
+  },
+  {
+    icon: '⚙️',
+    title: 'Microservices & RESTful APIs',
+    desc: 'Architect robust backend services with Node.js, Express, and Python FastAPI, handling data schemas with MongoDB and PostgreSQL.'
+  },
+  {
+    icon: '☁️',
+    title: 'Docker & Cloud CI/CD Automation',
+    desc: 'Package applications into Docker containers, automate test pipelines with GitHub Actions, and deploy zero-downtime releases on AWS.'
+  },
+  {
+    icon: '🤖',
+    title: 'AI Models & Autonomous Pipelines',
+    desc: 'Harness Google Gemini 2.0 API, OpenAI, LangChain, and vector embeddings to integrate intelligence and social autopilots into client software.'
+  },
+  {
+    icon: '🏆',
+    title: 'Direct 50+ Placement Referral Network',
+    desc: 'Get exclusive interviews, mock technical rounds, verified NIELIT credentials, and direct hiring calls from our partner software companies.'
   }
 ];
 
@@ -1151,10 +1261,6 @@ onMounted(() => {
   const statsList = props.content?.stats || [];
   animatedStats.value = statsList.map(s => s.number);
 
-  placeholderTimer = setInterval(() => {
-    placeholderIdx.value = (placeholderIdx.value + 1) % placeholders.length;
-  }, 2800);
-
   if (typeof window !== 'undefined' && 'IntersectionObserver' in window && statsSectionRef.value) {
     let triggered = false;
     observer = new IntersectionObserver((entries) => {
@@ -1170,7 +1276,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  if (placeholderTimer) clearInterval(placeholderTimer);
   if (observer) observer.disconnect();
 });
 </script>
@@ -1315,7 +1420,114 @@ onUnmounted(() => {
   color: var(--text-muted, #94a3b8);
   line-height: 1.65;
   max-width: 820px;
-  margin: 0 auto 2.5rem;
+  margin: 0 auto 2rem;
+}
+
+/* Platform Pills & Formats (AIPost Style) */
+.aipost-platform-pills-row {
+  font-size: clamp(0.92rem, 1.5vw, 1.1rem);
+  color: var(--text-muted, #94a3b8);
+  margin-bottom: 0.65rem;
+  font-weight: 500;
+}
+
+.platform-link {
+  color: var(--text-main, #f8fafc);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border-bottom: 1px dashed rgba(249, 115, 22, 0.4);
+}
+
+.platform-link:hover {
+  color: var(--color-ai-orange, #f97316);
+  border-bottom-color: var(--color-ai-orange, #f97316);
+}
+
+.aipost-track-formats-row {
+  font-size: clamp(0.82rem, 1.3vw, 0.92rem);
+  color: var(--text-dim, #64748b);
+  margin-bottom: 1.35rem;
+}
+
+.track-format-link {
+  color: var(--text-muted, #94a3b8);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.track-format-link:hover {
+  color: var(--color-ai-orange, #f97316);
+}
+
+/* Signature AIPost Hand-Drawn Brush Stroke Underline */
+.aipost-brush-wrap {
+  position: relative;
+  display: inline-block;
+  font-weight: 700;
+  color: var(--text-main, #ffffff);
+  white-space: nowrap;
+}
+
+.aipost-brush-stroke {
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 100%;
+  height: 10px;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* Dual Hero CTA Buttons (AIPost Style) */
+.aipost-hero-cta-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.aipost-hero-main-cta {
+  padding: 0.95rem 2rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 14px;
+  min-height: 52px;
+  box-shadow: 0 4px 20px rgba(249, 115, 22, 0.35);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.aipost-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--bg-card-glass, rgba(15, 23, 42, 0.8));
+  border: 1.5px solid var(--border-cyber, rgba(255, 255, 255, 0.15));
+  color: var(--text-main, #ffffff);
+  padding: 0.95rem 1.85rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 14px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.aipost-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--color-ai-orange, #f97316);
+  color: var(--color-ai-orange, #f97316);
+  transform: translateY(-2px);
+}
+
+.aipost-pricing-microtext {
+  font-size: 0.85rem;
+  color: var(--text-muted, #94a3b8);
+  margin-bottom: 3.25rem;
 }
 
 /* ==========================================================================
@@ -1469,9 +1681,10 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 1.25rem;
-  font-size: 0.85rem;
+  gap: 0.75rem 1.4rem;
+  margin-top: 1.5rem;
+  margin-bottom: 3.25rem;
+  font-size: 0.88rem;
   color: var(--text-muted, #94a3b8);
 }
 
@@ -2101,6 +2314,65 @@ onUnmounted(() => {
    5. EXAMPLES / LIVE PROJECTS (AIPost Section 4 Style)
    ========================================================================== */
 
+/* AIPost Category Filter Tabs */
+.aipost-cat-tabs-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2.75rem;
+  width: 100%;
+}
+
+.aipost-cat-tabs-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem;
+  background: var(--bg-card-glass, rgba(15, 23, 42, 0.85));
+  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.1));
+  border-radius: 16px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.aipost-cat-tabs-pill::-webkit-scrollbar {
+  display: none;
+}
+
+.aipost-cat-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.aipost-cat-tab-btn:hover {
+  color: var(--text-main, #ffffff);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.aipost-cat-tab-btn.active {
+  background: rgba(249, 115, 22, 0.18);
+  border-color: rgba(249, 115, 22, 0.4);
+  color: var(--color-ai-orange, #f97316);
+  box-shadow: 0 2px 10px rgba(249, 115, 22, 0.2);
+}
+
+.cat-tab-icon {
+  font-size: 1rem;
+}
+
 .examples-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -2221,6 +2493,105 @@ onUnmounted(() => {
 .example-view-btn:hover {
   text-decoration: underline;
   color: var(--color-ai-yellow, #f59e0b);
+}
+
+/* ==========================================================================
+   5B. SECTION 5: SIGNUP / HIGHLIGHT CARD (AIPost Section 5 Style)
+   ========================================================================== */
+
+.aipost-signup-highlight-section {
+  position: relative;
+  padding: 4.5rem 1rem;
+  overflow: hidden;
+}
+
+.aipost-highlight-card {
+  position: relative;
+  background: var(--bg-card-glass, rgba(15, 23, 42, 0.85));
+  border: 1.5px solid var(--border-cyber-glow, rgba(249, 115, 22, 0.35));
+  border-radius: 28px;
+  padding: 3.5rem 2.5rem;
+  text-align: center;
+  max-width: 960px;
+  margin: 0 auto;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), 0 0 35px var(--glow-orange, rgba(249, 115, 22, 0.15));
+  backdrop-filter: blur(20px);
+  overflow: hidden;
+}
+
+.aipost-highlight-glow {
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 450px;
+  height: 200px;
+  background: radial-gradient(circle, var(--glow-orange, rgba(249, 115, 22, 0.25)) 0%, transparent 70%);
+  pointer-events: none;
+  filter: blur(40px);
+}
+
+.highlight-title {
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: clamp(1.8rem, 3.8vw, 2.75rem);
+  font-weight: 800;
+  color: var(--text-main, #ffffff);
+  line-height: 1.25;
+  margin: 0 auto 1rem;
+  max-width: 780px;
+}
+
+.highlight-desc {
+  font-size: 1.05rem;
+  color: var(--text-muted, #94a3b8);
+  line-height: 1.6;
+  max-width: 680px;
+  margin: 0 auto 2.5rem;
+}
+
+.highlight-features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  max-width: 750px;
+  margin: 0 auto 2.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1.5rem 0;
+}
+
+.highlight-feat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.feat-val {
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--color-ai-orange, #f97316);
+  margin-bottom: 0.35rem;
+}
+
+.feat-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted, #94a3b8);
+  line-height: 1.4;
+}
+
+.highlight-cta-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.highlight-guarantee-note {
+  font-size: 0.82rem;
+  color: var(--text-dim, #64748b);
 }
 
 /* ==========================================================================
@@ -2394,6 +2765,67 @@ onUnmounted(() => {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+/* ==========================================================================
+   7B. SECTION 8: FEATURES BENTO GRID (AIPost Section 8 Style)
+   ========================================================================== */
+
+.features-bento-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.feature-bento-card {
+  background: var(--bg-card-glass, rgba(15, 23, 42, 0.75));
+  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
+  border-radius: 20px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.feature-bento-card:hover {
+  border-color: rgba(249, 115, 22, 0.45);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.35), 0 0 20px var(--glow-orange, rgba(249, 115, 22, 0.15));
+}
+
+.feature-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(249, 115, 22, 0.12);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1.25rem;
+  transition: transform 0.3s ease;
+}
+
+.feature-bento-card:hover .feature-icon-box {
+  transform: scale(1.1);
+}
+
+.feature-card-title {
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main, #ffffff);
+  margin-bottom: 0.65rem;
+  line-height: 1.35;
+}
+
+.feature-card-desc {
+  font-size: 0.9rem;
+  color: var(--text-muted, #94a3b8);
+  line-height: 1.6;
 }
 
 /* ==========================================================================
@@ -2746,7 +3178,10 @@ onUnmounted(() => {
 :global(body.light-theme) .faq-question-text,
 :global(body.light-theme) .stat-label-title,
 :global(body.light-theme) .metrics-panel-header h4,
-:global(body.light-theme) .codemaya-brand-text {
+:global(body.light-theme) .codemaya-brand-text,
+:global(body.light-theme) .highlight-title,
+:global(body.light-theme) .feature-card-title,
+:global(body.light-theme) .aipost-brush-wrap {
   color: #0f172a !important;
 }
 
@@ -2763,8 +3198,68 @@ onUnmounted(() => {
 :global(body.light-theme) .founder-quote,
 :global(body.light-theme) .acc-list li,
 :global(body.light-theme) .model-feature-list li,
-:global(body.light-theme) .step-subpoint-item {
+:global(body.light-theme) .step-subpoint-item,
+:global(body.light-theme) .highlight-desc,
+:global(body.light-theme) .feature-card-desc {
   color: #334155 !important;
+}
+
+:global(body.light-theme) .platform-link {
+  color: #0f172a !important;
+}
+:global(body.light-theme) .platform-link:hover {
+  color: #ea580c !important;
+}
+
+:global(body.light-theme) .aipost-btn-secondary {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.15) !important;
+  color: #0f172a !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+:global(body.light-theme) .aipost-btn-secondary:hover {
+  border-color: #f97316 !important;
+  color: #ea580c !important;
+  background: #fff7ed !important;
+}
+
+:global(body.light-theme) .aipost-cat-tabs-pill {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06) !important;
+}
+:global(body.light-theme) .aipost-cat-tab-btn {
+  color: #64748b !important;
+}
+:global(body.light-theme) .aipost-cat-tab-btn:hover {
+  color: #0f172a !important;
+  background: #f1f5f9 !important;
+}
+:global(body.light-theme) .aipost-cat-tab-btn.active {
+  background: rgba(249, 115, 22, 0.12) !important;
+  color: #ea580c !important;
+  border-color: rgba(249, 115, 22, 0.3) !important;
+}
+
+:global(body.light-theme) .aipost-highlight-card {
+  background: #ffffff !important;
+  border-color: rgba(249, 115, 22, 0.35) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08), 0 0 25px rgba(249, 115, 22, 0.06) !important;
+}
+:global(body.light-theme) .highlight-features-grid {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+:global(body.light-theme) .feat-sub {
+  color: #64748b !important;
+}
+
+:global(body.light-theme) .feature-bento-card {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+:global(body.light-theme) .feature-icon-box {
+  background: rgba(249, 115, 22, 0.1) !important;
+  border-color: rgba(249, 115, 22, 0.25) !important;
 }
 
 :global(body.light-theme) .stat-micro-note,
@@ -3212,6 +3707,32 @@ onUnmounted(() => {
   .founder-skills {
     justify-content: center;
   }
+
+  .highlight-features-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .features-bento-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .aipost-hero-cta-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .aipost-hero-main-cta,
+  .aipost-btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .aipost-cat-tabs-pill {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 0.35rem;
+  }
 }
 
 @media (max-width: 960px) {
@@ -3256,11 +3777,110 @@ onUnmounted(() => {
     word-break: break-word;
   }
 
+  .aipost-platform-pills-row {
+    font-size: 0.84rem;
+    line-height: 1.5;
+    margin-bottom: 0.4rem;
+    padding: 0 0.5rem;
+  }
+
+  .aipost-track-formats-row {
+    font-size: 0.78rem;
+    line-height: 1.4;
+    margin-bottom: 0.9rem;
+    padding: 0 0.5rem;
+  }
+
   .aipost-hero-subtitle {
     font-size: 0.92rem;
     line-height: 1.55;
-    margin-bottom: 1.75rem;
+    margin-bottom: 1.5rem;
     padding: 0 0.4rem;
+  }
+
+  .aipost-hero-cta-group {
+    margin-bottom: 0.75rem;
+  }
+
+  .aipost-hero-main-cta,
+  .aipost-btn-secondary {
+    font-size: 0.92rem;
+    padding: 0.8rem 1.25rem;
+    min-height: 48px;
+    border-radius: 12px;
+  }
+
+  .aipost-pricing-microtext {
+    font-size: 0.76rem;
+    margin-bottom: 2rem;
+    padding: 0 0.5rem;
+  }
+
+  .aipost-cat-tabs-pill {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 0.3rem;
+    border-radius: 12px;
+  }
+
+  .aipost-cat-tab-btn {
+    padding: 0.45rem 0.8rem;
+    font-size: 0.78rem;
+    border-radius: 8px;
+  }
+
+  .aipost-highlight-card {
+    padding: 2.25rem 1.15rem;
+    border-radius: 20px;
+  }
+
+  .highlight-title {
+    font-size: 1.45rem;
+    line-height: 1.3;
+  }
+
+  .highlight-desc {
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .highlight-features-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+    padding: 1rem 0;
+  }
+
+  .feat-val {
+    font-size: 1.2rem;
+  }
+
+  .highlight-cta-row {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .highlight-cta-row button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .features-bento-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .feature-bento-card {
+    padding: 1.4rem;
+    border-radius: 16px;
+  }
+
+  .feature-card-title {
+    font-size: 1.05rem;
+  }
+
+  .feature-card-desc {
+    font-size: 0.85rem;
   }
 
   /* Interactive Input Box */
@@ -3324,7 +3944,8 @@ onUnmounted(() => {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.5rem 0.75rem;
-    margin-top: 1.25rem;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
     text-align: left;
     padding: 0 0.5rem;
   }
