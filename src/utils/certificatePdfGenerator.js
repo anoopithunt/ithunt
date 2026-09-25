@@ -467,20 +467,20 @@ export async function createCourseCertificateDoc(data = {}) {
   doc.setLineWidth(0.5);
   doc.line(sigX2 - 25, sigLineY, sigX2 + 25, sigLineY);
 
-  const sigMentorUrl = createSignatureCanvasDataUrl('Sushil Kumar');
+  const sigMentorUrl = createSignatureCanvasDataUrl('Anup Mishra');
   if (sigMentorUrl) {
     doc.addImage(sigMentorUrl, 'PNG', sigX2 - 22, sigLineY - 14, 44, 13);
   } else {
     doc.setFont('helvetica', 'bolditalic');
     doc.setFontSize(13);
     doc.setTextColor(30, 58, 138);
-    doc.text('Sushil Kumar', sigX2, sigLineY - 3, { align: 'center' });
+    doc.text('Anup Mishra', sigX2, sigLineY - 3, { align: 'center' });
   }
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
   doc.setTextColor(15, 23, 42);
-  doc.text('Er. Sushil Kumar', sigX2, sigLineY + 4.5, { align: 'center' });
+  doc.text('Er. Anup Mishra', sigX2, sigLineY + 4.5, { align: 'center' });
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.2);
   doc.setTextColor(100, 116, 139);
