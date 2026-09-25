@@ -16,6 +16,29 @@
         </div>
 
         <div class="cert-modal-header-actions">
+          <!-- Zoom & Fit Controls -->
+          <div class="cert-zoom-toolbar">
+            <button 
+              class="cert-zoom-btn fit-btn" 
+              :class="{ 'is-active': isFitToPage }" 
+              @click="toggleFitToPage" 
+              title="Fit full certificate on screen"
+            >
+              <span>🔍 Fit Page</span>
+            </button>
+            <div class="cert-zoom-group">
+              <button class="cert-zoom-btn" @click="zoomOut" title="Zoom Out (−)" :disabled="zoomLevel <= 0.45">
+                <span>−</span>
+              </button>
+              <button class="cert-zoom-val" @click="resetZoom100" title="Click for 100% scale">
+                {{ Math.round(zoomLevel * 100) }}%
+              </button>
+              <button class="cert-zoom-btn" @click="zoomIn" title="Zoom In (+)" :disabled="zoomLevel >= 1.6">
+                <span>+</span>
+              </button>
+            </div>
+          </div>
+
           <button class="cert-action-btn primary" @click="handleDownloadPdf" :title="'Download Official PDF'">
             <span>📜 Download PDF</span>
           </button>
@@ -30,11 +53,19 @@
       </div>
 
       <!-- Modal Body Preview Container -->
-      <div class="cert-modal-body">
-        <!-- 1. COURSE CERTIFICATE VISUAL CARD (Landscape aesthetic) -->
-        <div v-if="certData.type !== 'experience'" class="course-cert-paper" id="printable-certificate">
-          <div class="course-cert-border-outer">
-            <div class="course-cert-border-inner">
+      <div class="cert-modal-body" ref="viewportRef">
+        <div 
+          class="cert-scaler-wrapper" 
+          :style="{ 
+            transform: `scale(${zoomLevel})`,
+            transformOrigin: 'top center',
+            marginBottom: scalerMarginBottom
+          }"
+        >
+          <!-- 1. COURSE CERTIFICATE VISUAL CARD (Landscape aesthetic) -->
+          <div v-if="certData.type !== 'experience'" class="course-cert-paper" id="printable-certificate" ref="paperRef">
+            <div class="course-cert-border-outer">
+              <div class="course-cert-border-inner">
               <!-- Corner Ornaments -->
               <div class="corner-ornament top-left"></div>
               <div class="corner-ornament top-right"></div>
@@ -125,7 +156,7 @@
         </div>
 
         <!-- 2. EXPERIENCE CERTIFICATE VISUAL LETTER (Portrait aesthetic) -->
-        <div v-else class="exp-cert-paper" id="printable-certificate">
+        <div v-else class="exp-cert-paper" id="printable-certificate" ref="paperRef">
           <div class="exp-cert-border-outer">
             <!-- Corporate Letterhead Header -->
             <div class="exp-letterhead-header">
@@ -230,6 +261,7 @@
             </div>
           </div>
         </div>
+        </div>
       </div>
 
       <!-- Modal Bottom Actions Bar -->
@@ -251,7 +283,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import QRCode from 'qrcode';
 import { generateCourseCertificatePdf, generateExperienceCertificatePdf } from '../../utils/certificatePdfGenerator.js';
 
@@ -266,6 +298,70 @@ defineEmits(['close']);
 
 const copied = ref(false);
 const qrCodeDataUrl = ref('');
+const viewportRef = ref(null);
+const paperRef = ref(null);
+const zoomLevel = ref(1);
+const isFitToPage = ref(true);
+const paperHeight = ref(780);
+let resizeObserver = null;
+
+const scalerMarginBottom = computed(() => {
+  if (!paperHeight.value) return '0px';
+  const diff = paperHeight.value * (zoomLevel.value - 1);
+  return `${Math.round(diff)}px`;
+});
+
+const calculateFitZoom = () => {
+  if (!viewportRef.value || !paperRef.value) return;
+
+  const vpHeight = viewportRef.value.clientHeight - 32;
+  const vpWidth = viewportRef.value.clientWidth - 32;
+  const pHeight = paperRef.value.offsetHeight;
+  const pWidth = paperRef.value.offsetWidth;
+
+  if (pHeight <= 0 || pWidth <= 0 || vpHeight <= 0 || vpWidth <= 0) return;
+
+  paperHeight.value = pHeight;
+
+  const scaleY = vpHeight / pHeight;
+  const scaleX = vpWidth / pWidth;
+  const fitScale = Math.min(scaleX, scaleY);
+
+  // In Fit Mode, scale down if needed (capped at 1.0, minimum 0.40)
+  const finalScale = Math.min(1.0, Math.max(0.40, fitScale));
+  zoomLevel.value = Number(finalScale.toFixed(2));
+};
+
+const toggleFitToPage = () => {
+  if (isFitToPage.value) {
+    isFitToPage.value = false;
+    zoomLevel.value = 1.0;
+  } else {
+    isFitToPage.value = true;
+    calculateFitZoom();
+  }
+};
+
+const resetZoom100 = () => {
+  isFitToPage.value = false;
+  zoomLevel.value = 1.0;
+};
+
+const zoomIn = () => {
+  isFitToPage.value = false;
+  zoomLevel.value = Math.min(1.6, Number((zoomLevel.value + 0.1).toFixed(2)));
+};
+
+const zoomOut = () => {
+  isFitToPage.value = false;
+  zoomLevel.value = Math.max(0.4, Number((zoomLevel.value - 0.1).toFixed(2)));
+};
+
+const handleWindowResize = () => {
+  if (isFitToPage.value) {
+    calculateFitZoom();
+  }
+};
 
 const getVerifyUrl = () => {
   const certId = props.certData?.certNo || props.certData?.certificateNumber || 'ITH-CERT-2026';
@@ -295,7 +391,47 @@ const updateQrCode = async () => {
   }
 };
 
-watch(() => props.certData, updateQrCode, { immediate: true, deep: true });
+watch(() => props.certData, () => {
+  updateQrCode();
+  nextTick(() => {
+    if (isFitToPage.value) {
+      calculateFitZoom();
+    }
+  });
+}, { immediate: true, deep: true });
+
+onMounted(() => {
+  nextTick(() => {
+    if (paperRef.value) {
+      paperHeight.value = paperRef.value.offsetHeight;
+      if (typeof window !== 'undefined' && window.ResizeObserver) {
+        resizeObserver = new ResizeObserver(() => {
+          if (paperRef.value) {
+            paperHeight.value = paperRef.value.offsetHeight;
+            if (isFitToPage.value) {
+              calculateFitZoom();
+            }
+          }
+        });
+        resizeObserver.observe(paperRef.value);
+        if (viewportRef.value) {
+          resizeObserver.observe(viewportRef.value);
+        }
+      }
+    }
+    if (isFitToPage.value) {
+      calculateFitZoom();
+    }
+    window.addEventListener('resize', handleWindowResize);
+  });
+});
+
+onUnmounted(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+  }
+  window.removeEventListener('resize', handleWindowResize);
+});
 
 const handleOpenVerifyUrl = () => {
   const url = getVerifyUrl();
@@ -476,13 +612,102 @@ const copyVerificationUrl = async () => {
   color: #ffffff;
 }
 
+/* Zoom & Fit Toolbar */
+.cert-zoom-toolbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  padding: 3px 5px;
+}
+
+.cert-zoom-btn {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.cert-zoom-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.cert-zoom-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.cert-zoom-btn.fit-btn {
+  font-size: 0.78rem;
+  font-weight: 700;
+  gap: 4px;
+  padding: 4px 9px;
+  color: #e2e8f0;
+}
+
+.cert-zoom-btn.fit-btn.is-active {
+  background: rgba(234, 88, 12, 0.28);
+  border: 1px solid rgba(234, 88, 12, 0.55);
+  color: #fb923c;
+}
+
+.cert-zoom-group {
+  display: flex;
+  align-items: center;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  padding-left: 0.25rem;
+  margin-left: 0.15rem;
+}
+
+.cert-zoom-val {
+  background: transparent;
+  border: none;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #94a3b8;
+  padding: 3px 6px;
+  min-width: 44px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.cert-zoom-val:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
 /* Modal Body */
 .cert-modal-body {
-  padding: 1.5rem;
+  padding: 1.25rem 1rem;
   overflow-y: auto;
+  overflow-x: auto;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
   background: #020617;
+  flex: 1;
+  min-height: 0;
+}
+
+.cert-scaler-wrapper {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), margin-bottom 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 
 /* =========================================================================
@@ -773,24 +998,24 @@ const copyVerificationUrl = async () => {
   background: #ffffff;
   color: #1e293b;
   width: 100%;
-  max-width: 760px;
+  max-width: 740px;
   border-radius: 8px;
-  padding: 24px;
+  padding: 16px;
   box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .exp-cert-border-outer {
   border: 1px solid #cbd5e1;
-  padding: 24px;
+  padding: 18px 22px;
 }
 
 .exp-letterhead-header {
   background: #fff7ed;
   border: 1px solid #fed7aa;
-  padding: 16px;
+  padding: 12px 16px;
   border-radius: 6px;
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.85rem;
 }
 
 .exp-header-brand-row {
@@ -803,7 +1028,7 @@ const copyVerificationUrl = async () => {
 
 .exp-brand-title {
   font-family: var(--font-heading, sans-serif);
-  font-size: 1.85rem;
+  font-size: 1.75rem;
   font-weight: 900;
   color: #ea580c;
 }
@@ -813,14 +1038,14 @@ const copyVerificationUrl = async () => {
 }
 
 .exp-brand-sub {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 800;
   color: #1e293b;
 }
 
 .exp-header-badge {
   text-align: right;
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   font-weight: 800;
   color: #c2410c;
 }
@@ -838,81 +1063,81 @@ const copyVerificationUrl = async () => {
 }
 
 .exp-header-address {
-  margin-top: 8px;
-  font-size: 0.72rem;
+  margin-top: 6px;
+  font-size: 0.70rem;
   color: #64748b;
-  line-height: 1.5;
+  line-height: 1.45;
 }
 
 .exp-header-divider {
   height: 2px;
   background: #ea580c;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .exp-ref-bar {
   display: flex;
   justify-content: space-between;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: #475569;
   border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 8px;
-  margin-bottom: 1.25rem;
+  padding-bottom: 6px;
+  margin-bottom: 0.85rem;
 }
 
 .exp-letter-title-section {
   text-align: center;
-  margin: 1.5rem 0;
+  margin: 0.85rem 0;
 }
 
 .exp-letter-title {
   font-family: var(--font-heading, sans-serif);
-  font-size: 1.45rem;
+  font-size: 1.35rem;
   font-weight: 800;
   color: #0f172a;
   letter-spacing: 0.5px;
 }
 
 .exp-letter-subtitle {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 800;
   color: #d97706;
-  margin-top: 3px;
+  margin-top: 2px;
 }
 
 .exp-letter-body {
-  font-size: 0.92rem;
-  line-height: 1.75;
+  font-size: 0.875rem;
+  line-height: 1.55;
   color: #334155;
   text-align: justify;
 }
 
 .exp-letter-body p {
-  margin-bottom: 1rem;
+  margin-bottom: 0.65rem;
 }
 
 .exp-bottom-section {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-top: 2rem;
-  padding-top: 1.5rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
   border-top: 1px solid #e2e8f0;
-  gap: 1.5rem;
+  gap: 1.25rem;
   flex-wrap: wrap;
 }
 
 .exp-qr-container {
   display: flex;
   align-items: center;
-  gap: 12px;
-  max-width: 320px;
+  gap: 10px;
+  max-width: 300px;
 }
 
 .exp-qr-box {
-  width: 68px;
-  height: 68px;
+  width: 62px;
+  height: 62px;
   background: #ffffff;
   border: 1px solid rgba(203, 213, 225, 0.9);
   border-radius: 4px;
@@ -930,26 +1155,26 @@ const copyVerificationUrl = async () => {
 }
 
 .exp-qr-real-img {
-  width: 64px;
-  height: 64px;
+  width: 58px;
+  height: 58px;
   display: block;
   border-radius: 3px;
 }
 
 .exp-qr-title {
-  font-size: 0.72rem;
+  font-size: 0.70rem;
   font-weight: 800;
   color: #0f172a;
 }
 
 .exp-qr-sub {
-  font-size: 0.65rem;
+  font-size: 0.63rem;
   color: #64748b;
   line-height: 1.3;
 }
 
 .exp-qr-link {
-  font-size: 0.65rem;
+  font-size: 0.63rem;
   font-family: var(--font-mono, monospace);
   color: #ea580c;
   font-weight: 700;
@@ -962,8 +1187,8 @@ const copyVerificationUrl = async () => {
 }
 
 .exp-corporate-stamp {
-  width: 68px;
-  height: 68px;
+  width: 64px;
+  height: 64px;
   border: 2px solid #ea580c;
   border-radius: 50%;
   display: flex;
@@ -974,13 +1199,13 @@ const copyVerificationUrl = async () => {
 .stamp-inner {
   border: 1px dashed #d97706;
   border-radius: 50%;
-  width: 58px;
-  height: 58px;
+  width: 54px;
+  height: 54px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 0.48rem;
+  font-size: 0.46rem;
   font-weight: 800;
   color: #ea580c;
   text-align: center;
@@ -992,18 +1217,18 @@ const copyVerificationUrl = async () => {
 }
 
 .for-company {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: #475569;
 }
 
 .exp-sig-script {
   font-family: 'Brush Script MT', 'Dancing Script', cursive, sans-serif;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   color: #1e3a8a;
   font-style: italic;
   font-weight: 700;
-  margin: 4px 0 2px;
+  margin: 3px 0 2px;
 }
 
 .exp-sig-line {
@@ -1014,22 +1239,22 @@ const copyVerificationUrl = async () => {
 }
 
 .exp-sig-name {
-  font-size: 0.825rem;
+  font-size: 0.80rem;
   font-weight: 800;
   color: #0f172a;
-  margin-top: 4px;
+  margin-top: 3px;
 }
 
 .exp-sig-designation {
-  font-size: 0.725rem;
+  font-size: 0.70rem;
   color: #64748b;
 }
 
 .exp-footer-note {
-  font-size: 0.65rem;
+  font-size: 0.63rem;
   color: #94a3b8;
   text-align: center;
-  margin-top: 1.5rem;
+  margin-top: 0.85rem;
 }
 
 /* Footer Actions */
