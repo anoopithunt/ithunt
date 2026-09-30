@@ -20,6 +20,8 @@ import projectsRoutes from './routes/projects.routes.js';
 import contactRoutes from './routes/contact.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import coursesRoutes from './routes/courses.routes.js';
+import { optionalAuth } from './middleware/auth.js';
+import { enforceRoleSectionPermission } from './middleware/rolePermissions.js';
 
 const app = express();
 const PORT = process.env.BACKEND_PORT || process.env.PORT || 3000;
@@ -84,6 +86,7 @@ const healthHandler = async (req, res) => {
 app.get(['/api/health', '/health', '/api'], healthHandler);
 app.get('/', (req, res) => res.json({ message: 'IT HUNT MERN & AI Backend API Server', status: 'Running', docs: '/api/health' }));
 
+app.use('/api', optionalAuth, enforceRoleSectionPermission);
 app.use('/api/auth', authRoutes);
 app.use('/api/admissions', admissionsRoutes);
 app.use('/api/students', studentsRoutes);

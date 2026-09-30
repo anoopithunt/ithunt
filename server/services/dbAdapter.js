@@ -13,6 +13,7 @@ import { ContactInquiry } from '../models/ContactInquiry.js';
 import { EventRsvp } from '../models/EventRsvp.js';
 import { Course } from '../models/Course.js';
 import { Event } from '../models/Event.js';
+import { SystemSetting } from '../models/SystemSetting.js';
 
 // Model map (All 14 IT HUNT database collections in MongoDB Atlas)
 export const MODELS = {
@@ -21,6 +22,7 @@ export const MODELS = {
   students: Student,
   courses: Course,
   events_catalog: Event,
+  settings: SystemSetting,
   nielit_projects: NielitProject,
   job_applications: JobApplication,
   internships: Internship,
@@ -191,18 +193,18 @@ export const dbAdapter = {
     const filter = String(id).match(/^[0-9a-fA-F]{24}$/)
       ? { _id: id }
       : {
-          $or: [
-            { id: id },
-            { userId: id },
-            { code: id },
-            { slug: id },
-            { registrationNo: id },
-            { registrationNumber: id },
-            { enrollmentNumber: id },
-            { certNo: id },
-            { email: String(id).toLowerCase() }
-          ]
-        };
+        $or: [
+          { id: id },
+          { userId: id },
+          { code: id },
+          { slug: id },
+          { registrationNo: id },
+          { registrationNumber: id },
+          { enrollmentNumber: id },
+          { certNo: id },
+          { email: String(id).toLowerCase() }
+        ]
+      };
 
     updatedDoc = await Model.findOneAndUpdate(
       filter,
