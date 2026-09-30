@@ -1,48 +1,29 @@
-# IT HUNT — Software Solutions & Tech Academy
+# IT HUNT
 
-> A Vue 3 and Node.js platform for technology education, internships, admissions, events, and software solutions.
+> Software Solutions & Tech Academy Portal
 
 [![Live Website](https://img.shields.io/badge/Live%20Website-ithunt.vercel.app-00C7B7?style=for-the-badge&logo=vercel&logoColor=white)](https://ithunt.vercel.app/)
-[![Repository](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/anoopithunt/ithunt)
-[![Vue](https://img.shields.io/badge/Vue-3-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white)](https://vuejs.org/)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/anoopithunt/ithunt)
+[![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white)](https://vuejs.org/)
 [![Vite](https://img.shields.io/badge/Vite-6-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev/)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Deploy](https://img.shields.io/badge/Deploy-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Database-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
 
-## Overview
+IT HUNT is a full-stack education and software solutions platform built for a technology academy, internship programs, admissions, events, careers, and digital services. The project combines a modern Vue 3 frontend with an Express API and MongoDB-backed data layer to support the business and student workflows of the academy.
 
-IT HUNT is a technology education and software solutions portal established in 2012 and based in Holagarh, Prayagraj, Uttar Pradesh, India. The website brings academy information and online workflows together in one responsive application.
+## Features
 
-The current platform supports:
+- Course, internship, and academic program information
+- Admissions and student enquiry workflows
+- Events, workshops, gallery, and promotional content
+- Career and faculty application forms
+- Contact and support enquiry handling
+- Authentication and secure admin/user operations
+- Email and notification integrations
+- PDF, QR, and document-generation utilities
+- Responsive dark/light themed UI
 
-- Technology courses and academic programmes
-- Three- and six-month internship tracks
-- Admissions and student information workflows
-- Events, workshops, hackathons, and gallery content
-- Careers and faculty/developer applications
-- Contact and enquiry forms
-- Certificates, projects, reviews, fees, and administrative workflows
-- Dark/light theme support and responsive layouts
-
-## Current programmes
-
-### Internship tracks
-
-1. MERN stack and cloud architecture
-2. Native iOS development with Swift and SwiftUI
-3. Native Android development with Kotlin and Jetpack Compose
-4. Digital marketing, SEO, and growth marketing
-5. Python, FastAPI, and applied generative AI
-
-### Academic programmes
-
-- NIELIT O Level
-- NIELIT A Level
-- BCA and MCA programmes
-
-Programme content, navigation, events, faculty, reviews, and other public-facing content are maintained through the application's centralized content configuration.
-
-## Technology stack
+## Tech Stack
 
 ### Frontend
 
@@ -50,53 +31,57 @@ Programme content, navigation, events, faculty, reviews, and other public-facing
 - Vite
 - JavaScript
 - HTML5 and CSS3
-- Responsive CSS and custom properties
-- jsPDF/PDFKit-based document generation where applicable
-- Vercel Analytics integration
+- Responsive, theme-aware UI styling
 
-### Backend and data
+### Backend
 
 - Node.js
 - Express
 - MongoDB with Mongoose
 - JWT authentication
 - bcryptjs password hashing
-- Nodemailer and Resend integrations for notifications
-- QR-code and PDF generation utilities
+- Nodemailer and Resend integrations
+- PDF and QR generation tools
 
 ### Deployment
 
-The application is configured for Vercel deployment through `vercel.json`. The Vercel routing configuration serves the frontend and forwards API routes to the Node.js backend/serverless entry point.
+- Vercel-ready project configuration
+- Static frontend build via Vite
+- Backend API routing and deployment config handled through `vercel.json`
 
-## Project structure
+## Project Structure
 
 ```text
 ithunt/
-├── .github/workflows/       # CI/CD workflows
-├── css/                     # Global styles and theme colors
-├── img/                     # Logos, course, event, faculty, and gallery media
-├── js/                      # Frontend configuration and content data
-├── public/                  # Public assets and generated documentation
-├── server/                  # Express API, database, seed, and utility scripts
-├── src/                     # Vue application source (where applicable)
-├── index.html               # Application entry point
-├── package.json             # Scripts and dependencies
-├── vercel.json              # Vercel routes and security headers
-├── .env.example             # Environment variable template
-└── README.md
+├── .github/                  # GitHub workflows and automation
+├── api/                      # API-related project assets
+├── public/                   # Static assets and generated/public files
+├── server/                   # Express server, DB utilities, seeds, and scripts
+├── src/                      # Vue application source
+├── .env.example              # Example environment configuration
+├── .gitignore                # Git ignore rules
+├── API_DOCUMENTATION.md      # API documentation
+├── IT_HUNT_API_Documentation.pdf
+├── firebase.json             # Firebase config
+├── firestore.rules           # Firestore rules
+├── index.html                # App entry point
+├── package.json              # Dependencies and scripts
+├── README.md                 # Project overview and setup guide
+├── vercel.json               # Vercel deployment config
+├── vite.config.js            # Vite configuration
+├── package-lock.json         # Lockfile
+└── .firebaserc               # Firebase project config
 ```
 
-> Directory contents may evolve as the frontend and backend continue to be consolidated. Use the repository tree as the authoritative source for newly added modules.
+## Prerequisites
 
-## Local development
-
-### Prerequisites
+Before starting the project, make sure you have:
 
 - Node.js 18 or later
 - npm
-- MongoDB for API and database features
+- MongoDB running locally or a MongoDB connection URL available
 
-### Install
+## Local Setup
 
 ```bash
 git clone https://github.com/anoopithunt/ithunt.git
@@ -105,140 +90,101 @@ npm install
 cp .env.example .env
 ```
 
-Update `.env` with local values. Never commit `.env` or real credentials.
+Then update the values in `.env` with your local environment details, especially:
 
-### Run the application
+- `MONGODB_URI`
+- `JWT_SECRET`
+- `PORT` / `BACKEND_PORT`
+- email notification credentials
+- any third-party API keys
 
-Start the Vite frontend:
+Never commit `.env` or production secrets to the repository.
+
+## Run the Project
+
+### Start the frontend
 
 ```bash
 npm run dev
 ```
 
-Start the API in a second terminal:
+### Start the backend API
 
 ```bash
 npm run server:dev
 ```
 
-The frontend is normally available at the Vite URL shown in the terminal, and the local API runs on the configured backend port (3000 by default).
+### Start local MongoDB
 
-### Useful scripts
+```bash
+npm run db:start
+```
+
+For the full app experience, run both the frontend and backend in separate terminals.
+
+## Useful Scripts
 
 | Command | Purpose |
 | --- | --- |
-| `npm run dev` | Start the Vite development server |
-| `npm run build` | Create a production frontend build |
-| `npm run preview` | Preview the production build locally |
+| `npm run dev` | Start the Vite frontend |
+| `npm run build` | Build production assets |
+| `npm run preview` | Preview the production build |
 | `npm run server` | Start the Express server |
-| `npm run server:dev` | Start the server with Node watch mode |
-| `npm run seed` | Seed local database data |
-| `npm run db:verify` | Verify database connectivity/data |
-| `npm run db:test` | Run database/table checks |
-| `npm test` | Run the repository's current test command |
+| `npm run server:dev` | Start the server in watch mode |
+| `npm run seed` | Seed database data |
+| `npm run db:start` | Start MongoDB locally |
+| `npm run db:verify` | Verify database connectivity and data |
+| `npm run db:setup` | Set up the required database configuration |
+| `npm run db:test` | Run database checks |
 | `npm run pdf:api` | Generate API documentation PDF output |
+| `npm test` | Project's current verification script |
 
-## API capabilities
+## Environment Configuration
 
-The backend provides REST workflows for the academy platform, including:
+The repository includes a starter template at `.env.example` with the main configuration points, including:
 
-- Health checks and database status
-- Authentication and current-user profiles
-- Admissions and student records
-- Courses and internship information
-- Event registrations and RSVPs
-- Career applications
-- NIELIT project submissions
-- Contact enquiries
-- Reviews, fees, certificates, projects, and administrative statistics
-
-The production API is exposed under `/api` on the deployed application. Local API URLs are controlled by environment variables rather than hardcoded deployment assumptions.
-
-## Configuration
-
-Start from `.env.example`. Important configuration areas include:
-
-- Application identity and branding
-- Contact and leadership information
-- Backend port and MongoDB connection string
+- app branding and contact information
+- backend port and MongoDB connection
+- JWT secret
 - API base URLs
-- JWT configuration
-- Email and notification providers
-- Theme and feature flags
-- Optional SMS and form-provider integrations
+- email and notification settings
+- feature toggles and theme-related settings
 
-### Security requirements
+## API and Documentation
 
-Before deploying:
+This project includes API documentation for the backend services:
 
-1. Replace every development credential and placeholder.
-2. Generate a strong, unique `JWT_SECRET`.
-3. Keep MongoDB credentials, SMTP credentials, API keys, and provider tokens in Vercel environment variables or another secret manager.
-4. Do not expose server-only secrets through `VITE_*` variables.
-5. Restrict MongoDB network access and create a least-privilege database user.
-6. Configure production CORS, rate limiting, validation, logging, and backups.
+- `API_DOCUMENTATION.md`
+- `IT_HUNT_API_Documentation.pdf`
 
-## Current status
+Use these files to understand the exposed routes, payloads, and service behavior for the application backend.
 
-The repository currently provides a working academy portal with a Vue/Vite frontend, Express API, MongoDB integration, authentication dependencies, content-driven programme pages, admission/career workflows, and Vercel deployment configuration. The codebase is actively evolving, so API contracts and page structure should be validated against the implementation before integrating external clients.
+## Deployment
 
-## Future plan
+The app is designed to be deployed on Vercel. The repository includes `vercel.json` for routing and configuration, and supports Vercel environment variables for secrets and production settings.
 
-The following roadmap is proposed for the next development stages.
+Recommended deployment checklist:
 
-### Phase 1 — Stabilize the foundation
-
-- Add a real automated test suite for frontend components, API routes, authentication, and database operations.
-- Add request validation, consistent API error responses, structured logging, and rate limiting.
-- Add CI checks for linting, formatting, tests, build output, dependency vulnerabilities, and deployment previews.
-- Remove duplicated configuration and document the canonical frontend/backend architecture.
-- Add API versioning and publish an OpenAPI specification.
-
-### Phase 2 — Improve the student experience
-
-- Create student and applicant dashboards with application status tracking.
-- Add secure document uploads for identity, certificates, and admission records.
-- Add online fee collection, invoices, receipts, and payment status reconciliation.
-- Provide downloadable digital certificates with QR verification.
-- Add course progress, attendance, assignments, mentor feedback, and internship milestones.
-
-### Phase 3 — Build a stronger administration platform
-
-- Add role-based access control for super administrators, counsellors, faculty, mentors, and students.
-- Add audit logs for sensitive changes and administrative actions.
-- Add searchable student, admission, course, event, and career records with pagination and exports.
-- Add a content management interface so authorized staff can update courses, events, faculty, reviews, and gallery content without code changes.
-- Add dashboards for admissions, enrollment, attendance, placement, revenue, and campaign performance.
-
-### Phase 4 — Expand learning and community features
-
-- Launch a learning area with recorded lessons, quizzes, coding exercises, and assignment submissions.
-- Add mentor/student messaging, announcements, notifications, and calendar scheduling.
-- Add an alumni network, job board, referrals, and verified success stories.
-- Add event registration passes, reminders, certificates of participation, and post-event resources.
-- Add multilingual content, beginning with English and Hindi.
-
-### Phase 5 — Scale the platform responsibly
-
-- Move toward a clear modular Vue frontend and documented service boundaries.
-- Add caching, background jobs, observability, backups, and disaster-recovery procedures.
-- Improve accessibility toward WCAG 2.2 AA and optimize Core Web Vitals, SEO, and image delivery.
-- Add privacy controls, consent management, data retention policies, and a documented security-incident process.
-- Evaluate a mobile application or PWA after the web workflows and API contracts are stable.
+1. Set production environment variables in Vercel.
+2. Use a secure MongoDB connection string.
+3. Replace all default or sample credentials.
+4. Set a strong `JWT_SECRET`.
+5. Verify CORS, API routes, and frontend/backend compatibility before releasing.
 
 ## Contributing
 
-1. Create a feature branch.
-2. Keep changes focused and update documentation for API or environment changes.
-3. Add or update tests for behavior changes.
-4. Run `npm run build` and the relevant test/database checks locally.
-5. Open a pull request describing the change, validation performed, and any migration or configuration requirements.
+1. Fork the repository.
+2. Create a feature branch.
+3. Keep changes focused and document any config or API updates.
+4. Run relevant validation such as `npm run build` and database checks.
+5. Submit a pull request with a clear description of the changes.
 
 ## License
 
-This project is licensed under the ISC License. See `package.json` for the project metadata.
+This project is licensed under the ISC License. See `package.json` for package metadata.
 
 ## Links
 
 - Live website: https://ithunt.vercel.app/
-- Repository: https://github.com/anoopithunt/ithunt
+- GitHub repository: https://github.com/anoopithunt/ithunt
+
