@@ -56,6 +56,7 @@
         <div class="nav-group-section">
           <div class="nav-group-label" v-if="!isSidebarCollapsed">EXECUTIVE</div>
           <button 
+            v-if="canViewTab('overview')"
             class="sidebar-nav-item" 
             :class="{ active: currentTab === 'overview' }" 
             @click="currentTab = 'overview'; isMobileSidebarOpen = false"
@@ -70,6 +71,7 @@
         <div class="nav-group-section">
           <div class="nav-group-label" v-if="!isSidebarCollapsed">STUDENTS & REGISTRY</div>
           <button 
+            v-if="canViewTab('admissions')"
             class="sidebar-nav-item" 
             :class="{ active: currentTab === 'admissions' }" 
             @click="currentTab = 'admissions'; isMobileSidebarOpen = false"
@@ -82,6 +84,7 @@
           </button>
 
           <button 
+            v-if="canViewTab('students')"
             class="sidebar-nav-item" 
             :class="{ active: currentTab === 'students' }" 
             @click="currentTab = 'students'; isMobileSidebarOpen = false"
@@ -93,6 +96,7 @@
           </button>
 
           <button 
+            v-if="canViewTab('student-exams')"
             class="sidebar-nav-item" 
             :class="{ active: currentTab === 'student-exams' }" 
             @click="currentTab = 'student-exams'; isMobileSidebarOpen = false"
@@ -104,6 +108,7 @@
           </button>
 
           <button 
+            v-if="canViewTab('nielit')"
             class="sidebar-nav-item" 
             :class="{ active: currentTab === 'nielit' }" 
             @click="currentTab = 'nielit'; isMobileSidebarOpen = false"
@@ -115,6 +120,7 @@
           </button>
 
           <button 
+            v-if="canViewTab('courses')"
             class="sidebar-nav-item" 
             :class="{ active: currentTab === 'courses' }" 
             @click="currentTab = 'courses'; isMobileSidebarOpen = false"
@@ -130,6 +136,7 @@
         <div class="nav-group-section">
           <div class="nav-group-label" v-if="!isSidebarCollapsed">FINANCE & CREDENTIALS</div>
           <button 
+            v-if="canViewTab('fees')"
             class="sidebar-nav-item" 
             :class="{ active: currentTab === 'fees' }" 
             @click="currentTab = 'fees'; isMobileSidebarOpen = false"
@@ -141,6 +148,7 @@
           </button>
 
           <button 
+            v-if="canViewTab('certificates')"
             class="sidebar-nav-item" 
             :class="{ active: currentTab === 'certificates' }" 
             @click="currentTab = 'certificates'; isMobileSidebarOpen = false"
@@ -152,6 +160,7 @@
           </button>
 
           <button 
+            v-if="canViewTab('internships')"
             class="sidebar-nav-item" 
             :class="{ active: currentTab === 'internships' }" 
             @click="currentTab = 'internships'; isMobileSidebarOpen = false"
@@ -163,6 +172,7 @@
           </button>
 
           <button 
+            v-if="canViewTab('careers')"
             class="sidebar-nav-item" 
             :class="{ active: currentTab === 'careers' }" 
             @click="currentTab = 'careers'; isMobileSidebarOpen = false"
@@ -178,6 +188,7 @@
         <div class="nav-group-section">
           <div class="nav-group-label" v-if="!isSidebarCollapsed">PLATFORM & SUPPORT</div>
           <button 
+            v-if="canViewTab('reviews')"
             class="sidebar-nav-item" 
             :class="{ active: currentTab === 'reviews' }" 
             @click="currentTab = 'reviews'; isMobileSidebarOpen = false"
@@ -189,6 +200,7 @@
           </button>
 
           <button 
+            v-if="canViewTab('events')"
             class="sidebar-nav-item" 
             :class="{ active: currentTab === 'events' }" 
             @click="currentTab = 'events'; isMobileSidebarOpen = false"
@@ -200,6 +212,7 @@
           </button>
 
           <button 
+            v-if="canViewTab('projects')"
             class="sidebar-nav-item" 
             :class="{ active: currentTab === 'projects' }" 
             @click="currentTab = 'projects'; isMobileSidebarOpen = false"
@@ -211,6 +224,7 @@
           </button>
 
           <button 
+            v-if="canViewTab('contact')"
             class="sidebar-nav-item" 
             :class="{ active: currentTab === 'contact' }" 
             @click="currentTab = 'contact'; isMobileSidebarOpen = false"
@@ -222,6 +236,7 @@
           </button>
 
           <button 
+            v-if="canViewTab('users')"
             class="sidebar-nav-item" 
             :class="{ active: currentTab === 'users' }" 
             @click="currentTab = 'users'; isMobileSidebarOpen = false"
@@ -233,6 +248,7 @@
           </button>
 
           <button 
+            v-if="canViewTab('settings')"
             class="sidebar-nav-item" 
             :class="{ active: currentTab === 'settings' }" 
             @click="currentTab = 'settings'; isMobileSidebarOpen = false"
@@ -275,7 +291,7 @@
     ></div>
 
     <!-- 2. MAIN ADMIN CONTENT CANVAS -->
-    <main class="admin-main-canvas">
+    <main class="admin-main-canvas" :class="{ 'permission-readonly': !canEditTab(currentTab) }" @click.capture="guardPermissionAction" @change.capture="guardPermissionChange" @submit.capture="guardPermissionSubmit">
       <!-- Top Executive Command Bar -->
       <header ref="adminHeaderRef" class="admin-top-command-bar">
         <div class="command-bar-left">
@@ -2701,75 +2717,108 @@
     </div>
 
     <!-- TAB 6: SYSTEM CONFIGURATION -->
-    <div v-else-if="currentTab === 'settings'" class="admin-tab-panel anim-stagger-3">
+    <div v-else-if="currentTab === 'settings' && canViewTab('settings')" class="admin-tab-panel anim-stagger-3">
       <div class="panel-header-controls">
         <div>
-          <h3 class="panel-title">⚙️ System Configuration & Environment Controls</h3>
-          <p class="panel-subtitle">Manage feature flags, security policies, and official verification keys.</p>
+          <h3 class="panel-title">Role Access</h3>
+          <p class="panel-subtitle">Choose which sections each account role can view or edit.</p>
         </div>
       </div>
 
-      <div class="admin-grid-2col">
-        <div class="form-card" style="margin: 0;">
-          <h4 style="font-family: var(--font-heading); font-size: 1.15rem; margin-bottom: 1rem; color: var(--color-ai-yellow);">
-            🌐 Production Environment Variables (.env)
-          </h4>
-          <div style="display: flex; flex-direction: column; gap: 0.75rem; font-family: var(--font-mono); font-size: 0.85rem;">
-            <div class="config-row">
-              <span class="config-key">PORT:</span>
-              <span class="config-val">5500 (Active)</span>
-            </div>
-            <div class="config-row">
-              <span class="config-key">DATABASE:</span>
-              <span class="config-val" :style="{ color: dbStatusColor, fontWeight: '700' }">{{ dbEngineLabel }} ({{ dbStatus.name }}) • {{ dbStatusLabel }} ✅</span>
-            </div>
-            <div class="config-row">
-              <span class="config-key">ACCREDITATION:</span>
-              <span class="config-val text-gradient-gold">ISO 9001:2015 Accredited</span>
-            </div>
-            <div class="config-row">
-              <span class="config-key">PRIVACY_CODE:</span>
-              <span class="config-val">ITH-POL-2026/01</span>
-            </div>
-            <div class="config-row">
-              <span class="config-key">TERMS_CODE:</span>
-              <span class="config-val">ITH-TOC-2026/02</span>
-            </div>
+      <section class="permission-config-panel">
+        <div class="permission-config-toolbar">
+          <label class="permission-role-select">
+            <span>Account role</span>
+            <select v-model="selectedPermissionRole" class="form-control" :disabled="permissionsLoading">
+              <option v-for="role in AVAILABLE_STAFF_ROLES" :key="role.value" :value="role.value">
+                {{ role.icon }} {{ role.label }}
+              </option>
+            </select>
+          </label>
+          <div class="permission-role-note" :class="{ locked: isProtectedPermissionRole }">
+            {{ isProtectedPermissionRole ? 'Administrator access is always enabled.' : 'Changes apply to every account with this role.' }}
           </div>
         </div>
 
-        <div class="form-card" style="margin: 0;">
-          <h4 style="font-family: var(--font-heading); font-size: 1.15rem; margin-bottom: 1rem; color: var(--color-ai-yellow);">
-            🛡️ Feature Flags & Live Services
-          </h4>
-          <div style="display: flex; flex-direction: column; gap: 1rem;">
-            <label class="toggle-control-label">
-              <input type="checkbox" v-model="featureAdmissionPortal" checked>
-              <div>
-                <strong>Online Admission Portal</strong>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">Enable public candidate registrations and PDF slip generator</div>
-              </div>
-            </label>
+        <div class="permission-table-wrap">
+          <table class="permission-table">
+            <thead>
+              <tr><th scope="col">Section</th><th scope="col">View</th><th scope="col">Edit</th></tr>
+            </thead>
+            <tbody>
+              <tr v-for="tab in defaultTabs" :key="tab.id">
+                <th scope="row"><span class="permission-section-icon">{{ tab.icon }}</span>{{ tab.label.replace(/^\S+\s/, '') }}</th>
+                <td>
+                  <input
+                    type="checkbox"
+                    :checked="selectedRolePermission(tab.id).view"
+                    :disabled="isProtectedPermissionRole || permissionsLoading"
+                    :aria-label="`Allow ${selectedPermissionRole} to view ${tab.label}`"
+                    @change="updateRolePermission(tab.id, 'view', $event.target.checked)"
+                  >
+                </td>
+                <td>
+                  <input
+                    type="checkbox"
+                    :checked="selectedRolePermission(tab.id).edit"
+                    :disabled="isProtectedPermissionRole || permissionsLoading || !selectedRolePermission(tab.id).view || tab.id === 'users'"
+                    :aria-label="`Allow ${selectedPermissionRole} to edit ${tab.label}`"
+                    @change="updateRolePermission(tab.id, 'edit', $event.target.checked)"
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-            <label class="toggle-control-label">
-              <input type="checkbox" v-model="featureCareersPortal" checked>
-              <div>
-                <strong>Faculty & Developer Hiring Portal</strong>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">Accept online trainer and engineering applications</div>
-              </div>
-            </label>
-
-            <label class="toggle-control-label">
-              <input type="checkbox" v-model="featureCosmicStarfield" checked>
-              <div>
-                <strong>Cosmic Twinkling Starfield Animation</strong>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">60 FPS GPU-accelerated background atmosphere</div>
-              </div>
-            </label>
+        <div class="permission-config-footer">
+          <p class="permission-save-status" role="status">{{ permissionSaveStatus }}</p>
+          <div class="permission-config-actions">
+            <button class="btn-secondary" type="button" :disabled="isProtectedPermissionRole || permissionsLoading" @click="resetSelectedRolePermissions">Reset role</button>
+            <button class="btn-primary" type="button" :disabled="isProtectedPermissionRole || permissionsLoading || permissionsSaving" @click="saveRolePermissionSettings">
+              {{ permissionsSaving ? 'Saving…' : 'Save access rules' }}
+            </button>
           </div>
         </div>
+      </section>
+      <div class="admin-grid-2col settings-support-grid">
+        <section class="form-card settings-support-card">
+          <h4 class="settings-support-title">Environment status</h4>
+          <div class="settings-environment-list">
+            <div class="config-row"><span class="config-key">PORT</span><span class="config-val">5500 (Active)</span></div>
+            <div class="config-row"><span class="config-key">DATABASE</span><span class="config-val" :style="{ color: dbStatusColor, fontWeight: '700' }">{{ dbEngineLabel }} ({{ dbStatus.name }}) • {{ dbStatusLabel }}</span></div>
+            <div class="config-row"><span class="config-key">ACCREDITATION</span><span class="config-val">ISO 9001:2015 Accredited</span></div>
+            <div class="config-row"><span class="config-key">PRIVACY CODE</span><span class="config-val">ITH-POL-2026/01</span></div>
+            <div class="config-row"><span class="config-key">TERMS CODE</span><span class="config-val">ITH-TOC-2026/02</span></div>
+          </div>
+        </section>
+        <section class="form-card settings-support-card">
+          <h4 class="settings-support-title">Feature flags & services</h4>
+          <div class="settings-feature-list">
+            <label class="toggle-control-label">
+              <input type="checkbox" v-model="featureAdmissionPortal">
+              <span><strong>Online admission portal</strong><small>Allow new candidate registrations.</small></span>
+            </label>
+            <label class="toggle-control-label">
+              <input type="checkbox" v-model="featureCareersPortal">
+              <span><strong>Hiring portal</strong><small>Accept faculty and engineering applications.</small></span>
+            </label>
+            <label class="toggle-control-label">
+              <input type="checkbox" v-model="featureCosmicStarfield">
+              <span><strong>Starfield animation</strong><small>Enable the site background animation.</small></span>
+            </label>
+          </div>
+        </section>
       </div>
     </div>
+    <div v-else-if="currentTab === 'settings'" class="access-empty-state">
+      <h3>Settings are restricted</h3>
+      <p>Your role does not have access to system settings.</p>
+    </div>
+    <div v-else-if="currentTab === 'restricted'" class="access-empty-state">
+      <h3>No sections assigned</h3>
+      <p>Ask an administrator to grant this role access.</p>
+      </div>
 
     <!-- Add / Edit Course Program Modal -->
     <div class="modal-overlay" v-if="showAddCourseModal" @click.self="showAddCourseModal = false">
@@ -5352,6 +5401,7 @@ const handleDeleteExamSubmission = (subId) => {
 const AVAILABLE_STAFF_ROLES = [
   { value: 'admin', label: 'SuperAdmin / Director', icon: '🛡️', color: '#ea580c', bg: 'rgba(234, 88, 12, 0.12)', border: 'rgba(234, 88, 12, 0.35)' },
   { value: 'teacher', label: 'Teacher / Faculty Mentor', icon: '👨‍🏫', color: '#059669', bg: 'rgba(5, 150, 105, 0.12)', border: 'rgba(5, 150, 105, 0.35)' },
+  { value: 'faculty', label: 'Faculty', icon: '🎓', color: '#0f766e', bg: 'rgba(15, 118, 110, 0.12)', border: 'rgba(15, 118, 110, 0.35)' },
   { value: 'tech-lead', label: 'Tech Lead / Architect', icon: '💻', color: '#9333ea', bg: 'rgba(147, 51, 234, 0.12)', border: 'rgba(147, 51, 234, 0.35)' },
   { value: 'developer', label: 'Software Developer', icon: '⚡', color: '#0284c7', bg: 'rgba(2, 132, 199, 0.12)', border: 'rgba(2, 132, 199, 0.35)' },
   { value: 'senior-developer', label: 'Senior Developer', icon: '🚀', color: '#2563eb', bg: 'rgba(37, 99, 235, 0.12)', border: 'rgba(37, 99, 235, 0.35)' },
@@ -5382,7 +5432,7 @@ const filteredUsersList = computed(() => {
   let list = usersList.value || [];
 
   if (userRoleFilter.value === 'staff') {
-    list = list.filter(u => ['admin', 'superadmin', 'teacher', 'tech-lead', 'developer', 'senior-developer', 'staff', 'accountant'].includes(u.role));
+    list = list.filter(u => ['admin', 'superadmin', 'teacher', 'faculty', 'tech-lead', 'developer', 'senior-developer', 'staff', 'accountant'].includes(u.role));
   } else if (userRoleFilter.value !== 'all') {
     list = list.filter(u => u.role === userRoleFilter.value);
   }
@@ -5404,7 +5454,7 @@ const filteredUsersList = computed(() => {
 
 const userStats = computed(() => {
   const all = usersList.value || [];
-  const staff = all.filter(u => ['admin', 'superadmin', 'teacher', 'tech-lead', 'developer', 'senior-developer', 'staff', 'accountant'].includes(u.role));
+  const staff = all.filter(u => ['admin', 'superadmin', 'teacher', 'faculty', 'tech-lead', 'developer', 'senior-developer', 'staff', 'accountant'].includes(u.role));
   const teachers = all.filter(u => u.role === 'teacher');
   const developers = all.filter(u => ['developer', 'senior-developer', 'tech-lead', 'intern'].includes(u.role));
   const students = all.filter(u => u.role === 'student');
@@ -5853,6 +5903,145 @@ const defaultTabs = [
   { id: 'users', label: '👥 User Accounts', icon: '👥' },
   { id: 'settings', label: '⚙️ System Config', icon: '⚙️' }
 ];
+
+const DEFAULT_ROLE_SECTION_ACCESS = {
+  teacher: { overview: 'view', students: 'edit', 'student-exams': 'edit', admissions: 'view', courses: 'view', nielit: 'edit', internships: 'view', reviews: 'view', certificates: 'view' },
+  faculty: { overview: 'view', students: 'edit', 'student-exams': 'edit', admissions: 'view', courses: 'view', nielit: 'edit', internships: 'view', reviews: 'view', certificates: 'view' },
+  'tech-lead': { overview: 'view', students: 'view', 'student-exams': 'view', courses: 'edit', nielit: 'view', internships: 'edit', careers: 'view', projects: 'edit' },
+  developer: { overview: 'view', courses: 'view', internships: 'view', projects: 'edit' },
+  'senior-developer': { overview: 'view', students: 'view', courses: 'edit', internships: 'edit', careers: 'view', projects: 'edit' },
+  student: {},
+  intern: { overview: 'view', courses: 'view', internships: 'view', projects: 'view' },
+  staff: { overview: 'view', admissions: 'edit', students: 'view', courses: 'view', careers: 'view', contact: 'edit' },
+  accountant: { overview: 'view', admissions: 'view', students: 'view', fees: 'edit', certificates: 'view' }
+};
+
+const createDefaultRolePermissions = () => Object.fromEntries(
+  [...AVAILABLE_STAFF_ROLES, { value: 'superadmin' }].map(({ value: role }) => {
+    const sections = Object.fromEntries(defaultTabs.map(({ id }) => [id, {
+      view: role === 'admin' || role === 'superadmin',
+      edit: role === 'admin' || role === 'superadmin'
+    }]));
+
+    for (const [tabId, accessLevel] of Object.entries(DEFAULT_ROLE_SECTION_ACCESS[role] || {})) {
+      sections[tabId] = { view: true, edit: accessLevel === 'edit' };
+    }
+
+    if (role === 'teacher' || role === 'faculty' || role === 'tech-lead' || role === 'developer' || role === 'senior-developer' || role === 'intern' || role === 'staff' || role === 'accountant') {
+      sections.overview = { view: true, edit: false };
+    }
+
+    return [role, sections];
+  })
+);
+
+const rolePermissions = ref(createDefaultRolePermissions());
+const selectedPermissionRole = ref('teacher');
+const permissionSaveStatus = ref('Loading access rules…');
+const permissionsLoading = ref(true);
+const permissionsSaving = ref(false);
+const currentAdminRole = computed(() => {
+  const role = String(props.adminUser?.roleType || props.adminUser?.role || '').toLowerCase().trim();
+  if (role === 'director & chief administrator' || props.adminUser?.email === 'admin@ithunt.com') return 'superadmin';
+  return role;
+});
+const isSuperAdmin = computed(() => ['admin', 'superadmin'].includes(currentAdminRole.value));
+const isProtectedPermissionRole = computed(() => ['admin', 'superadmin'].includes(selectedPermissionRole.value));
+const selectedRolePermission = (tabId) => rolePermissions.value[selectedPermissionRole.value]?.[tabId] || { view: false, edit: false };
+const canViewTab = (tabId) => isSuperAdmin.value || (!permissionsLoading.value && rolePermissions.value[currentAdminRole.value]?.[tabId]?.view === true);
+const canEditTab = (tabId) => isSuperAdmin.value || (!permissionsLoading.value && rolePermissions.value[currentAdminRole.value]?.[tabId]?.edit === true);
+const visibleTabs = computed(() => defaultTabs.filter(({ id }) => canViewTab(id)));
+
+const updateRolePermission = (tabId, permission, checked) => {
+  if (isProtectedPermissionRole.value) return;
+  const role = selectedPermissionRole.value;
+  const nextRolePermissions = { ...(rolePermissions.value[role] || {}) };
+  const current = nextRolePermissions[tabId] || { view: false, edit: false };
+  const view = permission === 'view' ? checked : (checked || current.view);
+  const edit = permission === 'edit' ? (view && checked) : (view && current.edit);
+  rolePermissions.value = {
+    ...rolePermissions.value,
+    [role]: { ...nextRolePermissions, [tabId]: { view, edit } }
+  };
+  permissionSaveStatus.value = 'Unsaved changes';
+};
+
+const resetSelectedRolePermissions = () => {
+  if (isProtectedPermissionRole.value) return;
+  const defaults = createDefaultRolePermissions();
+  rolePermissions.value = {
+    ...rolePermissions.value,
+    [selectedPermissionRole.value]: defaults[selectedPermissionRole.value]
+  };
+  permissionSaveStatus.value = 'Role defaults restored. Save to apply.';
+};
+
+const loadRolePermissionSettings = async () => {
+  permissionsLoading.value = true;
+  try {
+    const response = await API.getRolePermissions();
+    if (response?.success === false) throw new Error(response.error || 'Permission rules unavailable');
+    const saved = response?.permissions || response?.data?.permissions;
+    if (saved && typeof saved === 'object') {
+      const defaults = createDefaultRolePermissions();
+      for (const [role, sections] of Object.entries(defaults)) {
+        if (role === 'admin' || role === 'superadmin') continue;
+        for (const { id } of defaultTabs) {
+          const access = saved[role]?.[id];
+          if (access) sections[id] = { view: access.view === true, edit: access.view === true && access.edit === true };
+        }
+      }
+      rolePermissions.value = defaults;
+    }
+    permissionSaveStatus.value = saved ? 'Access rules loaded' : 'Default rules shown. Save them to enable staff access.';
+  } catch (error) {
+    permissionSaveStatus.value = 'Could not load saved rules. Defaults are shown.';
+  } finally {
+    permissionsLoading.value = false;
+  }
+};
+
+const saveRolePermissionSettings = async () => {
+  if (isProtectedPermissionRole.value || permissionsSaving.value) return;
+  permissionsSaving.value = true;
+  permissionSaveStatus.value = 'Saving access rules…';
+  try {
+    const response = await API.saveRolePermissions(rolePermissions.value);
+    if (response?.success === false) throw new Error(response.error || 'Permission rules could not be saved');
+    const saved = response?.permissions || response?.data?.permissions;
+    if (!saved) throw new Error('Permission API returned no saved rules');
+    if (saved) rolePermissions.value = { ...rolePermissions.value, ...saved };
+    permissionSaveStatus.value = 'Access rules saved';
+  } catch (error) {
+    permissionSaveStatus.value = 'Save failed. Check your connection and try again.';
+  } finally {
+    permissionsSaving.value = false;
+  }
+};
+
+const guardPermissionAction = (event) => {
+  if (canEditTab(currentTab.value)) return;
+  if (event.target?.closest?.('button[type="submit"], .btn-primary, .btn-danger, .btn-success, .admin-action-btn, .staff-role-changer-select, input[type="checkbox"], [data-edit-action]')) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+};
+
+const guardPermissionChange = (event) => {
+  if (canEditTab(currentTab.value)) return;
+  if (event.target?.closest?.('.staff-role-changer-select, .settings-feature-list input, input[type="checkbox"]')) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+};
+
+const guardPermissionSubmit = (event) => {
+  if (canEditTab(currentTab.value)) return;
+  event.preventDefault();
+  event.stopPropagation();
+};
+
+onMounted(loadRolePermissionSettings);
 
 // Reactive dataset states (initialized from live props if available)
 const admissionsList = ref(props.allAdmissions && props.allAdmissions.length ? [...props.allAdmissions] : []);
@@ -7190,7 +7379,12 @@ const refreshAllData = async () => {
 };
 
 // Automatically on-demand load data when the user switches tabs
-watch(currentTab, (newTab) => {
+watch([currentTab, rolePermissions, permissionsLoading], ([newTab]) => {
+  if (newTab === 'restricted') return;
+  if (!canViewTab(newTab)) {
+    currentTab.value = visibleTabs.value[0]?.id || 'restricted';
+    return;
+  }
   loadTabData(newTab);
 }, { immediate: true });
 
@@ -10866,4 +11060,166 @@ label {
     padding: 0.75rem 1rem !important;
   }
 }
+.permission-config-panel {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--border-cyber);
+  border-radius: 8px;
+  background: var(--panel-bg, rgba(15, 23, 42, 0.42));
+}
+
+.permission-config-toolbar,
+.permission-config-footer {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.15rem;
+}
+
+.permission-config-toolbar {
+  align-items: center;
+  border-bottom: 1px solid var(--border-cyber);
+}
+
+.permission-role-select {
+  display: grid;
+  width: min(100%, 360px);
+  gap: 0.4rem;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.permission-role-note {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.permission-role-note.locked {
+  color: var(--color-ai-yellow);
+}
+
+.permission-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.permission-table {
+  width: 100%;
+  min-width: 480px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.permission-table th,
+.permission-table td {
+  padding: 0.72rem 1.15rem;
+  border-bottom: 1px solid var(--border-cyber);
+}
+
+.permission-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--panel-bg, #111827);
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+}
+
+.permission-table tbody th {
+  min-width: 260px;
+  color: var(--text-main);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.permission-table td {
+  width: 88px;
+  text-align: center;
+}
+
+.permission-table input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-ai-orange);
+  cursor: pointer;
+}
+
+.permission-table input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+}
+
+.permission-section-icon {
+  display: inline-block;
+  width: 2rem;
+  margin-right: 0.45rem;
+}
+
+.permission-config-footer {
+  align-items: center;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border-cyber);
+}
+
+.permission-save-status {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.permission-config-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.access-empty-state {
+  display: grid;
+  min-height: 280px;
+  align-content: center;
+  justify-items: center;
+  gap: 0.5rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.access-empty-state p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.permission-readonly button[type="submit"],
+.permission-readonly .btn-primary,
+.permission-readonly .btn-danger,
+.permission-readonly .btn-success,
+.permission-readonly .admin-action-btn {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@media (max-width: 640px) {
+  .permission-config-toolbar,
+  .permission-config-footer {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 0.85rem;
+  }
+
+  .permission-role-select {
+    width: 100%;
+  }
+
+  .permission-config-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .permission-config-actions button {
+    min-height: 42px;
+  }
+}
+
 </style>

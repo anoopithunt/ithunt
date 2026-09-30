@@ -445,6 +445,11 @@ export const API = {
   updateUser: (id, data) => apiRequest(`/auth/users/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteUser: (id) => apiRequest(`/auth/users/${id}`, { method: 'DELETE' }),
   getDashboardStats: () => apiRequest('/admin/stats'),
+  getRolePermissions: () => apiRequest('/admin/role-permissions'),
+  saveRolePermissions: (permissions) => apiRequest('/admin/role-permissions', {
+    method: 'PUT',
+    body: JSON.stringify({ permissions })
+  }),
   syncDatabase: () => apiRequest('/admin/stats')
 };
 

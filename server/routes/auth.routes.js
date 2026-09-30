@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { dbAdapter } from '../services/dbAdapter.js';
-import { generateToken, verifyToken, requireAdmin, optionalAuth } from '../middleware/auth.js';
+import { generateToken, verifyToken, requireAdmin } from '../middleware/auth.js';
 import bcrypt from 'bcryptjs';
 
 const router = Router();
@@ -89,9 +89,9 @@ router.post('/login', async (req, res) => {
 
     // 4. Check Database Users, Students, and Admissions
     const allUsers = await dbAdapter.find('users');
-    let user = allUsers.find(u => 
+    let user = allUsers.find(u =>
       (u.userId && u.userId.toLowerCase() === normEmail) ||
-      (u.email && u.email.toLowerCase() === normEmail) || 
+      (u.email && u.email.toLowerCase() === normEmail) ||
       (u.registrationNo && u.registrationNo.toLowerCase() === normEmail) ||
       (u.enrollmentNumber && u.enrollmentNumber.toLowerCase() === normEmail) ||
       (u.id && u.id.toLowerCase() === normEmail)
@@ -99,9 +99,9 @@ router.post('/login', async (req, res) => {
 
     if (!user) {
       const allStudents = await dbAdapter.find('students');
-      const stu = allStudents.find(s => 
+      const stu = allStudents.find(s =>
         (s.userId && s.userId.toLowerCase() === normEmail) ||
-        (s.email && s.email.toLowerCase() === normEmail) || 
+        (s.email && s.email.toLowerCase() === normEmail) ||
         (s.registrationNo && s.registrationNo.toLowerCase() === normEmail) ||
         (s.enrollmentNumber && s.enrollmentNumber.toLowerCase() === normEmail) ||
         (s.id && s.id.toLowerCase() === normEmail)
@@ -125,9 +125,9 @@ router.post('/login', async (req, res) => {
 
     if (!user) {
       const allAdmissions = await dbAdapter.find('admissions');
-      const adm = allAdmissions.find(a => 
+      const adm = allAdmissions.find(a =>
         (a.userId && a.userId.toLowerCase() === normEmail) ||
-        (a.email && a.email.toLowerCase() === normEmail) || 
+        (a.email && a.email.toLowerCase() === normEmail) ||
         (a.registrationNo && a.registrationNo.toLowerCase() === normEmail) ||
         (a.enrollmentNumber && a.enrollmentNumber.toLowerCase() === normEmail) ||
         (a.id && a.id.toLowerCase() === normEmail)
@@ -203,7 +203,7 @@ router.post('/login', async (req, res) => {
 /**
  * GET /api/auth/users and /api/users
  */
-router.get(['/users', '/'], async (req, res) => {
+router.get(['/users', '/'], verifyToken, async (req, res) => {
   try {
     const users = await dbAdapter.find('users');
     const sanitized = users.map(u => ({
@@ -226,7 +226,7 @@ router.get(['/users', '/'], async (req, res) => {
  * POST /api/auth/users and /api/users
  * Create a new staff or user account
  */
-router.post(['/users', '/'], optionalAuth, async (req, res) => {
+router.post(['/users', '/'], verifyToken, requireAdmin, async (req, res) => {
   try {
     const { name, email, password, role, phone, designation, verified } = req.body || {};
     if (!email) {
@@ -263,7 +263,7 @@ router.post(['/users', '/'], optionalAuth, async (req, res) => {
  * PUT /api/auth/users/:id and /api/users/:id
  * Update user account details or change role (SuperAdmin, Teacher, Tech Lead, Developer, Student, etc.)
  */
-router.put(['/users/:id', '/:id'], optionalAuth, async (req, res) => {
+router.put(['/users/:id', '/:id'], verifyToken, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { role, name, email, phone, status, verified, designation, password } = req.body || {};
@@ -283,10 +283,10 @@ router.put(['/users/:id', '/:id'], optionalAuth, async (req, res) => {
     const targetKey = user ? (user.id || user._id) : id;
 
     const updated = await dbAdapter.update('users', targetKey, updateData);
-    res.json({ 
-      success: true, 
-      message: `User ${id} updated successfully.`, 
-      data: updated || { id: targetKey, ...updateData } 
+    res.json({
+      success: true,
+      message: `User ${id} updated successfully.`,
+      data: updated || { id: targetKey, ...updateData }
     });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -296,7 +296,7 @@ router.put(['/users/:id', '/:id'], optionalAuth, async (req, res) => {
 /**
  * DELETE /api/auth/users/:id and /api/users/:id
  */
-router.delete(['/users/:id', '/:id'], optionalAuth, async (req, res) => {
+router.delete(['/users/:id', '/:id'], verifyToken, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     await dbAdapter.delete('users', id);
