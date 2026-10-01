@@ -66,7 +66,7 @@ export function createNielitProjectPdfDoc(data) {
     const state = data.state || 'Uttar Pradesh';
     const pin = data.pin || '230129';
     const mobile = data.mobile || '9795771806';
-    const email = (data.email || 'anupcodemaya@gmail.com').toUpperCase();
+    const email = (data.email || 'info@ithunt.in').toUpperCase();
 
     const paymentDate = formatNielitDate(data.paymentDate || '25-Mar-2026');
     const utrNumber = data.utrNumber || 'CHD550W1FMSF1B';

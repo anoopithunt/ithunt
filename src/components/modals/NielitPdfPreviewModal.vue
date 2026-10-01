@@ -241,7 +241,7 @@ const renderPage2 = () => {
   const state = d.state || 'Uttar Pradesh';
   const pin = d.pin || '230129';
   const mobile = d.mobile || '9795771806';
-  const email = (d.email || 'anupcodemaya@gmail.com').toUpperCase();
+  const email = (d.email || 'info@ithunt.in').toUpperCase();
 
   ctx.fillStyle = '#000000';
 
