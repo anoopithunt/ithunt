@@ -86,7 +86,7 @@
       </div>
       <!-- ProductFame Featured Badge -->
       <a href="https://productfame.com/products/it-hunt" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; margin-top: 1rem;">
-        <img src="https://productfame.com/badges/featured-light.svg" alt="Featured on ProductFame" width="245" height="54" />
+        <img src="https://productfame.com/badges/featured-light.svg" alt="Featured on ProductFame" width="222" height="24" />
       </a>
     </div>
   </footer>
