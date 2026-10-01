@@ -836,24 +836,6 @@
         </div>
       </div>
     </section>
-
-    <!-- =====================================================================
-         12. SECTION 11: POWERED BY CODEMAYA (AIPost Section 12 Style)
-         ===================================================================== -->
-    <section class="aipost-codemaya-section">
-      <div class="container">
-        <div class="codemaya-banner text-center">
-          <p class="codemaya-tagline">Proudly powered by innovative engineering by</p>
-          <a href="https://www.codemaya.com" target="_blank" rel="noopener noreferrer" class="codemaya-logo-link">
-            <span class="codemaya-brand-text">Code<span class="text-brand">Maya</span></span>
-          </a>
-          <p class="codemaya-subtext">
-            Discover cutting-edge software solutions and digital transformation services at 
-            <a href="https://www.codemaya.com" target="_blank" rel="noopener noreferrer" class="text-brand font-bold">www.codemaya.com</a>
-          </p>
-        </div>
-      </div>
-    </section>
   </div>
 </template>
 
@@ -3117,40 +3099,7 @@ onUnmounted(() => {
   flex-wrap: wrap;
 }
 
-/* ==========================================================================
-   12. POWERED BY CODEMAYA (AIPost Section 12)
-   ========================================================================== */
 
-.aipost-codemaya-section {
-  padding: 3rem 1rem 4rem;
-  background: var(--bg-cyber-dark, #070a12);
-  border-top: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
-}
-
-.codemaya-banner {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.codemaya-tagline {
-  font-size: 0.88rem;
-  color: var(--text-dim, #64748b);
-  margin-bottom: 0.5rem;
-}
-
-.codemaya-brand-text {
-  font-family: var(--font-heading, 'Outfit', sans-serif);
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: var(--text-main, #ffffff);
-  letter-spacing: -0.02em;
-}
-
-.codemaya-subtext {
-  font-size: 0.8rem;
-  color: var(--text-dim, #64748b);
-  margin-top: 0.5rem;
-}
 
 /* ==========================================================================
    LIGHT THEME SUPPORT (High-Contrast, Crisp, Clean & Polished)
@@ -3178,7 +3127,7 @@ onUnmounted(() => {
 :global(body.light-theme) .faq-question-text,
 :global(body.light-theme) .stat-label-title,
 :global(body.light-theme) .metrics-panel-header h4,
-:global(body.light-theme) .codemaya-brand-text,
+
 :global(body.light-theme) .highlight-title,
 :global(body.light-theme) .feature-card-title,
 :global(body.light-theme) .aipost-brush-wrap {
@@ -3269,9 +3218,7 @@ onUnmounted(() => {
 :global(body.light-theme) .quick-tag-label,
 :global(body.light-theme) .guarantee-item,
 :global(body.light-theme) .founder-role,
-:global(body.light-theme) .acc-cost-line,
-:global(body.light-theme) .codemaya-tagline,
-:global(body.light-theme) .codemaya-subtext {
+:global(body.light-theme) .acc-cost-line {
   color: #64748b !important;
 }
 
@@ -3600,11 +3547,7 @@ onUnmounted(() => {
   color: #ffffff !important;
 }
 
-/* Section 11: CodeMaya */
-:global(body.light-theme) .aipost-codemaya-section {
-  background: #f8fafc !important;
-  border-top-color: #e2e8f0 !important;
-}
+
 
 /* Light Theme Enhancements for Complete Contrast & Polish */
 :global(body.light-theme) .check,
@@ -4480,22 +4423,7 @@ onUnmounted(() => {
     display: none;
   }
 
-  /* Section 11: CodeMaya */
-  .aipost-codemaya-section {
-    padding: 2rem 0.85rem 3rem;
-  }
 
-  .codemaya-tagline {
-    font-size: 0.82rem;
-  }
-
-  .codemaya-brand-text {
-    font-size: 1.45rem;
-  }
-
-  .codemaya-subtext {
-    font-size: 0.78rem;
-  }
 }
 
 /* Ultra-Compact Mobile (< 400px, e.g. iPhone SE, Fold) */
