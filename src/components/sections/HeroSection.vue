@@ -434,9 +434,9 @@
 
 
     <!-- =====================================================================
-         6. SECTION 5: "From Zero to Hired" 4-Stage Pipeline (AIPost Section 6 "How It Works" Style)
+         6. SECTION 5: "From Zero to Hired" — Interactive Accordion
          ===================================================================== -->
-    <section class="aipost-section aipost-section-base">
+    <section class="aipost-section aipost-section-base hiw-section">
       <div class="container">
         <div class="section-title-wrap text-center">
           <div class="aipost-pill-badge small">
@@ -444,35 +444,74 @@
             <span>HOW IT WORKS</span>
           </div>
           <h2 class="aipost-section-heading">
-            From Day One to Placement Autopilot
+            From Day One to <span class="text-brand">Placement Autopilot</span>
           </h2>
           <p class="aipost-section-desc">
-            Let our structured production system guide you through every milestone from zero experience to deploying live apps and cracking senior tech rounds.
+            Our structured 4-stage production system guides you from zero to deployed apps and senior tech placements.
           </p>
         </div>
 
-        <div class="pipeline-wrapper">
-          <div class="pipeline-step-item" v-for="(step, sIdx) in workflowSteps" :key="step.number">
-            <div class="pipeline-step-number-wrap">
-              <span class="pipeline-step-number">{{ step.number }}</span>
-              <div class="pipeline-line" v-if="sIdx < workflowSteps.length - 1"></div>
-            </div>
-            <div class="pipeline-step-card">
-              <div class="step-card-header">
-                <div class="step-icon-box">{{ step.icon }}</div>
-                <div>
-                  <span class="step-phase-badge">{{ step.phase }}</span>
-                  <h3 class="step-title">{{ step.title }}</h3>
+        <div class="hiw-accordion-wrap">
+          <div
+            v-for="(step, sIdx) in workflowSteps"
+            :key="step.number"
+            class="hiw-acc-item"
+            :class="{ 'hiw-acc-open': openStepIdx === sIdx }"
+          >
+            <!-- Trigger Row -->
+            <button
+              class="hiw-acc-trigger"
+              @click="openStepIdx = openStepIdx === sIdx ? -1 : sIdx"
+              :aria-expanded="openStepIdx === sIdx"
+            >
+              <!-- Step number pill -->
+              <span class="hiw-step-num">{{ step.number }}</span>
+
+              <!-- Icon + labels -->
+              <span class="hiw-step-icon">{{ step.icon }}</span>
+              <span class="hiw-trigger-labels">
+                <span class="hiw-phase">{{ step.phase }}</span>
+                <span class="hiw-title">{{ step.title }}</span>
+              </span>
+
+              <!-- Progress tag (visible when collapsed) -->
+              <span class="hiw-progress-tag" v-show="openStepIdx !== sIdx">
+                {{ step.points.length }} milestones
+              </span>
+
+              <!-- Chevron -->
+              <span class="hiw-chevron" :class="{ rotated: openStepIdx === sIdx }">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </span>
+            </button>
+
+            <!-- Expand Body -->
+            <Transition name="hiw-expand">
+              <div v-show="openStepIdx === sIdx" class="hiw-acc-body">
+                <div class="hiw-acc-body-inner">
+                  <p class="hiw-desc">{{ step.desc }}</p>
+                  <div class="hiw-points-grid">
+                    <div class="hiw-point" v-for="pt in step.points" :key="pt">
+                      <span class="hiw-point-check">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                      <span>{{ pt }}</span>
+                    </div>
+                  </div>
+                  <!-- CTA inside step -->
+                  <button
+                    v-if="sIdx === workflowSteps.length - 1"
+                    class="hiw-inline-cta"
+                    @click="$emit('set-tab', 'admission')"
+                  >
+                    Apply for 2026 Batch ➜
+                  </button>
                 </div>
               </div>
-              <p class="step-desc">{{ step.desc }}</p>
-              <div class="step-subpoints">
-                <div class="step-subpoint-item" v-for="pt in step.points" :key="pt">
-                  <span class="point-check">✓</span>
-                  <span>{{ pt }}</span>
-                </div>
-              </div>
-            </div>
+            </Transition>
+
+            <!-- Connector line to next item -->
+            <div class="hiw-connector" v-if="sIdx < workflowSteps.length - 1"></div>
           </div>
         </div>
       </div>
@@ -1011,6 +1050,9 @@ const workflowSteps = [
     points: ['Online QR verifiable certificate', 'Mock DSA & tech interview rounds', 'Direct placement referrals']
   }
 ];
+
+// How It Works accordion — step 0 open by default
+const openStepIdx = ref(0);
 
 // Section 9 FAQ Accordion
 const faqsList = [
@@ -2339,121 +2381,288 @@ onUnmounted(() => {
 
 
 /* ==========================================================================
-   6. 4-STAGE PIPELINE (AIPost Section 6 "How It Works")
+   6. HOW IT WORKS — INTERACTIVE ACCORDION
    ========================================================================== */
 
-.pipeline-wrapper {
-  max-width: 900px;
+.hiw-section { --hiw-accent: var(--color-ai-orange, #f97316); }
+
+.hiw-accordion-wrap {
+  max-width: 820px;
   margin: 0 auto;
-}
-
-.pipeline-step-item {
-  display: flex;
-  gap: 1.5rem;
-  position: relative;
-  margin-bottom: 2rem;
-}
-
-.pipeline-step-number-wrap {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  width: 44px;
-  flex-shrink: 0;
+  gap: 0;
 }
 
-.pipeline-step-number {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--gradient-ai-btn, linear-gradient(135deg, #ea580c 0%, #f97316 100%));
-  color: #ffffff;
-  font-family: var(--font-heading, 'Outfit', sans-serif);
-  font-weight: 800;
-  font-size: 1.15rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 15px var(--glow-orange, rgba(249, 115, 22, 0.35));
-  z-index: 2;
+/* Each accordion item */
+.hiw-acc-item {
+  position: relative;
 }
 
-.pipeline-line {
-  flex: 1;
+/* Connector line between items */
+.hiw-connector {
   width: 2px;
-  background: rgba(255, 255, 255, 0.1);
-  margin: 0.5rem 0;
+  height: 20px;
+  background: linear-gradient(to bottom, rgba(249,115,22,0.45), rgba(249,115,22,0.1));
+  margin-left: 27px;
 }
 
-.pipeline-step-card {
-  background: var(--bg-card-glass, rgba(15, 23, 42, 0.75));
-  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
-  border-radius: 16px;
-  padding: 1.75rem;
-  flex: 1;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-.step-card-header {
+/* Trigger row (the clickable header) */
+.hiw-acc-trigger {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 0.75rem;
+  width: 100%;
+  text-align: left;
+  background: var(--bg-card-glass, rgba(15,23,42,0.7));
+  border: 1px solid var(--border-cyber, rgba(255,255,255,0.08));
+  border-radius: 16px;
+  padding: 1.1rem 1.4rem;
+  cursor: pointer;
+  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+  z-index: 1;
 }
 
-.step-icon-box {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  background: rgba(249, 115, 22, 0.12);
-  color: var(--color-ai-orange, #f97316);
+.hiw-acc-trigger:hover {
+  border-color: rgba(249,115,22,0.35);
+  background: var(--bg-card-hover, rgba(22,33,58,0.85));
+}
+
+.hiw-acc-open .hiw-acc-trigger {
+  border-color: rgba(249,115,22,0.55);
+  background: linear-gradient(135deg, rgba(249,115,22,0.08) 0%, rgba(251,191,36,0.04) 100%);
+  box-shadow: 0 0 0 1px rgba(249,115,22,0.25), 0 8px 28px rgba(0,0,0,0.25);
+  border-radius: 16px 16px 0 0;
+  border-bottom-color: transparent;
+}
+
+/* Step number pill */
+.hiw-step-num {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--gradient-ai-btn, linear-gradient(135deg,#ea580c,#f97316));
+  color: #fff;
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-weight: 900;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  box-shadow: 0 3px 12px rgba(249,115,22,0.4);
+  transition: transform 0.3s var(--transition-spring, cubic-bezier(0.34,1.56,0.64,1));
 }
 
-.step-phase-badge {
-  font-size: 0.7rem;
+.hiw-acc-open .hiw-step-num {
+  transform: scale(1.12);
+}
+
+/* Emoji icon */
+.hiw-step-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+/* Labels block */
+.hiw-trigger-labels {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.hiw-phase {
+  font-size: 0.68rem;
   font-weight: 800;
-  color: var(--color-ai-orange, #f97316);
-  letter-spacing: 0.05em;
   text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-ai-orange, #f97316);
 }
 
-.step-title {
+.hiw-title {
   font-family: var(--font-heading, 'Outfit', sans-serif);
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: var(--text-main, #ffffff);
-  margin: 0;
+  color: var(--text-main, #f8fafc);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.step-desc {
+/* Milestone count tag */
+.hiw-progress-tag {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.22rem 0.65rem;
+  border-radius: 99px;
+  background: rgba(249,115,22,0.1);
+  color: var(--color-ai-orange, #f97316);
+  border: 1px solid rgba(249,115,22,0.25);
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+/* Chevron */
+.hiw-chevron {
+  flex-shrink: 0;
+  color: var(--text-muted, #94a3b8);
+  transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), color 0.2s;
+  display: flex;
+}
+
+.hiw-chevron.rotated {
+  transform: rotate(180deg);
+  color: var(--color-ai-orange, #f97316);
+}
+
+/* Expand body */
+.hiw-acc-body {
+  background: linear-gradient(135deg, rgba(249,115,22,0.05) 0%, rgba(15,23,42,0.75) 100%);
+  border: 1px solid rgba(249,115,22,0.35);
+  border-top: none;
+  border-radius: 0 0 16px 16px;
+  overflow: hidden;
+}
+
+.hiw-acc-body-inner {
+  padding: 1.35rem 1.6rem 1.5rem;
+}
+
+.hiw-desc {
   font-size: 0.92rem;
   color: var(--text-muted, #94a3b8);
-  line-height: 1.6;
-  margin-bottom: 1rem;
+  line-height: 1.65;
+  margin-bottom: 1.1rem;
 }
 
-.step-subpoints {
+.hiw-points-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 0.5rem;
+  gap: 0.55rem;
+  margin-bottom: 1.25rem;
 }
 
-.step-subpoint-item {
+.hiw-point {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.82rem;
-  color: #cbd5e1;
+  gap: 0.5rem;
+  font-size: 0.84rem;
   font-weight: 600;
+  color: var(--text-main, #e2e8f0);
 }
 
-.point-check {
-  color: #10B981;
+.hiw-point-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(16,185,129,0.15);
+  border: 1.5px solid rgba(16,185,129,0.4);
+  color: #10b981;
+}
+
+/* Inline CTA for last step */
+.hiw-inline-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--gradient-ai-btn, linear-gradient(135deg,#ea580c,#f97316,#fbbf24));
+  border: none;
+  border-radius: 99px;
+  padding: 0.6rem 1.5rem;
+  font-family: var(--font-heading, 'Outfit', sans-serif);
   font-weight: 800;
+  font-size: 0.9rem;
+  color: #fff;
+  cursor: pointer;
+  transition: var(--transition-spring, all 0.4s cubic-bezier(0.34,1.56,0.64,1));
+  box-shadow: 0 4px 16px rgba(249,115,22,0.35);
+}
+
+.hiw-inline-cta:hover {
+  transform: translateY(-2px) scale(1.04);
+  filter: brightness(1.1);
+}
+
+/* Expand/collapse transition */
+.hiw-expand-enter-active,
+.hiw-expand-leave-active {
+  transition: max-height 0.38s cubic-bezier(0.16,1,0.3,1), opacity 0.28s ease;
+  max-height: 400px;
+  overflow: hidden;
+}
+
+.hiw-expand-enter-from,
+.hiw-expand-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+
+/* ── Light Theme ─── */
+body.light-theme .hiw-acc-trigger {
+  background: #ffffff;
+  border-color: rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+body.light-theme .hiw-acc-trigger:hover {
+  border-color: rgba(249,115,22,0.3);
+  background: #fff7ed;
+}
+
+body.light-theme .hiw-acc-open .hiw-acc-trigger {
+  background: linear-gradient(135deg, rgba(249,115,22,0.06), #ffffff);
+  border-color: rgba(249,115,22,0.4);
+  box-shadow: 0 0 0 1px rgba(249,115,22,0.2), 0 6px 20px rgba(0,0,0,0.06);
+}
+
+body.light-theme .hiw-title {
+  color: #0f172a;
+}
+
+body.light-theme .hiw-acc-body {
+  background: linear-gradient(135deg, rgba(249,115,22,0.04), #ffffff);
+  border-color: rgba(249,115,22,0.25);
+}
+
+body.light-theme .hiw-desc {
+  color: #475569;
+}
+
+body.light-theme .hiw-point {
+  color: #0f172a;
+}
+
+body.light-theme .hiw-progress-tag {
+  background: rgba(249,115,22,0.07);
+  border-color: rgba(249,115,22,0.2);
+  color: #c2410c;
+}
+
+body.light-theme .hiw-connector {
+  background: linear-gradient(to bottom, rgba(249,115,22,0.35), rgba(249,115,22,0.08));
+}
+
+body.light-theme .hiw-chevron {
+  color: #64748b;
+}
+
+/* ── Responsive ─── */
+@media (max-width: 640px) {
+  .hiw-acc-trigger { gap: 0.65rem; padding: 0.9rem 1rem; }
+  .hiw-title { font-size: 0.92rem; }
+  .hiw-step-icon { font-size: 1.25rem; }
+  .hiw-progress-tag { display: none; }
+  .hiw-points-grid { grid-template-columns: 1fr; }
+  .hiw-acc-body-inner { padding: 1rem 1rem 1.25rem; }
 }
 
 /* ==========================================================================
