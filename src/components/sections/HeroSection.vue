@@ -3,7 +3,7 @@
     <!-- =====================================================================
          1. HERO SECTION (IT Hunt Signature Style with Native Brand Palette)
          ===================================================================== -->
-    <section class="ithunt-hero">
+    <section class="ithunt-hero ithunt-section-odd">
       <div class="ithunt-hero-glow ithunt-hero-glow-1"></div>
       <div class="ithunt-hero-glow ithunt-hero-glow-2"></div>
 
@@ -187,7 +187,7 @@
     <!-- =====================================================================
          3. SECTION 2: "We build real software before we teach a class" (IT Hunt Section 2 Style)
          ===================================================================== -->
-    <section class="ithunt-section ithunt-section-alt">
+    <section class="ithunt-section ithunt-section-even ithunt-section-alt">
       <div class="container">
         <div class="section-title-wrap text-center">
           <div class="ithunt-pill-badge small">
@@ -265,7 +265,7 @@
     <!-- =====================================================================
          4. SECTION 3: "Three Core Tracks. One Integrated Studio." (IT Hunt Section 3 Style)
          ===================================================================== -->
-    <section class="ithunt-section ithunt-section-base">
+    <section class="ithunt-section ithunt-section-odd ithunt-section-base">
       <div class="container">
         <div class="section-title-wrap text-center">
           <div class="ithunt-pill-badge small">
@@ -360,7 +360,7 @@
     <!-- =====================================================================
          5. SECTION 4: "See in Action" Live Projects Showcase (IT Hunt Section 4 Style)
          ===================================================================== -->
-    <section class="ithunt-section ithunt-section-alt" id="examples">
+    <section class="ithunt-section ithunt-section-even ithunt-section-alt" id="examples">
       <div class="container">
         <div class="section-title-wrap text-center">
           <div class="ithunt-pill-badge small">
@@ -436,7 +436,7 @@
     <!-- =====================================================================
          6. SECTION 5: "From Zero to Hired" — Interactive Accordion
          ===================================================================== -->
-    <section class="ithunt-section ithunt-section-base hiw-section">
+    <section class="ithunt-section ithunt-section-odd ithunt-section-base hiw-section">
       <div class="container">
         <div class="section-title-wrap text-center">
           <div class="ithunt-pill-badge small">
@@ -520,7 +520,7 @@
     <!-- =====================================================================
          7. SECTION 6: "Why Choose IT HUNT?" Bento Grid (IT Hunt Section 7 Benefits Style)
          ===================================================================== -->
-    <section class="ithunt-section ithunt-section-alt">
+    <section class="ithunt-section ithunt-section-even ithunt-section-alt">
       <div class="container">
         <div class="section-title-wrap text-center">
           <div class="ithunt-pill-badge small">
@@ -604,7 +604,7 @@
     <!-- =====================================================================
          9. SECTION 8: EXECUTIVE LEADERSHIP & FOUNDERS (Clean Studio Style)
          ===================================================================== -->
-    <section class="ithunt-section ithunt-section-alt">
+    <section class="ithunt-section ithunt-section-odd ithunt-section-base">
       <div class="container">
         <div class="section-title-wrap text-center">
           <div class="ithunt-pill-badge small">
@@ -658,7 +658,7 @@
     <!-- =====================================================================
          10. SECTION 9: FREQUENTLY ASKED QUESTIONS (IT Hunt Section 10 Accordion)
          ===================================================================== -->
-    <section class="ithunt-section ithunt-section-base">
+    <section class="ithunt-section ithunt-section-even ithunt-section-alt">
       <div class="container">
         <div class="section-title-wrap text-center">
           <div class="ithunt-pill-badge small">
@@ -695,7 +695,7 @@
     <!-- =====================================================================
          11. SECTION 10: FINAL CONVERSION BANNER (IT Hunt Section 11 Style)
          ===================================================================== -->
-    <section class="ithunt-cta-section">
+    <section class="ithunt-cta-section ithunt-section-odd">
       <div class="container">
         <div class="ithunt-cta-banner">
           <div class="cta-glow-element"></div>
@@ -1977,14 +1977,506 @@ onUnmounted(() => {
   position: relative;
 }
 
-.ithunt-section-base {
-  background: var(--bg-cyber-dark, #070a12);
-  color: var(--text-main, #f8fafc);
+/* ─── EVEN SECTIONS: LIGHT MODE (Whitish, Crisp, High-Contrast, Eye-Pleasing) ─── */
+.ithunt-section-even,
+.ithunt-section-alt {
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
+  color: #0f172a !important;
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(255, 255, 255, 0.8);
 }
 
-.ithunt-section-alt {
-  background: rgba(15, 23, 42, 0.4);
-  color: var(--text-main, #f8fafc);
+.ithunt-section-even .ithunt-section-heading,
+.ithunt-section-alt .ithunt-section-heading {
+  color: #0f172a !important;
+}
+
+.ithunt-section-even .ithunt-section-desc,
+.ithunt-section-alt .ithunt-section-desc {
+  color: #475569 !important;
+}
+
+.ithunt-section-even .ithunt-pill-badge,
+.ithunt-section-alt .ithunt-pill-badge {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #ea580c !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+.ithunt-section-even .ithunt-badge-dot,
+.ithunt-section-alt .ithunt-badge-dot {
+  background-color: #ea580c !important;
+  box-shadow: 0 0 8px rgba(234, 88, 12, 0.4) !important;
+}
+
+/* Even Section 2: Homework Cards in Light Mode */
+.ithunt-section-even .homework-card,
+.ithunt-section-alt .homework-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ithunt-section-even .homework-card:hover,
+.ithunt-section-alt .homework-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(249, 115, 22, 0.5) !important;
+  box-shadow: 0 20px 35px -5px rgba(234, 88, 12, 0.12), 0 8px 16px -2px rgba(0, 0, 0, 0.04) !important;
+}
+
+.ithunt-section-even .card-icon-wrap,
+.ithunt-section-alt .card-icon-wrap {
+  background: rgba(249, 115, 22, 0.1) !important;
+  color: #ea580c !important;
+}
+
+.ithunt-section-even .homework-card-title,
+.ithunt-section-alt .homework-card-title {
+  color: #0f172a !important;
+  font-weight: 700;
+}
+
+.ithunt-section-even .homework-card-desc,
+.ithunt-section-alt .homework-card-desc {
+  color: #475569 !important;
+}
+
+.ithunt-section-even .pill-chip,
+.ithunt-section-alt .pill-chip {
+  background: #fff7ed !important;
+  color: #c2410c !important;
+  border: 1px solid #fed7aa !important;
+  font-weight: 700;
+}
+
+/* Even Section 4: See IT HUNT in Action in Light Mode */
+.ithunt-section-even .ithunt-cat-tabs-pill,
+.ithunt-section-alt .ithunt-cat-tabs-pill {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+}
+
+.ithunt-section-even .ithunt-cat-tab-btn,
+.ithunt-section-alt .ithunt-cat-tab-btn {
+  color: #64748b !important;
+}
+
+.ithunt-section-even .ithunt-cat-tab-btn:hover,
+.ithunt-section-alt .ithunt-cat-tab-btn:hover {
+  color: #0f172a !important;
+  background: #f8fafc !important;
+}
+
+.ithunt-section-even .ithunt-cat-tab-btn.active,
+.ithunt-section-alt .ithunt-cat-tab-btn.active {
+  background: var(--gradient-ai-btn, linear-gradient(135deg, #ea580c, #f97316)) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 15px rgba(234, 88, 12, 0.35) !important;
+}
+
+.ithunt-section-even .example-card,
+.ithunt-section-alt .example-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ithunt-section-even .example-card:hover,
+.ithunt-section-alt .example-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(249, 115, 22, 0.5) !important;
+  box-shadow: 0 20px 35px -5px rgba(234, 88, 12, 0.12), 0 8px 16px -2px rgba(0, 0, 0, 0.04) !important;
+}
+
+.ithunt-section-even .example-card-header,
+.ithunt-section-alt .example-card-header {
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.ithunt-section-even .example-client-name,
+.ithunt-section-alt .example-client-name {
+  color: #0f172a !important;
+  font-weight: 700;
+}
+
+.ithunt-section-even .example-meta-text,
+.ithunt-section-alt .example-meta-text {
+  color: #64748b !important;
+}
+
+.ithunt-section-even .example-platform-pill,
+.ithunt-section-alt .example-platform-pill {
+  background: #fff7ed !important;
+  color: #ea580c !important;
+  border: 1px solid #fed7aa !important;
+  font-weight: 700;
+}
+
+.ithunt-section-even .example-desc-text,
+.ithunt-section-alt .example-desc-text {
+  color: #334155 !important;
+}
+
+.ithunt-section-even .feature-bullet,
+.ithunt-section-alt .feature-bullet {
+  color: #475569 !important;
+}
+
+.ithunt-section-even .bullet-dot,
+.ithunt-section-alt .bullet-dot {
+  background: #ea580c !important;
+}
+
+.ithunt-section-even .example-card-footer,
+.ithunt-section-alt .example-card-footer {
+  border-top: 1px solid #f1f5f9 !important;
+}
+
+.ithunt-section-even .example-engagement-stats,
+.ithunt-section-alt .example-engagement-stats {
+  color: #64748b !important;
+}
+
+.ithunt-section-even .example-view-btn,
+.ithunt-section-alt .example-view-btn {
+  background: #fff7ed !important;
+  border: 1px solid #fed7aa !important;
+  color: #c2410c !important;
+  font-weight: 700 !important;
+}
+
+.ithunt-section-even .example-view-btn:hover,
+.ithunt-section-alt .example-view-btn:hover {
+  background: #ea580c !important;
+  color: #ffffff !important;
+  border-color: #ea580c !important;
+}
+
+/* Even Section 6: Bento Grid in Light Mode */
+.ithunt-section-even .bento-card,
+.ithunt-section-alt .bento-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ithunt-section-even .bento-card:hover,
+.ithunt-section-alt .bento-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(249, 115, 22, 0.5) !important;
+  box-shadow: 0 20px 35px -5px rgba(234, 88, 12, 0.12), 0 8px 16px -2px rgba(0, 0, 0, 0.04) !important;
+}
+
+.ithunt-section-even .bento-card-title,
+.ithunt-section-alt .bento-card-title {
+  color: #0f172a !important;
+  font-weight: 700;
+}
+
+.ithunt-section-even .bento-card-desc,
+.ithunt-section-alt .bento-card-desc {
+  color: #475569 !important;
+}
+
+.ithunt-section-even .bento-highlight-pill,
+.ithunt-section-alt .bento-highlight-pill {
+  display: inline-block;
+  padding: 0.35rem 0.8rem;
+  border-radius: 99px;
+  width: fit-content;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.ithunt-section-even .bento-highlight-pill.text-brand,
+.ithunt-section-alt .bento-highlight-pill.text-brand {
+  background: #fff7ed !important;
+  color: #ea580c !important;
+  border: 1px solid #ffedd5 !important;
+}
+
+.ithunt-section-even .bento-highlight-pill.text-green,
+.ithunt-section-alt .bento-highlight-pill.text-green {
+  background: #f0fdf4 !important;
+  color: #16a34a !important;
+  border: 1px solid #dcfce7 !important;
+}
+
+/* Even Section 8: FAQ Accordion in Light Mode */
+.ithunt-section-even .faq-accordion-item,
+.ithunt-section-alt .faq-accordion-item {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+  border-radius: 14px;
+}
+
+.ithunt-section-even .faq-accordion-item:hover,
+.ithunt-section-alt .faq-accordion-item:hover {
+  border-color: rgba(249, 115, 22, 0.4) !important;
+}
+
+.ithunt-section-even .faq-accordion-item.open,
+.ithunt-section-alt .faq-accordion-item.open {
+  border-color: #ea580c !important;
+  box-shadow: 0 8px 24px rgba(234, 88, 12, 0.12) !important;
+}
+
+.ithunt-section-even .faq-question-bar,
+.ithunt-section-alt .faq-question-bar {
+  background: transparent !important;
+}
+
+.ithunt-section-even .faq-question-text,
+.ithunt-section-alt .faq-question-text {
+  color: #0f172a !important;
+  font-weight: 700;
+}
+
+.ithunt-section-even .faq-chevron-icon,
+.ithunt-section-alt .faq-chevron-icon {
+  color: #ea580c !important;
+  font-weight: 800;
+}
+
+.ithunt-section-even .faq-answer-container,
+.ithunt-section-alt .faq-answer-container {
+  border-top: 1px solid #f1f5f9 !important;
+  background: #f8fafc !important;
+}
+
+.ithunt-section-even .faq-answer-text,
+.ithunt-section-alt .faq-answer-text {
+  color: #334155 !important;
+  line-height: 1.65;
+}
+
+/* ─── ODD SECTIONS: DARK MODE (Blackish, Cyber-Dark, Glowing, High-Tech) ─── */
+.ithunt-section-odd,
+.ithunt-section-base {
+  background: #070a12 !important;
+  color: #f8fafc !important;
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ithunt-hero.ithunt-section-odd {
+  background: radial-gradient(circle at 50% 0%, var(--glow-orange, rgba(249, 115, 22, 0.16)) 0%, #06090e 65%) !important;
+  border-top: none;
+}
+
+.ithunt-cta-section.ithunt-section-odd {
+  background: #06090e !important;
+}
+
+.hiw-section.ithunt-section-odd {
+  background: #090e1a !important;
+}
+
+.ithunt-section-odd .ithunt-section-heading,
+.ithunt-section-base .ithunt-section-heading {
+  color: #ffffff !important;
+}
+
+.ithunt-section-odd .ithunt-section-desc,
+.ithunt-section-base .ithunt-section-desc {
+  color: #94a3b8 !important;
+}
+
+.ithunt-section-odd .ithunt-pill-badge,
+.ithunt-section-base .ithunt-pill-badge {
+  background: rgba(249, 115, 22, 0.08) !important;
+  border: 1px solid rgba(249, 115, 22, 0.35) !important;
+  color: #f97316 !important;
+}
+
+.ithunt-section-odd .ithunt-badge-dot,
+.ithunt-section-base .ithunt-badge-dot {
+  background-color: #f97316 !important;
+  box-shadow: 0 0 10px #f97316 !important;
+}
+
+/* Odd Section 3: Three Core Tracks Cards in Dark Mode */
+.ithunt-section-odd .accelerator-card,
+.ithunt-section-base .accelerator-card {
+  background: rgba(15, 23, 42, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+.ithunt-section-odd .accelerator-card:hover,
+.ithunt-section-base .accelerator-card:hover {
+  border-color: rgba(249, 115, 22, 0.45) !important;
+  transform: translateY(-4px);
+}
+
+.ithunt-section-odd .accelerator-card.featured,
+.ithunt-section-base .accelerator-card.featured {
+  border-color: #ea580c !important;
+  box-shadow: 0 14px 40px rgba(234, 88, 12, 0.25) !important;
+}
+
+.ithunt-section-odd .acc-format-badge,
+.ithunt-section-base .acc-format-badge {
+  background: rgba(249, 115, 22, 0.15) !important;
+  color: #f97316 !important;
+}
+
+.ithunt-section-odd .acc-title,
+.ithunt-section-base .acc-title {
+  color: #ffffff !important;
+}
+
+.ithunt-section-odd .acc-sub,
+.ithunt-section-base .acc-sub {
+  color: #94a3b8 !important;
+}
+
+.ithunt-section-odd .acc-deliverables-title,
+.ithunt-section-base .acc-deliverables-title {
+  color: #e2e8f0 !important;
+}
+
+.ithunt-section-odd .acc-list li,
+.ithunt-section-base .acc-list li {
+  color: #cbd5e1 !important;
+}
+
+.ithunt-section-odd .acc-cost-line,
+.ithunt-section-base .acc-cost-line {
+  color: #94a3b8 !important;
+}
+
+/* Odd Section 5: How It Works Accordion in Dark Mode */
+.ithunt-section-odd .hiw-acc-trigger,
+.hiw-section.ithunt-section-odd .hiw-acc-trigger {
+  background: rgba(15, 23, 42, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+}
+
+.ithunt-section-odd .hiw-acc-trigger:hover,
+.hiw-section.ithunt-section-odd .hiw-acc-trigger:hover {
+  background: rgba(22, 33, 58, 0.85) !important;
+  border-color: rgba(249, 115, 22, 0.4) !important;
+}
+
+.ithunt-section-odd .hiw-acc-open .hiw-acc-trigger,
+.hiw-section.ithunt-section-odd .hiw-acc-open .hiw-acc-trigger {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.12), rgba(15, 23, 42, 0.95)) !important;
+  border-color: rgba(249, 115, 22, 0.55) !important;
+  box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.25), 0 8px 28px rgba(0, 0, 0, 0.25) !important;
+}
+
+.ithunt-section-odd .hiw-title,
+.hiw-section.ithunt-section-odd .hiw-title {
+  color: #ffffff !important;
+}
+
+.ithunt-section-odd .hiw-phase,
+.hiw-section.ithunt-section-odd .hiw-phase {
+  color: #f97316 !important;
+}
+
+.ithunt-section-odd .hiw-progress-tag,
+.hiw-section.ithunt-section-odd .hiw-progress-tag {
+  background: rgba(249, 115, 22, 0.12) !important;
+  color: #f97316 !important;
+  border: 1px solid rgba(249, 115, 22, 0.3) !important;
+}
+
+.ithunt-section-odd .hiw-chevron,
+.hiw-section.ithunt-section-odd .hiw-chevron {
+  color: #94a3b8 !important;
+}
+
+.ithunt-section-odd .hiw-chevron.rotated,
+.hiw-section.ithunt-section-odd .hiw-chevron.rotated {
+  color: #f97316 !important;
+}
+
+.ithunt-section-odd .hiw-acc-body,
+.hiw-section.ithunt-section-odd .hiw-acc-body {
+  background: rgba(11, 17, 33, 0.95) !important;
+  border: 1px solid rgba(249, 115, 22, 0.35) !important;
+  border-top: none !important;
+}
+
+.ithunt-section-odd .hiw-desc,
+.hiw-section.ithunt-section-odd .hiw-desc {
+  color: #94a3b8 !important;
+}
+
+.ithunt-section-odd .hiw-point,
+.hiw-section.ithunt-section-odd .hiw-point {
+  color: #e2e8f0 !important;
+}
+
+/* Odd Section 7: Founders & Leadership in Dark Mode */
+.ithunt-section-odd .founder-card {
+  background: rgba(15, 23, 42, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+.ithunt-section-odd .founder-card:hover {
+  border-color: rgba(249, 115, 22, 0.45) !important;
+}
+
+.ithunt-section-odd .founder-badge {
+  color: #f97316 !important;
+  font-weight: 800;
+}
+
+.ithunt-section-odd .founder-name {
+  color: #ffffff !important;
+  font-weight: 800;
+}
+
+.ithunt-section-odd .founder-role {
+  color: #94a3b8 !important;
+}
+
+.ithunt-section-odd .founder-quote {
+  color: #cbd5e1 !important;
+}
+
+.ithunt-section-odd .skill-tag {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #cbd5e1 !important;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Odd Section 9: CTA Banner in Dark Mode */
+.ithunt-section-odd .ithunt-cta-banner {
+  background: rgba(15, 23, 42, 0.9) !important;
+  border: 1.5px solid rgba(249, 115, 22, 0.45) !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(249, 115, 22, 0.2) !important;
+}
+
+.ithunt-section-odd .cta-main-title {
+  color: #ffffff !important;
+}
+
+.ithunt-section-odd .cta-subtitle {
+  color: #94a3b8 !important;
+}
+
+.ithunt-section-odd .cta-micro-guarantee {
+  color: #64748b !important;
 }
 
 .section-title-wrap {
@@ -2607,53 +3099,10 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-/* ── Light Theme ─── */
-body.light-theme .hiw-acc-trigger {
-  background: #ffffff;
-  border-color: rgba(0,0,0,0.1);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-}
-
-body.light-theme .hiw-acc-trigger:hover {
-  border-color: rgba(249,115,22,0.3);
-  background: #fff7ed;
-}
-
-body.light-theme .hiw-acc-open .hiw-acc-trigger {
-  background: linear-gradient(135deg, rgba(249,115,22,0.06), #ffffff);
-  border-color: rgba(249,115,22,0.4);
-  box-shadow: 0 0 0 1px rgba(249,115,22,0.2), 0 6px 20px rgba(0,0,0,0.06);
-}
-
-body.light-theme .hiw-title {
-  color: #0f172a;
-}
-
-body.light-theme .hiw-acc-body {
-  background: linear-gradient(135deg, rgba(249,115,22,0.04), #ffffff);
-  border-color: rgba(249,115,22,0.25);
-}
-
-body.light-theme .hiw-desc {
-  color: #475569;
-}
-
-body.light-theme .hiw-point {
-  color: #0f172a;
-}
-
-body.light-theme .hiw-progress-tag {
-  background: rgba(249,115,22,0.07);
-  border-color: rgba(249,115,22,0.2);
-  color: #c2410c;
-}
-
-body.light-theme .hiw-connector {
-  background: linear-gradient(to bottom, rgba(249,115,22,0.35), rgba(249,115,22,0.08));
-}
-
-body.light-theme .hiw-chevron {
-  color: #64748b;
+/* Section 5 (HIW) is Odd section: Keep deep cyber dark mode theme */
+.hiw-section .hiw-acc-trigger {
+  background: rgba(15, 23, 42, 0.85);
+  border-color: rgba(255, 255, 255, 0.09);
 }
 
 /* ── Responsive ─── */
@@ -2950,47 +3399,44 @@ body.light-theme .hiw-chevron {
   color: #0f172a;
 }
 
-:global(body.light-theme) .ithunt-hero {
-  background: radial-gradient(circle at 50% 0%, rgba(249, 115, 22, 0.1) 0%, transparent 60%), #f8fafc;
+:global(body.light-theme) .ithunt-hero.ithunt-section-odd {
+  background: radial-gradient(circle at 50% 0%, rgba(249, 115, 22, 0.16) 0%, #06090e 65%) !important;
 }
 
-:global(body.light-theme) .ithunt-hero-headline,
-:global(body.light-theme) .ithunt-section-heading,
-:global(body.light-theme) .project-main-title,
-:global(body.light-theme) .homework-card-title,
-:global(body.light-theme) .acc-title,
-:global(body.light-theme) .example-client-name,
-:global(body.light-theme) .step-title,
-:global(body.light-theme) .bento-card-title,
-:global(body.light-theme) .model-name,
-:global(body.light-theme) .founder-name,
-:global(body.light-theme) .faq-question-text,
-:global(body.light-theme) .stat-label-title,
-:global(body.light-theme) .metrics-panel-header h4,
+:global(body.light-theme) .ithunt-hero.ithunt-section-odd .ithunt-hero-headline {
+  color: #ffffff !important;
+}
 
-:global(body.light-theme) .highlight-title,
-:global(body.light-theme) .feature-card-title,
-:global(body.light-theme) .ithunt-brush-wrap {
+:global(body.light-theme) .ithunt-hero.ithunt-section-odd .ithunt-hero-subtitle {
+  color: #94a3b8 !important;
+}
+
+:global(body.light-theme) .ithunt-hero.ithunt-section-odd .project-main-title {
+  color: #ffffff !important;
+}
+
+:global(body.light-theme) .ithunt-hero.ithunt-section-odd .project-brief {
+  color: #94a3b8 !important;
+}
+
+:global(body.light-theme) .ithunt-hero.ithunt-section-odd .guarantee-item {
+  color: #94a3b8 !important;
+}
+
+:global(body.light-theme) .ithunt-section-even .ithunt-section-heading,
+:global(body.light-theme) .ithunt-section-even .homework-card-title,
+:global(body.light-theme) .ithunt-section-even .example-client-name,
+:global(body.light-theme) .ithunt-section-even .bento-card-title,
+:global(body.light-theme) .ithunt-section-even .faq-question-text {
   color: #0f172a !important;
 }
 
-:global(body.light-theme) .ithunt-hero-subtitle,
-:global(body.light-theme) .ithunt-section-desc,
-:global(body.light-theme) .project-brief,
-:global(body.light-theme) .homework-card-desc,
-:global(body.light-theme) .acc-sub,
-:global(body.light-theme) .example-desc-text,
-:global(body.light-theme) .step-desc,
-:global(body.light-theme) .bento-card-desc,
-:global(body.light-theme) .model-desc,
-:global(body.light-theme) .faq-answer-text,
-:global(body.light-theme) .founder-quote,
-:global(body.light-theme) .acc-list li,
-:global(body.light-theme) .model-feature-list li,
-:global(body.light-theme) .step-subpoint-item,
-:global(body.light-theme) .highlight-desc,
-:global(body.light-theme) .feature-card-desc {
-  color: #334155 !important;
+:global(body.light-theme) .ithunt-section-even .ithunt-section-desc,
+:global(body.light-theme) .ithunt-section-even .homework-card-desc,
+:global(body.light-theme) .ithunt-section-even .example-desc-text,
+:global(body.light-theme) .ithunt-section-even .bento-card-desc,
+:global(body.light-theme) .ithunt-section-even .faq-answer-text {
+  color: #475569 !important;
 }
 
 :global(body.light-theme) .platform-link {
@@ -3282,32 +3728,79 @@ body.light-theme .hiw-chevron {
   color: #ea580c !important;
 }
 
-/* Sections 2 - 9 Backgrounds & Cards */
-:global(body.light-theme) .ithunt-section-base {
-  background: #ffffff !important;
-}
-
+/* Sections 2 - 9: Maintain Odd (Dark) and Even (Light) Rhythms */
+:global(body.light-theme) .ithunt-section-even,
 :global(body.light-theme) .ithunt-section-alt {
-  background: #f8fafc !important;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
+  color: #0f172a !important;
+  border-top-color: #e2e8f0 !important;
+  border-bottom-color: #e2e8f0 !important;
 }
 
-:global(body.light-theme) .homework-card,
-:global(body.light-theme) .accelerator-card,
-:global(body.light-theme) .example-card,
-:global(body.light-theme) .pipeline-step-card,
-:global(body.light-theme) .bento-card,
-:global(body.light-theme) .tech-model-card,
-:global(body.light-theme) .founder-card,
-:global(body.light-theme) .faq-accordion-item {
+:global(body.light-theme) .ithunt-section-odd,
+:global(body.light-theme) .ithunt-section-base {
+  background: #070a12 !important;
+  color: #f8fafc !important;
+  border-top-color: rgba(255, 255, 255, 0.06) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+:global(body.light-theme) .ithunt-section-odd .ithunt-section-heading,
+:global(body.light-theme) .ithunt-section-odd .acc-title,
+:global(body.light-theme) .ithunt-section-odd .hiw-title,
+:global(body.light-theme) .ithunt-section-odd .founder-name,
+:global(body.light-theme) .ithunt-section-odd .cta-main-title {
+  color: #ffffff !important;
+}
+
+:global(body.light-theme) .ithunt-section-odd .ithunt-section-desc,
+:global(body.light-theme) .ithunt-section-odd .acc-sub,
+:global(body.light-theme) .ithunt-section-odd .hiw-desc,
+:global(body.light-theme) .ithunt-section-odd .founder-role,
+:global(body.light-theme) .ithunt-section-odd .cta-subtitle {
+  color: #94a3b8 !important;
+}
+
+:global(body.light-theme) .ithunt-section-odd .accelerator-card,
+:global(body.light-theme) .ithunt-section-odd .founder-card {
+  background: rgba(15, 23, 42, 0.85) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+:global(body.light-theme) .ithunt-section-odd .accelerator-card.featured {
+  border-color: #ea580c !important;
+  box-shadow: 0 14px 40px rgba(234, 88, 12, 0.25) !important;
+}
+
+:global(body.light-theme) .ithunt-section-odd .acc-deliverables-title {
+  color: #e2e8f0 !important;
+}
+
+:global(body.light-theme) .ithunt-section-odd .acc-list li {
+  color: #cbd5e1 !important;
+}
+
+:global(body.light-theme) .ithunt-section-odd .acc-cost-line {
+  color: #94a3b8 !important;
+}
+
+:global(body.light-theme) .ithunt-section-odd .founder-quote {
+  color: #cbd5e1 !important;
+}
+
+:global(body.light-theme) .ithunt-section-odd .skill-tag {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #cbd5e1 !important;
+}
+
+:global(body.light-theme) .ithunt-section-even .homework-card,
+:global(body.light-theme) .ithunt-section-even .example-card,
+:global(body.light-theme) .ithunt-section-even .bento-card,
+:global(body.light-theme) .ithunt-section-even .faq-accordion-item {
   background: #ffffff !important;
   border-color: #e2e8f0 !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
-}
-
-:global(body.light-theme) .accelerator-card.featured,
-:global(body.light-theme) .tech-model-card.featured-model {
-  border-color: #ea580c !important;
-  box-shadow: 0 12px 35px rgba(234, 88, 12, 0.12) !important;
 }
 
 :global(body.light-theme) .card-icon-wrap,
