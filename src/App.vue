@@ -474,8 +474,8 @@
 import { ref, watch, onMounted, onUnmounted, nextTick, defineAsyncComponent } from 'vue';
 import CONTENT_DATA from './data/contentData.js';
 import { DEFAULT_DEMO_STUDENT } from './data/studentAcademicData.js';
-import { generateAdmissionPdf, generatePrivacyPolicyPdf, generateTermsConditionsPdf, getAdmissionPdfBlob } from './utils/pdfGenerator.js';
-import { generateNielitProjectPdf, getNielitProjectPdfBlob } from './utils/nielitPdfGenerator.js';
+import { generateAdmissionPdf, generatePrivacyPolicyPdf, generateTermsConditionsPdf } from './utils/pdfGenerator.js';
+import { generateNielitProjectPdf } from './utils/nielitPdfGenerator.js';
 import { 
   saveNielitProjectRecord, 
   saveAdmissionRecord, 
@@ -494,7 +494,6 @@ import {
   fetchReviewsFromBackend,
   fetchUsersFromBackend,
   deleteStudentFromBackend,
-  deleteUserFromBackend,
   deleteAdmissionFromBackend,
   updateAdmissionInBackend,
   updateStudentInBackend,
