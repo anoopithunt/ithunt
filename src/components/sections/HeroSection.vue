@@ -981,40 +981,6 @@ const filteredProjects = computed(() => {
   return liveProjectsList.filter(p => p.categoryKey === selectedProjectCategory.value);
 });
 
-// Section 8 Features Bento Grid Data (IT Hunt Section 8 Style)
-const featureItems = [
-  {
-    icon: '⚡',
-    title: 'Live Git PR & Branch Workflows',
-    desc: 'Never push to main blindly. Work with feature branches, code reviews, automated CI checks, and merge approvals exactly like senior engineers.'
-  },
-  {
-    icon: '🌐',
-    title: 'Modern Reactive Frameworks',
-    desc: 'Master React 19, Next.js 15 App Router, and Vue 3 Composition API to build stateful, lightning-fast, and responsive applications.'
-  },
-  {
-    icon: '⚙️',
-    title: 'Microservices & RESTful APIs',
-    desc: 'Architect robust backend services with Node.js, Express, and Python FastAPI, handling data schemas with MongoDB and PostgreSQL.'
-  },
-  {
-    icon: '☁️',
-    title: 'Docker & Cloud CI/CD Automation',
-    desc: 'Package applications into Docker containers, automate test pipelines with GitHub Actions, and deploy zero-downtime releases on AWS.'
-  },
-  {
-    icon: '🤖',
-    title: 'AI Models & Autonomous Pipelines',
-    desc: 'Harness Google Gemini 2.0 API, OpenAI, LangChain, and vector embeddings to integrate intelligence and social autopilots into client software.'
-  },
-  {
-    icon: '🏆',
-    title: 'Direct 50+ Placement Referral Network',
-    desc: 'Get exclusive interviews, mock technical rounds, verified NIELIT credentials, and direct hiring calls from our partner software companies.'
-  }
-];
-
 // Section 5 4-Stage Pipeline Steps
 const workflowSteps = [
   {
@@ -1414,55 +1380,6 @@ onUnmounted(() => {
   margin-bottom: 3.25rem;
 }
 
-/* ==========================================================================
-   INTERACTIVE INPUT BAR
-   ========================================================================== */
-
-.ithunt-input-box-wrapper {
-  max-width: 760px;
-  margin: 0 auto 4rem;
-}
-
-.ithunt-input-box {
-  display: flex;
-  align-items: center;
-  background: var(--bg-card-glass, rgba(15, 23, 42, 0.85));
-  border: 1.5px solid var(--border-cyber-glow, rgba(249, 115, 22, 0.45));
-  border-radius: var(--radius-full, 9999px);
-  padding: 0.5rem 0.5rem 0.5rem 1.4rem;
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35), 0 0 25px var(--glow-orange, rgba(249, 115, 22, 0.2));
-  backdrop-filter: blur(12px);
-  transition: all 0.3s ease;
-}
-
-.ithunt-input-box:focus-within {
-  border-color: var(--color-ai-orange, #f97316);
-  box-shadow: 0 14px 45px var(--glow-orange, rgba(249, 115, 22, 0.35));
-}
-
-.ithunt-input-icon {
-  color: var(--color-ai-orange, #f97316);
-  display: flex;
-  align-items: center;
-  margin-right: 0.75rem;
-}
-
-.ithunt-hero-input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--text-main, #f8fafc);
-  padding: 0.5rem 0;
-}
-
-.ithunt-hero-input::placeholder {
-  color: var(--text-dim, #64748b);
-  font-weight: 400;
-}
-
 /* Buttons */
 .ithunt-btn-primary {
   display: inline-flex;
@@ -1519,44 +1436,6 @@ onUnmounted(() => {
 
 .w-full {
   width: 100%;
-}
-
-/* Quick Stack Filter Tags */
-.ithunt-quick-tags {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 1.25rem;
-}
-
-.quick-tag-label {
-  font-size: 0.82rem;
-  color: var(--text-dim, #64748b);
-  font-weight: 600;
-}
-
-.quick-tag-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.35rem 0.8rem;
-  border-radius: var(--radius-full, 9999px);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
-  color: var(--text-muted, #94a3b8);
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.quick-tag-btn:hover,
-.quick-tag-btn.active {
-  background: rgba(249, 115, 22, 0.15);
-  border-color: rgba(249, 115, 22, 0.5);
-  color: var(--color-ai-orange, #f97316);
 }
 
 /* Guarantees Row */
@@ -3476,32 +3355,10 @@ onUnmounted(() => {
   border-color: rgba(249, 115, 22, 0.3) !important;
 }
 
-:global(body.light-theme) .ithunt-highlight-card {
-  background: #ffffff !important;
-  border-color: rgba(249, 115, 22, 0.35) !important;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08), 0 0 25px rgba(249, 115, 22, 0.06) !important;
-}
-:global(body.light-theme) .highlight-features-grid {
-  border-color: rgba(0, 0, 0, 0.08) !important;
-}
-:global(body.light-theme) .feat-sub {
-  color: #64748b !important;
-}
-
-:global(body.light-theme) .feature-bento-card {
-  background: #ffffff !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
-}
-:global(body.light-theme) .feature-icon-box {
-  background: rgba(249, 115, 22, 0.1) !important;
-  border-color: rgba(249, 115, 22, 0.25) !important;
-}
-
 :global(body.light-theme) .stat-micro-note,
 :global(body.light-theme) .example-meta-text,
 :global(body.light-theme) .example-engagement-stats,
 :global(body.light-theme) .feature-bullet,
-:global(body.light-theme) .quick-tag-label,
 :global(body.light-theme) .guarantee-item,
 :global(body.light-theme) .founder-role,
 :global(body.light-theme) .acc-cost-line {
@@ -3513,35 +3370,6 @@ onUnmounted(() => {
   border-color: rgba(249, 115, 22, 0.4) !important;
   color: #ea580c !important;
   box-shadow: 0 2px 10px rgba(249, 115, 22, 0.08) !important;
-}
-
-/* Input Bar & Filter Tags */
-:global(body.light-theme) .ithunt-input-box {
-  background: #ffffff !important;
-  border-color: #cbd5e1 !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
-}
-
-:global(body.light-theme) .ithunt-hero-input {
-  color: #0f172a !important;
-}
-
-:global(body.light-theme) .ithunt-hero-input::placeholder {
-  color: #94a3b8 !important;
-}
-
-:global(body.light-theme) .quick-tag-btn {
-  background: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  color: #475569 !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02) !important;
-}
-
-:global(body.light-theme) .quick-tag-btn:hover,
-:global(body.light-theme) .quick-tag-btn.active {
-  background: rgba(249, 115, 22, 0.12) !important;
-  border-color: rgba(249, 115, 22, 0.5) !important;
-  color: #ea580c !important;
 }
 
 /* Showcase Card & Tabs */
@@ -3964,33 +3792,9 @@ onUnmounted(() => {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
 
-  .tech-models-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  }
-
   .founders-grid {
     grid-template-columns: 1fr;
     max-width: 650px;
-  }
-
-  .founder-card {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 1.75rem;
-  }
-
-  .founder-skills {
-    justify-content: center;
-  }
-
-  .highlight-features-grid {
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
-  }
-
-  .features-bento-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
 
   .ithunt-hero-cta-group {
@@ -4102,116 +3906,6 @@ onUnmounted(() => {
   .ithunt-cat-tab-btn {
     padding: 0.45rem 0.8rem;
     font-size: 0.78rem;
-    border-radius: 8px;
-  }
-
-  .ithunt-highlight-card {
-    padding: 2.25rem 1.15rem;
-    border-radius: 20px;
-  }
-
-  .highlight-title {
-    font-size: 1.45rem;
-    line-height: 1.3;
-  }
-
-  .highlight-desc {
-    font-size: 0.9rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .highlight-features-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    margin-bottom: 1.75rem;
-    padding: 1rem 0;
-  }
-
-  .feat-val {
-    font-size: 1.2rem;
-  }
-
-  .highlight-cta-row {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .highlight-cta-row button {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .features-bento-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .feature-bento-card {
-    padding: 1.4rem;
-    border-radius: 16px;
-  }
-
-  .feature-card-title {
-    font-size: 1.05rem;
-  }
-
-  .feature-card-desc {
-    font-size: 0.85rem;
-  }
-
-  /* Interactive Input Box */
-  .ithunt-input-box-wrapper {
-    margin-bottom: 2.25rem;
-    padding: 0;
-  }
-
-  .ithunt-input-box {
-    border-radius: 18px;
-    flex-direction: column;
-    padding: 0.75rem;
-    gap: 0.75rem;
-    align-items: stretch;
-  }
-
-  .ithunt-input-icon {
-    display: none;
-  }
-
-  .ithunt-hero-input {
-    width: 100%;
-    text-align: center;
-    font-size: 0.92rem;
-    padding: 0.4rem 0.25rem;
-  }
-
-  .ithunt-hero-cta {
-    width: 100%;
-    justify-content: center;
-    min-height: 48px;
-    padding: 0.8rem 1.25rem;
-    font-size: 0.92rem;
-  }
-
-  /* Specialization Quick Pills */
-  .ithunt-quick-tags {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.4rem;
-    margin-top: 1rem;
-    padding: 0 0.25rem;
-  }
-
-  .quick-tag-label {
-    width: 100%;
-    text-align: center;
-    font-size: 0.75rem;
-    margin-bottom: 0.2rem;
-  }
-
-  .quick-tag-btn {
-    padding: 0.35rem 0.65rem;
-    font-size: 0.76rem;
     border-radius: 8px;
   }
 
@@ -4551,64 +4245,6 @@ onUnmounted(() => {
     font-size: 0.82rem;
   }
 
-  /* Section 5: Pipeline */
-  .pipeline-step-item {
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1.25rem;
-  }
-
-  .pipeline-step-number-wrap {
-    flex-direction: row;
-    width: 100%;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .pipeline-step-number {
-    width: 32px;
-    height: 32px;
-    font-size: 0.9rem;
-  }
-
-  .pipeline-line {
-    display: none;
-  }
-
-  .pipeline-step-card {
-    padding: 1.15rem 1rem;
-    border-radius: 14px;
-  }
-
-  .step-card-header {
-    gap: 0.75rem;
-    margin-bottom: 0.6rem;
-  }
-
-  .step-icon-box {
-    width: 36px;
-    height: 36px;
-    font-size: 1.1rem;
-  }
-
-  .step-title {
-    font-size: 1.05rem;
-  }
-
-  .step-desc {
-    font-size: 0.86rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .step-subpoints {
-    grid-template-columns: 1fr;
-    gap: 0.35rem;
-  }
-
-  .step-subpoint-item {
-    font-size: 0.78rem;
-  }
-
   /* Section 6: Bento Grid */
   .bento-grid {
     grid-template-columns: 1fr;
@@ -4632,31 +4268,6 @@ onUnmounted(() => {
   .bento-card-desc {
     font-size: 0.86rem;
     margin-bottom: 1rem;
-  }
-
-  /* Section 7: Tech Models */
-  .tech-models-grid {
-    grid-template-columns: 1fr;
-    gap: 1.1rem;
-  }
-
-  .tech-model-card {
-    padding: 1.35rem 1.15rem;
-    border-radius: 16px;
-  }
-
-  .model-name {
-    font-size: 1.2rem;
-  }
-
-  .model-desc {
-    font-size: 0.86rem;
-    margin-bottom: 1.1rem;
-  }
-
-  .model-feature-list li {
-    font-size: 0.84rem;
-    margin-bottom: 0.5rem;
   }
 
   /* Section 8: Founders */
