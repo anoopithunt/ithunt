@@ -1,46 +1,46 @@
 <template>
-  <div class="aipost-wrapper">
+  <div class="ithunt-wrapper">
     <!-- =====================================================================
-         1. HERO SECTION (AIPost Signature Style with Native Brand Palette)
+         1. HERO SECTION (IT Hunt Signature Style with Native Brand Palette)
          ===================================================================== -->
-    <section class="aipost-hero">
-      <div class="aipost-hero-glow aipost-hero-glow-1"></div>
-      <div class="aipost-hero-glow aipost-hero-glow-2"></div>
+    <section class="ithunt-hero">
+      <div class="ithunt-hero-glow ithunt-hero-glow-1"></div>
+      <div class="ithunt-hero-glow ithunt-hero-glow-2"></div>
 
-      <div class="container aipost-hero-container">
+      <div class="container ithunt-hero-container">
         <!-- Top Announcement Badge -->
-        <div class="aipost-badge-wrapper anim-fade-in">
-          <div class="aipost-pill-badge">
-            <span class="aipost-badge-dot"></span>
-            <span class="aipost-badge-text">{{ content.hero?.badgeText || '🚀 SOFTWARE STUDIO & TECH ACADEMY 2026' }}</span>
+        <div class="ithunt-badge-wrapper anim-fade-in">
+          <div class="ithunt-pill-badge">
+            <span class="ithunt-badge-dot"></span>
+            <span class="ithunt-badge-text">{{ content.hero?.badgeText || '🚀 SOFTWARE STUDIO & TECH ACADEMY 2026' }}</span>
           </div>
         </div>
 
-        <!-- Main Headline (AIPost Dual-Tone Style) -->
-        <h1 class="aipost-hero-headline anim-fade-in-up">
+        <!-- Main Headline (IT Hunt Dual-Tone Style) -->
+        <h1 class="ithunt-hero-headline anim-fade-in-up">
           Every other institute starts with a blank syllabus.<br />
-          <span class="aipost-gradient-text">Ours starts with real client code.</span>
+          <span class="ithunt-gradient-text">Ours starts with real client code.</span>
         </h1>
 
         <!-- Subtitle with Signature Hand-Drawn Brush Stroke Underline -->
-        <p class="aipost-hero-subtitle anim-fade-in-up-delay">
+        <p class="ithunt-hero-subtitle anim-fade-in-up-delay">
           Premier software studio &amp; tech academy in Prayagraj. Build production-grade web, mobile, and AI applications with 1-on-1 industry mentorship — 
-          <span class="aipost-brush-wrap">on real client code.<svg class="aipost-brush-stroke" viewBox="0 0 120 12" fill="none" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8c20-4 40-2 60 1s40 3 56-1" stroke="var(--color-ai-orange)" stroke-width="2.8" stroke-linecap="round" opacity="0.9"></path><path d="M4 10c18-3 38-1 58 1s38 2 54-1" stroke="var(--color-ai-yellow)" stroke-width="2" stroke-linecap="round" opacity="0.65"></path></svg></span>
+          <span class="ithunt-brush-wrap">on real client code.<svg class="ithunt-brush-stroke" viewBox="0 0 120 12" fill="none" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8c20-4 40-2 60 1s40 3 56-1" stroke="var(--color-ai-orange)" stroke-width="2.8" stroke-linecap="round" opacity="0.9"></path><path d="M4 10c18-3 38-1 58 1s38 2 54-1" stroke="var(--color-ai-yellow)" stroke-width="2" stroke-linecap="round" opacity="0.65"></path></svg></span>
         </p>
 
-        <!-- Dual CTA Buttons (AIPost Style) -->
-        <div class="aipost-hero-cta-group anim-fade-in-up-delay">
-          <button class="aipost-btn-primary aipost-hero-main-cta" @click="$emit('set-tab', 'admission')">
+        <!-- Dual CTA Buttons (IT Hunt Style) -->
+        <div class="ithunt-hero-cta-group anim-fade-in-up-delay">
+          <button class="ithunt-btn-primary ithunt-hero-main-cta" @click="$emit('set-tab', 'admission')">
             <span>Apply for 2026 Batch</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
           </button>
-          <button class="aipost-btn-secondary aipost-hero-main-cta" @click="$emit('set-tab', 'internships')">
+          <button class="ithunt-btn-secondary ithunt-hero-main-cta" @click="$emit('set-tab', 'internships')">
             <span>Explore Programs ➜</span>
           </button>
         </div>
 
-        <!-- Trust Badges & Guarantee Row (AIPost Style) -->
-        <div class="aipost-guarantee-row anim-fade-in-up-delay">
+        <!-- Trust Badges & Guarantee Row (IT Hunt Style) -->
+        <div class="ithunt-guarantee-row anim-fade-in-up-delay">
           <div class="guarantee-item">
             <span class="guarantee-icon">✓</span>
             <span>ISO 9001:2015 Certified</span>
@@ -62,9 +62,9 @@
           </div>
         </div>
 
-        <!-- Interactive Hero Showcase Card (AIPost's "See in Action" Preview on Hero) -->
-        <div class="aipost-showcase-container">
-          <div class="aipost-showcase-card">
+        <!-- Interactive Hero Showcase Card (IT Hunt's "See in Action" Preview on Hero) -->
+        <div class="ithunt-showcase-container">
+          <div class="ithunt-showcase-card">
             <!-- Header with macOS window dots and interactive tabs -->
             <div class="showcase-card-header">
               <div class="mac-dots">
@@ -150,10 +150,10 @@
                   </div>
 
                   <div class="showcase-actions">
-                    <button class="aipost-btn-primary w-full" @click="$emit('apply-course', currentProject.track)">
+                    <button class="ithunt-btn-primary w-full" @click="$emit('apply-course', currentProject.track)">
                       <span>Apply for this Track ➜</span>
                     </button>
-                    <button class="aipost-btn-secondary w-full" @click="$emit('set-tab', 'internships')">
+                    <button class="ithunt-btn-secondary w-full" @click="$emit('set-tab', 'internships')">
                       <span>View All Internship Ventures</span>
                     </button>
                   </div>
@@ -166,9 +166,9 @@
     </section>
 
     <!-- =====================================================================
-         2. KEY METRICS COUNTER BAR (AIPost Style)
+         2. KEY METRICS COUNTER BAR (IT Hunt Style)
          ===================================================================== -->
-    <div class="aipost-stats-band" ref="statsSectionRef">
+    <div class="ithunt-stats-band" ref="statsSectionRef">
       <div class="container">
         <div class="stats-card-grid">
           <div class="stat-pill-card" v-for="(stat, idx) in content.stats" :key="idx">
@@ -185,19 +185,19 @@
     </div>
 
     <!-- =====================================================================
-         3. SECTION 2: "We build real software before we teach a class" (AIPost Section 2 Style)
+         3. SECTION 2: "We build real software before we teach a class" (IT Hunt Section 2 Style)
          ===================================================================== -->
-    <section class="aipost-section aipost-section-alt">
+    <section class="ithunt-section ithunt-section-alt">
       <div class="container">
         <div class="section-title-wrap text-center">
-          <div class="aipost-pill-badge small">
-            <span class="aipost-badge-dot"></span>
+          <div class="ithunt-pill-badge small">
+            <span class="ithunt-badge-dot"></span>
             <span>THE TRAINING PHILOSOPHY</span>
           </div>
-          <h2 class="aipost-section-heading">
+          <h2 class="ithunt-section-heading">
             We build real software before we teach a single class
           </h2>
-          <p class="aipost-section-desc">
+          <p class="ithunt-section-desc">
             A blank textbook puts the work back on you: memorize syntax, guess interview questions, build useless todo apps. IT HUNT gathers real client requirements and trains you directly on live code.
           </p>
         </div>
@@ -263,19 +263,19 @@
     </section>
 
     <!-- =====================================================================
-         4. SECTION 3: "Three Core Tracks. One Integrated Studio." (AIPost Section 3 Style)
+         4. SECTION 3: "Three Core Tracks. One Integrated Studio." (IT Hunt Section 3 Style)
          ===================================================================== -->
-    <section class="aipost-section aipost-section-base">
+    <section class="ithunt-section ithunt-section-base">
       <div class="container">
         <div class="section-title-wrap text-center">
-          <div class="aipost-pill-badge small">
-            <span class="aipost-badge-dot"></span>
+          <div class="ithunt-pill-badge small">
+            <span class="ithunt-badge-dot"></span>
             <span>MULTI-FORMAT ACCELERATION</span>
           </div>
-          <h2 class="aipost-section-heading">
+          <h2 class="ithunt-section-heading">
             Three Core Tracks. One Integrated Studio.
           </h2>
-          <p class="aipost-section-desc">
+          <p class="ithunt-section-desc">
             Most bootcamps charge separately for theory, projects, and interviews. At IT HUNT, one comprehensive track equips you with full-stack mastery, live client code, and career placement.
           </p>
         </div>
@@ -299,7 +299,7 @@
             </div>
             <div class="acc-footer">
               <div class="acc-cost-line">3 Months · Fast Track</div>
-              <button class="aipost-btn-primary w-full" @click="$emit('set-tab', 'internships')">
+              <button class="ithunt-btn-primary w-full" @click="$emit('set-tab', 'internships')">
                 <span>Enroll in 3-Month Track ➜</span>
               </button>
             </div>
@@ -324,7 +324,7 @@
             </div>
             <div class="acc-footer">
               <div class="acc-cost-line">6 Months · Full Immersion</div>
-              <button class="aipost-btn-primary w-full" @click="$emit('set-tab', 'internships')">
+              <button class="ithunt-btn-primary w-full" @click="$emit('set-tab', 'internships')">
                 <span>Enroll in 6-Month Masterclass ➜</span>
               </button>
             </div>
@@ -348,7 +348,7 @@
             </div>
             <div class="acc-footer">
               <div class="acc-cost-line">1 Year · Govt Credential</div>
-              <button class="aipost-btn-secondary w-full" @click="$emit('set-tab', 'courses')">
+              <button class="ithunt-btn-secondary w-full" @click="$emit('set-tab', 'courses')">
                 <span>Explore NIELIT Programs ➜</span>
               </button>
             </div>
@@ -358,30 +358,30 @@
     </section>
 
     <!-- =====================================================================
-         5. SECTION 4: "See in Action" Live Projects Showcase (AIPost Section 4 Style)
+         5. SECTION 4: "See in Action" Live Projects Showcase (IT Hunt Section 4 Style)
          ===================================================================== -->
-    <section class="aipost-section aipost-section-alt" id="examples">
+    <section class="ithunt-section ithunt-section-alt" id="examples">
       <div class="container">
         <div class="section-title-wrap text-center">
-          <div class="aipost-pill-badge small">
-            <span class="aipost-badge-dot"></span>
+          <div class="ithunt-pill-badge small">
+            <span class="ithunt-badge-dot"></span>
             <span>EXAMPLES</span>
           </div>
-          <h2 class="aipost-section-heading">
+          <h2 class="ithunt-section-heading">
             See IT HUNT <span class="text-brand">in Action</span>
           </h2>
-          <p class="aipost-section-desc">
+          <p class="ithunt-section-desc">
             A quick preview of real software products designed, engineered, and shipped by our students and leads. Each live project below runs in active production.
           </p>
         </div>
 
-        <!-- AIPost Category Filter Tabs Pill -->
-        <div class="aipost-cat-tabs-wrapper">
-          <div class="aipost-cat-tabs-pill">
+        <!-- IT Hunt Category Filter Tabs Pill -->
+        <div class="ithunt-cat-tabs-wrapper">
+          <div class="ithunt-cat-tabs-pill">
             <button 
               v-for="cat in projectCategories" 
               :key="cat.id"
-              class="aipost-cat-tab-btn"
+              class="ithunt-cat-tab-btn"
               :class="{ active: selectedProjectCategory === cat.id }"
               @click="selectedProjectCategory = cat.id"
             >
@@ -436,17 +436,17 @@
     <!-- =====================================================================
          6. SECTION 5: "From Zero to Hired" — Interactive Accordion
          ===================================================================== -->
-    <section class="aipost-section aipost-section-base hiw-section">
+    <section class="ithunt-section ithunt-section-base hiw-section">
       <div class="container">
         <div class="section-title-wrap text-center">
-          <div class="aipost-pill-badge small">
-            <span class="aipost-badge-dot"></span>
+          <div class="ithunt-pill-badge small">
+            <span class="ithunt-badge-dot"></span>
             <span>HOW IT WORKS</span>
           </div>
-          <h2 class="aipost-section-heading">
+          <h2 class="ithunt-section-heading">
             From Day One to <span class="text-brand">Placement Autopilot</span>
           </h2>
-          <p class="aipost-section-desc">
+          <p class="ithunt-section-desc">
             Our structured 4-stage production system guides you from zero to deployed apps and senior tech placements.
           </p>
         </div>
@@ -518,19 +518,19 @@
     </section>
 
     <!-- =====================================================================
-         7. SECTION 6: "Why Choose IT HUNT?" Bento Grid (AIPost Section 7 Benefits Style)
+         7. SECTION 6: "Why Choose IT HUNT?" Bento Grid (IT Hunt Section 7 Benefits Style)
          ===================================================================== -->
-    <section class="aipost-section aipost-section-alt">
+    <section class="ithunt-section ithunt-section-alt">
       <div class="container">
         <div class="section-title-wrap text-center">
-          <div class="aipost-pill-badge small">
-            <span class="aipost-badge-dot"></span>
+          <div class="ithunt-pill-badge small">
+            <span class="ithunt-badge-dot"></span>
             <span>BENEFITS & ADVANTAGES</span>
           </div>
-          <h2 class="aipost-section-heading">
+          <h2 class="ithunt-section-heading">
             Why Choose IT HUNT?
           </h2>
-          <p class="aipost-section-desc">
+          <p class="ithunt-section-desc">
             Join thousands of software engineers who stopped wasting time on disconnected tutorials and launched high-paying careers through real code.
           </p>
         </div>
@@ -604,17 +604,17 @@
     <!-- =====================================================================
          9. SECTION 8: EXECUTIVE LEADERSHIP & FOUNDERS (Clean Studio Style)
          ===================================================================== -->
-    <section class="aipost-section aipost-section-alt">
+    <section class="ithunt-section ithunt-section-alt">
       <div class="container">
         <div class="section-title-wrap text-center">
-          <div class="aipost-pill-badge small">
-            <span class="aipost-badge-dot"></span>
+          <div class="ithunt-pill-badge small">
+            <span class="ithunt-badge-dot"></span>
             <span>EXECUTIVE LEADERSHIP</span>
           </div>
-          <h2 class="aipost-section-heading">
+          <h2 class="ithunt-section-heading">
             Led by Active Industry Architects
           </h2>
-          <p class="aipost-section-desc">
+          <p class="ithunt-section-desc">
             Meet the senior founders and directors steering technical direction, client partnerships, and hands-on developer training.
           </p>
         </div>
@@ -656,19 +656,19 @@
     </section>
 
     <!-- =====================================================================
-         10. SECTION 9: FREQUENTLY ASKED QUESTIONS (AIPost Section 10 Accordion)
+         10. SECTION 9: FREQUENTLY ASKED QUESTIONS (IT Hunt Section 10 Accordion)
          ===================================================================== -->
-    <section class="aipost-section aipost-section-base">
+    <section class="ithunt-section ithunt-section-base">
       <div class="container">
         <div class="section-title-wrap text-center">
-          <div class="aipost-pill-badge small">
-            <span class="aipost-badge-dot"></span>
+          <div class="ithunt-pill-badge small">
+            <span class="ithunt-badge-dot"></span>
             <span>FAQ</span>
           </div>
-          <h2 class="aipost-section-heading">
+          <h2 class="ithunt-section-heading">
             Frequently Asked Questions
           </h2>
-          <p class="aipost-section-desc">
+          <p class="ithunt-section-desc">
             Everything you need to know about the IT HUNT training and internship venture. Have a specific question? Our tech team is ready to help.
           </p>
         </div>
@@ -693,15 +693,15 @@
     </section>
 
     <!-- =====================================================================
-         11. SECTION 10: FINAL CONVERSION BANNER (AIPost Section 11 Style)
+         11. SECTION 10: FINAL CONVERSION BANNER (IT Hunt Section 11 Style)
          ===================================================================== -->
-    <section class="aipost-cta-section">
+    <section class="ithunt-cta-section">
       <div class="container">
-        <div class="aipost-cta-banner">
+        <div class="ithunt-cta-banner">
           <div class="cta-glow-element"></div>
           <div class="cta-content-wrap text-center">
-            <div class="aipost-pill-badge small">
-              <span class="aipost-badge-dot"></span>
+            <div class="ithunt-pill-badge small">
+              <span class="ithunt-badge-dot"></span>
               <span>GET STARTED TODAY</span>
             </div>
             <h2 class="cta-main-title">
@@ -712,13 +712,13 @@
             </p>
 
             <div class="cta-buttons-group">
-              <button class="aipost-btn-primary aipost-btn-lg" @click="$emit('set-tab', 'admission')">
+              <button class="ithunt-btn-primary ithunt-btn-lg" @click="$emit('set-tab', 'admission')">
                 <span>Start Free Application ➜</span>
               </button>
-              <button class="aipost-btn-secondary aipost-btn-lg" @click="$emit('open-cv-modal')">
+              <button class="ithunt-btn-secondary ithunt-btn-lg" @click="$emit('open-cv-modal')">
                 <span>📄 Generate Professional CV</span>
               </button>
-              <button class="aipost-btn-secondary aipost-btn-lg" @click="$emit('set-tab', 'internships')">
+              <button class="ithunt-btn-secondary ithunt-btn-lg" @click="$emit('set-tab', 'internships')">
                 <span>Explore All Tracks</span>
               </button>
             </div>
@@ -775,7 +775,7 @@ const showcaseProjects = [
     ]
   },
   {
-    id: 'aipost',
+    id: 'postcraft',
     title: 'AI Social Post Autopilot',
     icon: '🤖',
     track: 'Python & Gemini AI',
@@ -788,7 +788,7 @@ const showcaseProjects = [
       "from fastapi import FastAPI, BackgroundTasks",
       "from ai_engine.models import GeminiProGenerator",
       "",
-      "app = FastAPI(title='AIPost Engine')",
+      "app = FastAPI(title='PostCraft Engine')",
       "@app.post('/api/generate-post')",
       "async def generate_post(website_url: str):",
       "    brief = await GeminiProGenerator.extract_brand_dna(website_url)",
@@ -896,7 +896,7 @@ const startStatsAnimation = () => {
   requestAnimationFrame(step);
 };
 
-// Section 4 Live Projects Data & Filter Categories (AIPost Style)
+// Section 4 Live Projects Data & Filter Categories (IT Hunt Style)
 const projectCategories = [
   { id: 'all', name: 'All Solutions', icon: '⚡' },
   { id: 'mern', name: 'MERN & Web', icon: '🌐' },
@@ -981,7 +981,7 @@ const filteredProjects = computed(() => {
   return liveProjectsList.filter(p => p.categoryKey === selectedProjectCategory.value);
 });
 
-// Section 8 Features Bento Grid Data (AIPost Section 8 Style)
+// Section 8 Features Bento Grid Data (IT Hunt Section 8 Style)
 const featureItems = [
   {
     icon: '⚡',
@@ -1165,7 +1165,7 @@ onUnmounted(() => {
 
 <style scoped>
 /* ==========================================================================
-   AIPOST LAYOUT & INTERACTION STRUCTURE WITH NATIVE IT HUNT BRAND PALETTE
+   IT HUNT LAYOUT & INTERACTION STRUCTURE WITH NATIVE IT HUNT BRAND PALETTE
    ==========================================================================
    Uses the project's original CSS variables:
    - Primary Accent: var(--color-ai-orange, #f97316) & var(--color-ai-yellow, #f59e0b)
@@ -1174,7 +1174,7 @@ onUnmounted(() => {
    - Supports both dark mode and light mode naturally via CSS variables!
    ========================================================================== */
 
-.aipost-wrapper {
+.ithunt-wrapper {
   width: 100%;
   position: relative;
   overflow-x: hidden;
@@ -1187,14 +1187,14 @@ onUnmounted(() => {
    1. HERO SECTION
    ========================================================================== */
 
-.aipost-hero {
+.ithunt-hero {
   position: relative;
   padding: 5rem 1rem 4rem;
   overflow: hidden;
   background: radial-gradient(circle at 50% 0%, var(--glow-orange, rgba(249, 115, 22, 0.14)) 0%, transparent 60%);
 }
 
-.aipost-hero-glow {
+.ithunt-hero-glow {
   position: absolute;
   border-radius: 50%;
   filter: blur(90px);
@@ -1202,7 +1202,7 @@ onUnmounted(() => {
   z-index: 0;
 }
 
-.aipost-hero-glow-1 {
+.ithunt-hero-glow-1 {
   top: -10%;
   left: 20%;
   width: 500px;
@@ -1210,7 +1210,7 @@ onUnmounted(() => {
   background: var(--glow-orange, rgba(249, 115, 22, 0.18));
 }
 
-.aipost-hero-glow-2 {
+.ithunt-hero-glow-2 {
   top: 15%;
   right: 15%;
   width: 450px;
@@ -1218,7 +1218,7 @@ onUnmounted(() => {
   background: var(--glow-yellow, rgba(245, 158, 11, 0.15));
 }
 
-.aipost-hero-container {
+.ithunt-hero-container {
   position: relative;
   z-index: 1;
   max-width: 1200px;
@@ -1227,13 +1227,13 @@ onUnmounted(() => {
 }
 
 /* Pill Badge */
-.aipost-badge-wrapper {
+.ithunt-badge-wrapper {
   display: flex;
   justify-content: center;
   margin-bottom: 1.5rem;
 }
 
-.aipost-pill-badge {
+.ithunt-pill-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -1249,13 +1249,13 @@ onUnmounted(() => {
   backdrop-filter: blur(8px);
 }
 
-.aipost-pill-badge.small {
+.ithunt-pill-badge.small {
   padding: 0.35rem 0.9rem;
   font-size: 0.75rem;
   margin-bottom: 1rem;
 }
 
-.aipost-badge-dot {
+.ithunt-badge-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -1270,7 +1270,7 @@ onUnmounted(() => {
 }
 
 /* Hero Headline */
-.aipost-hero-headline {
+.ithunt-hero-headline {
   font-family: var(--font-heading, 'Outfit', sans-serif);
   font-size: clamp(2.4rem, 5.2vw, 4.4rem);
   font-weight: 800;
@@ -1283,9 +1283,10 @@ onUnmounted(() => {
   margin-right: auto;
 }
 
-.aipost-gradient-text {
+.ithunt-gradient-text {
   background: var(--gradient-ai-hero, linear-gradient(135deg, #f97316 0%, #fbbf24 50%, #f59e0b 100%));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -1298,7 +1299,7 @@ onUnmounted(() => {
 }
 
 /* Subtitle */
-.aipost-hero-subtitle {
+.ithunt-hero-subtitle {
   font-size: clamp(1.05rem, 1.8vw, 1.25rem);
   color: var(--text-muted, #94a3b8);
   line-height: 1.65;
@@ -1306,8 +1307,8 @@ onUnmounted(() => {
   margin: 0 auto 2rem;
 }
 
-/* Platform Pills & Formats (AIPost Style) */
-.aipost-platform-pills-row {
+/* Platform Pills & Formats (IT Hunt Style) */
+.ithunt-platform-pills-row {
   font-size: clamp(0.92rem, 1.5vw, 1.1rem);
   color: var(--text-muted, #94a3b8);
   margin-bottom: 0.65rem;
@@ -1327,7 +1328,7 @@ onUnmounted(() => {
   border-bottom-color: var(--color-ai-orange, #f97316);
 }
 
-.aipost-track-formats-row {
+.ithunt-track-formats-row {
   font-size: clamp(0.82rem, 1.3vw, 0.92rem);
   color: var(--text-dim, #64748b);
   margin-bottom: 1.35rem;
@@ -1344,8 +1345,8 @@ onUnmounted(() => {
   color: var(--color-ai-orange, #f97316);
 }
 
-/* Signature AIPost Hand-Drawn Brush Stroke Underline */
-.aipost-brush-wrap {
+/* Signature IT Hunt Hand-Drawn Brush Stroke Underline */
+.ithunt-brush-wrap {
   position: relative;
   display: inline-block;
   font-weight: 700;
@@ -1353,7 +1354,7 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
-.aipost-brush-stroke {
+.ithunt-brush-stroke {
   position: absolute;
   left: 0;
   bottom: -6px;
@@ -1363,8 +1364,8 @@ onUnmounted(() => {
   pointer-events: none;
 }
 
-/* Dual Hero CTA Buttons (AIPost Style) */
-.aipost-hero-cta-group {
+/* Dual Hero CTA Buttons (IT Hunt Style) */
+.ithunt-hero-cta-group {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1373,7 +1374,7 @@ onUnmounted(() => {
   margin-bottom: 1rem;
 }
 
-.aipost-hero-main-cta {
+.ithunt-hero-main-cta {
   padding: 0.95rem 2rem;
   font-size: 1rem;
   font-weight: 700;
@@ -1383,7 +1384,7 @@ onUnmounted(() => {
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.aipost-btn-secondary {
+.ithunt-btn-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1400,14 +1401,14 @@ onUnmounted(() => {
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.aipost-btn-secondary:hover {
+.ithunt-btn-secondary:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: var(--color-ai-orange, #f97316);
   color: var(--color-ai-orange, #f97316);
   transform: translateY(-2px);
 }
 
-.aipost-pricing-microtext {
+.ithunt-pricing-microtext {
   font-size: 0.85rem;
   color: var(--text-muted, #94a3b8);
   margin-bottom: 3.25rem;
@@ -1417,12 +1418,12 @@ onUnmounted(() => {
    INTERACTIVE INPUT BAR
    ========================================================================== */
 
-.aipost-input-box-wrapper {
+.ithunt-input-box-wrapper {
   max-width: 760px;
   margin: 0 auto 4rem;
 }
 
-.aipost-input-box {
+.ithunt-input-box {
   display: flex;
   align-items: center;
   background: var(--bg-card-glass, rgba(15, 23, 42, 0.85));
@@ -1434,19 +1435,19 @@ onUnmounted(() => {
   transition: all 0.3s ease;
 }
 
-.aipost-input-box:focus-within {
+.ithunt-input-box:focus-within {
   border-color: var(--color-ai-orange, #f97316);
   box-shadow: 0 14px 45px var(--glow-orange, rgba(249, 115, 22, 0.35));
 }
 
-.aipost-input-icon {
+.ithunt-input-icon {
   color: var(--color-ai-orange, #f97316);
   display: flex;
   align-items: center;
   margin-right: 0.75rem;
 }
 
-.aipost-hero-input {
+.ithunt-hero-input {
   flex: 1;
   background: transparent;
   border: none;
@@ -1457,13 +1458,13 @@ onUnmounted(() => {
   padding: 0.5rem 0;
 }
 
-.aipost-hero-input::placeholder {
+.ithunt-hero-input::placeholder {
   color: var(--text-dim, #64748b);
   font-weight: 400;
 }
 
 /* Buttons */
-.aipost-btn-primary {
+.ithunt-btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1482,12 +1483,12 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
-.aipost-btn-primary:hover {
+.ithunt-btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px var(--glow-orange, rgba(249, 115, 22, 0.6));
 }
 
-.aipost-btn-secondary {
+.ithunt-btn-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1505,13 +1506,13 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
-.aipost-btn-secondary:hover {
+.ithunt-btn-secondary:hover {
   background: rgba(255, 255, 255, 0.12);
   border-color: var(--color-ai-orange, #f97316);
   color: #ffffff;
 }
 
-.aipost-btn-lg {
+.ithunt-btn-lg {
   padding: 1rem 2.2rem;
   font-size: 1.05rem;
 }
@@ -1521,7 +1522,7 @@ onUnmounted(() => {
 }
 
 /* Quick Stack Filter Tags */
-.aipost-quick-tags {
+.ithunt-quick-tags {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1559,7 +1560,7 @@ onUnmounted(() => {
 }
 
 /* Guarantees Row */
-.aipost-guarantee-row {
+.ithunt-guarantee-row {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1590,13 +1591,13 @@ onUnmounted(() => {
    HERO INTERACTIVE SHOWCASE CARD
    ========================================================================== */
 
-.aipost-showcase-container {
+.ithunt-showcase-container {
   max-width: 1100px;
   margin: 0 auto;
   text-align: left;
 }
 
-.aipost-showcase-card {
+.ithunt-showcase-card {
   background: var(--bg-card-glass, rgba(15, 23, 42, 0.9));
   border: 1px solid var(--border-cyber-glow, rgba(249, 115, 22, 0.35));
   border-radius: var(--radius-lg, 20px);
@@ -1917,7 +1918,7 @@ onUnmounted(() => {
    2. STATS COUNTER BAND
    ========================================================================== */
 
-.aipost-stats-band {
+.ithunt-stats-band {
   background: rgba(15, 23, 42, 0.6);
   border-top: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.06));
   border-bottom: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.06));
@@ -1971,17 +1972,17 @@ onUnmounted(() => {
    GENERIC SECTION HEADINGS
    ========================================================================== */
 
-.aipost-section {
+.ithunt-section {
   padding: 5rem 1rem;
   position: relative;
 }
 
-.aipost-section-base {
+.ithunt-section-base {
   background: var(--bg-cyber-dark, #070a12);
   color: var(--text-main, #f8fafc);
 }
 
-.aipost-section-alt {
+.ithunt-section-alt {
   background: rgba(15, 23, 42, 0.4);
   color: var(--text-main, #f8fafc);
 }
@@ -1995,7 +1996,7 @@ onUnmounted(() => {
   text-align: center;
 }
 
-.aipost-section-heading {
+.ithunt-section-heading {
   font-family: var(--font-heading, 'Outfit', sans-serif);
   font-size: clamp(2rem, 3.8vw, 3rem);
   font-weight: 800;
@@ -2005,14 +2006,14 @@ onUnmounted(() => {
   color: var(--text-main, #f8fafc);
 }
 
-.aipost-section-desc {
+.ithunt-section-desc {
   font-size: 1.05rem;
   line-height: 1.65;
   color: var(--text-muted, #94a3b8);
 }
 
 /* ==========================================================================
-   3. HOMEWORK CARDS (AIPost Section 2)
+   3. HOMEWORK CARDS (IT Hunt Section 2)
    ========================================================================== */
 
 .homework-grid {
@@ -2083,7 +2084,7 @@ onUnmounted(() => {
 }
 
 /* ==========================================================================
-   4. ACCELERATORS GRID (AIPost Section 3 Format Cards)
+   4. ACCELERATORS GRID (IT Hunt Section 3 Format Cards)
    ========================================================================== */
 
 .accelerators-grid {
@@ -2194,18 +2195,18 @@ onUnmounted(() => {
 }
 
 /* ==========================================================================
-   5. EXAMPLES / LIVE PROJECTS (AIPost Section 4 Style)
+   5. EXAMPLES / LIVE PROJECTS (IT Hunt Section 4 Style)
    ========================================================================== */
 
-/* AIPost Category Filter Tabs */
-.aipost-cat-tabs-wrapper {
+/* IT Hunt Category Filter Tabs */
+.ithunt-cat-tabs-wrapper {
   display: flex;
   justify-content: center;
   margin-bottom: 2.75rem;
   width: 100%;
 }
 
-.aipost-cat-tabs-pill {
+.ithunt-cat-tabs-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -2220,11 +2221,11 @@ onUnmounted(() => {
   scrollbar-width: none;
 }
 
-.aipost-cat-tabs-pill::-webkit-scrollbar {
+.ithunt-cat-tabs-pill::-webkit-scrollbar {
   display: none;
 }
 
-.aipost-cat-tab-btn {
+.ithunt-cat-tab-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -2240,12 +2241,12 @@ onUnmounted(() => {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.aipost-cat-tab-btn:hover {
+.ithunt-cat-tab-btn:hover {
   color: var(--text-main, #ffffff);
   background: rgba(255, 255, 255, 0.05);
 }
 
-.aipost-cat-tab-btn.active {
+.ithunt-cat-tab-btn.active {
   background: rgba(249, 115, 22, 0.18);
   border-color: rgba(249, 115, 22, 0.4);
   color: var(--color-ai-orange, #f97316);
@@ -2666,7 +2667,7 @@ body.light-theme .hiw-chevron {
 }
 
 /* ==========================================================================
-   7. BENTO GRID (AIPost Section 7 Benefits)
+   7. BENTO GRID (IT Hunt Section 7 Benefits)
    ========================================================================== */
 
 .bento-grid {
@@ -2808,7 +2809,7 @@ body.light-theme .hiw-chevron {
 }
 
 /* ==========================================================================
-   10. FAQ ACCORDION (AIPost Section 10)
+   10. FAQ ACCORDION (IT Hunt Section 10)
    ========================================================================== */
 
 .faq-accordion-wrap {
@@ -2869,15 +2870,15 @@ body.light-theme .hiw-chevron {
 }
 
 /* ==========================================================================
-   11. FINAL CTA BANNER (AIPost Section 11)
+   11. FINAL CTA BANNER (IT Hunt Section 11)
    ========================================================================== */
 
-.aipost-cta-section {
+.ithunt-cta-section {
   padding: 4rem 1rem;
   background: var(--bg-cyber-dark, #070a12);
 }
 
-.aipost-cta-banner {
+.ithunt-cta-banner {
   background: var(--bg-card-glass, rgba(15, 23, 42, 0.85));
   border: 1.5px solid var(--border-cyber-glow, rgba(249, 115, 22, 0.45));
   border-radius: 24px;
@@ -2944,17 +2945,17 @@ body.light-theme .hiw-chevron {
    LIGHT THEME SUPPORT (High-Contrast, Crisp, Clean & Polished)
    ========================================================================== */
 
-:global(body.light-theme) .aipost-wrapper {
+:global(body.light-theme) .ithunt-wrapper {
   background-color: #f8fafc;
   color: #0f172a;
 }
 
-:global(body.light-theme) .aipost-hero {
+:global(body.light-theme) .ithunt-hero {
   background: radial-gradient(circle at 50% 0%, rgba(249, 115, 22, 0.1) 0%, transparent 60%), #f8fafc;
 }
 
-:global(body.light-theme) .aipost-hero-headline,
-:global(body.light-theme) .aipost-section-heading,
+:global(body.light-theme) .ithunt-hero-headline,
+:global(body.light-theme) .ithunt-section-heading,
 :global(body.light-theme) .project-main-title,
 :global(body.light-theme) .homework-card-title,
 :global(body.light-theme) .acc-title,
@@ -2969,12 +2970,12 @@ body.light-theme .hiw-chevron {
 
 :global(body.light-theme) .highlight-title,
 :global(body.light-theme) .feature-card-title,
-:global(body.light-theme) .aipost-brush-wrap {
+:global(body.light-theme) .ithunt-brush-wrap {
   color: #0f172a !important;
 }
 
-:global(body.light-theme) .aipost-hero-subtitle,
-:global(body.light-theme) .aipost-section-desc,
+:global(body.light-theme) .ithunt-hero-subtitle,
+:global(body.light-theme) .ithunt-section-desc,
 :global(body.light-theme) .project-brief,
 :global(body.light-theme) .homework-card-desc,
 :global(body.light-theme) .acc-sub,
@@ -2999,37 +3000,37 @@ body.light-theme .hiw-chevron {
   color: #ea580c !important;
 }
 
-:global(body.light-theme) .aipost-btn-secondary {
+:global(body.light-theme) .ithunt-btn-secondary {
   background: #ffffff !important;
   border-color: rgba(0, 0, 0, 0.15) !important;
   color: #0f172a !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
 }
-:global(body.light-theme) .aipost-btn-secondary:hover {
+:global(body.light-theme) .ithunt-btn-secondary:hover {
   border-color: #f97316 !important;
   color: #ea580c !important;
   background: #fff7ed !important;
 }
 
-:global(body.light-theme) .aipost-cat-tabs-pill {
+:global(body.light-theme) .ithunt-cat-tabs-pill {
   background: #ffffff !important;
   border-color: rgba(0, 0, 0, 0.1) !important;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06) !important;
 }
-:global(body.light-theme) .aipost-cat-tab-btn {
+:global(body.light-theme) .ithunt-cat-tab-btn {
   color: #64748b !important;
 }
-:global(body.light-theme) .aipost-cat-tab-btn:hover {
+:global(body.light-theme) .ithunt-cat-tab-btn:hover {
   color: #0f172a !important;
   background: #f1f5f9 !important;
 }
-:global(body.light-theme) .aipost-cat-tab-btn.active {
+:global(body.light-theme) .ithunt-cat-tab-btn.active {
   background: rgba(249, 115, 22, 0.12) !important;
   color: #ea580c !important;
   border-color: rgba(249, 115, 22, 0.3) !important;
 }
 
-:global(body.light-theme) .aipost-highlight-card {
+:global(body.light-theme) .ithunt-highlight-card {
   background: #ffffff !important;
   border-color: rgba(249, 115, 22, 0.35) !important;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08), 0 0 25px rgba(249, 115, 22, 0.06) !important;
@@ -3061,7 +3062,7 @@ body.light-theme .hiw-chevron {
   color: #64748b !important;
 }
 
-:global(body.light-theme) .aipost-pill-badge {
+:global(body.light-theme) .ithunt-pill-badge {
   background: #ffffff !important;
   border-color: rgba(249, 115, 22, 0.4) !important;
   color: #ea580c !important;
@@ -3069,17 +3070,17 @@ body.light-theme .hiw-chevron {
 }
 
 /* Input Bar & Filter Tags */
-:global(body.light-theme) .aipost-input-box {
+:global(body.light-theme) .ithunt-input-box {
   background: #ffffff !important;
   border-color: #cbd5e1 !important;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
 }
 
-:global(body.light-theme) .aipost-hero-input {
+:global(body.light-theme) .ithunt-hero-input {
   color: #0f172a !important;
 }
 
-:global(body.light-theme) .aipost-hero-input::placeholder {
+:global(body.light-theme) .ithunt-hero-input::placeholder {
   color: #94a3b8 !important;
 }
 
@@ -3098,7 +3099,7 @@ body.light-theme .hiw-chevron {
 }
 
 /* Showcase Card & Tabs */
-:global(body.light-theme) .aipost-showcase-card {
+:global(body.light-theme) .ithunt-showcase-card {
   background: #ffffff !important;
   border-color: #e2e8f0 !important;
   box-shadow: 0 20px 45px rgba(0, 0, 0, 0.07) !important;
@@ -3252,21 +3253,21 @@ body.light-theme .hiw-chevron {
   color: #1e293b !important;
 }
 
-:global(body.light-theme) .aipost-btn-secondary {
+:global(body.light-theme) .ithunt-btn-secondary {
   background: #ffffff !important;
   border-color: #cbd5e1 !important;
   color: #0f172a !important;
   font-weight: 700 !important;
 }
 
-:global(body.light-theme) .aipost-btn-secondary:hover {
+:global(body.light-theme) .ithunt-btn-secondary:hover {
   background: #f8fafc !important;
   border-color: #ea580c !important;
   color: #ea580c !important;
 }
 
 /* Stats Counter Band */
-:global(body.light-theme) .aipost-stats-band {
+:global(body.light-theme) .ithunt-stats-band {
   background: #ffffff !important;
   border-color: #e2e8f0 !important;
 }
@@ -3282,11 +3283,11 @@ body.light-theme .hiw-chevron {
 }
 
 /* Sections 2 - 9 Backgrounds & Cards */
-:global(body.light-theme) .aipost-section-base {
+:global(body.light-theme) .ithunt-section-base {
   background: #ffffff !important;
 }
 
-:global(body.light-theme) .aipost-section-alt {
+:global(body.light-theme) .ithunt-section-alt {
   background: #f8fafc !important;
 }
 
@@ -3358,11 +3359,11 @@ body.light-theme .hiw-chevron {
 }
 
 /* Section 10: Final CTA Stays Striking Midnight Luxury in Both Modes */
-:global(body.light-theme) .aipost-cta-section {
+:global(body.light-theme) .ithunt-cta-section {
   background: #f8fafc !important;
 }
 
-:global(body.light-theme) .aipost-cta-banner {
+:global(body.light-theme) .ithunt-cta-banner {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
   border-color: rgba(249, 115, 22, 0.4) !important;
   box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25) !important;
@@ -3380,7 +3381,7 @@ body.light-theme .hiw-chevron {
   color: #94a3b8 !important;
 }
 
-:global(body.light-theme) .cta-buttons-group .aipost-btn-secondary {
+:global(body.light-theme) .cta-buttons-group .ithunt-btn-secondary {
   background: rgba(255, 255, 255, 0.12) !important;
   border-color: rgba(255, 255, 255, 0.25) !important;
   color: #ffffff !important;
@@ -3425,7 +3426,7 @@ body.light-theme .hiw-chevron {
    ========================================================================== */
 
 /* Wrapper safety for mobile viewports to prevent horizontal overflow */
-.aipost-wrapper {
+.ithunt-wrapper {
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden;
@@ -3447,7 +3448,7 @@ body.light-theme .hiw-chevron {
 }
 
 @media (max-width: 900px) {
-  .aipost-hero {
+  .ithunt-hero {
     padding: 3.5rem 1.25rem 3rem;
   }
 
@@ -3499,18 +3500,18 @@ body.light-theme .hiw-chevron {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
 
-  .aipost-hero-cta-group {
+  .ithunt-hero-cta-group {
     flex-direction: column;
     width: 100%;
   }
 
-  .aipost-hero-main-cta,
-  .aipost-btn-secondary {
+  .ithunt-hero-main-cta,
+  .ithunt-btn-secondary {
     width: 100%;
     justify-content: center;
   }
 
-  .aipost-cat-tabs-pill {
+  .ithunt-cat-tabs-pill {
     width: 100%;
     justify-content: flex-start;
     padding: 0.35rem;
@@ -3536,22 +3537,22 @@ body.light-theme .hiw-chevron {
 
 @media (max-width: 640px) {
   /* Hero Spacing & Typography */
-  .aipost-hero {
+  .ithunt-hero {
     padding: 2.25rem 0.85rem 2.25rem;
     overflow: hidden;
   }
 
-  .aipost-badge-wrapper {
+  .ithunt-badge-wrapper {
     margin-bottom: 1.1rem;
   }
 
-  .aipost-pill-badge {
+  .ithunt-pill-badge {
     padding: 0.35rem 0.85rem;
     font-size: 0.72rem;
     letter-spacing: 0.04em;
   }
 
-  .aipost-hero-headline {
+  .ithunt-hero-headline {
     font-size: clamp(1.65rem, 6.2vw, 2.25rem);
     line-height: 1.22;
     margin-bottom: 1rem;
@@ -3559,59 +3560,59 @@ body.light-theme .hiw-chevron {
     word-break: break-word;
   }
 
-  .aipost-platform-pills-row {
+  .ithunt-platform-pills-row {
     font-size: 0.84rem;
     line-height: 1.5;
     margin-bottom: 0.4rem;
     padding: 0 0.5rem;
   }
 
-  .aipost-track-formats-row {
+  .ithunt-track-formats-row {
     font-size: 0.78rem;
     line-height: 1.4;
     margin-bottom: 0.9rem;
     padding: 0 0.5rem;
   }
 
-  .aipost-hero-subtitle {
+  .ithunt-hero-subtitle {
     font-size: 0.92rem;
     line-height: 1.55;
     margin-bottom: 1.5rem;
     padding: 0 0.4rem;
   }
 
-  .aipost-hero-cta-group {
+  .ithunt-hero-cta-group {
     margin-bottom: 0.75rem;
   }
 
-  .aipost-hero-main-cta,
-  .aipost-btn-secondary {
+  .ithunt-hero-main-cta,
+  .ithunt-btn-secondary {
     font-size: 0.92rem;
     padding: 0.8rem 1.25rem;
     min-height: 48px;
     border-radius: 12px;
   }
 
-  .aipost-pricing-microtext {
+  .ithunt-pricing-microtext {
     font-size: 0.76rem;
     margin-bottom: 2rem;
     padding: 0 0.5rem;
   }
 
-  .aipost-cat-tabs-pill {
+  .ithunt-cat-tabs-pill {
     width: 100%;
     justify-content: flex-start;
     padding: 0.3rem;
     border-radius: 12px;
   }
 
-  .aipost-cat-tab-btn {
+  .ithunt-cat-tab-btn {
     padding: 0.45rem 0.8rem;
     font-size: 0.78rem;
     border-radius: 8px;
   }
 
-  .aipost-highlight-card {
+  .ithunt-highlight-card {
     padding: 2.25rem 1.15rem;
     border-radius: 20px;
   }
@@ -3666,12 +3667,12 @@ body.light-theme .hiw-chevron {
   }
 
   /* Interactive Input Box */
-  .aipost-input-box-wrapper {
+  .ithunt-input-box-wrapper {
     margin-bottom: 2.25rem;
     padding: 0;
   }
 
-  .aipost-input-box {
+  .ithunt-input-box {
     border-radius: 18px;
     flex-direction: column;
     padding: 0.75rem;
@@ -3679,18 +3680,18 @@ body.light-theme .hiw-chevron {
     align-items: stretch;
   }
 
-  .aipost-input-icon {
+  .ithunt-input-icon {
     display: none;
   }
 
-  .aipost-hero-input {
+  .ithunt-hero-input {
     width: 100%;
     text-align: center;
     font-size: 0.92rem;
     padding: 0.4rem 0.25rem;
   }
 
-  .aipost-hero-cta {
+  .ithunt-hero-cta {
     width: 100%;
     justify-content: center;
     min-height: 48px;
@@ -3699,7 +3700,7 @@ body.light-theme .hiw-chevron {
   }
 
   /* Specialization Quick Pills */
-  .aipost-quick-tags {
+  .ithunt-quick-tags {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -3722,7 +3723,7 @@ body.light-theme .hiw-chevron {
   }
 
   /* Guarantees 2x2 Grid on Mobile */
-  .aipost-guarantee-row {
+  .ithunt-guarantee-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.5rem 0.75rem;
@@ -3742,12 +3743,12 @@ body.light-theme .hiw-chevron {
   }
 
   /* Interactive Showcase Card Mobile Ergonomics */
-  .aipost-showcase-container {
+  .ithunt-showcase-container {
     width: 100%;
     padding: 0;
   }
 
-  .aipost-showcase-card {
+  .ithunt-showcase-card {
     border-radius: 16px;
   }
 
@@ -3902,7 +3903,7 @@ body.light-theme .hiw-chevron {
   }
 
   /* Stats Band 2-Column Mobile Layout */
-  .aipost-stats-band {
+  .ithunt-stats-band {
     padding: 1.75rem 0.75rem;
   }
 
@@ -3933,7 +3934,7 @@ body.light-theme .hiw-chevron {
   }
 
   /* Sections Generic */
-  .aipost-section {
+  .ithunt-section {
     padding: 3rem 0.85rem;
   }
 
@@ -3941,13 +3942,13 @@ body.light-theme .hiw-chevron {
     margin: 0 auto 2rem;
   }
 
-  .aipost-section-heading {
+  .ithunt-section-heading {
     font-size: clamp(1.55rem, 5.5vw, 2.15rem);
     margin-bottom: 0.75rem;
     line-height: 1.22;
   }
 
-  .aipost-section-desc {
+  .ithunt-section-desc {
     font-size: 0.92rem;
     line-height: 1.55;
   }
@@ -4220,11 +4221,11 @@ body.light-theme .hiw-chevron {
   }
 
   /* Section 10: CTA Banner */
-  .aipost-cta-section {
+  .ithunt-cta-section {
     padding: 2.5rem 0.85rem;
   }
 
-  .aipost-cta-banner {
+  .ithunt-cta-banner {
     padding: 2.25rem 1.15rem;
     border-radius: 18px;
   }
@@ -4267,7 +4268,7 @@ body.light-theme .hiw-chevron {
 
 /* Ultra-Compact Mobile (< 400px, e.g. iPhone SE, Fold) */
 @media (max-width: 400px) {
-  .aipost-hero-headline {
+  .ithunt-hero-headline {
     font-size: 1.55rem;
   }
 
@@ -4288,7 +4289,7 @@ body.light-theme .hiw-chevron {
     font-size: 0.72rem;
   }
 
-  .aipost-guarantee-row {
+  .ithunt-guarantee-row {
     grid-template-columns: 1fr;
     text-align: center;
     justify-items: center;

@@ -25,7 +25,7 @@
         </ul>
       </nav>
 
-      <!-- Action Buttons (AIPost Style: Clean, Modern & Responsive) -->
+      <!-- Action Buttons (ITHUNT Style: Clean, Modern & Responsive) -->
       <div class="nav-actions">
         <!-- Theme Toggle -->
         <button 
