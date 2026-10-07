@@ -17,6 +17,18 @@ html {
   overflow-x: clip;
 }
 
+/* Home Page Vertical One-Page-Per-Section Snapping */
+html.ithunt-home-snapping {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+
+@media (max-width: 991px) {
+  html.ithunt-home-snapping {
+    scroll-snap-type: y proximity;
+  }
+}
+
 /* Custom Modern Scrollbar */
 ::-webkit-scrollbar {
   width: 10px;

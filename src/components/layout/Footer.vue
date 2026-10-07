@@ -1,5 +1,9 @@
 <template>
-  <footer class="footer-section">
+  <footer 
+    class="footer-section ithunt-home-section" 
+    id="page-footer"
+    :class="{ 'home-footer-snap': activeTab === 'home' }"
+  >
 
     <!-- ── Main 3-column grid ── -->
     <div class="container footer-grid">
@@ -84,7 +88,8 @@
 
 <script setup>
 defineProps({
-  content: { type: Object, required: true }
+  content: { type: Object, required: true },
+  activeTab: { type: String, default: 'home' }
 });
 defineEmits(['set-tab', 'open-privacy-policy', 'open-terms-conditions', 'open-cv-modal']);
 
@@ -102,6 +107,17 @@ const onImgError = (event) => {
   border-top: 1px solid rgba(255,255,255,0.08);
   padding: 3rem 0 0;
   color: #fff;
+}
+
+.home-footer-snap {
+  min-height: calc(100vh - var(--navbar-height, 72px));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  scroll-margin-top: var(--navbar-height, 72px);
+  box-sizing: border-box;
 }
 
 .footer-grid {

@@ -450,6 +450,7 @@
     <Footer 
       v-if="!isAdminLoggedIn && activeTab !== 'superadmin' && activeTab !== 'login'"
       :content="content" 
+      :activeTab="activeTab"
       @set-tab="setTab" 
       @open-privacy-policy="openPrivacyPolicyPdf"
       @open-terms-conditions="openTermsConditionsPdf"
