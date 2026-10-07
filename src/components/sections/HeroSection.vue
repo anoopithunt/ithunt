@@ -1,9 +1,18 @@
 <template>
   <div class="ithunt-wrapper">
+    <!-- Dedicated Vertical Pagination Rail for Home View -->
+    <VerticalPaginationNav
+      :sections="homeSections"
+      :activeSectionId="activeSectionId"
+      :isSnapEnabled="isSnapEnabled"
+      @navigate="scrollToSection"
+      @toggle-snap="toggleSnapMode"
+    />
+
     <!-- =====================================================================
-         1. HERO SECTION (IT Hunt Signature Style with Native Brand Palette)
+         1. PAGE 1: HERO OVERVIEW & KEY METRICS (IT Hunt Signature Style)
          ===================================================================== -->
-    <section class="ithunt-hero ithunt-section-odd">
+    <section class="ithunt-home-section ithunt-hero ithunt-section-odd" id="page-hero">
       <div class="ithunt-hero-glow ithunt-hero-glow-1"></div>
       <div class="ithunt-hero-glow ithunt-hero-glow-2"></div>
 
@@ -62,7 +71,48 @@
           </div>
         </div>
 
-        <!-- Interactive Hero Showcase Card (IT Hunt's "See in Action" Preview on Hero) -->
+        <!-- Key Metrics Counter Band right inside Page 1 -->
+        <div class="ithunt-stats-band-hero" ref="statsSectionRef">
+          <div class="stats-card-grid">
+            <div class="stat-pill-card" v-for="(stat, idx) in content.stats" :key="idx">
+              <div class="stat-number-box">
+                <span class="stat-num text-brand">{{ animatedStats[idx] || stat.number }}</span>
+              </div>
+              <div class="stat-desc-box">
+                <div class="stat-label-title">{{ stat.label }}</div>
+                <div class="stat-micro-note">Verified & Audited 2026</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Jump Down Pill to Next Page -->
+      <button class="section-scroll-pill" @click="scrollToSection('page-showcase')" aria-label="Inspect Production Code Showcase">
+        <span>Inspect Production Code Showcase</span>
+        <span class="scroll-arrow-anim">↓</span>
+      </button>
+    </section>
+
+    <!-- =====================================================================
+         2. PAGE 2: INTERACTIVE PRODUCTION SHOWCASE (Mac App & Code Terminal)
+         ===================================================================== -->
+    <section class="ithunt-home-section ithunt-showcase-section ithunt-section-even ithunt-section-alt" id="page-showcase">
+      <div class="container">
+        <div class="section-title-wrap text-center">
+          <div class="ithunt-pill-badge small">
+            <span class="ithunt-badge-dot"></span>
+            <span>PRODUCTION ARCHITECTURE</span>
+          </div>
+          <h2 class="ithunt-section-heading">
+            Live Client Code &amp; Deployment Telemetry
+          </h2>
+          <p class="ithunt-section-desc">
+            Before you enroll, inspect the actual Swift, Web, and AI codebases engineered by IT HUNT interns in real client sprints.
+          </p>
+        </div>
+
+        <!-- Interactive Hero Showcase Card -->
         <div class="ithunt-showcase-container">
           <div class="ithunt-showcase-card">
             <!-- Header with macOS window dots and interactive tabs -->
@@ -163,31 +213,18 @@
           </div>
         </div>
       </div>
+
+      <!-- Jump Down Pill -->
+      <button class="section-scroll-pill" @click="scrollToSection('page-philosophy')" aria-label="Next: Training Philosophy">
+        <span>Next: Training Philosophy</span>
+        <span class="scroll-arrow-anim">↓</span>
+      </button>
     </section>
 
     <!-- =====================================================================
-         2. KEY METRICS COUNTER BAR (IT Hunt Style)
+         3. PAGE 3: THE TRAINING PHILOSOPHY ("We build real software before we teach a class")
          ===================================================================== -->
-    <div class="ithunt-stats-band" ref="statsSectionRef">
-      <div class="container">
-        <div class="stats-card-grid">
-          <div class="stat-pill-card" v-for="(stat, idx) in content.stats" :key="idx">
-            <div class="stat-number-box">
-              <span class="stat-num text-brand">{{ animatedStats[idx] || stat.number }}</span>
-            </div>
-            <div class="stat-desc-box">
-              <div class="stat-label-title">{{ stat.label }}</div>
-              <div class="stat-micro-note">Verified & Audited 2026</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- =====================================================================
-         3. SECTION 2: "We build real software before we teach a class" (IT Hunt Section 2 Style)
-         ===================================================================== -->
-    <section class="ithunt-section ithunt-section-even ithunt-section-alt">
+    <section class="ithunt-home-section ithunt-section ithunt-section-odd ithunt-section-base" id="page-philosophy">
       <div class="container">
         <div class="section-title-wrap text-center">
           <div class="ithunt-pill-badge small">
@@ -260,12 +297,18 @@
           </div>
         </div>
       </div>
+
+      <!-- Jump Down Pill to Next Page -->
+      <button class="section-scroll-pill" @click="scrollToSection('page-tracks')" aria-label="Next: Core Tracks">
+        <span>Next: Core Tracks</span>
+        <span class="scroll-arrow-anim">↓</span>
+      </button>
     </section>
 
     <!-- =====================================================================
-         4. SECTION 3: "Three Core Tracks. One Integrated Studio." (IT Hunt Section 3 Style)
+         4. PAGE 4: THREE CORE TRACKS ("Three Core Tracks. One Integrated Studio.")
          ===================================================================== -->
-    <section class="ithunt-section ithunt-section-odd ithunt-section-base">
+    <section class="ithunt-home-section ithunt-section ithunt-section-even ithunt-section-alt" id="page-tracks">
       <div class="container">
         <div class="section-title-wrap text-center">
           <div class="ithunt-pill-badge small">
@@ -355,13 +398,19 @@
           </div>
         </div>
       </div>
+
+      <!-- Jump Down Pill to Next Page -->
+      <button class="section-scroll-pill" @click="scrollToSection('page-projects')" aria-label="Next: Live Projects">
+        <span>Next: Live Projects</span>
+        <span class="scroll-arrow-anim">↓</span>
+      </button>
     </section>
 
     <!-- =====================================================================
-         5. SECTION 4: "See in Action" Live Projects Showcase (IT Hunt Section 4 Style)
+         5. PAGE 5: LIVE PROJECTS SHOWCASE ("See in Action" Live Projects)
          ===================================================================== -->
-    <section class="ithunt-section ithunt-section-even ithunt-section-alt" id="examples">
-      <div class="container">
+    <section class="ithunt-home-section ithunt-section ithunt-section-odd ithunt-section-base" id="page-projects">
+      <div class="container" id="examples">
         <div class="section-title-wrap text-center">
           <div class="ithunt-pill-badge small">
             <span class="ithunt-badge-dot"></span>
@@ -430,13 +479,19 @@
           </div>
         </div>
       </div>
+
+      <!-- Jump Down Pill to Next Page -->
+      <button class="section-scroll-pill" @click="scrollToSection('page-roadmap')" aria-label="Next: Placement Roadmap">
+        <span>Next: Placement Roadmap</span>
+        <span class="scroll-arrow-anim">↓</span>
+      </button>
     </section>
 
 
     <!-- =====================================================================
-         6. SECTION 5: "From Zero to Hired" — Interactive Accordion
+         6. PAGE 6: PLACEMENT PIPELINE & ROADMAP ("From Zero to Hired" — Interactive Accordion)
          ===================================================================== -->
-    <section class="ithunt-section ithunt-section-odd ithunt-section-base hiw-section">
+    <section class="ithunt-home-section ithunt-section ithunt-section-even ithunt-section-alt hiw-section" id="page-roadmap">
       <div class="container">
         <div class="section-title-wrap text-center">
           <div class="ithunt-pill-badge small">
@@ -515,12 +570,18 @@
           </div>
         </div>
       </div>
+
+      <!-- Jump Down Pill to Next Page -->
+      <button class="section-scroll-pill" @click="scrollToSection('page-benefits')" aria-label="Next: Why Choose Us">
+        <span>Next: Why Choose Us</span>
+        <span class="scroll-arrow-anim">↓</span>
+      </button>
     </section>
 
     <!-- =====================================================================
-         7. SECTION 6: "Why Choose IT HUNT?" Bento Grid (IT Hunt Section 7 Benefits Style)
+         7. PAGE 7: WHY CHOOSE IT HUNT (Bento Grid)
          ===================================================================== -->
-    <section class="ithunt-section ithunt-section-even ithunt-section-alt">
+    <section class="ithunt-home-section ithunt-section ithunt-section-odd ithunt-section-base" id="page-benefits">
       <div class="container">
         <div class="section-title-wrap text-center">
           <div class="ithunt-pill-badge small">
@@ -597,14 +658,20 @@
           </div>
         </div>
       </div>
+
+      <!-- Jump Down Pill to Next Page -->
+      <button class="section-scroll-pill" @click="scrollToSection('page-leadership')" aria-label="Next: Leadership">
+        <span>Next: Leadership</span>
+        <span class="scroll-arrow-anim">↓</span>
+      </button>
     </section>
 
 
 
     <!-- =====================================================================
-         9. SECTION 8: EXECUTIVE LEADERSHIP & FOUNDERS (Clean Studio Style)
+         8. PAGE 8: EXECUTIVE LEADERSHIP & FOUNDERS (Clean Studio Style)
          ===================================================================== -->
-    <section class="ithunt-section ithunt-section-odd ithunt-section-base">
+    <section class="ithunt-home-section ithunt-section ithunt-section-even ithunt-section-alt" id="page-leadership">
       <div class="container">
         <div class="section-title-wrap text-center">
           <div class="ithunt-pill-badge small">
@@ -653,12 +720,18 @@
           </div>
         </div>
       </div>
+
+      <!-- Jump Down Pill to Next Page -->
+      <button class="section-scroll-pill" @click="scrollToSection('page-faq')" aria-label="Next: Frequently Asked Questions">
+        <span>Next: Frequently Asked Questions</span>
+        <span class="scroll-arrow-anim">↓</span>
+      </button>
     </section>
 
     <!-- =====================================================================
-         10. SECTION 9: FREQUENTLY ASKED QUESTIONS (IT Hunt Section 10 Accordion)
+         9. PAGE 9: FREQUENTLY ASKED QUESTIONS (Accordion)
          ===================================================================== -->
-    <section class="ithunt-section ithunt-section-even ithunt-section-alt">
+    <section class="ithunt-home-section ithunt-section ithunt-section-odd ithunt-section-base" id="page-faq">
       <div class="container">
         <div class="section-title-wrap text-center">
           <div class="ithunt-pill-badge small">
@@ -690,12 +763,18 @@
           </div>
         </div>
       </div>
+
+      <!-- Jump Down Pill to Next Page -->
+      <button class="section-scroll-pill" @click="scrollToSection('page-cta')" aria-label="Next: Get Started">
+        <span>Next: Get Started</span>
+        <span class="scroll-arrow-anim">↓</span>
+      </button>
     </section>
 
     <!-- =====================================================================
-         11. SECTION 10: FINAL CONVERSION BANNER (IT Hunt Section 11 Style)
+         10. PAGE 10: FINAL CONVERSION BANNER (IT Hunt Signature CTA)
          ===================================================================== -->
-    <section class="ithunt-cta-section ithunt-section-odd">
+    <section class="ithunt-home-section ithunt-cta-section ithunt-section-even ithunt-section-alt" id="page-cta">
       <div class="container">
         <div class="ithunt-cta-banner">
           <div class="cta-glow-element"></div>
@@ -733,12 +812,19 @@
           </div>
         </div>
       </div>
+
+      <!-- Jump Down Pill to Footer / Contact -->
+      <button class="section-scroll-pill" @click="scrollToSection('page-footer')" aria-label="Next: Contact & Information">
+        <span>Contact &amp; Information</span>
+        <span class="scroll-arrow-anim">↓</span>
+      </button>
     </section>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import VerticalPaginationNav from '../layout/VerticalPaginationNav.vue';
 
 const props = defineProps({
   content: {
@@ -748,6 +834,43 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['set-tab', 'apply-course', 'open-job-modal', 'open-cv-modal']);
+
+// Vertical Section-Wise Pagination Config (11 Distinct Full-Viewport Pages)
+const homeSections = [
+  { id: 'page-hero', label: 'Overview', icon: '🏠', subtitle: 'Hero & Verified Stats' },
+  { id: 'page-showcase', label: 'Code Showcase', icon: '💻', subtitle: 'Interactive Mac Terminal' },
+  { id: 'page-philosophy', label: 'Philosophy', icon: '💡', subtitle: 'Client-Code First Training' },
+  { id: 'page-tracks', label: 'Core Tracks', icon: '🎯', subtitle: '3 Structured Acceleration Tracks' },
+  { id: 'page-projects', label: 'Live Projects', icon: '🚀', subtitle: 'Production Client Software' },
+  { id: 'page-roadmap', label: 'Roadmap', icon: '🗺️', subtitle: 'From Day 1 to Placement' },
+  { id: 'page-benefits', label: 'Why IT HUNT', icon: '💎', subtitle: 'Bento Grid of Advantages' },
+  { id: 'page-leadership', label: 'Leadership', icon: '👥', subtitle: 'Founders & Senior Architects' },
+  { id: 'page-faq', label: 'FAQs', icon: '❓', subtitle: 'Common Inquiries Answered' },
+  { id: 'page-cta', label: 'Apply Now', icon: '🔥', subtitle: 'Start 2026 Batch Application' },
+  { id: 'page-footer', label: 'Contact & Info', icon: '📍', subtitle: 'Location, Socials & Legal' },
+];
+
+const activeSectionId = ref('page-hero');
+const isSnapEnabled = ref(true);
+
+const scrollToSection = (id) => {
+  activeSectionId.value = id;
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+};
+
+const toggleSnapMode = () => {
+  isSnapEnabled.value = !isSnapEnabled.value;
+  if (isSnapEnabled.value) {
+    document.documentElement.classList.add('ithunt-home-snapping');
+    document.body.classList.add('ithunt-home-snapping');
+  } else {
+    document.documentElement.classList.remove('ithunt-home-snapping');
+    document.body.classList.remove('ithunt-home-snapping');
+  }
+};
 
 // Interactive Showcase Card Data (Mac-style App & Terminal view)
 const showcaseProjects = [
@@ -1106,7 +1229,78 @@ const onImgError = (event) => {
   event.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="%231e293b"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="16" fill="%2394a3b8">IT HUNT Center</text></svg>';
 };
 
+let sectionObserver = null;
+
+const handleKeyDown = (e) => {
+  const tag = (e.target?.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'textarea' || e.target?.isContentEditable) return;
+
+  const currentIdx = homeSections.findIndex(s => s.id === activeSectionId.value);
+  if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+    if (currentIdx < homeSections.length - 1) {
+      e.preventDefault();
+      scrollToSection(homeSections[currentIdx + 1].id);
+    }
+  } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+    if (currentIdx > 0) {
+      e.preventDefault();
+      scrollToSection(homeSections[currentIdx - 1].id);
+    }
+  } else if (e.key === 'Home') {
+    e.preventDefault();
+    scrollToSection(homeSections[0].id);
+  } else if (e.key === 'End') {
+    e.preventDefault();
+    scrollToSection(homeSections[homeSections.length - 1].id);
+  }
+};
+
+const handleScrollBounds = () => {
+  if (window.scrollY < 60) {
+    activeSectionId.value = 'page-hero';
+  } else if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 60) {
+    activeSectionId.value = 'page-footer';
+  }
+};
+
+const initSectionObserver = () => {
+  if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
+
+  const observerOptions = {
+    threshold: [0.2, 0.45, 0.75],
+    rootMargin: '-10% 0px -10% 0px'
+  };
+
+  sectionObserver = new IntersectionObserver((entries) => {
+    let highestRatio = 0;
+    let mostVisibleId = null;
+
+    entries.forEach(entry => {
+      if (entry.isIntersecting && entry.intersectionRatio > highestRatio) {
+        highestRatio = entry.intersectionRatio;
+        mostVisibleId = entry.target.id;
+      }
+    });
+
+    if (mostVisibleId && highestRatio > 0.25) {
+      activeSectionId.value = mostVisibleId;
+    }
+  }, observerOptions);
+
+  homeSections.forEach(sec => {
+    const el = document.getElementById(sec.id);
+    if (el) sectionObserver.observe(el);
+  });
+};
+
 onMounted(() => {
+  document.documentElement.classList.add('ithunt-home-snapping');
+  document.body.classList.add('ithunt-home-snapping');
+  window.addEventListener('keydown', handleKeyDown);
+  window.addEventListener('scroll', handleScrollBounds, { passive: true });
+
+  setTimeout(initSectionObserver, 200);
+
   const statsList = props.content?.stats || [];
   animatedStats.value = statsList.map(s => s.number);
 
@@ -1125,6 +1319,11 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  document.documentElement.classList.remove('ithunt-home-snapping');
+  document.body.classList.remove('ithunt-home-snapping');
+  window.removeEventListener('keydown', handleKeyDown);
+  window.removeEventListener('scroll', handleScrollBounds);
+  if (sectionObserver) sectionObserver.disconnect();
   if (observer) observer.disconnect();
 });
 </script>
@@ -1147,6 +1346,151 @@ onUnmounted(() => {
   background-color: var(--bg-cyber-dark, #070a12);
   color: var(--text-main, #f8fafc);
   font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+}
+
+/* ==========================================================================
+   VERTICAL ONE-PAGE-PER-SECTION PAGINATION LAYOUT
+   ========================================================================== */
+
+/* Enable scroll snap on html/body when home snapping is active */
+:global(html.ithunt-home-snapping) {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+
+:global(body.ithunt-home-snapping) {
+  overflow-y: scroll;
+}
+
+/* Base Full-Viewport Section Style */
+.ithunt-home-section {
+  min-height: calc(100vh - var(--navbar-height, 72px));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  scroll-margin-top: var(--navbar-height, 72px);
+  box-sizing: border-box;
+  padding: 3rem 1.5rem 4rem;
+  width: 100%;
+}
+
+.ithunt-home-section > .container {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+/* Hero Section Specific Page 1 Tuning */
+.ithunt-hero.ithunt-home-section {
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+  justify-content: center;
+}
+
+.ithunt-stats-band-hero {
+  margin-top: 2rem;
+  width: 100%;
+}
+
+.ithunt-stats-band-hero .stats-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+/* Page 2: Showcase Section Tuning */
+.ithunt-showcase-section {
+  padding-top: 2.5rem;
+  padding-bottom: 4rem;
+}
+
+.ithunt-showcase-section .section-title-wrap {
+  margin-bottom: 1.5rem;
+}
+
+/* In-Page Jump Pill / Next Section Indicator */
+.section-scroll-pill {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1.15rem;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  border-radius: 9999px;
+  color: #ffffff;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+}
+
+.section-scroll-pill:hover {
+  background: rgba(249, 115, 22, 0.22);
+  border-color: #f97316;
+  color: #f97316;
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.35);
+}
+
+.scroll-arrow-anim {
+  display: inline-block;
+  color: var(--color-ai-orange, #f97316);
+  font-weight: 800;
+  animation: bounce-arrow 1.6s infinite ease-in-out;
+}
+
+@keyframes bounce-arrow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+:global(body.light-theme) .section-scroll-pill {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(249, 115, 22, 0.45);
+  color: #0f172a;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+:global(body.light-theme) .section-scroll-pill:hover {
+  background: #ffffff;
+  color: #ea580c;
+  border-color: #ea580c;
+}
+
+/* Mobile & Tablet Responsiveness */
+@media (max-width: 991px) {
+  :global(html.ithunt-home-snapping) {
+    scroll-snap-type: y proximity;
+  }
+
+  .ithunt-home-section {
+    min-height: auto;
+    padding: 3.5rem 1rem 3.5rem;
+    scroll-snap-align: start;
+    scroll-snap-stop: normal;
+  }
+
+  .ithunt-stats-band-hero .stats-card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .section-scroll-pill {
+    display: none;
+  }
 }
 
 /* ==========================================================================
