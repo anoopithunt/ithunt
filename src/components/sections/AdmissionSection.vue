@@ -303,3 +303,40 @@ const onImgError = (event) => {
   event.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60"><rect width="60" height="60" rx="12" fill="%23f97316"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="900" fill="white">IT HUNT</text></svg>';
 };
 </script>
+<style scoped>
+/* Responsive layout for AdmissionSection */
+.admission-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.form-card {
+  width: 100%;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+/* Ensure receipt preview card scrolls on small screens */
+.receipt-preview-card {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .receipt-preview-card {
+    max-height: 50vh;
+  }
+  .form-title, .form-subtitle {
+    text-align: center;
+  }
+  .btn-primary {
+    font-size: 0.9rem;
+    padding: 0.75rem;
+  }
+}
+</style>
