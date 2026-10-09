@@ -1,22 +1,21 @@
 <template>
   <section class="nielit-project-section">
     <div class="container nielit-container">
-      <div class="nielit-page-card">
-        <!-- Header -->
-      <div class="modal-header">
+      <!-- Page Header -->
+      <div class="page-header">
         <div class="modal-badge-pill">
           <span class="pulse-dot"></span>
           <span>📜 OFFICIAL NIELIT PORTAL • PROJECT SUBMISSION 2026</span>
         </div>
-        <h2 class="modal-title">
+        <h2 class="page-title">
           NIELIT Student <span class="text-gradient">Project & Thesis Submission</span>
         </h2>
-        <p class="modal-subtitle">
+        <p class="page-subtitle">
           Step {{ activeSection }} of 3: {{ stepTitles[activeSection - 1] }}. The official 4-Page NIELIT Project Document (Annexure II, III, Guide Certificate & Fee Receipt) will be automatically compiled.
         </p>
 
         <!-- Step Navigation Pill Strip -->
-        <div class="nielit-steps-pill-strip">
+        <div class="nielit-steps-pill-strip mx-auto">
           <div 
             class="step-pill" 
             :class="{ active: activeSection === 1, done: isSection1Filled && activeSection > 1 }" 
@@ -444,7 +443,6 @@
         </div>
       </form>
     </div>
-  </div>
   </section>
 </template>
 
@@ -715,32 +713,52 @@ const handleFormSubmit = () => {
   margin: 0 auto;
 }
 
-.nielit-page-card {
-  width: 100%;
-  position: relative;
-  padding: 3rem;
-  border-radius: var(--radius-xl, 24px);
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  overflow: hidden;
+.page-header {
+  margin-bottom: 3rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.modal-header {
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.modal-title {
-  font-family: var(--font-heading);
-  font-size: 2rem;
+.modal-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  background: rgba(249, 115, 22, 0.1);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  border-radius: 9999px;
+  color: #f97316;
+  font-size: 0.75rem;
   font-weight: 800;
-  margin: 0.75rem 0 0.5rem;
+  letter-spacing: 0.5px;
+  margin-bottom: 1rem;
+}
+
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f97316;
+  box-shadow: 0 0 10px #f97316;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); }
+  70% { box-shadow: 0 0 0 6px rgba(249, 115, 22, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+}
+
+.page-title {
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin: 0 0 0.75rem;
   line-height: 1.25;
   letter-spacing: -0.5px;
+  color: #fff;
 }
 
 .text-gradient {
@@ -749,12 +767,12 @@ const handleFormSubmit = () => {
   -webkit-text-fill-color: transparent;
 }
 
-.modal-subtitle {
+.page-subtitle {
   color: #94a3b8;
   font-size: 0.95rem;
   line-height: 1.6;
-  margin-bottom: 1.5rem;
-  max-width: 90%;
+  margin-bottom: 2rem;
+  max-width: 800px;
 }
 
 /* Step Navigation Strip */
@@ -1060,12 +1078,7 @@ const handleFormSubmit = () => {
     padding: 100px 1rem 40px;
   }
   
-  .nielit-page-card {
-    padding: 1.5rem;
-    border-radius: 16px;
-  }
-
-  .modal-title {
+  .page-title {
     font-size: 1.6rem;
   }
 
