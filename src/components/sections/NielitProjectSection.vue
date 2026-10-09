@@ -1,17 +1,8 @@
 <template>
-  <div class="modal-overlay" @click.self="$emit('close')">
-    <div class="modal-card nielit-modal-card">
-      <!-- Theme Matched Top-Right Close Button -->
-      <button 
-        class="modal-close-icon" 
-        @click="$emit('close')" 
-        title="Close Project Submission Form (Esc)"
-        aria-label="Close Project Submission Form"
-      >
-        ✕
-      </button>
-
-      <!-- Modal Header -->
+  <section class="nielit-project-section" style="padding: 120px 0 60px;">
+    <div class="container" style="max-width: 900px; margin: 0 auto;">
+      <div class="nielit-page-card">
+        <!-- Header -->
       <div class="modal-header">
         <div class="modal-badge-pill">
           <span class="pulse-dot"></span>
@@ -421,7 +412,7 @@
             type="button" 
             class="btn-secondary modal-cancel-btn" 
             :disabled="isSubmitting" 
-            @click="$emit('close')"
+            @click="$emit('cancel-submission')"
           >
             <span>Cancel</span>
           </button>
@@ -454,6 +445,7 @@
       </form>
     </div>
   </div>
+  </section>
 </template>
 
 <script setup>
@@ -467,7 +459,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['close', 'submit-nielit-project']);
+const emit = defineEmits(['cancel-submission', 'submit-nielit-project']);
 
 const isSubmitting = ref(false);
 const activeSection = ref(1);
@@ -699,17 +691,14 @@ const handleFormSubmit = () => {
 </script>
 
 <style scoped>
-.nielit-modal-card {
-  max-width: 820px;
-  width: 95%;
-  max-height: 90vh;
-  overflow-y: auto;
+.nielit-page-card {
+  width: 100%;
   position: relative;
-  padding: 2.25rem 2rem;
+  padding: 2.5rem 2.5rem;
   border-radius: var(--radius-xl, 20px);
   background: var(--bg-card-glass);
   border: 1px solid var(--border-cyber-glow);
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.95), 0 0 40px rgba(249, 115, 22, 0.25);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(249, 115, 22, 0.15);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
@@ -995,21 +984,41 @@ body.light-theme .form-section-group {
 }
 
 @media (max-width: 680px) {
-  .nielit-modal-card {
-    padding: 1.5rem 1.15rem;
+  .nielit-page-card {
+    padding: 1.5rem 1rem;
+    border-radius: 12px;
   }
 
   .modal-title {
-    font-size: 1.45rem;
+    font-size: 1.35rem;
+  }
+  
+  .modal-header {
+    padding-right: 2rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+  }
+
+  .form-section-group {
+    padding: 1rem 0.85rem;
   }
 
   .form-grid-2, .form-grid-3 {
     grid-template-columns: 1fr;
     gap: 0.85rem;
   }
+  
+  .step-text {
+    font-size: 0.75rem;
+  }
+  
+  .step-pill {
+    padding: 0.4rem 0.75rem;
+  }
 
   .modal-actions-bar {
     flex-direction: column;
+    gap: 0.75rem;
   }
 
   .modal-cancel-btn,

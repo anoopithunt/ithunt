@@ -65,7 +65,7 @@
       :adminUser="adminUser"
       @set-tab="setTab" 
       @toggle-theme="toggleTheme" 
-      @open-nielit-modal="showNielitModal = true"
+      @open-nielit-modal="setTab('nielit-project')"
       @open-cv-modal="showCvModal = true"
     />
 
@@ -91,7 +91,7 @@
           @set-tab="setTab" 
           @open-detail="openCourseDetailModal" 
           @fast-apply="proceedToRegistration" 
-          @open-nielit-modal="showNielitModal = true"
+          @open-nielit-modal="setTab('nielit-project')"
         />
 
         <!-- 3. Dedicated Events & Gallery View -->
@@ -232,6 +232,14 @@
           @open-cv-modal="showCvModal = true"
           @go-to-login="setTab('login')"
         />
+
+        <!-- 12. Dedicated NIELIT Project Section -->
+        <NielitProjectSection 
+          v-else-if="activeTab === 'nielit-project'" 
+          key="nielit-project"
+          @cancel-submission="setTab('home')"
+          @submit-nielit-project="submitNielitProject" 
+        />
       </Transition>
     </main>
 
@@ -278,11 +286,7 @@
       @submit-job="submitJobApplication" 
     />
 
-    <NielitProjectModal 
-      v-if="showNielitModal" 
-      @close="showNielitModal = false" 
-      @submit-nielit-project="submitNielitProject" 
-    />
+
 
     <NielitPdfPreviewModal 
       v-if="showNielitPreviewModal" 
@@ -542,6 +546,7 @@ const AdmissionSection = defineAsyncComponent(() => import('./components/section
 const LoginSection = defineAsyncComponent(() => import('./components/sections/LoginSection.vue'));
 const SuperAdminSection = defineAsyncComponent(() => import('./components/sections/SuperAdminSection.vue'));
 const StudentPortalSection = defineAsyncComponent(() => import('./components/sections/StudentPortalSection.vue'));
+const NielitProjectSection = defineAsyncComponent(() => import('./components/sections/NielitProjectSection.vue'));
 
 // Lazy-loaded modals (only downloaded when user triggers interaction)
 const CourseDetailModal = defineAsyncComponent(() => import('./components/modals/CourseDetailModal.vue'));
@@ -549,7 +554,7 @@ const EventDetailModal = defineAsyncComponent(() => import('./components/modals/
 const EventLightbox = defineAsyncComponent(() => import('./components/modals/EventLightbox.vue'));
 const EventRsvpModal = defineAsyncComponent(() => import('./components/modals/EventRsvpModal.vue'));
 const JobApplicationModal = defineAsyncComponent(() => import('./components/modals/JobApplicationModal.vue'));
-const NielitProjectModal = defineAsyncComponent(() => import('./components/modals/NielitProjectModal.vue'));
+
 const NielitPdfPreviewModal = defineAsyncComponent(() => import('./components/modals/NielitPdfPreviewModal.vue'));
 const ConfirmationModal = defineAsyncComponent(() => import('./components/modals/ConfirmationModal.vue'));
 const CvBuilderModal = defineAsyncComponent(() => import('./components/modals/CvBuilderModal.vue'));
@@ -974,7 +979,7 @@ const selectedUpcomingEvent = ref({});
 const showJobModal = ref(false);
 const selectedJob = ref({});
 
-const showNielitModal = ref(false);
+
 const showNielitPreviewModal = ref(false);
 const submittedNielitData = ref(null);
 
@@ -1187,7 +1192,7 @@ const submitJobApplication = async (jobData) => {
 };
 
 const submitNielitProject = async (projectData) => {
-  showNielitModal.value = false;
+  activeTab.value = 'home';
   submittedNielitData.value = projectData;
 
   const regId = String(projectData.nielitRegNo || projectData.registrationNo || ('NIELIT-' + Math.floor(100000 + Math.random() * 900000))).trim();
