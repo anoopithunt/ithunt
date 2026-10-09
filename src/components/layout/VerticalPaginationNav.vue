@@ -559,50 +559,7 @@ onUnmounted(() => {
 /* ── Mobile Compact View ── */
 @media (max-width: 768px) {
   .ithunt-vertical-pagination {
-    right: 0.5rem;
-  }
-
-  .pagination-glass-rail {
-    padding: 0.45rem 0.3rem;
-    gap: 0.35rem;
-    backdrop-filter: blur(12px);
-  }
-
-  .pagination-chevron-btn {
-    width: 22px;
-    height: 22px;
-  }
-
-  .pagination-dots-list {
-    gap: 0.38rem;
-  }
-
-  .pagination-dot-btn {
-    width: 18px;
-    height: 18px;
-  }
-
-  .dot-core {
-    width: 6px;
-    height: 6px;
-  }
-
-  .pagination-dot-btn.active .dot-core {
-    width: 8px;
-    height: 14px;
-  }
-
-  .pagination-counter-pill {
-    font-size: 0.6rem;
-    padding: 0.15rem 0.3rem;
-  }
-
-  .pagination-snap-toggle {
-    display: none; /* Hide snap button on very small screens to keep dock ultra-compact */
-  }
-
-  .pagination-tooltip-card {
-    display: none; /* Don't display hover tooltips on touch devices */
+    display: none !important;
   }
 }
 </style>
