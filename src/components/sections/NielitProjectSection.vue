@@ -1,6 +1,6 @@
 <template>
-  <section class="nielit-project-section" style="padding: 120px 0 60px;">
-    <div class="container" style="max-width: 900px; margin: 0 auto;">
+  <section class="nielit-project-section">
+    <div class="container nielit-container">
       <div class="nielit-page-card">
         <!-- Header -->
       <div class="modal-header">
@@ -691,6 +691,15 @@ const handleFormSubmit = () => {
 </script>
 
 <style scoped>
+.nielit-project-section {
+  padding: 120px 1rem 60px;
+}
+
+.nielit-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
 .nielit-page-card {
   width: 100%;
   position: relative;
@@ -707,7 +716,6 @@ const handleFormSubmit = () => {
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
   border-bottom: 1px solid var(--border-cyber);
-  padding-right: 3rem;
 }
 
 .modal-title {
@@ -984,6 +992,10 @@ body.light-theme .form-section-group {
 }
 
 @media (max-width: 680px) {
+  .nielit-project-section {
+    padding: 90px 1rem 40px;
+  }
+
   .nielit-page-card {
     padding: 1.5rem 1rem;
     border-radius: 12px;
@@ -994,7 +1006,6 @@ body.light-theme .form-section-group {
   }
   
   .modal-header {
-    padding-right: 2rem;
     margin-bottom: 1.25rem;
     padding-bottom: 1rem;
   }
