@@ -852,4 +852,72 @@ body.light-theme .login-demo-helper {
   color: var(--color-ai-yellow);
   text-decoration: underline;
 }
+
+/* Mobile & Tablet Responsiveness */
+@media (max-width: 640px) {
+  .login-page-section {
+    padding: 2.25rem 1rem !important;
+    min-height: calc(100vh - var(--navbar-height-mob, 64px));
+  }
+
+  .login-card {
+    padding: 1.75rem 1.25rem;
+    border-radius: 18px;
+  }
+
+  .login-title {
+    font-size: 1.65rem;
+  }
+
+  .login-subtitle {
+    font-size: 0.84rem;
+  }
+
+  .login-options-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .role-demo-chips {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.35rem;
+  }
+
+  .demo-chip-btn {
+    padding: 0.45rem 0.3rem;
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .login-page-section {
+    padding: 1.5rem 0.75rem !important;
+  }
+
+  .login-card {
+    padding: 1.35rem 0.95rem;
+    border-radius: 16px;
+  }
+
+  .login-title {
+    font-size: 1.45rem;
+  }
+
+  .role-demo-chips {
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+  }
+
+  .demo-chip-btn {
+    padding: 0.55rem 0.85rem;
+    justify-content: flex-start;
+    font-size: 0.8rem;
+  }
+
+  .new-student-callout {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
 </style>

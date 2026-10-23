@@ -556,8 +556,8 @@ onUnmounted(() => {
   box-shadow: 0 0 6px #10b981;
 }
 
-/* ── Mobile Compact View ── */
-@media (max-width: 768px) {
+/* ── Tablet & Mobile Compact View: Hide to avoid overlapping content ── */
+@media (max-width: 1100px) {
   .ithunt-vertical-pagination {
     display: none !important;
   }

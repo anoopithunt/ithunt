@@ -1498,19 +1498,55 @@ function handleDownloadCv() {
 
 /* Mobile Responsiveness */
 @media (max-width: 640px) {
+  .cv-modal-overlay {
+    padding: 0.5rem;
+  }
+  .cv-modal-card {
+    border-radius: 12px;
+    max-height: 95dvh;
+    max-height: 95vh;
+  }
   .form-grid-2, .skills-2col-grid, .paper-skills-grid, .paper-lang-bars-grid {
     grid-template-columns: 1fr;
   }
   .cv-modal-header {
     flex-direction: column;
+    padding: 1rem 0.85rem 0.75rem;
+    gap: 0.75rem;
+  }
+  .cv-header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .cv-tabs-bar {
+    padding: 0.4rem 0.75rem;
+  }
+  .cv-modal-body {
+    padding: 1rem 0.85rem;
+  }
+  .paper-preview-container {
+    padding: 0.75rem 0.5rem;
+  }
+  .paper-sheet {
+    min-width: 290px;
+    padding: 1.25rem 1rem;
   }
   .cv-modal-footer {
     flex-direction: column;
     align-items: stretch;
+    padding: 0.85rem 1rem;
+    gap: 0.75rem;
   }
   .cv-footer-buttons {
     width: 100%;
-    justify-content: flex-end;
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+  .btn-cancel,
+  .btn-download-cv {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
   }
 }
 </style>

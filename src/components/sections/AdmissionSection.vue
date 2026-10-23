@@ -1098,5 +1098,72 @@ const onImgError = (event) => {
     font-size: 0.92rem;
   }
 }
+
+@media (max-width: 520px) {
+  .admission-steps-bar {
+    gap: 0.2rem;
+    margin: 1.15rem 0 1.35rem;
+  }
+
+  .step-label {
+    display: none;
+  }
+
+  .admission-step.active .step-label {
+    display: inline-block;
+    font-size: 0.72rem;
+    white-space: nowrap;
+  }
+
+  .receipt-preview-card {
+    padding: 1.25rem 0.85rem;
+  }
+
+  .receipt-badges-row {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .receipt-reg-badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.45rem;
+  }
+
+  .receipt-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .receipt-brand-logo-wrap {
+    gap: 0.5rem;
+  }
+
+  .receipt-row {
+    font-size: 0.8rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+  }
+
+  .receipt-label {
+    min-width: 0;
+  }
+
+  .receipt-val {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .receipt-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.65rem;
+  }
+
+  .receipt-signature-line {
+    text-align: left;
+  }
+}
 </style>
 

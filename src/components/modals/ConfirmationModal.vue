@@ -24,7 +24,7 @@
           </div>
         </div>
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 0.85rem;">
+        <div class="confirm-details-grid">
           <div>
             <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">
               {{ content?.modalTexts?.confirmation?.candidateNameLabel || 'Candidate Name' }}
@@ -65,7 +65,7 @@
             </span>
             <span style="font-size: 0.7rem; color: #34d399; font-weight: 700; background: rgba(52, 211, 153, 0.15); padding: 0.15rem 0.4rem; border-radius: 4px;">Active</span>
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.82rem;">
+          <div class="confirm-creds-grid">
             <div>
               <span style="color: var(--text-muted); font-size: 0.72rem; display: block;">User ID (Email):</span>
               <strong style="color: var(--text-main); word-break: break-all;">{{ admission.email || admission.userId || '—' }}</strong>
@@ -157,3 +157,32 @@ const openStudentGmailLetter = (adm) => {
   window.open(url, '_blank', 'noopener,noreferrer');
 };
 </script>
+
+<style scoped>
+.confirm-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.confirm-creds-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 480px) {
+  .confirm-details-grid,
+  .confirm-creds-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem;
+  }
+
+  .modal-actions-group button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+</style>

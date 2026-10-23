@@ -15,7 +15,7 @@
           <input type="text" v-model="form.name" required class="form-control" :placeholder="content?.modalTexts?.jobApplication?.namePlaceholder || 'Your full legal name'">
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 0.85rem;">
+        <div class="modal-form-2col">
           <div class="form-group">
             <label class="form-label">{{ content?.modalTexts?.jobApplication?.expLabel || 'Total Exp' }} <span class="req">*</span></label>
             <select v-model="form.experience" class="form-control" required>
@@ -44,7 +44,7 @@
           <input type="url" v-model="form.link" required class="form-control" :placeholder="content?.modalTexts?.jobApplication?.portfolioPlaceholder || 'https://linkedin.com/in/username'">
         </div>
 
-        <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <div class="modal-actions-row">
           <button type="button" class="btn-secondary" @click="$emit('close')">{{ content?.modalTexts?.jobApplication?.cancelBtn || 'Cancel' }}</button>
           <button type="submit" class="btn-primary">{{ content?.modalTexts?.jobApplication?.submitBtn || 'Submit Job Application 💼' }}</button>
         </div>
@@ -95,3 +95,36 @@ const handleSubmit = () => {
   };
 };
 </script>
+
+<style scoped>
+.modal-form-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+
+.modal-actions-row {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 520px) {
+  .modal-form-2col {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .modal-actions-row {
+    flex-direction: column-reverse;
+    width: 100%;
+  }
+
+  .modal-actions-row button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+</style>
