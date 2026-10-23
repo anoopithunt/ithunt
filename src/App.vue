@@ -1057,10 +1057,16 @@ const setTab = (tab) => {
     }
   }
   activeTab.value = tab;
-  // Keep URL completely clean without exposing hash fragment
-  if (window.history && window.history.replaceState) {
-    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+  // Seamless browser history & deep link synchronization for search engines and user bookmarks
+  if (typeof window !== 'undefined' && window.history && window.history.pushState) {
+    const targetHash = (tab === 'home') ? '' : '#' + tab;
+    const currentHash = window.location.hash || '';
+    if (currentHash !== targetHash) {
+      const targetUrl = window.location.pathname + window.location.search + targetHash;
+      window.history.pushState({ tab }, '', targetUrl);
+    }
   }
+  updateSeoMetadata(tab);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
@@ -1692,6 +1698,11 @@ const updateSeoMetadata = (tab) => {
     setMetaTag('meta[property="og:description"]', 'property', 'og:description', metaObj.ogDescription || metaObj.description);
   }
   setMetaTag('meta[property="og:type"]', 'property', 'og:type', 'website');
+  setMetaTag('meta[property="og:image"]', 'property', 'og:image', 'https://ithunt.vercel.app/img/ithunt.jpg');
+  setMetaTag('meta[property="og:image:secure_url"]', 'property', 'og:image:secure_url', 'https://ithunt.vercel.app/img/ithunt.jpg');
+  setMetaTag('meta[property="og:image:type"]', 'property', 'og:image:type', 'image/jpeg');
+  setMetaTag('meta[property="og:image:width"]', 'property', 'og:image:width', '1200');
+  setMetaTag('meta[property="og:image:height"]', 'property', 'og:image:height', '630');
   if (typeof window !== 'undefined') {
     setMetaTag('meta[property="og:url"]', 'property', 'og:url', window.location.href);
   }
@@ -1700,6 +1711,7 @@ const updateSeoMetadata = (tab) => {
   setMetaTag('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
   setMetaTag('meta[name="twitter:title"]', 'name', 'twitter:title', metaObj.ogTitle || metaObj.title);
   setMetaTag('meta[name="twitter:description"]', 'name', 'twitter:description', metaObj.ogDescription || metaObj.description);
+  setMetaTag('meta[name="twitter:image"]', 'name', 'twitter:image', 'https://ithunt.vercel.app/img/ithunt.jpg');
 
   // 5. Canonical URL Link Tag
   if (typeof window !== 'undefined') {
@@ -1717,6 +1729,21 @@ const updateSeoMetadata = (tab) => {
 watch(activeTab, (newTab) => {
   updateSeoMetadata(newTab);
 });
+
+// Synchronize tab view when browser back/forward history is triggered
+const handlePopState = () => {
+  if (typeof window === 'undefined') return;
+  const rawHash = (window.location.hash || '').replace('#', '').toLowerCase().trim();
+  if (!rawHash || rawHash === 'home') {
+    activeTab.value = 'home';
+  } else if (['internships', 'courses', 'events', 'testimonials', 'reviews', 'careers', 'admission', 'login', 'nielit-project'].includes(rawHash)) {
+    activeTab.value = rawHash;
+  } else if (rawHash === 'superadmin' || rawHash === 'admin') {
+    activeTab.value = isAdminLoggedIn.value ? 'superadmin' : 'login';
+  } else if (rawHash === 'student-portal' || rawHash === 'student') {
+    activeTab.value = studentUser.value ? 'student-portal' : 'login';
+  }
+};
 
 onMounted(() => {
   // Default to Light Mode unless explicitly set to 'dark' by user preference
@@ -1792,7 +1819,7 @@ onMounted(() => {
     }
   } catch (e) {}
 
-  // If user arrived with a hash (e.g. #admission, #login, #superadmin), open corresponding view
+  // If user arrived with a hash (e.g. #admission, #courses, #internships, #nielit-project), open corresponding view
   if (window.location.hash) {
     const rawHash = window.location.hash.replace('#', '').toLowerCase().trim();
     if (rawHash === 'admission' || rawHash === 'admisson') {
@@ -1803,11 +1830,8 @@ onMounted(() => {
       activeTab.value = isAdminLoggedIn.value ? 'superadmin' : 'login';
     } else if (rawHash === 'student-portal' || rawHash === 'student') {
       activeTab.value = studentUser.value ? 'student-portal' : 'login';
-    } else if (['home', 'internships', 'courses', 'careers', 'reviews', 'testimonials', 'events'].includes(rawHash)) {
+    } else if (['home', 'internships', 'courses', 'careers', 'reviews', 'testimonials', 'events', 'nielit-project'].includes(rawHash)) {
       activeTab.value = rawHash;
-    }
-    if (window.history && window.history.replaceState) {
-      window.history.replaceState(null, '', window.location.pathname + window.location.search);
     }
   } else {
     // If no explicit hash in URL, ensure logged in users open their dashboard by default even on hard refresh
@@ -1817,6 +1841,9 @@ onMounted(() => {
       activeTab.value = 'student-portal';
     }
   }
+
+  // Bind browser history navigation
+  window.addEventListener('popstate', handlePopState);
 
   // Defer background API synchronization to background idle cycles so the Home page loads instantly
   if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
@@ -1867,6 +1894,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
+  window.removeEventListener('popstate', handlePopState);
   if (revealObserver) revealObserver.disconnect();
 });
 </script>

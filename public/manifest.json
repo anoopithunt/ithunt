@@ -1,0 +1,31 @@
+{
+  "name": "IT HUNT - Software Solutions & Tech Academy",
+  "short_name": "IT HUNT",
+  "description": "Premier Computer Institute & Software Development Center in Holagarh, Prayagraj. Offering NIELIT diplomas, MERN Stack, Python AI, and software engineering internships.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070a13",
+  "theme_color": "#f97316",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/img/ithunt-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/img/ithunt.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ],
+  "categories": [
+    "education",
+    "productivity",
+    "technology"
+  ],
+  "lang": "en-IN",
+  "dir": "ltr"
+}
