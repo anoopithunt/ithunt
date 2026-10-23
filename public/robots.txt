@@ -1,8 +1,26 @@
 User-agent: *
 Allow: /
+Allow: /img/
+Allow: /assets/
+Disallow: /api/private/
 
-# Host
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /img/
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+# Canonical Host
 Host: https://ithunt.vercel.app
 
-# Sitemap
+# Official XML Sitemap Reference
 Sitemap: https://ithunt.vercel.app/sitemap.xml

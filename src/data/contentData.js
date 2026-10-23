@@ -2140,75 +2140,89 @@ const CONTENT_DATA = {
     copyrightText: "© 2026 IT HUNT Institute of Computer Technology & IT Solutions. All rights reserved."
   },
 
-  // Page-Specific SEO Metadata Dictionary (Calibrated for 90%+ SEObility Score)
+  // Page-Specific SEO Metadata Dictionary (Calibrated for High Search Engine Visibility)
   seoPages: {
     home: {
-      title: "IT HUNT | Software Solutions & Tech Academy Prayagraj",
-      description: "IT HUNT - Premier IT Solution & Training Center in Holagarh Prayagraj. Offering 3 & 6-month software engineering internships, MERN Stack & NIELIT diplomas.",
-      keywords: "IT HUNT, IT HUNT Holagarh, IT HUNT Prayagraj, IT Solution Center Prayagraj, Software Academy Holagarh, Lakshman Singh Chauhan, Anup Mishra",
-      ogTitle: "IT HUNT | Software Solutions & Tech Academy Prayagraj",
-      ogDescription: "IT HUNT - Premier IT Solution & Training Center in Holagarh Prayagraj. Offering 3 & 6-month software engineering internships, MERN Stack & NIELIT diplomas."
+      title: "IT HUNT - Software Solutions, Tech Academy & Computer Institute Prayagraj | NIELIT, MERN, Python, Internship 2026",
+      description: "IT HUNT is the premier Computer Institute & Software Development Center in Holagarh, Prayagraj. Offering 3 & 6-month software engineering internships, MERN Stack, Python AI, NIELIT O/A Level diplomas, CCC, ADCA with 100% placement assistance.",
+      keywords: "IT HUNT, IT HUNT Prayagraj, IT HUNT Holagarh, Computer Institute in Prayagraj, Best Software Training Institute Prayagraj, NIELIT O Level Prayagraj, NIELIT A Level Holagarh, MERN Stack Internship Prayagraj, Python AI Course Holagarh, Computer Center Dahiyawa, CCC Coaching Prayagraj, ADCA Course, IT Solutions Center Prayagraj, Software Academy Holagarh, Lakshman Singh Chauhan, Anup Mishra, Software Development Company Prayagraj",
+      ogTitle: "IT HUNT - Software Solutions, Tech Academy & Computer Institute Prayagraj",
+      ogDescription: "Premier Computer Institute & Software Development Center in Holagarh, Prayagraj. Offering 3 & 6-month software engineering internships, MERN Stack, Python AI, NIELIT O/A Level diplomas with placement assistance."
     },
     internships: {
-      title: "3 & 6 Month IT Internships & Production Training | IT HUNT",
-      description: "Join 3 & 6-month production software engineering internships at IT HUNT Prayagraj. Master MERN Stack, React 19, Node.js & Python AI with corporate LOR.",
-      keywords: "IT Internships Prayagraj, MERN Stack Internship Holagarh, Web Development Training Prayagraj, Software Engineering Internship UP, Corporate LOR",
-      ogTitle: "3 & 6 Month IT Internships & Production Training | IT HUNT",
-      ogDescription: "Join 3 & 6-month production software engineering internships at IT HUNT Prayagraj. Master MERN Stack, React 19, Node.js & Python AI with corporate LOR."
+      title: "Software Engineering Internships (3 & 6 Months) in Prayagraj | IT HUNT",
+      description: "Join 3 & 6-month production software engineering internships at IT HUNT Prayagraj. Master MERN Stack, React 19, Node.js & Python AI with live client projects, corporate LOR, and 100% placement support.",
+      keywords: "IT Internships Prayagraj, MERN Stack Internship Holagarh, Web Development Training Prayagraj, Software Engineering Internship UP, Corporate LOR, React 19 Training, Full Stack Internship, IT HUNT Internships",
+      ogTitle: "Software Engineering Internships (3 & 6 Months) in Prayagraj | IT HUNT",
+      ogDescription: "Join 3 & 6-month production software engineering internships at IT HUNT Prayagraj. Master MERN Stack, React 19, Node.js & Python AI with live client projects and corporate LOR."
     },
     courses: {
-      title: "IT & Computer Science Courses, NIELIT O/A Level | IT HUNT",
-      description: "Explore job-ready computer courses at IT HUNT Holagarh. NIELIT O/A Level Diplomas, Full Stack Web Engineering, Python AI/ML, Tally ERP & Cyber Security.",
-      keywords: "NIELIT O Level Prayagraj, NIELIT A Level Holagarh, Python AI Course, Full Stack Web Course, Tally ERP 9 Coaching Holagarh",
-      ogTitle: "IT & Computer Science Courses, NIELIT O/A Level | IT HUNT",
-      ogDescription: "Explore job-ready computer courses at IT HUNT Holagarh. NIELIT O/A Level Diplomas, Full Stack Web Engineering, Python AI/ML, Tally ERP & Cyber Security."
+      title: "Computer Courses & NIELIT O/A Level Government Diplomas in Prayagraj | IT HUNT",
+      description: "Explore job-ready computer courses at IT HUNT Holagarh, Prayagraj. Government-recognized NIELIT O/A Level Diplomas, CCC, ADCA, Full-Stack Web Development, Python AI/ML, and Tally Prime with GST.",
+      keywords: "NIELIT O Level Prayagraj, NIELIT A Level Holagarh, CCC Course Prayagraj, ADCA Course Holagarh, Python AI Course, Full Stack Web Course, Tally Prime GST Coaching Prayagraj, Computer Diploma Courses",
+      ogTitle: "Computer Courses & NIELIT O/A Level Government Diplomas in Prayagraj | IT HUNT",
+      ogDescription: "Explore job-ready computer courses at IT HUNT Holagarh, Prayagraj. Government-recognized NIELIT O/A Level Diplomas, CCC, ADCA, Full-Stack Web Development, Python AI/ML, and Tally Prime with GST."
     },
     events: {
-      title: "Hackathons, Workshops & Convocation Media Gallery | IT HUNT",
-      description: "Browse flagship events, annual hackathons, technical workshops, campus placement drives, and convocation photo albums at IT HUNT Holagarh Prayagraj.",
-      keywords: "IT HUNT Events, Hackathon Prayagraj, Tech Workshops Holagarh, Convocation Gallery IT HUNT, Placement Drives",
-      ogTitle: "Hackathons, Workshops & Convocation Media Gallery | IT HUNT",
-      ogDescription: "Browse flagship events, annual hackathons, technical workshops, campus placement drives, and convocation photo albums at IT HUNT Holagarh Prayagraj."
+      title: "Tech Hackathons, Workshops & Convocation Media Gallery | IT HUNT Prayagraj",
+      description: "Browse flagship technical events, annual hackathons, code jams, campus placement drives, and convocation ceremony photo galleries at IT HUNT Holagarh, Prayagraj.",
+      keywords: "IT HUNT Events, Hackathon Prayagraj, Tech Workshops Holagarh, Convocation Gallery IT HUNT, Placement Drives Prayagraj, Coding Contests UP",
+      ogTitle: "Tech Hackathons, Workshops & Convocation Media Gallery | IT HUNT Prayagraj",
+      ogDescription: "Browse flagship technical events, annual hackathons, code jams, campus placement drives, and convocation ceremony photo galleries at IT HUNT Holagarh, Prayagraj."
     },
     testimonials: {
-      title: "Student Placement Stories & Alum Reviews | IT HUNT",
-      description: "Read inspiring career placement success stories and alumni reviews of IT HUNT candidates placed at Paytm, TCS, Infosys, and leading tech companies.",
-      keywords: "IT HUNT Placements, Student Success Stories Holagarh, IT HUNT Reviews, Software Career Placement Prayagraj",
-      ogTitle: "Student Placement Stories & Alum Reviews | IT HUNT",
-      ogDescription: "Read inspiring career placement success stories and alumni reviews of IT HUNT candidates placed at Paytm, TCS, Infosys, and leading tech companies."
+      title: "Student Placement Stories & Corporate Alumni Reviews | IT HUNT Prayagraj",
+      description: "Read inspiring software career placement stories and alumni testimonials of IT HUNT students placed at Paytm, TCS, Infosys, and leading technology firms across India.",
+      keywords: "IT HUNT Placements, Student Success Stories Holagarh, IT HUNT Reviews, Software Career Placement Prayagraj, Alumni Testimonials",
+      ogTitle: "Student Placement Stories & Corporate Alumni Reviews | IT HUNT Prayagraj",
+      ogDescription: "Read inspiring software career placement stories and alumni testimonials of IT HUNT students placed at Paytm, TCS, Infosys, and leading technology firms across India."
     },
     reviews: {
-      title: "Verified Student & Client Ratings (4.9★) | IT HUNT",
-      description: "Check 250+ verified student ratings and client testimonials evaluating IT HUNT's computer lab workstations, faculty mentorship, and placement support.",
-      keywords: "IT HUNT Student Reviews, IT HUNT Rating, Holagarh Institute Reviews, Software Development Feedback",
-      ogTitle: "Verified Student & Client Ratings (4.9★) | IT HUNT",
-      ogDescription: "Check 250+ verified student ratings and client testimonials evaluating IT HUNT's computer lab workstations, faculty mentorship, and placement support."
+      title: "Verified Student Ratings (4.9★) & Lab Feedback | IT HUNT Prayagraj",
+      description: "Check 250+ verified student ratings and genuine reviews evaluating IT HUNT's modern computer lab workstations, 1-on-1 faculty mentorship, practical project training, and placement support.",
+      keywords: "IT HUNT Student Reviews, IT HUNT Rating, Holagarh Institute Reviews, Computer Center Feedback Prayagraj, Best Institute Rating",
+      ogTitle: "Verified Student Ratings (4.9★) & Lab Feedback | IT HUNT Prayagraj",
+      ogDescription: "Check 250+ verified student ratings and genuine reviews evaluating IT HUNT's modern computer lab workstations, 1-on-1 faculty mentorship, and placement support."
     },
     careers: {
-      title: "Career Opportunities & Faculty Hiring | IT HUNT",
-      description: "Build your teaching or software engineering career at IT HUNT. Explore open positions for Full Stack Faculty, Python AI Mentors & Lab Coordinators.",
-      keywords: "IT HUNT Careers, Teaching Jobs Holagarh, Computer Instructor Jobs Prayagraj, Software Faculty Hiring",
-      ogTitle: "Career Opportunities & Faculty Hiring | IT HUNT",
-      ogDescription: "Build your teaching or software engineering career at IT HUNT. Explore open positions for Full Stack Faculty, Python AI Mentors & Lab Coordinators."
+      title: "Faculty Careers & Software Engineering Hiring 2026 | IT HUNT Prayagraj",
+      description: "Build your teaching or software engineering career at IT HUNT. Explore open vacancies for Full-Stack Faculty, Python AI Mentors, and Computer Lab Coordinators with competitive packages.",
+      keywords: "IT HUNT Careers, Teaching Jobs Holagarh, Computer Instructor Jobs Prayagraj, Software Faculty Hiring, IT Trainer Vacancy Uttar Pradesh",
+      ogTitle: "Faculty Careers & Software Engineering Hiring 2026 | IT HUNT Prayagraj",
+      ogDescription: "Build your teaching or software engineering career at IT HUNT. Explore open vacancies for Full-Stack Faculty, Python AI Mentors, and Computer Lab Coordinators."
     },
     admission: {
-      title: "Online Admission & Seat Registration 2026-27 | IT HUNT",
-      description: "Apply online for 2026-27 Academic Session Admissions & Internship Tracks at IT HUNT Holagarh. Instant registration confirmation and seat booking.",
-      keywords: "IT HUNT Admission 2026, Computer Course Registration Holagarh, Internship Seat Booking Prayagraj",
-      ogTitle: "Online Admission & Seat Registration 2026-27 | IT HUNT",
-      ogDescription: "Apply online for 2026-27 Academic Session Admissions & Internship Tracks at IT HUNT Holagarh. Instant registration confirmation and seat booking."
+      title: "Online Admission 2026-27 & Instant Seat Registration | IT HUNT Prayagraj",
+      description: "Apply online for 2026-27 Academic Session Admissions & Software Engineering Internship Tracks at IT HUNT Holagarh, Prayagraj. Instant digital admission slip and fee receipt generation.",
+      keywords: "IT HUNT Admission 2026, Computer Course Registration Holagarh, Internship Seat Booking Prayagraj, Online Admission Form",
+      ogTitle: "Online Admission 2026-27 & Instant Seat Registration | IT HUNT Prayagraj",
+      ogDescription: "Apply online for 2026-27 Academic Session Admissions & Software Engineering Internship Tracks at IT HUNT Holagarh, Prayagraj. Instant digital admission slip generation."
+    },
+    'nielit-project': {
+      title: "NIELIT O/A Level Project Submission & Training Guide | IT HUNT Prayagraj",
+      description: "Official guide and project assistance for NIELIT O Level and A Level practical submissions, viva preparation, and government project completion certificates at IT HUNT Prayagraj.",
+      keywords: "NIELIT Project Submission, O Level Project Prayagraj, A Level Project UP, NIELIT Certificate Verification, IT HUNT Project Guidance",
+      ogTitle: "NIELIT O/A Level Project Submission & Training Guide | IT HUNT Prayagraj",
+      ogDescription: "Official guide and project assistance for NIELIT O Level and A Level practical submissions, viva preparation, and government project completion certificates at IT HUNT Prayagraj."
+    },
+    'student-portal': {
+      title: "Student Dashboard & Digital Academic Registry | IT HUNT",
+      description: "Access your personalized student learning dashboard, digital ID card, verified certificates, fee receipts, and course study materials on IT HUNT's student portal.",
+      keywords: "IT HUNT Student Portal, Student Dashboard, Digital ID Card, Certificate Verification",
+      ogTitle: "Student Dashboard & Digital Academic Registry | IT HUNT",
+      ogDescription: "Access your personalized student learning dashboard, digital ID card, verified certificates, fee receipts, and course study materials on IT HUNT's student portal."
     },
     login: {
-      title: "Directorate & Student Portal Authentication | IT HUNT",
+      title: "Directorate & Student Portal Authentication Gateway | IT HUNT",
       description: "Secure portal authentication gateway for IT HUNT Directorate, Faculty Leads, Academic Registry Staff, and Registered Internship Students.",
-      keywords: "IT HUNT Login, Student Portal Login, SuperAdmin Directorate Portal",
-      ogTitle: "Directorate & Student Portal Authentication | IT HUNT",
+      keywords: "IT HUNT Login, Student Portal Login, SuperAdmin Directorate Portal, IT HUNT Sign In",
+      ogTitle: "Directorate & Student Portal Authentication Gateway | IT HUNT",
       ogDescription: "Secure portal authentication gateway for IT HUNT Directorate, Faculty Leads, Academic Registry Staff, and Registered Internship Students."
     },
     superadmin: {
       title: "SuperAdmin Executive Directorate Management Console | IT HUNT",
       description: "Central administrative control panel for managing admission registrations, course offerings, event photo galleries, and student review verification.",
-      keywords: "IT HUNT Admin Dashboard, Directorate Management",
+      keywords: "IT HUNT Admin Dashboard, Directorate Management Console",
       ogTitle: "SuperAdmin Executive Directorate Management Console | IT HUNT",
       ogDescription: "Central administrative control panel for managing admission registrations, course offerings, event photo galleries, and student review verification."
     }
