@@ -731,14 +731,36 @@ onUnmounted(() => {
 }
 
 @media (max-width: 640px) {
+  .secure-preview-card {
+    width: 98vw;
+    height: 95dvh;
+    height: 95vh;
+    border-radius: 12px;
+  }
+
   .security-banner {
     flex-direction: column;
     align-items: flex-start;
+    padding: 0.75rem 1rem;
+    gap: 0.75rem;
   }
   
   .page-nav-capsule {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .secure-pages-scroll-viewport {
+    padding: 0.75rem 0.5rem;
+    gap: 1.25rem;
+  }
+
+  .secure-preview-footer {
+    flex-direction: column;
+    gap: 0.65rem;
+    align-items: stretch;
+    text-align: center;
+    padding: 0.75rem 1rem;
   }
 }
 </style>

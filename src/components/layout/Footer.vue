@@ -319,10 +319,30 @@ body.light-theme .footer-sep { color: #cbd5e1; }
 
 /* ── Responsive ── */
 @media (max-width: 900px) {
+  .home-footer-snap {
+    min-height: auto !important;
+    scroll-snap-align: none !important;
+    scroll-snap-stop: normal !important;
+  }
   .footer-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 600px) {
   .footer-grid { grid-template-columns: 1fr; gap: 1.75rem; }
-  .footer-bottom { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
+  .footer-bottom { 
+    flex-direction: column; 
+    align-items: flex-start; 
+    gap: 0.85rem; 
+    padding: 1.25rem 0 2rem;
+  }
+  .footer-bottom-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    align-items: center;
+  }
+  .footer-productfame-badge img {
+    max-width: 100%;
+    height: auto;
+  }
 }
 </style>
