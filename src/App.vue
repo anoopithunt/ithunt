@@ -1682,7 +1682,16 @@ const updateSeoMetadata = (tab) => {
     el.setAttribute('content', contentVal);
   };
 
-  // 2. Standard Description & Keywords
+  // 2. Robots Indexing Directives (Private vs Public Views)
+  if (tab === 'superadmin' || tab === 'student-portal') {
+    setMetaTag('meta[name="robots"]', 'name', 'robots', 'noindex, nofollow');
+    setMetaTag('meta[name="googlebot"]', 'name', 'googlebot', 'noindex, nofollow');
+  } else {
+    setMetaTag('meta[name="robots"]', 'name', 'robots', 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
+    setMetaTag('meta[name="googlebot"]', 'name', 'googlebot', 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1');
+  }
+
+  // 3. Standard Description & Keywords
   if (metaObj.description) {
     setMetaTag('meta[name="description"]', 'name', 'description', metaObj.description);
   }
@@ -1690,7 +1699,7 @@ const updateSeoMetadata = (tab) => {
     setMetaTag('meta[name="keywords"]', 'name', 'keywords', metaObj.keywords);
   }
 
-  // 3. Open Graph Social Card Tags
+  // 4. Open Graph Social Card Tags
   if (metaObj.ogTitle || metaObj.title) {
     setMetaTag('meta[property="og:title"]', 'property', 'og:title', metaObj.ogTitle || metaObj.title);
   }
@@ -1698,22 +1707,29 @@ const updateSeoMetadata = (tab) => {
     setMetaTag('meta[property="og:description"]', 'property', 'og:description', metaObj.ogDescription || metaObj.description);
   }
   setMetaTag('meta[property="og:type"]', 'property', 'og:type', 'website');
+  setMetaTag('meta[property="og:site_name"]', 'property', 'og:site_name', 'IT HUNT');
   setMetaTag('meta[property="og:image"]', 'property', 'og:image', 'https://ithunt.vercel.app/img/ithunt.jpg');
   setMetaTag('meta[property="og:image:secure_url"]', 'property', 'og:image:secure_url', 'https://ithunt.vercel.app/img/ithunt.jpg');
   setMetaTag('meta[property="og:image:type"]', 'property', 'og:image:type', 'image/jpeg');
   setMetaTag('meta[property="og:image:width"]', 'property', 'og:image:width', '1200');
   setMetaTag('meta[property="og:image:height"]', 'property', 'og:image:height', '630');
+  setMetaTag('meta[property="og:image:alt"]', 'property', 'og:image:alt', 'IT HUNT Software Solutions & Tech Academy Prayagraj Campus');
   if (typeof window !== 'undefined') {
-    setMetaTag('meta[property="og:url"]', 'property', 'og:url', window.location.href);
+    const canonicalBase = 'https://ithunt.vercel.app/';
+    const targetUrl = (tab === 'home' || !tab) ? canonicalBase : `${canonicalBase}#${tab}`;
+    setMetaTag('meta[property="og:url"]', 'property', 'og:url', targetUrl);
   }
 
-  // 4. Twitter Card Meta Tags
+  // 5. Twitter Card Meta Tags
   setMetaTag('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
+  setMetaTag('meta[name="twitter:site"]', 'name', 'twitter:site', '@ithunt');
+  setMetaTag('meta[name="twitter:creator"]', 'name', 'twitter:creator', '@anoopithunt');
   setMetaTag('meta[name="twitter:title"]', 'name', 'twitter:title', metaObj.ogTitle || metaObj.title);
   setMetaTag('meta[name="twitter:description"]', 'name', 'twitter:description', metaObj.ogDescription || metaObj.description);
   setMetaTag('meta[name="twitter:image"]', 'name', 'twitter:image', 'https://ithunt.vercel.app/img/ithunt.jpg');
+  setMetaTag('meta[name="twitter:image:alt"]', 'name', 'twitter:image:alt', 'IT HUNT Computer Institute & Software Solutions Prayagraj');
 
-  // 5. Canonical URL Link Tag
+  // 6. Canonical URL Link Tag
   if (typeof window !== 'undefined') {
     let canonicalEl = document.querySelector('link[rel="canonical"]');
     if (!canonicalEl) {
@@ -1721,7 +1737,8 @@ const updateSeoMetadata = (tab) => {
       canonicalEl.setAttribute('rel', 'canonical');
       document.head.appendChild(canonicalEl);
     }
-    canonicalEl.setAttribute('href', window.location.href);
+    const canonicalBase = 'https://ithunt.vercel.app/';
+    canonicalEl.setAttribute('href', (tab === 'home' || !tab) ? canonicalBase : `${canonicalBase}#${tab}`);
   }
 };
 

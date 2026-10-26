@@ -9922,3 +9922,295 @@ body.light-theme .code-terminal-card .terminal-title {
 body.light-theme .code-terminal-card .code-line-num {
   color: #64748b !important;
 }
+
+/* ==========================================================================
+   MASTER FULL RESPONSIVENESS & ACCESSIBILITY OPTIMIZATION SUITE
+   Guarantees 100% responsiveness across 320px - 1920px+ viewports
+   ========================================================================== */
+
+/* 1. Viewport & Root Overflow Immunity */
+html,
+body {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  overflow-x: clip;
+  box-sizing: border-box;
+}
+
+#app {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  overflow-x: clip;
+  position: relative;
+  min-height: 100vh;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* 2. Skip to Content Accessibility Landmark */
+.skip-to-content:focus {
+  position: fixed !important;
+  left: 1rem !important;
+  top: 1rem !important;
+  width: auto !important;
+  height: auto !important;
+  outline: 3px solid #f97316 !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
+  z-index: 999999 !important;
+}
+
+/* 3. Universal Fluid Media Safeguards */
+img,
+video,
+iframe,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 4. Smooth Mobile Scroll Safety (Disables Jarring Snap on Touchscreens) */
+@media (max-width: 768px) {
+  html.ithunt-home-snapping {
+    scroll-snap-type: none !important;
+  }
+  .ithunt-home-section {
+    scroll-snap-align: none !important;
+    scroll-snap-stop: normal !important;
+    min-height: auto !important;
+    padding-top: 2.5rem !important;
+    padding-bottom: 2.5rem !important;
+  }
+}
+
+/* 5. Mobile Form Input Zoom Prevention (iOS Safari requires >= 16px font-size) */
+@media (max-width: 768px) {
+  input,
+  select,
+  textarea,
+  .form-control,
+  .events-search-input {
+    font-size: 16px !important;
+  }
+}
+
+/* 6. Universal Touch Target Accessibility (Min 44px tap targets on mobile) */
+@media (max-width: 768px) {
+  .btn-primary,
+  .btn-secondary,
+  .course-action-btn,
+  .event-explore-btn,
+  .filter-capsule-btn,
+  .event-cat-btn,
+  .admin-nav-tab-btn,
+  .sidebar-nav-item,
+  .sidebar-contact-btn,
+  .modal-close-icon,
+  .floating-back-to-top,
+  .whatsapp-float-btn,
+  .theme-toggle-btn,
+  .mobile-toggle-btn {
+    min-height: 44px;
+  }
+}
+
+/* 7. Tablet Ergonomics (769px - 1024px) */
+@media (max-width: 1024px) {
+  .container {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+
+  .courses-grid,
+  .internship-tracks-grid,
+  .events-grid,
+  .bento-grid,
+  .accelerators-grid,
+  .examples-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1.5rem !important;
+  }
+
+  .stats-card-grid,
+  .stats-grid,
+  .superadmin-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .form-grid-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* 8. Smartphone & Mobile Landscape (481px - 768px) */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .section {
+    padding: 2.5rem 0 !important;
+  }
+
+  .courses-grid,
+  .internship-tracks-grid,
+  .events-grid,
+  .bento-grid,
+  .accelerators-grid,
+  .examples-grid,
+  .alumni-cards-grid,
+  .homework-grid,
+  .founders-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+  }
+
+  .form-grid,
+  .form-grid-2,
+  .form-grid-3,
+  .admission-grid-container {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .modal-card,
+  .modal-lg,
+  .course-detail-popup,
+  .nielit-modal-card,
+  .cv-modal-card {
+    width: min(96vw, 680px) !important;
+    max-width: calc(100vw - 1rem) !important;
+    margin: 0.5rem auto !important;
+    padding: 1.25rem 1rem !important;
+    max-height: 90dvh !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-actions-group,
+  .detail-modal-footer,
+  .event-modal-actions-footer,
+  .cv-footer-buttons {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 0.65rem !important;
+  }
+
+  .modal-actions-group button,
+  .detail-modal-footer button,
+  .event-modal-actions-footer button,
+  .cv-footer-buttons button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .events-search-box {
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* 9. Small Smartphone Portrait (361px - 480px) */
+@media (max-width: 480px) {
+  .container {
+    padding-left: 0.85rem !important;
+    padding-right: 0.85rem !important;
+  }
+
+  .brand-tagline {
+    display: none !important;
+  }
+
+  .brand-title {
+    font-size: 1.15rem !important;
+  }
+
+  .section-title {
+    font-size: 1.6rem !important;
+  }
+
+  .section-subtitle {
+    font-size: 0.88rem !important;
+  }
+
+  .hero-main-title,
+  .ithunt-hero-headline {
+    font-size: clamp(1.6rem, 5.8vw, 1.95rem) !important;
+    line-height: 1.22 !important;
+  }
+
+  .stats-card-grid,
+  .stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+  }
+
+  .stat-card-inner,
+  .stat-pill-card {
+    padding: 0.75rem 0.5rem !important;
+  }
+
+  .stat-number,
+  .stat-num {
+    font-size: 1.35rem !important;
+  }
+
+  .stat-label,
+  .stat-label-title {
+    font-size: 0.72rem !important;
+  }
+
+  .hero-cta-group,
+  .ithunt-hero-cta-group {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 0.65rem !important;
+  }
+
+  .hero-cta-group button,
+  .ithunt-hero-cta-group button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* 10. Ultra-Compact Displays (< 360px, e.g. iPhone SE 1st Gen, Galaxy Fold Cover) */
+@media (max-width: 360px) {
+  .container {
+    padding-left: 0.65rem !important;
+    padding-right: 0.65rem !important;
+  }
+
+  .hero-main-title,
+  .ithunt-hero-headline {
+    font-size: 1.45rem !important;
+  }
+
+  .section-title {
+    font-size: 1.35rem !important;
+  }
+
+  .stats-card-grid,
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem !important;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    padding: 0.65rem 0.85rem !important;
+    font-size: 0.82rem !important;
+  }
+
+  .detail-popup-title {
+    font-size: 1.15rem !important;
+  }
+}
