@@ -3,7 +3,7 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://ithunt.vercel.app/</loc>
-    <lastmod>2026-10-23</lastmod>
+    <lastmod>2026-10-26</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <image:image>
@@ -14,31 +14,37 @@
     <image:image>
       <image:loc>https://ithunt.vercel.app/img/ithunt-logo.svg</image:loc>
       <image:title>IT HUNT Official Brand Logo</image:title>
+      <image:caption>IT HUNT - Software Studio &amp; Tech Academy</image:caption>
     </image:image>
     <image:image>
       <image:loc>https://ithunt.vercel.app/img/event_hackathon.jpg</image:loc>
       <image:title>IT HUNT Annual Technical Hackathon &amp; Code Contest</image:title>
+      <image:caption>Annual Technical Code Jam and Hackathon at IT HUNT Prayagraj Campus</image:caption>
     </image:image>
     <image:image>
       <image:loc>https://ithunt.vercel.app/img/event_convocation.jpg</image:loc>
       <image:title>IT HUNT Annual Convocation and Diploma Certification</image:title>
+      <image:caption>Student graduation and convocation ceremony for NIELIT and ADCA diplomas</image:caption>
     </image:image>
     <image:image>
       <image:loc>https://ithunt.vercel.app/img/event_placement.jpg</image:loc>
       <image:title>IT HUNT Corporate Placement Drive &amp; Industry Hiring</image:title>
+      <image:caption>Campus placement and software industry hiring drive at IT HUNT</image:caption>
     </image:image>
     <image:image>
       <image:loc>https://ithunt.vercel.app/img/certification.png</image:loc>
       <image:title>Verified ISO 9001:2015 Software Internship Certificate Specimen</image:title>
+      <image:caption>ISO 9001:2015 Certified Software Internship Credential and Corporate LOR</image:caption>
     </image:image>
     <image:image>
       <image:loc>https://ithunt.vercel.app/img/anoop.png</image:loc>
       <image:title>Anup Mishra - Lead Software Architect &amp; Co-Founder IT HUNT</image:title>
+      <image:caption>Senior software mentor directing production engineering internship tracks</image:caption>
     </image:image>
   </url>
   <url>
     <loc>https://ithunt.vercel.app/IT_HUNT_API_Documentation.pdf</loc>
-    <lastmod>2026-10-23</lastmod>
+    <lastmod>2026-10-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
