@@ -34,7 +34,7 @@
         <!-- Subtitle with Signature Hand-Drawn Brush Stroke Underline -->
         <p class="ithunt-hero-subtitle anim-fade-in-up-delay">
           Premier software studio &amp; tech academy in Prayagraj. Build production-grade web, mobile, and AI applications with 1-on-1 industry mentorship — 
-          <span class="ithunt-brush-wrap">on real client code.<svg class="ithunt-brush-stroke" viewBox="0 0 120 12" fill="none" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8c20-4 40-2 60 1s40 3 56-1" stroke="var(--color-ai-orange)" stroke-width="2.8" stroke-linecap="round" opacity="0.9"></path><path d="M4 10c18-3 38-1 58 1s38 2 54-1" stroke="var(--color-ai-yellow)" stroke-width="2" stroke-linecap="round" opacity="0.65"></path></svg></span>
+          <span class="ithunt-brush-wrap">on real client code.<svg class="ithunt-brush-stroke" viewBox="0 0 120 12" fill="none" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="ithuntGreenBrushGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#10b981" /><stop offset="50%" stop-color="#4ade80" /><stop offset="100%" stop-color="#22c55e" /></linearGradient></defs><path class="brush-path-main" d="M2 8c20-4 40-2 60 1s40 3 56-1" stroke="url(#ithuntGreenBrushGradient)" stroke-width="2.8" stroke-linecap="round"></path><path class="brush-path-sub" d="M4 10c18-3 38-1 58 1s38 2 54-1" stroke="#34d399" stroke-width="2.2" stroke-linecap="round" opacity="0.8"></path></svg></span>
         </p>
 
         <!-- Dual CTA Buttons (IT Hunt Style) -->
@@ -1655,7 +1655,7 @@ onUnmounted(() => {
   color: var(--color-ai-orange, #f97316);
 }
 
-/* Signature IT Hunt Hand-Drawn Brush Stroke Underline */
+/* Signature IT Hunt Hand-Drawn Brush Stroke Underline (Animated Green Glow) */
 .ithunt-brush-wrap {
   position: relative;
   display: inline-block;
@@ -1669,9 +1669,70 @@ onUnmounted(() => {
   left: 0;
   bottom: -6px;
   width: 100%;
-  height: 10px;
+  height: 12px;
   overflow: visible;
   pointer-events: none;
+  animation: greenUnderlineGlow 2.8s ease-in-out infinite;
+}
+
+.ithunt-brush-stroke .brush-path-main {
+  stroke: #22c55e;
+  stroke: url(#ithuntGreenBrushGradient);
+  stroke-dasharray: 140;
+  stroke-dashoffset: 140;
+  animation: brushDrawLoop 3.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.ithunt-brush-stroke .brush-path-sub {
+  stroke: #4ade80;
+  stroke-dasharray: 140;
+  stroke-dashoffset: 140;
+  animation: brushDrawLoop 3.6s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.18s;
+}
+
+@keyframes brushDrawLoop {
+  0% {
+    stroke-dashoffset: 140;
+    opacity: 0;
+  }
+  28% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  82% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  94%, 100% {
+    stroke-dashoffset: -140;
+    opacity: 0;
+  }
+}
+
+@keyframes greenUnderlineGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 3px rgba(34, 197, 94, 0.55));
+  }
+  50% {
+    filter: drop-shadow(0 0 9px rgba(34, 197, 94, 0.95)) drop-shadow(0 0 16px rgba(74, 222, 128, 0.5));
+  }
+}
+
+:global(body.light-theme) .ithunt-brush-wrap {
+  color: #0f172a !important;
+}
+
+:global(body.light-theme) .ithunt-brush-stroke {
+  animation: greenUnderlineGlowLight 2.8s ease-in-out infinite;
+}
+
+@keyframes greenUnderlineGlowLight {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px rgba(22, 163, 74, 0.45));
+  }
+  50% {
+    filter: drop-shadow(0 0 7px rgba(22, 163, 74, 0.8)) drop-shadow(0 0 14px rgba(34, 197, 94, 0.35));
+  }
 }
 
 /* Dual Hero CTA Buttons (IT Hunt Style) */
