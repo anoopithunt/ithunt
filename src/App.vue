@@ -54,6 +54,31 @@
     </a>
 
 
+    <!-- Festive Greeting Announcement Bar (Always Visible on Web Page When Active) -->
+    <div 
+      v-if="festivalWish && festivalWish.isActive && activeTab !== 'superadmin'" 
+      class="festive-web-banner"
+      :class="['theme-' + (festivalWish.theme || 'diwali')]"
+      @click="showFestivalModal = true"
+      role="banner"
+      title="Click to view full celebration greeting and scholarship offer"
+    >
+      <div class="festive-web-banner-inner">
+        <span class="festive-web-icon">{{ getFestivalEmoji(festivalWish.theme) }}</span>
+        <span class="festive-web-badge">{{ festivalWish.occasion || 'CELEBRATION' }}</span>
+        <span class="festive-web-title">{{ festivalWish.title }}</span>
+        <span class="festive-web-offer" v-if="festivalWish.specialOffer">{{ festivalWish.specialOffer }}</span>
+        <button 
+          type="button" 
+          class="festive-web-cta-btn" 
+          @click.stop="showFestivalModal = true"
+          title="Open celebration greeting and scholarship offer"
+        >
+          <span>View Celebration ✨</span>
+        </button>
+      </div>
+    </div>
+
     <!-- Navbar Component (Hidden in SuperAdmin mode for dedicated admin experience) -->
     <Navbar 
       v-if="activeTab !== 'superadmin'"
@@ -322,6 +347,7 @@
 
     <!-- Festive Celebration Greeting Modal Popup on Home Page -->
     <FestivalWishModal 
+      :key="festivalWish.festivalKey || festivalWish.theme || 'festive-modal'"
       :isOpen="showFestivalModal && activeTab === 'home'" 
       :wish="festivalWish" 
       @close="showFestivalModal = false" 
@@ -614,6 +640,16 @@ const getStoredFestivalWish = () => {
 const festivalWish = ref(getStoredFestivalWish());
 const showFestivalModal = ref(false);
 
+const getFestivalEmoji = (theme) => {
+  if (theme === 'freedom' || theme === 'republic') return '🇮🇳';
+  if (theme === 'diwali') return '🪔';
+  if (theme === 'holi') return '🎨';
+  if (theme === 'eid') return '🌙';
+  if (theme === 'newyear') return '🎆';
+  if (theme === 'custom') return '✨';
+  return '🎉';
+};
+
 const checkAndShowFestivalModal = (force = false) => {
   if (!festivalWish.value || !festivalWish.value.isActive) {
     showFestivalModal.value = false;
@@ -630,7 +666,7 @@ const checkAndShowFestivalModal = (force = false) => {
   if (activeTab.value === 'home' || force) {
     setTimeout(() => {
       showFestivalModal.value = true;
-    }, 750);
+    }, 350);
   }
 };
 
@@ -640,7 +676,7 @@ const handleUpdateFestivalWish = (updated) => {
     localStorage.setItem('ithunt_festival_wish', JSON.stringify(festivalWish.value));
     localStorage.removeItem('ithunt_festival_dismissed_until');
   } catch (e) {}
-  showToast('🎉 Festival wish updated & synced with Home Page!', 'success');
+  showToast(`🎉 ${updated.occasion || 'Festival'} celebration is now LIVE on Home Page!`, 'success');
 };
 
 const handlePreviewFestivalWish = (previewWish) => {
@@ -1152,7 +1188,7 @@ const setTab = (tab) => {
   }
   updateSeoMetadata(tab);
   if (tab === 'home') {
-    checkAndShowFestivalModal();
+    checkAndShowFestivalModal(true);
   }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
