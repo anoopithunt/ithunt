@@ -3,13 +3,13 @@
     <div class="container admission-inner-wrap">
       <!-- Section Header -->
       <div class="section-header anim-stagger-1 text-center">
-        <span class="section-tag">{{ content.admissionSection?.sectionTag || 'Online Registration 2026' }}</span>
+        <span class="section-tag">{{ content.admissionSection?.sectionTag || 'Admissions & Program Enquiry' }}</span>
         <h2 class="section-title">
           {{ content.admissionSection?.titlePrefix || 'Candidate ' }}
           <span class="text-gradient">{{ content.admissionSection?.titleGradient || 'Admission Application' }}</span>
         </h2>
         <p class="section-subtitle-desc">
-          Official enrollment portal for software development, IT certification, and career incubator batches.
+          Tell us what you want to learn. Share your details and preferred program to begin the admission process.
         </p>
       </div>
 
@@ -1166,4 +1166,3 @@ const onImgError = (event) => {
   }
 }
 </style>
-

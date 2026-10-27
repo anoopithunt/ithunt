@@ -5,7 +5,7 @@
       <div class="container">
         <div class="internship-live-pill">
           <span class="pulse-dot"></span>
-          <span>{{ content.internshipsSectionUI?.heroPill || '2026 BATCH ENROLLMENTS OPEN • PRODUCTION-GRADE SOFTWARE INCUBATOR' }}</span>
+          <span>{{ content.internshipsSectionUI?.heroPill || 'SOFTWARE INTERNSHIPS • WEB, MOBILE & DIGITAL SKILLS' }}</span>
         </div>
         
         <h1 class="internship-main-title">
