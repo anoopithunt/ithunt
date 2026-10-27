@@ -138,12 +138,12 @@ const CONTENT_DATA = {
 
   // Hero Section Copy
   hero: {
-    badgeText: "🚀 IT SOLUTIONS & SOFTWARE DEVELOPMENT ACADEMY 2026",
-    titlePrefix: "Architecting Next-Gen ",
-    titleGradient: "Software & AI Solutions",
-    subtitle: "IT HUNT is a premier software development studio & technology academy in Prayagraj. We build production-ready software solutions while empowering engineers with 3-Month & 6-Month hands-on internships in MERN Stack, iOS, Android, and Digital Marketing.",
-    primaryCtaText: "Explore NIELIT Project 🚀",
-    secondaryCtaText: "Start Application 2026 📝",
+    badgeText: "🚀 SOFTWARE TRAINING & IT SOLUTIONS",
+    titlePrefix: "Learn by building. ",
+    titleGradient: "Grow into your next opportunity.",
+    subtitle: "Explore software internships and IT diplomas in Prayagraj. Build practical skills through guided projects, strengthen your portfolio, and get support as you prepare for your next step.",
+    primaryCtaText: "Start your application",
+    secondaryCtaText: "Explore internship tracks",
     highlights: [
       "✓ 3 & 6 Months Production Internships",
       "✓ Live Enterprise Client Projects",
@@ -175,10 +175,10 @@ const CONTENT_DATA = {
 
   // Software Company Services & Internship Venture
   internshipVenture: {
-    tagline: "SOFTWARE SOLUTIONS & INTERNSHIP VENTURE 2026",
-    titlePrefix: "Production-Grade ",
-    titleGradient: "IT Solutions & Training",
-    description: "Work directly on real-world client software, enterprise APIs, mobile apps, and growth campaigns alongside senior developers.",
+    tagline: "SOFTWARE INTERNSHIPS • WEB, MOBILE & DIGITAL SKILLS",
+    titlePrefix: "Practical Software ",
+    titleGradient: "Internships & Training",
+    description: "Build practical skills through structured tracks, guided project work, and instructor support across web, mobile, and digital marketing.",
     spotlightBadge: "ENTERPRISE SOFTWARE VENTURE 2026",
     spotlightTitlePrefix: "IT Solutions ",
     spotlightTitleGradient: "Internship Program",
@@ -447,10 +447,10 @@ const CONTENT_DATA = {
 
   // Accredited Computer Courses & Diplomas Section
   coursesSection: {
-    tagline: "ACCREDITED TECH CURRICULUMS",
-    titlePrefix: "Recognized ",
-    titleGradient: "Diplomas & Degree Programs",
-    description: "Government recognized computer education combined with practical lab training.",
+    tagline: "LEARNING PATHS & IT DIPLOMAS",
+    titlePrefix: "Build skills with ",
+    titleGradient: "structured IT programs",
+    description: "Explore accredited diploma options and practical technology courses. Compare the curriculum, duration, and outcomes to find a program that fits your goals.",
     coursesList: [
       {
         id: 1,
@@ -997,8 +997,8 @@ const CONTENT_DATA = {
   testimonialsSection: {
     tagline: "PROVEN ALUMNI SUCCESS STORIES",
     titlePrefix: "Our Alumni ",
-    titleGradient: "Experiences & Achievements",
-    description: "Discover how engineering students, freshers, and graduates transformed their careers and secured top-tier tech roles with IT HUNT.",
+    titleGradient: "Stories & Experiences",
+    description: "Read about learners’ experiences, the skills they developed, and the projects they worked on during their time with IT HUNT.",
     stats: [
       { label: "Graduated Alumni", value: "500+", icon: "🎓" },
       { label: "Highest Package", value: "₹18.5 LPA", icon: "💰" },
@@ -1716,7 +1716,7 @@ const CONTENT_DATA = {
     "minExpRequiredBadge": "Min 4+ Yrs Exp",
     "fastApplyBtn": "Fast Apply ⚡",
     "viewDetailsSyllabusBtn": "View Details & Syllabus 🔬",
-    "startAdmissionCta": "Start Admission Application 📝 →",
+    "startAdmissionCta": "Start your application 📝 →",
     "chatWhatsappBtn": "Chat on WhatsApp 💬",
     "exploreInternshipsBtn": "Explore Internship Tracks 🚀",
     "exploreEventsGalleryBtn": "Explore Events & Media Gallery 🎪 →",
@@ -1755,7 +1755,7 @@ const CONTENT_DATA = {
     }
   },
   "internshipsSectionUI": {
-    "heroPill": "2026 BATCH ENROLLMENTS OPEN • PRODUCTION-GRADE SOFTWARE INCUBATOR",
+    "heroPill": "SOFTWARE INTERNSHIPS • WEB, MOBILE & DIGITAL SKILLS",
     "trustRibbon": [
       {
         "icon": "🚀",
@@ -1813,7 +1813,7 @@ const CONTENT_DATA = {
       "badgePill": "LIMITED SEATS AVAILABLE PER BATCH",
       "headlinePrefix": "Ready to Transform from a Student to a ",
       "headlineGradient": "Production Engineer?",
-      "subtext": "Book a free 1-on-1 counseling session with Director Mr. Lakshman Singh Chauhan, tour our Holagarh high-tech labs, and test drive our live workstation setups."
+      "subtext": "Talk with the team about your goals, compare available internship tracks, and learn what to expect from the application process."
     }
   },
   "eventsSectionUI": {
@@ -1833,7 +1833,7 @@ const CONTENT_DATA = {
     }
   },
   "testimonialsSectionUI": {
-    "heroPill": "PROVEN TRACK RECORD • 500+ SUCCESSFUL ALUMNI WORLDWIDE",
+    "heroPill": "ALUMNI STORIES • LEARNING, PROJECTS & CAREER PATHS",
     "filterTabs": [
       {
         "id": "all",
@@ -1864,7 +1864,7 @@ const CONTENT_DATA = {
       "badgePill": "NEXT BATCH ADMISSIONS OPEN",
       "headlinePrefix": "Want to Be Our Next ",
       "headlineGradient": "Alumni Success Story?",
-      "subtext": "Join our hands-on 3-Month or 6-Month IT Internship incubation in Prayagraj. Learn direct from senior MCA tech architects and build portfolio-worthy enterprise code."
+      "subtext": "Explore internship options, ask questions about the learning experience, and choose a next step that fits your goals."
     }
   },
   "reviewsSectionUI": {
@@ -1904,11 +1904,11 @@ const CONTENT_DATA = {
     ]
   },
   "admissionSection": {
-    "sectionTag": "Online Registration 2026",
+    "sectionTag": "Admissions & Program Enquiry",
     "titlePrefix": "Candidate ",
     "titleGradient": "Admission Application",
     "formTitle": "Student Registration Details",
-    "formSubtitle": "Please enter accurate candidate information as per official records.",
+    "formSubtitle": "Share your details and preferred program so the team can guide you through the next steps.",
     "fields": {
       "candidateName": "Candidate Name",
       "candidateNamePlaceholder": "Full candidate name",
@@ -1930,7 +1930,7 @@ const CONTENT_DATA = {
       "emailPlaceholder": "name@example.com",
       "address": "Permanent Address",
       "addressPlaceholder": "Full residential street address",
-      "submitBtn": "Submit Registration 🚀"
+      "submitBtn": "Submit application 🚀"
     },
     "courseOptgroups": [
       {

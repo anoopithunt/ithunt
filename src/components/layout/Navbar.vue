@@ -67,9 +67,9 @@
         <button 
           class="cta-btn-header nav-action-desktop" 
           @click="$emit('set-tab', 'admission')"
-          title="Apply for 2026 Batch"
+          title="Start your application"
         >
-          <span>Apply 2026 ➜</span>
+          <span>Apply now ➜</span>
         </button>
 
         <!-- Mobile Drawer Toggle -->
@@ -239,7 +239,7 @@
                 @click="$emit('set-tab', 'admission'); closeMobileNav();"
               >
                 <span class="sidebar-item-icon">📝</span>
-                <span class="sidebar-item-label">Direct Admission 2026</span>
+                <span class="sidebar-item-label">Apply for admission</span>
                 <span class="sidebar-item-pill pulse">Open</span>
               </button>
             </li>

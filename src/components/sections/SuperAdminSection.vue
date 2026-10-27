@@ -5346,7 +5346,7 @@ const DEFAULT_FESTIVAL_PRESETS = {
     tagline: 'A New Year of Breakthrough Growth & High-Tech Careers',
     message: 'Welcome 2026! Make this year the turning point of your career by building real-world software, AI products, and apps. Join our 100% placement-assisted batches.',
     specialOffer: '🎆 New Year Resolution: Guaranteed 1-on-1 Mentorship & Placement Sprint!',
-    ctaText: 'Apply for 2026 Batch 🚀',
+    ctaText: 'Explore available programs 🚀',
     ctaAction: 'admission',
     theme: 'newyear',
     locationScope: 'All Locations & Campuses (Holagarh, Prayagraj & Online)',
@@ -12539,4 +12539,3 @@ label {
 }
 
 </style>
-

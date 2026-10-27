@@ -27,24 +27,23 @@
 
         <!-- Main Headline (IT Hunt Dual-Tone Style) -->
         <h1 class="ithunt-hero-headline anim-fade-in-up">
-          Every other institute starts with a blank syllabus.<br />
-          <span class="ithunt-gradient-text">Ours starts with real client code.</span>
+          Learn by building.<br />
+          <span class="ithunt-gradient-text">Grow into your next opportunity.</span>
         </h1>
 
         <!-- Subtitle with Signature Hand-Drawn Brush Stroke Underline -->
         <p class="ithunt-hero-subtitle anim-fade-in-up-delay">
-          Premier software studio &amp; tech academy in Prayagraj. Build production-grade web, mobile, and AI applications with 1-on-1 industry mentorship — 
-          <span class="ithunt-brush-wrap">on real client code.<svg class="ithunt-brush-stroke" viewBox="0 0 120 12" fill="none" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="ithuntGreenBrushGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#10b981" /><stop offset="50%" stop-color="#4ade80" /><stop offset="100%" stop-color="#22c55e" /></linearGradient></defs><path class="brush-path-main" d="M2 8c20-4 40-2 60 1s40 3 56-1" stroke="url(#ithuntGreenBrushGradient)" stroke-width="2.8" stroke-linecap="round"></path><path class="brush-path-sub" d="M4 10c18-3 38-1 58 1s38 2 54-1" stroke="#34d399" stroke-width="2.2" stroke-linecap="round" opacity="0.8"></path></svg></span>
+          Explore software internships and IT diplomas in Prayagraj. Build practical skills through guided projects, strengthen your portfolio, and get support as you prepare for your next step.
         </p>
 
         <!-- Dual CTA Buttons (IT Hunt Style) -->
         <div class="ithunt-hero-cta-group anim-fade-in-up-delay">
           <button class="ithunt-btn-primary ithunt-hero-main-cta" @click="$emit('set-tab', 'admission')">
-            <span>Apply for 2026 Batch</span>
+            <span>Start your application</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
           </button>
           <button class="ithunt-btn-secondary ithunt-hero-main-cta" @click="$emit('set-tab', 'internships')">
-            <span>Explore Programs ➜</span>
+            <span>Explore internship tracks</span>
           </button>
         </div>
 
@@ -57,7 +56,7 @@
           <span class="guarantee-sep">·</span>
           <div class="guarantee-item">
             <span class="guarantee-icon">✓</span>
-            <span>100% Practical Client Sprints</span>
+            <span>Hands-on project sprints</span>
           </div>
           <span class="guarantee-sep">·</span>
           <div class="guarantee-item">
@@ -67,7 +66,7 @@
           <span class="guarantee-sep">·</span>
           <div class="guarantee-item">
             <span class="guarantee-icon">✓</span>
-            <span>Direct Hiring Placements</span>
+            <span>Career guidance &amp; placement support</span>
           </div>
         </div>
 
@@ -80,7 +79,7 @@
               </div>
               <div class="stat-desc-box">
                 <div class="stat-label-title">{{ stat.label }}</div>
-                <div class="stat-micro-note">Verified & Audited 2026</div>
+                <div class="stat-micro-note">Program snapshot</div>
               </div>
             </div>
           </div>
@@ -105,10 +104,10 @@
             <span>PRODUCTION ARCHITECTURE</span>
           </div>
           <h2 class="ithunt-section-heading">
-            Live Client Code &amp; Deployment Telemetry
+            Project Code &amp; Architecture Showcase
           </h2>
           <p class="ithunt-section-desc">
-            Before you enroll, inspect the actual Swift, Web, and AI codebases engineered by IT HUNT interns in real client sprints.
+            Explore representative web, mobile, and AI code examples. See how guided practice connects core concepts to practical projects.
           </p>
         </div>
 
@@ -245,7 +244,7 @@
             <div class="card-icon-wrap">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
             </div>
-            <h3 class="homework-card-title">Real Client Repositories</h3>
+            <h3 class="homework-card-title">Collaborative Project Workflows</h3>
             <p class="homework-card-desc">
               On day one you clone active software codebases — what clients buy, how APIs scale, and real architecture. If an issue is challenging, senior mentors guide your approach rather than giving you toy answers.
             </p>
@@ -319,7 +318,7 @@
             Three Core Tracks. One Integrated Studio.
           </h2>
           <p class="ithunt-section-desc">
-            Most bootcamps charge separately for theory, projects, and interviews. At IT HUNT, one comprehensive track equips you with full-stack mastery, live client code, and career placement.
+            Compare a focused short sprint, a longer immersive internship, and accredited diploma options. Choose a learning path that fits your goals and schedule.
           </p>
         </div>
 
@@ -559,7 +558,7 @@
                     class="hiw-inline-cta"
                     @click="$emit('set-tab', 'admission')"
                   >
-                    Apply for 2026 Batch ➜
+                    Start your application ➜
                   </button>
                 </div>
               </div>
@@ -787,12 +786,12 @@
               Ready to Transform Your Tech Career?
             </h2>
             <p class="cta-subtitle">
-              Join thousands of developers, students, and engineers who turned theory into high-paying engineering careers with IT HUNT.
+              Build practical skills, explore a learning path that fits your goals, and take a clear next step with IT HUNT.
             </p>
 
             <div class="cta-buttons-group">
               <button class="ithunt-btn-primary ithunt-btn-lg" @click="$emit('set-tab', 'admission')">
-                <span>Start Free Application ➜</span>
+                <span>Start your application ➜</span>
               </button>
               <button class="ithunt-btn-secondary ithunt-btn-lg" @click="$emit('open-cv-modal')">
                 <span>📄 Generate Professional CV</span>
@@ -805,7 +804,7 @@
             <div class="cta-micro-guarantee">
               <span>✔ Free Initial Career Consultation</span>
               <span>·</span>
-              <span>✔ 100% Practical Client Sprints</span>
+              <span>✔ Hands-on project work</span>
               <span>·</span>
               <span>✔ Flexible Batches Available</span>
             </div>
@@ -846,7 +845,7 @@ const homeSections = [
   { id: 'page-benefits', label: 'Why IT HUNT', icon: '💎', subtitle: 'Bento Grid of Advantages' },
   { id: 'page-leadership', label: 'Leadership', icon: '👥', subtitle: 'Founders & Senior Architects' },
   { id: 'page-faq', label: 'FAQs', icon: '❓', subtitle: 'Common Inquiries Answered' },
-  { id: 'page-cta', label: 'Apply Now', icon: '🔥', subtitle: 'Start 2026 Batch Application' },
+  { id: 'page-cta', label: 'Apply Now', icon: '🔥', subtitle: 'Start your application' },
   { id: 'page-footer', label: 'Contact & Info', icon: '📍', subtitle: 'Location, Socials & Legal' },
 ];
 
@@ -1118,7 +1117,7 @@ const workflowSteps = [
     number: '2',
     icon: '💻',
     phase: 'PRODUCTION SPRINT IMMERSION',
-    title: 'Real Client Codebase Immersion',
+    title: 'Guided Codebase Practice',
     desc: 'You join active engineering sprint teams, attend daily standups, pick up real GitHub tickets, and build scalable features.',
     points: ['Active Git branches & PR reviews', 'Agile sprint methodology', 'Docker containerized workflows']
   },

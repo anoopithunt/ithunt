@@ -8,13 +8,17 @@
 
 /* Global layout polish for a premium, responsive experience */
 :root {
-  color-scheme: dark light;
   --section-padding-mobile: clamp(3.25rem, 8vw, 5rem);
 }
 
 body {
+  color-scheme: dark;
   -webkit-tap-highlight-color: transparent;
   text-rendering: optimizeLegibility;
+}
+
+body.light-theme {
+  color-scheme: light;
 }
 
 button,
@@ -26,9 +30,9 @@ textarea {
 }
 
 button,
-input,
 select,
 textarea,
+:is(input:not([type]), input[type='text'], input[type='email'], input[type='tel'], input[type='password'], input[type='number'], input[type='date'], input[type='search'], input[type='url']),
 [role='button'] {
   min-height: 44px;
 }
@@ -99,7 +103,6 @@ aside {
   .button-row,
   .hero-actions,
   .inline-actions,
-  .nav-actions,
   .action-group {
     flex-wrap: wrap;
     width: 100%;
@@ -109,7 +112,6 @@ aside {
   .button-row > *,
   .hero-actions > *,
   .inline-actions > *,
-  .nav-actions > *,
   .action-group > * {
     flex: 1 1 100%;
   }
@@ -318,8 +320,7 @@ main.superadmin-main-active {
   .cta-row,
   .button-row,
   .hero-actions,
-  .inline-actions,
-  .nav-actions {
+  .inline-actions {
     flex-direction: column;
     align-items: stretch;
   }
@@ -328,8 +329,7 @@ main.superadmin-main-active {
   .cta-row > *,
   .button-row > *,
   .hero-actions > *,
-  .inline-actions > *,
-  .nav-actions > * {
+  .inline-actions > * {
     width: 100%;
   }
 
@@ -550,7 +550,7 @@ main.superadmin-main-active {
 
 .form-control,
 .select-control,
-input,
+:is(input:not([type]), input[type='text'], input[type='email'], input[type='tel'], input[type='password'], input[type='number'], input[type='date'], input[type='search'], input[type='url']),
 select,
 textarea {
   background: rgba(15, 23, 42, 0.5) !important;
@@ -562,7 +562,7 @@ textarea {
 .form-control:focus,
 select:focus,
 textarea:focus,
-input:focus {
+:is(input:not([type]), input[type='text'], input[type='email'], input[type='tel'], input[type='password'], input[type='number'], input[type='date'], input[type='search'], input[type='url']):focus {
   border-color: rgba(99, 102, 241, 0.5) !important;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
@@ -675,6 +675,171 @@ input:focus {
   border: 1px solid rgba(148, 163, 184, 0.12);
 }
 
+/* Explicit light-theme surfaces keep shared components readable in both modes. */
+body.light-theme .ithunt-hero {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(99, 102, 241, 0.1), transparent 28%),
+    radial-gradient(circle at 82% 18%, rgba(249, 115, 22, 0.08), transparent 30%),
+    linear-gradient(180deg, #f8fafc, #ffffff);
+}
+
+body.light-theme .ithunt-hero .ithunt-hero-headline,
+body.light-theme .ithunt-hero .ithunt-hero-subtitle,
+body.light-theme .ithunt-hero .ithunt-brush-wrap {
+  color: #172033 !important;
+}
+
+body.light-theme .ithunt-hero .guarantee-item,
+body.light-theme .stat-pill-card,
+body.light-theme .modern-track-card,
+body.light-theme .review-card,
+body.light-theme .rating-summary-card,
+body.light-theme .form-card,
+body.light-theme .tab-switch-btn,
+body.light-theme .preview-card,
+body.light-theme .receipt-preview-card,
+body.light-theme .student-welcome-banner {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.94) !important;
+  border-color: rgba(15, 23, 42, 0.11) !important;
+  box-shadow: 0 16px 38px rgba(15, 23, 42, 0.07) !important;
+}
+
+body.light-theme .guarantee-item {
+  background: rgba(255, 255, 255, 0.82);
+}
+
+body.light-theme .form-control,
+body.light-theme .select-control,
+body.light-theme :is(input:not([type]), input[type='text'], input[type='email'], input[type='tel'], input[type='password'], input[type='number'], input[type='date'], input[type='search'], input[type='url']),
+body.light-theme select,
+body.light-theme textarea {
+  color: #111827 !important;
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+body.light-theme .form-control::placeholder,
+body.light-theme :is(input:not([type]), input[type='text'], input[type='email'], input[type='tel'], input[type='password'], input[type='number'], input[type='date'], input[type='search'], input[type='url'])::placeholder,
+body.light-theme textarea::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+body.light-theme .filter-capsule-btn,
+body.light-theme .tab-switch-btn {
+  color: #334155;
+  background: #ffffff;
+  border-color: #dbe2ea;
+}
+
+body.light-theme .tab-switch-btn.active {
+  color: #312e81;
+  background: rgba(99, 102, 241, 0.1) !important;
+  border-color: rgba(99, 102, 241, 0.38) !important;
+}
+
+body.light-theme .verified-badge-pill {
+  color: #047857;
+}
+
+body.light-theme .admin-shell {
+  color: #172033;
+  background: #f3f6fb;
+}
+
+body.light-theme .admin-shell .admin-sidebar,
+body.light-theme .admin-shell .admin-top-command-bar {
+  color: #172033;
+  background: rgba(255, 255, 255, 0.94);
+  border-color: #e2e8f0;
+  box-shadow: 0 8px 26px rgba(15, 23, 42, 0.06);
+}
+
+body.light-theme .admin-shell .overview-welcome-card,
+body.light-theme .admin-shell .overview-festival-banner,
+body.light-theme .admin-shell .admin-control-bar,
+body.light-theme .admin-shell .admin-stat-card,
+body.light-theme .admin-shell .admin-table-card,
+body.light-theme .admin-shell .control-card-section,
+body.light-theme .admin-shell .admin-tabs-nav-bar {
+  color: #172033;
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+}
+
+body.light-theme .admin-shell .sidebar-nav-item,
+body.light-theme .admin-shell .admin-nav-tab-btn {
+  color: #475569;
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+body.light-theme .admin-shell .sidebar-nav-item.active,
+body.light-theme .admin-shell .admin-nav-tab-btn.active {
+  color: #3730a3;
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.32);
+}
+
+body.light-theme .admin-shell .admin-data-table,
+body.light-theme .admin-shell .table-responsive {
+  color: #172033;
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+body.light-theme .admin-shell .admin-data-table thead th,
+body.light-theme .admin-shell .admin-data-table th {
+  color: #334155;
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
+body.light-theme .admin-shell .admin-data-table tbody td,
+body.light-theme .admin-shell .admin-data-table tbody th {
+  color: #334155;
+  border-color: #edf1f5;
+}
+
+body.light-theme .admin-shell .admin-data-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.admin-shell .admin-top-command-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-radius: 0 0 18px 18px;
+}
+
+.admin-shell .admin-data-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.admin-shell .admin-table-card,
+.admin-shell .table-responsive {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.admin-shell .overview-welcome-card {
+  border-radius: 22px;
+}
+
+.admin-shell .command-search-input {
+  color: var(--text-main);
+}
+
+@media (max-width: 720px) {
+  .admin-shell .admin-top-command-bar {
+    border-radius: 0 0 14px 14px;
+  }
+}
+
 @media (max-width: 1024px) {
   .admission-grid-container {
     grid-template-columns: 1fr;
@@ -719,4 +884,15 @@ input:focus {
 ::selection {
   background: rgba(99, 102, 241, 0.28);
   color: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
