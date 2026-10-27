@@ -23,7 +23,6 @@ const CONTENT_DATA = {
   // SuperAdmin & Login Governance Architecture
   "adminAuth": {
     "defaultUsername": "admin@ithunt.com",
-    "defaultPassword": "admin@ithunt2026",
     "superAdminName": "Mr. Lakshman Singh Chauhan",
     "role": "Director & Chief Administrator",
     "avatar": "img/ithunt.webp",
@@ -40,8 +39,6 @@ const CONTENT_DATA = {
     "passwordPlaceholder": "Enter administrator password",
     "rememberMeLabel": "Keep me authenticated on this workstation",
     "loginBtnText": "Sign In to SuperAdmin Console 🚀",
-    "demoAdminCredentialsText": "🔑 Demo Credentials: admin@ithunt.com / admin@ithunt2026",
-    "quickFillBtnText": "Auto-Fill SuperAdmin Credentials ⚡",
     "backToHomeBtnText": "← Back to Public Website",
     "securityNotice": "🛡️ 256-Bit Encrypted Session • ISO 9001:2015 Verified Academic Console"
   },
@@ -1617,10 +1614,11 @@ const CONTENT_DATA = {
   // Contact Information
   contact: {
     location: "Dahiyawa Holagarh(Near Mela Ground in Front of Kali Maa Mandir), Prayagraj (Allahabad), UP",
-    phone: "Mobile: +91 9795771806",
-    rawPhone: "+91 9795771806",
-    email: "Email: softtechithunt@gmail.com",
+    phone: "+91-9795771806",
+    rawPhone: "+919795771806",
+    email: "softtechithunt@gmail.com",
     rawEmail: "softtechithunt@gmail.com",
+    whatsapp: "919795771806",
     districts: ["PRAYAGRAJ", "PRATAPGARH", "KAUSHAMBI", "GORAKHPUR", "LUCKNOW", "RAEBARELI", "VARANASI", "AMETHI"]
   },
 

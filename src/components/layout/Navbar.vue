@@ -358,11 +358,11 @@
         </div>
 
         <div class="sidebar-contact-grid">
-          <a href="tel:+919140412215" class="sidebar-contact-btn">
+          <a href="tel:+919795771806" class="sidebar-contact-btn">
             <span>📞 Call Us</span>
           </a>
           <a 
-            href="https://wa.me/919838112215?text=Hello%20IT%20HUNT,%20I%20am%20interested%20in%20Software%20Training%20and%20Internships" 
+            href="https://wa.me/919795771806?text=Hello%20IT%20HUNT,%20I%20am%20interested%20in%20Software%20Training%20and%20Internships" 
             target="_blank" 
             rel="noopener noreferrer"
             class="sidebar-contact-btn whatsapp"

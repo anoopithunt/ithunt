@@ -54,8 +54,12 @@
       <div class="footer-col">
         <h4>Contact & Location</h4>
         <p class="footer-contact-item">📍 {{ content.contact?.location }}</p>
-        <p class="footer-contact-item">📞 {{ content.contact?.phone }}</p>
-        <p class="footer-contact-item">✉️ {{ content.contact?.email }}</p>
+        <p class="footer-contact-item">
+          📞 <a href="tel:+919795771806" class="footer-contact-link">+91-9795771806</a>
+        </p>
+        <p class="footer-contact-item">
+          ✉️ <a href="mailto:softtechithunt@gmail.com" class="footer-contact-link">softtechithunt@gmail.com</a>
+        </p>
         <a
           :href="'https://wa.me/' + (content.contact?.whatsapp || '919795771806') + '?text=Hello%20IT%20HUNT%20Team!'"
           target="_blank"
@@ -231,6 +235,19 @@ const onImgError = (event) => {
   color: rgba(255, 255, 255, 0.75);
   margin-bottom: 0.4rem;
   line-height: 1.5;
+}
+
+.footer-contact-link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(99, 102, 241, 0.4);
+  text-underline-offset: 3px;
+  transition: all 0.2s ease;
+}
+
+.footer-contact-link:hover {
+  color: var(--color-ai-indigo, #6366f1);
+  text-decoration-color: var(--color-ai-indigo, #6366f1);
 }
 
 /* ── WhatsApp button ── */

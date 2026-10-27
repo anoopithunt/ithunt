@@ -108,32 +108,16 @@
           <!-- Quick 1-Click Demo Credentials Pill Helpers -->
           <div class="login-demo-helper">
             <div class="demo-cred-title">
-              ⚡ Quick Demo Login Shortcuts (Click to Auto-Fill):
+              ⚡ Demo Portal Shortcut:
             </div>
             <div class="demo-chips-grid">
               <button 
                 type="button" 
-                class="demo-chip-btn chip-admin" 
-                @click="quickFillRole('admin')"
-                title="Fill SuperAdmin credentials (admin@ithunt.com)"
-              >
-                <span>⚡ Admin</span>
-              </button>
-              <button 
-                type="button" 
-                class="demo-chip-btn chip-teacher" 
-                @click="quickFillRole('teacher')"
-                title="Fill Teacher credentials (teacher@ithunt.com)"
-              >
-                <span>👨‍🏫 Teacher</span>
-              </button>
-              <button 
-                type="button" 
                 class="demo-chip-btn chip-student" 
                 @click="quickFillRole('student')"
-                title="Fill Student credentials (student@ithunt.com)"
+                title="Fill Student demo profile"
               >
-                <span>🎓 Student</span>
+                <span>🎓 Student Demo Access</span>
               </button>
             </div>
           </div>
@@ -242,24 +226,16 @@ const studentSignup = reactive({
   password: ''
 });
 
-// Quick 1-Click Demo Credentials
+// Quick 1-Click Demo Credentials (Student demo only - administrative access strictly requires verified server auth)
 const quickFillRole = (role) => {
   errorMessage.value = '';
   successMessage.value = '';
   authMode.value = 'login';
 
-  if (role === 'admin') {
-    loginIdentifier.value = props.content.superAdminData?.adminAuth?.defaultUsername || 'admin@ithunt.com';
-    loginPassword.value = props.content.superAdminData?.adminAuth?.defaultPassword || 'admin@ithunt2026';
-    successMessage.value = '⚡ Admin demo credentials loaded: admin@ithunt.com / admin@ithunt2026';
-  } else if (role === 'teacher') {
-    loginIdentifier.value = 'teacher@ithunt.com';
-    loginPassword.value = 'teacher@123';
-    successMessage.value = '👨‍🏫 Teacher demo credentials loaded: teacher@ithunt.com / teacher@123';
-  } else if (role === 'student') {
+  if (role === 'student') {
     loginIdentifier.value = 'student@ithunt.com';
     loginPassword.value = 'Ithunt@123';
-    successMessage.value = '🎓 Student demo credentials loaded: student@ithunt.com / Ithunt@123';
+    successMessage.value = '🎓 Student demo credentials loaded';
   }
 };
 
@@ -407,34 +383,12 @@ const handleUnifiedLogin = async () => {
     console.warn('Backend API auth note:', apiErr.message);
   }
 
-  // 2. Client-Side Fallback Verification (Offline & Demo Accounts)
-
-  // 2.A Check Admin fallback
-  const validAdminUser = (props.content.superAdminData?.adminAuth?.defaultUsername || 'admin@ithunt.com').toLowerCase();
-  const validAdminPass = props.content.superAdminData?.adminAuth?.defaultPassword || 'admin@ithunt2026';
-  if ((norm === validAdminUser || norm === 'admin') &&
-      (rawPassword === validAdminPass || rawPassword === 'admin' || rawPassword === 'admin123' || rawPassword === 'admin@ithunt2026')) {
-    recordLoginAttempt(true);
-    routeUserByRole({
-      name: props.content.superAdminData?.adminAuth?.superAdminName || 'Mr. Lakshman Singh Chauhan',
-      email: validAdminUser,
-      role: 'superadmin',
-      roleType: 'superadmin'
-    });
-    return;
-  }
-
-  // 2.B Check Teacher fallback
-  if ((norm === 'teacher@ithunt.com' || norm === 'teacher' || norm === 'faculty@ithunt.com' || norm === 'faculty') &&
-      (rawPassword === 'teacher@ithunt2026' || rawPassword === 'teacher@123' || rawPassword === 'teacher' || rawPassword === 'faculty@123' || rawPassword === 'faculty')) {
-    recordLoginAttempt(true);
-    routeUserByRole({
-      name: 'Er. Sandeep Srivastava (Teacher)',
-      email: 'teacher@ithunt.com',
-      role: 'teacher',
-      roleType: 'teacher',
-      designation: 'Senior Faculty Lead & Technical Mentor'
-    });
+  // 2. Client-Side Fallback Verification (Offline & Demo Student Only)
+  // 2.A Strict Security: SuperAdmin accounts require verified server-side authentication.
+  if (norm === 'admin' || norm === 'admin@ithunt.com' || norm === 'superadmin') {
+    recordLoginAttempt(false);
+    isLoading.value = false;
+    errorMessage.value = 'Invalid administrator credentials. Administrator accounts require verified server-side authentication.';
     return;
   }
 
