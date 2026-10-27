@@ -2,13 +2,13 @@
   <header class="navbar-header" :class="{ scrolled: isScrolled }">
     <div class="container navbar-container">
       <!-- Brand Logo -->
-      <div class="brand-logo" @click="$emit('set-tab', 'home')">
+      <button class="brand-logo brand-logo-button" type="button" @click="$emit('set-tab', 'home')" aria-label="Go to IT HUNT home page">
         <img :src="content.brand?.logoImage" :alt="(content.brand?.name || 'IT HUNT') + ' Logo'" class="brand-logo-img" @error="onImgError" loading="eager" fetchpriority="high">
         <div>
           <div class="brand-title">IT <span class="text-gradient">{{ content.brand?.nameHighlight }}</span></div>
           <div class="brand-tagline">{{ content.brand?.tagline }}</div>
         </div>
-      </div>
+      </button>
 
       <!-- Desktop Navigation -->
       <nav>
@@ -19,7 +19,7 @@
               :class="{ active: activeTab === item.id }" 
               @click="$emit('set-tab', item.id)"
             >
-              <span class="nav-item-icon">{{ item.icon }}</span> {{ item.label }}
+              <span class="nav-item-icon" aria-hidden="true">{{ item.icon }}</span><span>{{ item.label }}</span>
             </button>
           </li>
         </ul>
