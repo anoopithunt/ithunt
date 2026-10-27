@@ -216,6 +216,9 @@
           @add-review="handleAddReview"
           @delete-review="handleDeleteReview"
           @delete-contact="handleDeleteContact"
+          :festivalWish="festivalWish"
+          @update-festival-wish="handleUpdateFestivalWish"
+          @preview-festival-wish="handlePreviewFestivalWish"
           @set-tab="setTab" 
         />
 
@@ -315,6 +318,14 @@
       @download-pdf="downloadAdmissionPdf" 
       @print-slip="printAdmissionSlip" 
       @login-as-student="handleLoginAsStudent"
+    />
+
+    <!-- Festive Celebration Greeting Modal Popup on Home Page -->
+    <FestivalWishModal 
+      :isOpen="showFestivalModal && activeTab === 'home'" 
+      :wish="festivalWish" 
+      @close="showFestivalModal = false" 
+      @action="handleFestivalModalAction" 
     />
 
     <!-- Hidden Printable Slip for Browser Print Engine -->
@@ -558,6 +569,7 @@ const JobApplicationModal = defineAsyncComponent(() => import('./components/moda
 const NielitPdfPreviewModal = defineAsyncComponent(() => import('./components/modals/NielitPdfPreviewModal.vue'));
 const ConfirmationModal = defineAsyncComponent(() => import('./components/modals/ConfirmationModal.vue'));
 const CvBuilderModal = defineAsyncComponent(() => import('./components/modals/CvBuilderModal.vue'));
+const FestivalWishModal = defineAsyncComponent(() => import('./components/modals/FestivalWishModal.vue'));
 
 const content = ref(CONTENT_DATA);
 const isDarkMode = ref(false);
@@ -575,6 +587,70 @@ const showToast = (message, type = 'success', duration = 4000) => {
   setTimeout(() => {
     toasts.value = toasts.value.filter(t => t.id !== id);
   }, duration);
+};
+
+// Festival & Celebration Wishes Broadcast System (SuperAdmin Controlled)
+const DEFAULT_FESTIVAL_WISH = {
+  isActive: true,
+  festivalKey: 'freedom',
+  occasion: 'FREEDOM DAY (15th August)',
+  title: '🇮🇳 Happy Independence Day from IT HUNT!',
+  tagline: 'Freedom to Learn, Code & Innovate for a Digital India',
+  message: 'On this Independence Day, celebrate true freedom by mastering next-generation software technologies. Build production-level MERN, AI, and mobile apps with 1-on-1 industry mentorship.',
+  specialOffer: '🇮🇳 Freedom Tech Scholarship: Up to 25% Fee Waiver on All Advanced Batches!',
+  ctaText: 'Claim Freedom Scholarship 🚀',
+  ctaAction: 'admission',
+  theme: 'freedom'
+};
+
+const getStoredFestivalWish = () => {
+  try {
+    const raw = localStorage.getItem('ithunt_festival_wish');
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return DEFAULT_FESTIVAL_WISH;
+};
+
+const festivalWish = ref(getStoredFestivalWish());
+const showFestivalModal = ref(false);
+
+const checkAndShowFestivalModal = (force = false) => {
+  if (!festivalWish.value || !festivalWish.value.isActive) {
+    showFestivalModal.value = false;
+    return;
+  }
+  if (!force) {
+    try {
+      const dismissedUntil = localStorage.getItem('ithunt_festival_dismissed_until');
+      if (dismissedUntil && Number(dismissedUntil) > Date.now()) {
+        return;
+      }
+    } catch (e) {}
+  }
+  if (activeTab.value === 'home' || force) {
+    setTimeout(() => {
+      showFestivalModal.value = true;
+    }, 750);
+  }
+};
+
+const handleUpdateFestivalWish = (updated) => {
+  festivalWish.value = { ...updated };
+  try {
+    localStorage.setItem('ithunt_festival_wish', JSON.stringify(festivalWish.value));
+  } catch (e) {}
+  showToast('🎉 Festival wish updated & synced with Home Page!', 'success');
+};
+
+const handlePreviewFestivalWish = (previewWish) => {
+  festivalWish.value = { ...previewWish, isActive: true };
+  activeTab.value = 'home';
+  showFestivalModal.value = true;
+};
+
+const handleFestivalModalAction = (targetTab) => {
+  showFestivalModal.value = false;
+  setTab(targetTab || 'admission');
 };
 
 // Scroll-reveal IntersectionObserver
@@ -1067,6 +1143,9 @@ const setTab = (tab) => {
     }
   }
   updateSeoMetadata(tab);
+  if (tab === 'home') {
+    checkAndShowFestivalModal();
+  }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
@@ -1907,6 +1986,11 @@ onMounted(() => {
       showToast('🔒 Session closed automatically after 30 minutes of inactivity for your security.', 'info');
     }
   });
+
+  // Display Festival Popup if active when visitor opens the Home page
+  if (activeTab.value === 'home') {
+    checkAndShowFestivalModal();
+  }
 });
 
 onUnmounted(() => {

@@ -65,6 +65,17 @@
             <span class="nav-item-icon">📊</span>
             <span class="nav-item-label" v-if="!isSidebarCollapsed">Overview</span>
           </button>
+          <button 
+            v-if="canViewTab('festival-wishes')"
+            class="sidebar-nav-item" 
+            :class="{ active: currentTab === 'festival-wishes' }" 
+            @click="currentTab = 'festival-wishes'; isMobileSidebarOpen = false"
+            title="Festival & Occasion Wishes Broadcast"
+          >
+            <span class="nav-item-icon">🎉</span>
+            <span class="nav-item-label" v-if="!isSidebarCollapsed">Festival Wishes</span>
+            <span class="nav-badge-pill green" v-if="!isSidebarCollapsed && festivalWishData.isActive">Live</span>
+          </button>
         </div>
 
         <!-- Group 2: Academics & Registry -->
@@ -416,6 +427,43 @@
               <button class="btn-secondary welcome-secondary-btn" @click="refreshAllData" :disabled="isRefreshing">
                 <span :style="isRefreshing ? 'display: inline-block; animation: spin 1s linear infinite;' : ''">🔄</span>
                 <span>Sync Live Data</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Executive Festival Greetings Broadcast Widget -->
+          <div class="overview-festival-banner" :class="{ 'is-active': festivalWishData.isActive }">
+            <div class="festival-banner-content">
+              <div class="festival-banner-icon-badge">
+                {{ getFestivalIcon(festivalWishData.theme) }}
+              </div>
+              <div class="festival-banner-text-wrap">
+                <div class="festival-banner-meta">
+                  <span class="festival-live-dot" :class="{ active: festivalWishData.isActive }"></span>
+                  <span class="festival-status-text">
+                    {{ festivalWishData.isActive ? 'HOME PAGE FESTIVAL POPUP IS LIVE' : 'FESTIVAL POPUP IS PAUSED' }}
+                  </span>
+                  <span class="festival-occasion-tag">{{ festivalWishData.occasion || 'Freedom Day' }}</span>
+                </div>
+                <h3 class="festival-banner-headline">{{ festivalWishData.title }}</h3>
+                <p class="festival-banner-sub">{{ festivalWishData.tagline || festivalWishData.message }}</p>
+              </div>
+            </div>
+            <div class="festival-banner-actions">
+              <button 
+                type="button" 
+                class="btn-secondary festival-toggle-btn"
+                @click="toggleFestivalStatus"
+                :title="festivalWishData.isActive ? 'Pause Popup on Home Page' : 'Activate Popup on Home Page'"
+              >
+                {{ festivalWishData.isActive ? 'Turn Off' : 'Turn On' }}
+              </button>
+              <button 
+                type="button" 
+                class="btn-primary festival-edit-btn"
+                @click="currentTab = 'festival-wishes'"
+              >
+                <span>Configure Wishes →</span>
               </button>
             </div>
           </div>
@@ -2716,6 +2764,260 @@
       </div>
     </div>
 
+    <!-- TAB: FESTIVAL & CELEBRATION WISHES BROADCAST -->
+    <div v-else-if="currentTab === 'festival-wishes'" class="admin-tab-panel anim-stagger-3 festival-wishes-panel">
+      <div class="panel-header-controls">
+        <div>
+          <div class="panel-eyebrow">BROADCAST & VISITOR EXPERIENCE</div>
+          <h3 class="panel-title">Festival & Occasion Wishes Broadcast</h3>
+          <p class="panel-subtitle">Set celebration greetings (Freedom Day, Diwali, Holi, Eid, New Year) to automatically welcome visitors with an interactive celebration popup on the public home page.</p>
+        </div>
+        <div class="panel-header-actions">
+          <button 
+            type="button" 
+            class="btn-secondary" 
+            @click="testHomePopup"
+            title="Preview popup exactly as visitors experience it on the home page"
+          >
+            <span>👁️ Test Home Popup</span>
+          </button>
+          <button 
+            type="button" 
+            class="btn-primary" 
+            @click="saveFestivalWishes"
+            title="Save and activate greeting broadcast"
+          >
+            <span>💾 Save & Broadcast</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Preset Toolbar -->
+      <div class="festival-presets-card">
+        <div class="presets-header">
+          <span class="presets-title">⚡ Instant Festival Presets (Click to Auto-Fill):</span>
+          <span class="presets-sub">Select an occasion to instantly populate greetings, visual theme, and celebration scholarships.</span>
+        </div>
+        <div class="preset-buttons-row">
+          <button 
+            type="button" 
+            class="preset-chip" 
+            :class="{ active: festivalWishData.festivalKey === 'freedom' }"
+            @click="applyFestivalPreset('freedom')"
+          >
+            <span>🇮🇳 Freedom Day (15 Aug)</span>
+          </button>
+          <button 
+            type="button" 
+            class="preset-chip" 
+            :class="{ active: festivalWishData.festivalKey === 'diwali' }"
+            @click="applyFestivalPreset('diwali')"
+          >
+            <span>🪔 Diwali / Deepawali</span>
+          </button>
+          <button 
+            type="button" 
+            class="preset-chip" 
+            :class="{ active: festivalWishData.festivalKey === 'republic' }"
+            @click="applyFestivalPreset('republic')"
+          >
+            <span>🇮🇳 Republic Day (26 Jan)</span>
+          </button>
+          <button 
+            type="button" 
+            class="preset-chip" 
+            :class="{ active: festivalWishData.festivalKey === 'holi' }"
+            @click="applyFestivalPreset('holi')"
+          >
+            <span>🎨 Holi (Colors)</span>
+          </button>
+          <button 
+            type="button" 
+            class="preset-chip" 
+            :class="{ active: festivalWishData.festivalKey === 'eid' }"
+            @click="applyFestivalPreset('eid')"
+          >
+            <span>🌙 Eid Mubarak</span>
+          </button>
+          <button 
+            type="button" 
+            class="preset-chip" 
+            :class="{ active: festivalWishData.festivalKey === 'newyear' }"
+            @click="applyFestivalPreset('newyear')"
+          >
+            <span>🎆 New Year 2026</span>
+          </button>
+          <button 
+            type="button" 
+            class="preset-chip" 
+            :class="{ active: festivalWishData.festivalKey === 'custom' }"
+            @click="applyFestivalPreset('custom')"
+          >
+            <span>✨ Custom Occasion</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 2-Column Minimal Editor Layout -->
+      <div class="admin-grid-2col festival-layout-grid">
+        <!-- Column 1: Config Form -->
+        <div class="form-card festival-config-card">
+          <div class="card-section-head">
+            <h4 class="card-section-title">Popup Content & Settings</h4>
+            <label class="toggle-control-label live-status-switch">
+              <input type="checkbox" v-model="festivalWishData.isActive">
+              <strong :style="{ color: festivalWishData.isActive ? '#10b981' : '#64748b' }">
+                {{ festivalWishData.isActive ? 'Active on Home Page' : 'Disabled / Hidden' }}
+              </strong>
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label class="field-label">Occasion / Festival Name</label>
+            <input 
+              type="text" 
+              v-model="festivalWishData.occasion" 
+              class="form-control" 
+              placeholder="e.g. Independence Day, Diwali, Republic Day"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="field-label">Popup Main Heading</label>
+            <input 
+              type="text" 
+              v-model="festivalWishData.title" 
+              class="form-control" 
+              placeholder="e.g. 🇮🇳 Happy Independence Day from IT HUNT!"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="field-label">Subtitle / Tagline</label>
+            <input 
+              type="text" 
+              v-model="festivalWishData.tagline" 
+              class="form-control" 
+              placeholder="e.g. Freedom to Learn, Code & Innovate"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="field-label">Heartfelt Greeting Message</label>
+            <textarea 
+              v-model="festivalWishData.message" 
+              class="form-control" 
+              rows="3" 
+              placeholder="Enter greeting message for visitors..."
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="field-label">Celebration Scholarship / Special Offer (Optional)</label>
+            <input 
+              type="text" 
+              v-model="festivalWishData.specialOffer" 
+              class="form-control" 
+              placeholder="e.g. 🎁 Festive Offer: Up to 25% Fee Waiver on All Coding Bootcamps!"
+            >
+          </div>
+
+          <div class="admin-grid-2col form-subgrid">
+            <div class="form-group">
+              <label class="field-label">Visual Theme & Palette</label>
+              <select v-model="festivalWishData.theme" class="form-control">
+                <option value="freedom">🇮🇳 Freedom / Tricolor (Saffron & Emerald)</option>
+                <option value="diwali">🪔 Diwali (Warm Gold, Amber & Crimson)</option>
+                <option value="holi">🎨 Holi (Vibrant Rainbow Powder)</option>
+                <option value="eid">🌙 Eid (Emerald & Moonlit Gold)</option>
+                <option value="newyear">🎆 New Year (Midnight & Purple Glow)</option>
+                <option value="republic">🇮🇳 Republic Day (National Pride)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="field-label">Button Action Link</label>
+              <select v-model="festivalWishData.ctaAction" class="form-control">
+                <option value="admission">Admissions / Registration Page</option>
+                <option value="courses">Courses & Programs</option>
+                <option value="internships">Internship Tracks</option>
+                <option value="events">Events & Workshops</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="field-label">Call To Action Button Label</label>
+            <input 
+              type="text" 
+              v-model="festivalWishData.ctaText" 
+              class="form-control" 
+              placeholder="e.g. Claim Freedom Scholarship 🚀"
+            >
+          </div>
+        </div>
+
+        <!-- Column 2: Live Real-Time Interactive Preview -->
+        <div class="form-card festival-preview-card">
+          <div class="card-section-head">
+            <h4 class="card-section-title">Live Home Page Preview</h4>
+            <span class="preview-badge">LIVE SIMULATOR</span>
+          </div>
+
+          <div class="preview-simulator-box" :class="['theme-' + (festivalWishData.theme || 'freedom')]">
+            <div class="sim-banner-strip">
+              <span class="sim-badge">
+                {{ getFestivalIcon(festivalWishData.theme) }} {{ festivalWishData.occasion || 'FESTIVAL OCCASION' }} • IT HUNT
+              </span>
+            </div>
+
+            <div class="sim-body">
+              <div class="sim-title-row">
+                <div class="sim-symbol">{{ getFestivalIcon(festivalWishData.theme) }}</div>
+                <div>
+                  <div class="sim-title">{{ festivalWishData.title || 'Happy Festival!' }}</div>
+                  <div class="sim-tagline" v-if="festivalWishData.tagline">{{ festivalWishData.tagline }}</div>
+                </div>
+              </div>
+
+              <div class="sim-message">
+                {{ festivalWishData.message || 'Heartfelt greetings from IT HUNT Software Solutions & Tech Academy.' }}
+              </div>
+
+              <div v-if="festivalWishData.specialOffer" class="sim-offer-box">
+                <span class="sim-offer-tag">🎁 CELEBRATION BENEFIT</span>
+                <div class="sim-offer-text">{{ festivalWishData.specialOffer }}</div>
+              </div>
+
+              <div class="sim-signature">
+                <img src="/img/ithunt.webp" alt="Director" class="sim-avatar" @error="onImgError">
+                <div>
+                  <div class="sim-director-name">Mr. Lakshman Singh Chauhan</div>
+                  <div class="sim-director-role">Director, IT HUNT</div>
+                </div>
+              </div>
+
+              <div class="sim-actions">
+                <button type="button" class="sim-btn-secondary">Close</button>
+                <button type="button" class="sim-btn-primary">
+                  {{ festivalWishData.ctaText || 'Claim Offer 🚀' }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="preview-card-footer">
+            <button type="button" class="btn-primary w-full" @click="saveFestivalWishes">
+              <span>💾 Save & Apply to Live Website</span>
+            </button>
+            <p class="preview-footer-note">
+              When saved with Active enabled, all visitors arriving on the IT HUNT home page will see this festive celebration greeting popup.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- TAB 6: SYSTEM CONFIGURATION -->
     <div v-else-if="currentTab === 'settings' && canViewTab('settings')" class="admin-tab-panel anim-stagger-3">
       <div class="panel-header-controls">
@@ -4900,6 +5202,10 @@ const props = defineProps({
   isDarkMode: {
     type: Boolean,
     default: true
+  },
+  festivalWish: {
+    type: Object,
+    default: () => ({})
   }
 });
 
@@ -4936,13 +5242,155 @@ const emit = defineEmits([
   'delete-contact',
   'refresh-data',
   'set-tab',
-  'toggle-theme'
+  'toggle-theme',
+  'update-festival-wish',
+  'preview-festival-wish'
 ]);
 
 const emailActionMsg = ref('');
 const showAdmissionEmailModal = ref(false);
 const selectedAdmissionForEmail = ref(null);
 const emailLetterPreview = ref('');
+
+// --- FESTIVAL & CELEBRATION WISHES LOGIC & PRESETS ---
+const FESTIVAL_PRESETS = {
+  freedom: {
+    festivalKey: 'freedom',
+    occasion: 'FREEDOM DAY (15th August)',
+    title: '🇮🇳 Happy Independence Day from IT HUNT!',
+    tagline: 'Freedom to Learn, Code & Innovate for a Digital India',
+    message: 'On this Independence Day, celebrate true freedom by mastering next-generation software technologies. Build production-level MERN, AI, and mobile apps with 1-on-1 industry mentorship.',
+    specialOffer: '🇮🇳 Freedom Tech Scholarship: Up to 25% Fee Waiver on All Advanced Batches!',
+    ctaText: 'Claim Freedom Scholarship 🚀',
+    ctaAction: 'admission',
+    theme: 'freedom',
+    isActive: true
+  },
+  diwali: {
+    festivalKey: 'diwali',
+    occasion: 'DIWALI (Festival of Lights)',
+    title: '🪔 Shubh Deepawali & Happy Diwali from IT HUNT!',
+    tagline: 'Illuminating Your Career with Knowledge, Code & Technology',
+    message: 'May the divine light of Diwali illuminate your future with endless career opportunities, technical mastery, and good fortune. Wishing all our students, interns, and partners a joyful and prosperous celebration!',
+    specialOffer: '🪔 Diwali Special: Free Certification Voucher & Up to 20% Course Discount!',
+    ctaText: 'Explore Courses & Batches 🪔',
+    ctaAction: 'courses',
+    theme: 'diwali',
+    isActive: true
+  },
+  republic: {
+    festivalKey: 'republic',
+    occasion: 'REPUBLIC DAY (26th January)',
+    title: '🇮🇳 Happy Republic Day from IT HUNT!',
+    tagline: 'Empowering India’s Future Software Engineers & Builders',
+    message: 'Saluting the spirit of the Constitution of India! We are committed to building tech self-reliance through top-grade computer science education, NIELIT diplomas, and software craftsmanship.',
+    specialOffer: '🇮🇳 Republic Day Special: Complimentary Industry Aptitude & Career Kit',
+    ctaText: 'Apply for Next Batch ➜',
+    ctaAction: 'admission',
+    theme: 'republic',
+    isActive: true
+  },
+  holi: {
+    festivalKey: 'holi',
+    occasion: 'HOLI (Festival of Colors)',
+    title: '🎨 Happy Holi from IT HUNT SoftTech!',
+    tagline: 'Splash Vibrant Colors into Your Tech Career',
+    message: 'Wishing you and your loved ones a joyful, safe, and colorful Holi! May your journey ahead be enriched with the vibrant colors of innovation, problem-solving, and continuous learning.',
+    specialOffer: '🎨 Holi Bonanza: Flat ₹2,000 Off on Full-Stack MERN & Python Internships!',
+    ctaText: 'Explore Internship Tracks ➜',
+    ctaAction: 'internships',
+    theme: 'holi',
+    isActive: true
+  },
+  eid: {
+    festivalKey: 'eid',
+    occasion: 'EID MUBARAK (Blessed Celebration)',
+    title: '🌙 Eid Mubarak from IT HUNT!',
+    tagline: 'Wishing Peace, Prosperity & Technical Excellence',
+    message: 'May this blessed occasion shower happiness, peace, and abundance upon you and your family. Elevate your technical journey with our accredited software and computer courses.',
+    specialOffer: '🌙 Festive Gift: Free Access to Web Development Foundations Toolkit',
+    ctaText: 'Enroll Online Today 🚀',
+    ctaAction: 'admission',
+    theme: 'eid',
+    isActive: true
+  },
+  newyear: {
+    festivalKey: 'newyear',
+    occasion: 'NEW YEAR 2026',
+    title: '🎆 Happy New Year 2026 from IT HUNT!',
+    tagline: 'A New Year of Breakthrough Growth & High-Tech Careers',
+    message: 'Welcome 2026! Make this year the turning point of your career by building real-world software, AI products, and apps. Join our 100% placement-assisted batches.',
+    specialOffer: '🎆 New Year Resolution: Guaranteed 1-on-1 Mentorship & Placement Sprint!',
+    ctaText: 'Apply for 2026 Batch 🚀',
+    ctaAction: 'admission',
+    theme: 'newyear',
+    isActive: true
+  },
+  custom: {
+    festivalKey: 'custom',
+    occasion: 'SPECIAL CELEBRATION',
+    title: '🎉 Warm Festive Wishes from IT HUNT!',
+    tagline: 'Celebrating Knowledge, Innovation & Progress',
+    message: 'Sending heartfelt greetings and best wishes to our students, faculty, and tech community. Unlock your full potential with IT HUNT Software Solutions & Academy.',
+    specialOffer: '🎁 Limited-Period Special Offer Available for New Enrollments!',
+    ctaText: 'Explore Opportunities 🚀',
+    ctaAction: 'admission',
+    theme: 'freedom',
+    isActive: true
+  }
+};
+
+const loadInitialFestivalWish = () => {
+  if (props.festivalWish && props.festivalWish.title) {
+    return { ...props.festivalWish };
+  }
+  try {
+    const raw = localStorage.getItem('ithunt_festival_wish');
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return { ...FESTIVAL_PRESETS.freedom };
+};
+
+const festivalWishData = ref(loadInitialFestivalWish());
+
+const applyFestivalPreset = (key) => {
+  if (FESTIVAL_PRESETS[key]) {
+    festivalWishData.value = {
+      ...FESTIVAL_PRESETS[key],
+      isActive: festivalWishData.value.isActive !== undefined ? festivalWishData.value.isActive : true
+    };
+    emailActionMsg.value = `✓ Loaded ${FESTIVAL_PRESETS[key].occasion} preset`;
+    setTimeout(() => { emailActionMsg.value = ''; }, 3000);
+  }
+};
+
+const saveFestivalWishes = () => {
+  try {
+    localStorage.setItem('ithunt_festival_wish', JSON.stringify(festivalWishData.value));
+  } catch (e) {}
+  emit('update-festival-wish', { ...festivalWishData.value });
+  emailActionMsg.value = '✓ Festival wish saved & live on home page!';
+  setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+};
+
+const testHomePopup = () => {
+  emit('preview-festival-wish', { ...festivalWishData.value, isActive: true });
+  emit('set-tab', 'home');
+};
+
+const toggleFestivalStatus = () => {
+  festivalWishData.value.isActive = !festivalWishData.value.isActive;
+  saveFestivalWishes();
+};
+
+const getFestivalIcon = (theme) => {
+  if (theme === 'freedom' || theme === 'republic') return '🇮🇳';
+  if (theme === 'diwali') return '🪔';
+  if (theme === 'holi') return '🎨';
+  if (theme === 'eid') return '🌙';
+  if (theme === 'newyear') return '🎆';
+  return '🎉';
+};
 
 // Confirmed Credentials Modal State
 const showConfirmedCredentialsModal = ref(false);
@@ -5887,6 +6335,7 @@ const quickForm = ref({
 
 const defaultTabs = [
   { id: 'overview', label: '📊 Dashboard Overview', icon: '📊' },
+  { id: 'festival-wishes', label: '🎉 Festival Wishes', icon: '🎉' },
   { id: 'students', label: '🎓 Students Directory', icon: '🎓' },
   { id: 'student-exams', label: '📝 Student Exam Sheets', icon: '📝' },
   { id: 'admissions', label: '📝 Admissions Registry', icon: '📝' },
@@ -11222,4 +11671,478 @@ label {
   }
 }
 
+/* ==========================================================================
+   MINIMAL & PROFESSIONAL FESTIVAL WISHES PANEL & OVERVIEW WIDGET
+   ========================================================================== */
+
+/* Overview Festival Banner */
+.overview-festival-banner {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.75) 0%, rgba(30, 41, 59, 0.6) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 4px solid #f97316;
+  border-radius: 16px;
+  padding: 1.15rem 1.5rem;
+  margin-bottom: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.25s ease;
+}
+
+.overview-festival-banner.is-active {
+  border-left-color: #10b981;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(15, 23, 42, 0.8) 100%);
+}
+
+.admin-shell.light-theme .overview-festival-banner {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #f97316;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+.admin-shell.light-theme .overview-festival-banner.is-active {
+  border-left-color: #10b981;
+  background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 100%);
+}
+
+.festival-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+}
+
+.festival-banner-icon-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.admin-shell.light-theme .festival-banner-icon-badge {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.festival-banner-text-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.festival-banner-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.2rem;
+}
+
+.festival-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #64748b;
+}
+
+.festival-live-dot.active {
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.festival-status-text {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+}
+
+.admin-shell.light-theme .festival-status-text {
+  color: #475569;
+}
+
+.festival-occasion-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: rgba(249, 115, 22, 0.15);
+  color: #f97316;
+  padding: 0.1rem 0.5rem;
+  border-radius: 4px;
+}
+
+.festival-banner-headline {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+}
+
+.admin-shell.light-theme .festival-banner-headline {
+  color: #0f172a;
+}
+
+.festival-banner-sub {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin: 0.15rem 0 0;
+}
+
+.admin-shell.light-theme .festival-banner-sub {
+  color: #64748b;
+}
+
+.festival-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-shrink: 0;
+}
+
+/* Festival Wishes Panel */
+.festival-wishes-panel {
+  padding-bottom: 3rem;
+}
+
+.panel-eyebrow {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #f97316;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+}
+
+/* Presets Card */
+.festival-presets-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-shell.light-theme .festival-presets-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+}
+
+.presets-header {
+  margin-bottom: 0.85rem;
+}
+
+.presets-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin-right: 0.5rem;
+}
+
+.admin-shell.light-theme .presets-title {
+  color: #1e293b;
+}
+
+.presets-sub {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.preset-buttons-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.preset-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.admin-shell.light-theme .preset-chip {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #334155;
+}
+
+.preset-chip:hover {
+  background: rgba(249, 115, 22, 0.15);
+  border-color: rgba(249, 115, 22, 0.4);
+  color: #f97316;
+  transform: translateY(-1px);
+}
+
+.preset-chip.active {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  border-color: #f97316;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+}
+
+/* 2-Column Editor Grid */
+.festival-layout-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.card-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-shell.light-theme .card-section-head {
+  border-color: #e2e8f0;
+}
+
+.card-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  color: #e2e8f0;
+}
+
+.admin-shell.light-theme .card-section-title {
+  color: #0f172a;
+}
+
+.preview-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+}
+
+/* Simulator Box Inside Preview Card */
+.preview-simulator-box {
+  background: #070d19;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+.admin-shell.light-theme .preview-simulator-box {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.sim-banner-strip {
+  padding: 0.85rem 1.25rem;
+}
+
+.preview-simulator-box.theme-freedom .sim-banner-strip,
+.preview-simulator-box.theme-republic .sim-banner-strip {
+  background: linear-gradient(135deg, rgba(255, 153, 51, 0.9) 0%, rgba(255, 255, 255, 0.85) 50%, rgba(19, 136, 8, 0.9) 100%);
+}
+
+.preview-simulator-box.theme-diwali .sim-banner-strip {
+  background: linear-gradient(135deg, #b45309 0%, #f59e0b 50%, #d97706 100%);
+}
+
+.preview-simulator-box.theme-holi .sim-banner-strip {
+  background: linear-gradient(135deg, #ec4899 0%, #f59e0b 50%, #10b981 100%);
+}
+
+.preview-simulator-box.theme-eid .sim-banner-strip {
+  background: linear-gradient(135deg, #065f46 0%, #10b981 50%, #f59e0b 100%);
+}
+
+.preview-simulator-box.theme-newyear .sim-banner-strip {
+  background: linear-gradient(135deg, #4f46e5 0%, #9333ea 50%, #f59e0b 100%);
+}
+
+.sim-badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  background: rgba(11, 17, 32, 0.9);
+  color: #fff;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  letter-spacing: 0.05em;
+}
+
+.sim-body {
+  padding: 1.25rem;
+}
+
+.sim-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.sim-symbol {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.45rem;
+  flex-shrink: 0;
+}
+
+.sim-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.25;
+}
+
+.admin-shell.light-theme .sim-title {
+  color: #0f172a;
+}
+
+.sim-tagline {
+  font-size: 0.75rem;
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+.sim-message {
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: #94a3b8;
+  margin-bottom: 0.95rem;
+}
+
+.admin-shell.light-theme .sim-message {
+  color: #475569;
+}
+
+.sim-offer-box {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 10px;
+  padding: 0.65rem 0.85rem;
+  margin-bottom: 0.95rem;
+}
+
+.sim-offer-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #f59e0b;
+}
+
+.sim-offer-text {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fbbf24;
+}
+
+.admin-shell.light-theme .sim-offer-text {
+  color: #b45309;
+}
+
+.sim-signature {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 1rem;
+}
+
+.sim-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #f97316;
+}
+
+.sim-director-name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.admin-shell.light-theme .sim-director-name {
+  color: #1e293b;
+}
+
+.sim-director-role {
+  font-size: 0.68rem;
+  color: #64748b;
+}
+
+.sim-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.sim-btn-secondary {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #94a3b8;
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.sim-btn-primary {
+  background: linear-gradient(135deg, #f97316 0%, #f59e0b 100%);
+  color: #fff;
+  border: none;
+  padding: 0.45rem 0.95rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.preview-card-footer {
+  margin-top: 1.25rem;
+}
+
+.preview-footer-note {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.65rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
+@media (max-width: 991px) {
+  .festival-layout-grid {
+    grid-template-columns: 1fr;
+  }
+  .overview-festival-banner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .festival-banner-actions {
+    justify-content: flex-end;
+  }
+}
+
 </style>
+
