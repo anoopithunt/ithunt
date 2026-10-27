@@ -54,11 +54,19 @@
       <div class="footer-col">
         <h4>Contact & Location</h4>
         <p class="footer-contact-item">📍 {{ content.contact?.location }}</p>
+        <a
+          class="footer-contact-link footer-map-link"
+          :href="'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(content.contact?.location || 'IT HUNT Prayagraj')"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Get directions ↗
+        </a>
         <p class="footer-contact-item">
-          📞 <a href="tel:+919795771806" class="footer-contact-link">+91-9795771806</a>
+          📞 <a :href="'tel:' + (content.contact?.rawPhone || '+919795771806')" class="footer-contact-link">{{ content.contact?.phone || '+91-9795771806' }}</a>
         </p>
         <p class="footer-contact-item">
-          ✉️ <a href="mailto:softtechithunt@gmail.com" class="footer-contact-link">softtechithunt@gmail.com</a>
+          ✉️ <a :href="'mailto:' + (content.contact?.rawEmail || 'softtechithunt@gmail.com')" class="footer-contact-link">{{ content.contact?.email || 'softtechithunt@gmail.com' }}</a>
         </p>
         <a
           :href="'https://wa.me/' + (content.contact?.whatsapp || '919795771806') + '?text=Hello%20IT%20HUNT%20Team!'"

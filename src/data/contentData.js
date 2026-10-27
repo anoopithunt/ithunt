@@ -133,7 +133,11 @@ const CONTENT_DATA = {
     { id: "home", label: "Home", icon: "🏠" },
     { id: "internships", label: "Internships", icon: "💼" },
     { id: "courses", label: "Courses", icon: "📚" },
-    { id: "events", label: "Events", icon: "🎪" }
+    { id: "events", label: "Events & Gallery", icon: "🎪" },
+    { id: "testimonials", label: "Success Stories", icon: "🏆" },
+    { id: "reviews", label: "Reviews", icon: "⭐" },
+    { id: "careers", label: "Join Our Team", icon: "🧑‍💻" },
+    { id: "admission", label: "Apply Now", icon: "📝" }
   ],
 
   // Hero Section Copy

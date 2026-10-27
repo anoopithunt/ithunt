@@ -250,6 +250,15 @@ textarea {
   min-width: 0;
 }
 
+.brand-logo-button {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
 .brand-logo-img {
   width: 42px;
   height: 42px;
@@ -289,7 +298,7 @@ textarea {
 .nav-links {
   display: flex;
   align-items: center;
-  gap: clamp(0.65rem, 1.15vw, 1.4rem);
+  gap: clamp(0.35rem, 0.8vw, 1rem);
   list-style: none;
 }
 
@@ -7158,8 +7167,8 @@ body.light-theme input[type="date"]::-webkit-calendar-picker-indicator {
   }
 
   .nav-item-btn {
-    padding: 0.45rem 0.75rem;
-    font-size: 0.825rem;
+    padding: 0.45rem 0.45rem;
+    font-size: 0.76rem;
   }
 
   .cta-btn-header {
@@ -7175,6 +7184,15 @@ body.light-theme input[type="date"]::-webkit-calendar-picker-indicator {
     grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
     gap: 1.75rem;
   }
+}
+
+@media (max-width: 1100px) {
+  .navbar-container { gap: 0.75rem; }
+  .navbar-container > nav { flex: 1 1 auto; min-width: 0; }
+  .nav-links { justify-content: flex-end; }
+  .nav-actions { gap: 0.45rem; }
+  .nav-action-desktop { display: none; }
+  .mobile-toggle-btn { display: flex; }
 }
 
 /* --------------------------------------------------------------------------

@@ -1863,6 +1863,13 @@ const updateSeoMetadata = (tab) => {
     const canonicalBase = 'https://ithunt.vercel.app/';
     const targetUrl = (tab === 'home' || !tab) ? canonicalBase : `${canonicalBase}#${tab}`;
     setMetaTag('meta[property="og:url"]', 'property', 'og:url', targetUrl);
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', targetUrl);
   }
 
   // 5. Twitter Card Meta Tags
