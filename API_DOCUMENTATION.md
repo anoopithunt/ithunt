@@ -484,6 +484,67 @@ curl -s https://ithunt.vercel.app/api/admin/stats \
 
 ---
 
+### 15. Festival Wishes & Celebration Broadcast System
+
+#### `GET /api/festival-wish`
+Fetches the currently active celebration wish, dynamic preset library, and location scopes from MongoDB Atlas Cloud (`SystemSetting` collection with key `festival_wish`). Publicly accessible across all devices and visitor locations.
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "data": {
+    "festivalKey": "diwali",
+    "occasion": "DIWALI (Festival of Lights)",
+    "title": "🪔 Shubh Deepawali & Happy Diwali from IT HUNT!",
+    "tagline": "Illuminating Your Career with Knowledge, Code & Technology",
+    "message": "May the divine light of Diwali illuminate your future...",
+    "specialOffer": "🪔 Diwali Special: Free Certification Voucher & Up to 20% Course Discount!",
+    "ctaText": "Explore Courses & Batches 🪔",
+    "ctaAction": "courses",
+    "theme": "diwali",
+    "locationScope": "All Locations & Campuses (Holagarh, Prayagraj & Online)",
+    "isActive": true,
+    "updatedAt": "2026-10-27T09:30:00.000Z"
+  },
+  "presets": { ... },
+  "locationScopes": [
+    "All Locations & Campuses (Holagarh, Prayagraj & Online)",
+    "Holagarh Prayagraj Campus",
+    "Prayagraj Main Tech Studio",
+    "Online / Remote Students Only"
+  ]
+}
+```
+
+#### `PUT /api/festival-wish` (or `POST /api/festival-wish`)
+Updates the active festival greeting dynamically in MongoDB Atlas Cloud, immediately broadcasting it across all visitor locations and campuses.
+
+**Payload:**
+```json
+{
+  "festivalKey": "freedom",
+  "occasion": "FREEDOM DAY (15th August)",
+  "title": "🇮🇳 Happy Independence Day from IT HUNT!",
+  "tagline": "Freedom to Learn, Code & Innovate for a Digital India",
+  "message": "On this Independence Day, celebrate true freedom...",
+  "specialOffer": "🇮🇳 Freedom Tech Scholarship: Up to 25% Fee Waiver!",
+  "ctaText": "Claim Freedom Scholarship 🚀",
+  "ctaAction": "admission",
+  "theme": "freedom",
+  "locationScope": "All Locations & Campuses (Holagarh, Prayagraj & Online)",
+  "isActive": true
+}
+```
+
+#### `GET /api/festival-wish/presets`
+Retrieves all dynamic festival presets saved in database.
+
+#### `PUT /api/festival-wish/presets`
+Saves or updates custom festival presets in database.
+
+---
+
 ## 🛠️ Automated Testing & Validation
 
 Execute the automated test suites anytime:

@@ -450,7 +450,13 @@ export const API = {
     method: 'PUT',
     body: JSON.stringify({ permissions })
   }),
-  syncDatabase: () => apiRequest('/admin/stats')
+  syncDatabase: () => apiRequest('/admin/stats'),
+
+  // Dynamic Festival Wishes & Presets (Synchronized across all locations)
+  getFestivalWish: () => apiRequest('/festival-wish'),
+  updateFestivalWish: (wishData) => apiRequest('/festival-wish', { method: 'PUT', body: JSON.stringify(wishData) }),
+  getFestivalPresets: () => apiRequest('/festival-wish/presets'),
+  saveFestivalPresets: (presets) => apiRequest('/festival-wish/presets', { method: 'PUT', body: JSON.stringify(presets) })
 };
 
 let authTokenPromise = null;
@@ -1842,12 +1848,81 @@ export async function updateCourseInBackend(id, courseData) {
 /**
  * Delete Course from MongoDB Backend
  */
+/**
+ * Delete Course from MongoDB Backend
+ */
 export async function deleteCourseFromBackend(id) {
   try {
     const res = await API.deleteCourse(id);
     return { success: true, data: res };
   } catch (e) {
     return { success: false, error: e.message };
+  }
+}
+
+/**
+ * Fetch dynamic festival wish and presets from backend (Synchronized across all locations)
+ */
+export async function fetchFestivalWishFromBackend() {
+  try {
+    const res = await API.getFestivalWish();
+    if (res && res.data) {
+      try {
+        localStorage.setItem('ithunt_festival_wish', JSON.stringify(res.data));
+      } catch (e) {}
+      return { success: true, data: res.data, presets: res.presets, locationScopes: res.locationScopes };
+    }
+    if (res && res.title) {
+      try {
+        localStorage.setItem('ithunt_festival_wish', JSON.stringify(res));
+      } catch (e) {}
+      return { success: true, data: res, presets: res.presets, locationScopes: res.locationScopes };
+    }
+    return { success: false, error: 'No festival data returned' };
+  } catch (err) {
+    console.warn('Notice loading festival wish from backend:', err?.message || err);
+    return { success: false, error: err?.message || 'Failed to fetch festival data' };
+  }
+}
+
+/**
+ * Update dynamic festival wish in backend MongoDB (Broadcast live across all locations)
+ */
+export async function updateFestivalWishInBackend(wishData) {
+  try {
+    try {
+      localStorage.setItem('ithunt_festival_wish', JSON.stringify(wishData));
+      localStorage.removeItem('ithunt_festival_dismissed_until');
+    } catch (e) {}
+    const res = await API.updateFestivalWish(wishData);
+    return { success: true, data: res?.data || res || wishData };
+  } catch (err) {
+    console.warn('Notice saving festival wish to backend:', err?.message || err);
+    return { success: false, error: err?.message || 'Failed to save to backend', fallbackData: wishData };
+  }
+}
+
+/**
+ * Fetch dynamic festival presets from backend
+ */
+export async function fetchFestivalPresetsFromBackend() {
+  try {
+    const res = await API.getFestivalPresets();
+    return { success: true, data: res?.data || res };
+  } catch (err) {
+    return { success: false, error: err?.message || 'Failed to fetch presets' };
+  }
+}
+
+/**
+ * Save/update dynamic festival presets list in backend
+ */
+export async function saveFestivalPresetsToBackend(presets) {
+  try {
+    const res = await API.saveFestivalPresets(presets);
+    return { success: true, data: res?.data || res };
+  } catch (err) {
+    return { success: false, error: err?.message || 'Failed to save presets' };
   }
 }
 
@@ -1899,5 +1974,9 @@ export default {
   saveFeeToBackend,
   updateFeeInBackend,
   deleteFeeFromBackend,
-  deleteContactInquiryFromBackend
+  deleteContactInquiryFromBackend,
+  fetchFestivalWishFromBackend,
+  updateFestivalWishInBackend,
+  fetchFestivalPresetsFromBackend,
+  saveFestivalPresetsToBackend
 };
