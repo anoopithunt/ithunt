@@ -592,15 +592,15 @@ const showToast = (message, type = 'success', duration = 4000) => {
 // Festival & Celebration Wishes Broadcast System (SuperAdmin Controlled)
 const DEFAULT_FESTIVAL_WISH = {
   isActive: true,
-  festivalKey: 'freedom',
-  occasion: 'FREEDOM DAY (15th August)',
-  title: '🇮🇳 Happy Independence Day from IT HUNT!',
-  tagline: 'Freedom to Learn, Code & Innovate for a Digital India',
-  message: 'On this Independence Day, celebrate true freedom by mastering next-generation software technologies. Build production-level MERN, AI, and mobile apps with 1-on-1 industry mentorship.',
-  specialOffer: '🇮🇳 Freedom Tech Scholarship: Up to 25% Fee Waiver on All Advanced Batches!',
-  ctaText: 'Claim Freedom Scholarship 🚀',
-  ctaAction: 'admission',
-  theme: 'freedom'
+  festivalKey: 'diwali',
+  occasion: 'DIWALI (Festival of Lights)',
+  title: '🪔 Shubh Deepawali & Happy Diwali from IT HUNT!',
+  tagline: 'Illuminating Your Career with Knowledge, Code & Technology',
+  message: 'May the divine light of Diwali illuminate your future with endless career opportunities, technical mastery, and good fortune. Wishing all our students, interns, and partners a joyful and prosperous celebration!',
+  specialOffer: '🪔 Diwali Special: Free Certification Voucher & Up to 20% Course Discount!',
+  ctaText: 'Explore Courses & Batches 🪔',
+  ctaAction: 'courses',
+  theme: 'diwali'
 };
 
 const getStoredFestivalWish = () => {
@@ -638,12 +638,17 @@ const handleUpdateFestivalWish = (updated) => {
   festivalWish.value = { ...updated };
   try {
     localStorage.setItem('ithunt_festival_wish', JSON.stringify(festivalWish.value));
+    localStorage.removeItem('ithunt_festival_dismissed_until');
   } catch (e) {}
   showToast('🎉 Festival wish updated & synced with Home Page!', 'success');
 };
 
 const handlePreviewFestivalWish = (previewWish) => {
   festivalWish.value = { ...previewWish, isActive: true };
+  try {
+    localStorage.setItem('ithunt_festival_wish', JSON.stringify(festivalWish.value));
+    localStorage.removeItem('ithunt_festival_dismissed_until');
+  } catch (e) {}
   showFestivalModal.value = false;
   activeTab.value = 'home';
   setTimeout(() => {
