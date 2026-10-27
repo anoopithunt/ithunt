@@ -601,7 +601,7 @@ const CvBuilderModal = defineAsyncComponent(() => import('./components/modals/Cv
 const FestivalWishModal = defineAsyncComponent(() => import('./components/modals/FestivalWishModal.vue'));
 
 const content = ref(CONTENT_DATA);
-const isDarkMode = ref(false);
+const isDarkMode = ref(true);
 const scrollProgress = ref(0);
 const showBackToTop = ref(false);
 const showConfetti = ref(false);
@@ -1908,19 +1908,19 @@ const handlePopState = () => {
 };
 
 onMounted(() => {
-  // Default to Light Mode unless explicitly set to 'dark' by user preference
+  // Default to Dark Mode SaaS theme unless explicitly set to 'light' by user preference
   try {
     const savedTheme = localStorage.getItem('ithunt_theme');
-    if (savedTheme === 'dark') {
-      isDarkMode.value = true;
-      document.body.classList.remove('light-theme');
-    } else {
+    if (savedTheme === 'light') {
       isDarkMode.value = false;
       document.body.classList.add('light-theme');
+    } else {
+      isDarkMode.value = true;
+      document.body.classList.remove('light-theme');
     }
   } catch (e) {
-    isDarkMode.value = false;
-    document.body.classList.add('light-theme');
+    isDarkMode.value = true;
+    document.body.classList.remove('light-theme');
   }
 
   window.addEventListener('scroll', handleScroll, { passive: true });

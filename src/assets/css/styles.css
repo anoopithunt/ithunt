@@ -9385,29 +9385,23 @@ body.light-theme main.superadmin-main-active {
    ========================================================================== */
 
 body.light-theme {
-  background-color: #f8fafc !important;
-  color: #000000 !important;
-  -webkit-text-fill-color: initial !important;
+  background-color: #f9fafb !important;
+  color: #111827 !important;
 }
 
-body.light-theme h1,
-body.light-theme h2,
-body.light-theme h3,
-body.light-theme h4,
-body.light-theme h5,
-body.light-theme h6 {
-  color: #000000 !important;
-  -webkit-text-fill-color: initial !important;
+body.light-theme h1:not(.text-gradient):not(.ithunt-gradient-text),
+body.light-theme h2:not(.text-gradient):not(.ithunt-gradient-text),
+body.light-theme h3:not(.text-gradient):not(.ithunt-gradient-text),
+body.light-theme h4:not(.text-gradient):not(.ithunt-gradient-text),
+body.light-theme h5:not(.text-gradient):not(.ithunt-gradient-text),
+body.light-theme h6:not(.text-gradient):not(.ithunt-gradient-text) {
+  color: #111827 !important;
 }
 
 body.light-theme p,
 body.light-theme li,
-body.light-theme label,
-body.light-theme input,
-body.light-theme textarea,
-body.light-theme select {
-  color: #000000 !important;
-  -webkit-text-fill-color: initial !important;
+body.light-theme label {
+  color: #4b5563 !important;
 }
 
 /* Ensure gradient text elements maintain transparent text-fill so their radiant gradient shines */
@@ -9415,10 +9409,12 @@ body.light-theme select {
 .text-gradient-secondary,
 .text-gradient-gold,
 .text-gradient-emerald,
+.ithunt-gradient-text,
 body.light-theme .text-gradient,
 body.light-theme .text-gradient-secondary,
 body.light-theme .text-gradient-gold,
-body.light-theme .text-gradient-emerald {
+body.light-theme .text-gradient-emerald,
+body.light-theme .ithunt-gradient-text {
   -webkit-text-fill-color: transparent !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
@@ -9481,15 +9477,15 @@ body.light-theme .nav-item-btn.active * {
 }
 
 body.light-theme .brand-title {
-  color: #000000 !important;
+  color: #111827 !important;
 }
 
 body.light-theme .brand-tagline {
-  color: #000000 !important;
+  color: #4b5563 !important;
 }
 
 body.light-theme .hero-title {
-  color: #000000 !important;
+  color: #111827 !important;
 }
 
 body.light-theme .hero-subtitle,
@@ -9505,7 +9501,7 @@ body.light-theme .events-hero-subtitle,
 body.light-theme .event-card-desc,
 body.light-theme .login-subtitle,
 body.light-theme .form-subtitle {
-  color: #000000 !important;
+  color: #4b5563 !important;
 }
 
 body.light-theme .stat-card {
@@ -9515,11 +9511,11 @@ body.light-theme .stat-card {
 }
 
 body.light-theme .stat-val {
-  color: #000000 !important;
+  color: #111827 !important;
 }
 
 body.light-theme .stat-label {
-  color: #000000 !important;
+  color: #4b5563 !important;
   font-weight: 700 !important;
 }
 
