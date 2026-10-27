@@ -1501,31 +1501,31 @@ onUnmounted(() => {
   position: relative;
   padding: 5rem 1rem 4rem;
   overflow: hidden;
-  background: radial-gradient(circle at 50% 0%, var(--glow-orange, rgba(249, 115, 22, 0.14)) 0%, transparent 60%);
+  background: radial-gradient(circle at 50% -10%, var(--glow-primary, rgba(99, 102, 241, 0.18)) 0%, transparent 65%);
 }
 
 .ithunt-hero-glow {
   position: absolute;
   border-radius: 50%;
-  filter: blur(90px);
+  filter: blur(95px);
   pointer-events: none;
   z-index: 0;
 }
 
 .ithunt-hero-glow-1 {
-  top: -10%;
-  left: 20%;
-  width: 500px;
-  height: 500px;
-  background: var(--glow-orange, rgba(249, 115, 22, 0.18));
+  top: -12%;
+  left: 18%;
+  width: 520px;
+  height: 520px;
+  background: var(--glow-primary, rgba(99, 102, 241, 0.22));
 }
 
 .ithunt-hero-glow-2 {
-  top: 15%;
-  right: 15%;
-  width: 450px;
-  height: 450px;
-  background: var(--glow-yellow, rgba(245, 158, 11, 0.15));
+  top: 12%;
+  right: 14%;
+  width: 480px;
+  height: 480px;
+  background: var(--glow-violet, rgba(139, 92, 246, 0.18));
 }
 
 .ithunt-hero-container {
@@ -1546,17 +1546,19 @@ onUnmounted(() => {
 .ithunt-pill-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.45rem 1.1rem;
+  gap: 0.55rem;
+  padding: 0.45rem 1.15rem;
   border-radius: var(--radius-full, 9999px);
-  background: rgba(249, 115, 22, 0.08);
-  border: 1px solid var(--border-cyber-glow, rgba(249, 115, 22, 0.35));
-  color: var(--color-ai-orange, #f97316);
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid var(--border-cyber-glow, rgba(99, 102, 241, 0.3));
+  color: var(--color-ai-indigo, #6366f1);
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.1);
 }
 
 .ithunt-pill-badge.small {
@@ -1569,8 +1571,8 @@ onUnmounted(() => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: var(--color-ai-orange, #f97316);
-  box-shadow: 0 0 10px var(--color-ai-orange, #f97316);
+  background-color: var(--color-ai-indigo, #6366f1);
+  box-shadow: 0 0 10px var(--color-ai-indigo, #6366f1);
   animation: pulse-dot-anim 2s infinite ease-in-out;
 }
 
@@ -1581,11 +1583,11 @@ onUnmounted(() => {
 
 /* Hero Headline */
 .ithunt-hero-headline {
-  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif);
   font-size: clamp(2.4rem, 5.2vw, 4.4rem);
   font-weight: 800;
   line-height: 1.15;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
   color: var(--text-main, #f8fafc);
   margin-bottom: 1.5rem;
   max-width: 1050px;
@@ -1594,14 +1596,14 @@ onUnmounted(() => {
 }
 
 .ithunt-gradient-text {
-  background: var(--gradient-ai-hero, linear-gradient(135deg, #f97316 0%, #fbbf24 50%, #f59e0b 100%));
+  background: var(--gradient-ai-hero, linear-gradient(135deg, #6366f1 0%, #8b5cf6 40%, #f97316 100%));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-brand, .text-cyan {
-  color: var(--color-ai-orange, #f97316) !important;
+  color: var(--color-ai-indigo, #6366f1) !important;
 }
 
 .text-green {
@@ -1630,12 +1632,12 @@ onUnmounted(() => {
   text-decoration: none;
   font-weight: 600;
   transition: all 0.2s ease;
-  border-bottom: 1px dashed rgba(249, 115, 22, 0.4);
+  border-bottom: 1px dashed rgba(99, 102, 241, 0.4);
 }
 
 .platform-link:hover {
-  color: var(--color-ai-orange, #f97316);
-  border-bottom-color: var(--color-ai-orange, #f97316);
+  color: var(--color-ai-indigo, #6366f1);
+  border-bottom-color: var(--color-ai-indigo, #6366f1);
 }
 
 .ithunt-track-formats-row {
@@ -1652,7 +1654,7 @@ onUnmounted(() => {
 }
 
 .track-format-link:hover {
-  color: var(--color-ai-orange, #f97316);
+  color: var(--color-ai-indigo, #6366f1);
 }
 
 /* Signature IT Hunt Hand-Drawn Brush Stroke Underline (Animated Green Glow) */
@@ -1749,9 +1751,9 @@ onUnmounted(() => {
   padding: 0.95rem 2rem;
   font-size: 1rem;
   font-weight: 700;
-  border-radius: 14px;
+  border-radius: 12px;
   min-height: 52px;
-  box-shadow: 0 4px 20px rgba(249, 115, 22, 0.35);
+  box-shadow: 0 4px 20px var(--glow-primary, rgba(99, 102, 241, 0.35));
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -1760,23 +1762,25 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: var(--bg-card-glass, rgba(15, 23, 42, 0.8));
-  border: 1.5px solid var(--border-cyber, rgba(255, 255, 255, 0.15));
+  background: var(--bg-card-glass, rgba(17, 24, 39, 0.8));
+  border: 1.5px solid var(--border-cyber, rgba(255, 255, 255, 0.12));
   color: var(--text-main, #ffffff);
   padding: 0.95rem 1.85rem;
   font-size: 1rem;
   font-weight: 600;
-  border-radius: 14px;
+  border-radius: 12px;
   cursor: pointer;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .ithunt-btn-secondary:hover {
   background: rgba(255, 255, 255, 0.08);
-  border-color: var(--color-ai-orange, #f97316);
-  color: var(--color-ai-orange, #f97316);
+  border-color: var(--color-ai-indigo, #6366f1);
+  color: var(--color-ai-indigo, #6366f1);
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.2);
 }
 
 .ithunt-pricing-microtext {
@@ -1791,23 +1795,23 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: var(--gradient-ai-btn, linear-gradient(135deg, #ea580c 0%, #f97316 50%, #fbbf24 100%));
+  background: var(--gradient-ai-btn, linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #3b82f6 100%));
   color: #ffffff;
   border: none;
-  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif);
   font-weight: 700;
   font-size: 0.95rem;
   padding: 0.85rem 1.6rem;
-  border-radius: var(--radius-full, 9999px);
+  border-radius: 12px;
   cursor: pointer;
-  box-shadow: 0 4px 18px var(--glow-orange, rgba(249, 115, 22, 0.4));
+  box-shadow: 0 4px 18px var(--glow-primary, rgba(99, 102, 241, 0.4));
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
 }
 
 .ithunt-btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px var(--glow-orange, rgba(249, 115, 22, 0.6));
+  box-shadow: 0 8px 25px var(--glow-primary, rgba(99, 102, 241, 0.6));
 }
 
 .ithunt-btn-secondary {
@@ -1816,13 +1820,13 @@ onUnmounted(() => {
   justify-content: center;
   gap: 0.5rem;
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.15));
+  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.12));
   color: var(--text-main, #f8fafc);
-  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif);
   font-weight: 600;
   font-size: 0.95rem;
   padding: 0.85rem 1.6rem;
-  border-radius: var(--radius-full, 9999px);
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.25s ease;
   white-space: nowrap;
@@ -1830,7 +1834,7 @@ onUnmounted(() => {
 
 .ithunt-btn-secondary:hover {
   background: rgba(255, 255, 255, 0.12);
-  border-color: var(--color-ai-orange, #f97316);
+  border-color: var(--color-ai-indigo, #6366f1);
   color: #ffffff;
 }
 
@@ -1882,12 +1886,13 @@ onUnmounted(() => {
 }
 
 .ithunt-showcase-card {
-  background: var(--bg-card-glass, rgba(15, 23, 42, 0.9));
-  border: 1px solid var(--border-cyber-glow, rgba(249, 115, 22, 0.35));
+  background: var(--bg-card-glass, rgba(17, 24, 39, 0.88));
+  border: 1px solid var(--border-cyber-glow, rgba(99, 102, 241, 0.28));
   border-radius: var(--radius-lg, 20px);
-  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.5), 0 0 35px var(--glow-orange, rgba(249, 115, 22, 0.12));
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.55), 0 0 35px var(--glow-primary, rgba(99, 102, 241, 0.12));
   overflow: hidden;
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 /* Card Header */
@@ -1896,7 +1901,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: 0.85rem 1.25rem;
-  background: rgba(2, 6, 23, 0.7);
+  background: rgba(11, 15, 25, 0.85);
   border-bottom: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
   flex-wrap: wrap;
   gap: 0.75rem;
@@ -1946,9 +1951,9 @@ onUnmounted(() => {
 }
 
 .showcase-tab-btn.active {
-  color: var(--color-ai-orange, #f97316);
-  background: rgba(249, 115, 22, 0.12);
-  border-color: rgba(249, 115, 22, 0.35);
+  color: var(--color-ai-indigo, #6366f1);
+  background: rgba(99, 102, 241, 0.12);
+  border-color: rgba(99, 102, 241, 0.35);
 }
 
 .showcase-badge-status {
@@ -1995,8 +2000,8 @@ onUnmounted(() => {
   display: inline-block;
   font-size: 0.7rem;
   font-weight: 700;
-  color: var(--color-ai-orange, #f97316);
-  background: rgba(249, 115, 22, 0.12);
+  color: var(--color-ai-indigo, #6366f1);
+  background: rgba(99, 102, 241, 0.12);
   padding: 0.15rem 0.5rem;
   border-radius: 4px;
   margin-bottom: 0.35rem;
@@ -2004,7 +2009,7 @@ onUnmounted(() => {
 }
 
 .project-main-title {
-  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif);
   font-size: 1.12rem;
   font-weight: 700;
   color: var(--text-main, #ffffff);
@@ -2096,7 +2101,7 @@ onUnmounted(() => {
 
 /* Right Pane */
 .metrics-panel-card {
-  background: rgba(2, 6, 23, 0.6);
+  background: rgba(11, 15, 25, 0.65);
   border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.06));
   border-radius: 12px;
   padding: 1rem;
@@ -2126,8 +2131,8 @@ onUnmounted(() => {
 
 .branch-tag {
   font-size: 0.68rem;
-  background: rgba(249, 115, 22, 0.15);
-  color: var(--color-ai-orange, #f97316);
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--color-ai-indigo, #6366f1);
   padding: 0.15rem 0.45rem;
   border-radius: 4px;
   white-space: nowrap;
@@ -2149,7 +2154,7 @@ onUnmounted(() => {
 }
 
 .metric-val {
-  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif);
   font-size: 1.1rem;
   font-weight: 800;
   display: block;
@@ -2203,7 +2208,7 @@ onUnmounted(() => {
    ========================================================================== */
 
 .ithunt-stats-band {
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(11, 15, 25, 0.7);
   border-top: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.06));
   border-bottom: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.06));
   padding: 2.5rem 1rem;
@@ -2221,20 +2226,24 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: var(--bg-card-glass, rgba(255, 255, 255, 0.02));
-  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.06));
-  padding: 1rem 1.25rem;
+  background: var(--bg-card-glass, rgba(17, 24, 39, 0.75));
+  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.08));
+  padding: 1.1rem 1.35rem;
   border-radius: 16px;
-  transition: all 0.2s ease;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .stat-pill-card:hover {
-  border-color: rgba(249, 115, 22, 0.4);
-  background: rgba(249, 115, 22, 0.05);
+  border-color: var(--border-cyber-glow, rgba(99, 102, 241, 0.35));
+  background: rgba(99, 102, 241, 0.06);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35), 0 0 15px rgba(99, 102, 241, 0.12);
 }
 
 .stat-num {
-  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif);
   font-size: 2rem;
   font-weight: 800;
   line-height: 1;
@@ -2287,14 +2296,14 @@ onUnmounted(() => {
 .ithunt-section-alt .ithunt-pill-badge {
   background: #ffffff !important;
   border: 1px solid #cbd5e1 !important;
-  color: #ea580c !important;
+  color: var(--color-ai-indigo, #6366f1) !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
 }
 
 .ithunt-section-even .ithunt-badge-dot,
 .ithunt-section-alt .ithunt-badge-dot {
-  background-color: #ea580c !important;
-  box-shadow: 0 0 8px rgba(234, 88, 12, 0.4) !important;
+  background-color: var(--color-ai-indigo, #6366f1) !important;
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.4) !important;
 }
 
 /* Even Section 2: Homework Cards in Light Mode */
@@ -2310,14 +2319,14 @@ onUnmounted(() => {
 .ithunt-section-even .homework-card:hover,
 .ithunt-section-alt .homework-card:hover {
   transform: translateY(-5px);
-  border-color: rgba(249, 115, 22, 0.5) !important;
-  box-shadow: 0 20px 35px -5px rgba(234, 88, 12, 0.12), 0 8px 16px -2px rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(99, 102, 241, 0.5) !important;
+  box-shadow: 0 20px 35px -5px rgba(99, 102, 241, 0.12), 0 8px 16px -2px rgba(0, 0, 0, 0.04) !important;
 }
 
 .ithunt-section-even .card-icon-wrap,
 .ithunt-section-alt .card-icon-wrap {
-  background: rgba(249, 115, 22, 0.1) !important;
-  color: #ea580c !important;
+  background: rgba(99, 102, 241, 0.1) !important;
+  color: var(--color-ai-indigo, #6366f1) !important;
 }
 
 .ithunt-section-even .homework-card-title,
@@ -2333,9 +2342,9 @@ onUnmounted(() => {
 
 .ithunt-section-even .pill-chip,
 .ithunt-section-alt .pill-chip {
-  background: #fff7ed !important;
-  color: #c2410c !important;
-  border: 1px solid #fed7aa !important;
+  background: rgba(99, 102, 241, 0.08) !important;
+  color: #4f46e5 !important;
+  border: 1px solid rgba(99, 102, 241, 0.25) !important;
   font-weight: 700;
 }
 
@@ -2360,9 +2369,9 @@ onUnmounted(() => {
 
 .ithunt-section-even .ithunt-cat-tab-btn.active,
 .ithunt-section-alt .ithunt-cat-tab-btn.active {
-  background: var(--gradient-ai-btn, linear-gradient(135deg, #ea580c, #f97316)) !important;
+  background: var(--gradient-ai-btn, linear-gradient(135deg, #6366f1, #8b5cf6)) !important;
   color: #ffffff !important;
-  box-shadow: 0 4px 15px rgba(234, 88, 12, 0.35) !important;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35) !important;
 }
 
 .ithunt-section-even .example-card,
@@ -2377,8 +2386,8 @@ onUnmounted(() => {
 .ithunt-section-even .example-card:hover,
 .ithunt-section-alt .example-card:hover {
   transform: translateY(-5px);
-  border-color: rgba(249, 115, 22, 0.5) !important;
-  box-shadow: 0 20px 35px -5px rgba(234, 88, 12, 0.12), 0 8px 16px -2px rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(99, 102, 241, 0.5) !important;
+  box-shadow: 0 20px 35px -5px rgba(99, 102, 241, 0.12), 0 8px 16px -2px rgba(0, 0, 0, 0.04) !important;
 }
 
 .ithunt-section-even .example-card-header,
@@ -2399,9 +2408,9 @@ onUnmounted(() => {
 
 .ithunt-section-even .example-platform-pill,
 .ithunt-section-alt .example-platform-pill {
-  background: #fff7ed !important;
-  color: #ea580c !important;
-  border: 1px solid #fed7aa !important;
+  background: rgba(99, 102, 241, 0.08) !important;
+  color: #4f46e5 !important;
+  border: 1px solid rgba(99, 102, 241, 0.25) !important;
   font-weight: 700;
 }
 
@@ -2417,7 +2426,7 @@ onUnmounted(() => {
 
 .ithunt-section-even .bullet-dot,
 .ithunt-section-alt .bullet-dot {
-  background: #ea580c !important;
+  background: var(--color-ai-indigo, #6366f1) !important;
 }
 
 .ithunt-section-even .example-card-footer,
@@ -2432,17 +2441,17 @@ onUnmounted(() => {
 
 .ithunt-section-even .example-view-btn,
 .ithunt-section-alt .example-view-btn {
-  background: #fff7ed !important;
-  border: 1px solid #fed7aa !important;
-  color: #c2410c !important;
+  background: rgba(99, 102, 241, 0.08) !important;
+  border: 1px solid rgba(99, 102, 241, 0.25) !important;
+  color: #4f46e5 !important;
   font-weight: 700 !important;
 }
 
 .ithunt-section-even .example-view-btn:hover,
 .ithunt-section-alt .example-view-btn:hover {
-  background: #ea580c !important;
+  background: var(--gradient-ai-btn) !important;
   color: #ffffff !important;
-  border-color: #ea580c !important;
+  border-color: transparent !important;
 }
 
 /* Even Section 6: Bento Grid in Light Mode */
@@ -2458,7 +2467,7 @@ onUnmounted(() => {
 .ithunt-section-even .bento-card:hover,
 .ithunt-section-alt .bento-card:hover {
   transform: translateY(-5px);
-  border-color: rgba(249, 115, 22, 0.5) !important;
+  border-color: rgba(99, 102, 241, 0.5) !important;
   box-shadow: 0 20px 35px -5px rgba(234, 88, 12, 0.12), 0 8px 16px -2px rgba(0, 0, 0, 0.04) !important;
 }
 
@@ -2746,9 +2755,9 @@ onUnmounted(() => {
 
 /* Odd Section 9: CTA Banner in Dark Mode */
 .ithunt-section-odd .ithunt-cta-banner {
-  background: rgba(15, 23, 42, 0.9) !important;
-  border: 1.5px solid rgba(249, 115, 22, 0.45) !important;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(249, 115, 22, 0.2) !important;
+  background: rgba(17, 24, 39, 0.9) !important;
+  border: 1.5px solid rgba(99, 102, 241, 0.45) !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55), 0 0 40px rgba(99, 102, 241, 0.2) !important;
 }
 
 .ithunt-section-odd .cta-main-title {
@@ -3612,14 +3621,15 @@ onUnmounted(() => {
 }
 
 .ithunt-cta-banner {
-  background: var(--bg-card-glass, rgba(15, 23, 42, 0.85));
-  border: 1.5px solid var(--border-cyber-glow, rgba(249, 115, 22, 0.45));
+  background: var(--bg-card-glass, rgba(17, 24, 39, 0.88));
+  border: 1.5px solid var(--border-cyber-glow, rgba(99, 102, 241, 0.35));
   border-radius: 24px;
   padding: 4.5rem 2rem;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px var(--glow-orange, rgba(249, 115, 22, 0.2));
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55), 0 0 40px var(--glow-primary, rgba(99, 102, 241, 0.2));
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   max-width: 1100px;
   margin: 0 auto;
 }
@@ -3631,13 +3641,13 @@ onUnmounted(() => {
   transform: translateX(-50%);
   width: 600px;
   height: 300px;
-  background: radial-gradient(circle, var(--glow-orange, rgba(249, 115, 22, 0.25)) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--glow-primary, rgba(99, 102, 241, 0.25)) 0%, transparent 70%);
   filter: blur(50px);
   pointer-events: none;
 }
 
 .cta-main-title {
-  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif);
   font-size: clamp(2.2rem, 4vw, 3.2rem);
   font-weight: 800;
   color: #ffffff;
@@ -4091,8 +4101,8 @@ onUnmounted(() => {
 
 :global(body.light-theme) .ithunt-cta-banner {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
-  border-color: rgba(249, 115, 22, 0.4) !important;
-  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25) !important;
+  border-color: rgba(99, 102, 241, 0.45) !important;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25), 0 0 25px rgba(99, 102, 241, 0.15) !important;
 }
 
 :global(body.light-theme) .cta-main-title {
