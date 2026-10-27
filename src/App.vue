@@ -644,8 +644,11 @@ const handleUpdateFestivalWish = (updated) => {
 
 const handlePreviewFestivalWish = (previewWish) => {
   festivalWish.value = { ...previewWish, isActive: true };
+  showFestivalModal.value = false;
   activeTab.value = 'home';
-  showFestivalModal.value = true;
+  setTimeout(() => {
+    showFestivalModal.value = true;
+  }, 60);
 };
 
 const handleFestivalModalAction = (targetTab) => {
