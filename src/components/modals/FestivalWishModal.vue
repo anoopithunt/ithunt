@@ -30,6 +30,9 @@
               <span class="festive-badge-icon">{{ festivalIcon }}</span>
               <span class="festive-badge-text">{{ currentWish.occasion || 'SPECIAL OCCASION' }} • IT HUNT</span>
             </div>
+            <div class="festive-loc-chip" v-if="currentWish.locationScope">
+              <span>📍 {{ currentWish.locationScope }}</span>
+            </div>
 
             <!-- Animated Sparkle Particles in Banner -->
             <div class="festive-sparkles" aria-hidden="true">
@@ -134,7 +137,8 @@ const currentWish = computed(() => {
     specialOffer: w.specialOffer || '🪔 Diwali Special: Free Certification Voucher & Up to 20% Course Discount!',
     ctaText: w.ctaText || 'Explore Courses & Batches 🪔',
     ctaAction: w.ctaAction || 'courses',
-    theme: w.theme || 'diwali'
+    theme: w.theme || 'diwali',
+    locationScope: w.locationScope || 'All Locations & Campuses (Holagarh, Prayagraj & Online)'
   };
 });
 
@@ -390,6 +394,21 @@ onUnmounted(() => {
   font-weight: 800;
   color: inherit !important;
   -webkit-text-fill-color: initial !important;
+}
+
+.festive-loc-chip {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5rem;
+  padding: 0.28rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.45);
+  color: #f1f5f9;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+  z-index: 5;
 }
 
 /* Sparkles in Banner (With Drop-Shadow for 100% Visibility on White) */

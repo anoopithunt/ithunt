@@ -54,7 +54,7 @@
     </a>
 
 
-    <!-- Festive Greeting Announcement Bar (Always Visible on Web Page When Active) -->
+    <!-- Festive Greeting Announcement Bar (Always Visible on Web Page When Active Across All Locations) -->
     <div 
       v-if="festivalWish && festivalWish.isActive && activeTab !== 'superadmin'" 
       class="festive-web-banner"
@@ -66,6 +66,7 @@
       <div class="festive-web-banner-inner">
         <span class="festive-web-icon">{{ getFestivalEmoji(festivalWish.theme) }}</span>
         <span class="festive-web-badge">{{ festivalWish.occasion || 'CELEBRATION' }}</span>
+        <span class="festive-web-location" v-if="festivalWish.locationScope">📍 {{ festivalWish.locationScope }}</span>
         <span class="festive-web-title">{{ festivalWish.title }}</span>
         <span class="festive-web-offer" v-if="festivalWish.specialOffer">{{ festivalWish.specialOffer }}</span>
         <button 
@@ -563,7 +564,9 @@ import {
   loginStudentUser, 
   saveStudentAccount,
   updateStudentProfile,
-  submitReviewToBackend
+  submitReviewToBackend,
+  fetchFestivalWishFromBackend,
+  updateFestivalWishInBackend
 } from './utils/apiClient.js';
 import { sendNielitProjectEmailNotification } from './utils/emailNotifier.js';
 
@@ -670,13 +673,32 @@ const checkAndShowFestivalModal = (force = false) => {
   }
 };
 
-const handleUpdateFestivalWish = (updated) => {
+const loadFestivalSettings = async () => {
+  try {
+    const res = await fetchFestivalWishFromBackend();
+    if (res && res.success && res.data) {
+      festivalWish.value = { ...res.data };
+      if (festivalWish.value.isActive) {
+        checkAndShowFestivalModal();
+      } else {
+        showFestivalModal.value = false;
+      }
+    }
+  } catch (err) {
+    console.warn('Could not sync festival wish from cloud:', err);
+  }
+};
+
+const handleUpdateFestivalWish = async (updated) => {
   festivalWish.value = { ...updated };
   try {
     localStorage.setItem('ithunt_festival_wish', JSON.stringify(festivalWish.value));
     localStorage.removeItem('ithunt_festival_dismissed_until');
   } catch (e) {}
-  showToast(`🎉 ${updated.occasion || 'Festival'} celebration is now LIVE on Home Page!`, 'success');
+
+  // Save dynamically to Cloud Database (MongoDB Atlas) so it is live across all visitor locations
+  await updateFestivalWishInBackend(festivalWish.value);
+  showToast(`🎉 ${updated.occasion || 'Festival'} celebration is now LIVE across all locations!`, 'success');
 };
 
 const handlePreviewFestivalWish = (previewWish) => {
@@ -1987,9 +2009,15 @@ onMounted(() => {
 
   // Defer background API synchronization to background idle cycles so the Home page loads instantly
   if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-    window.requestIdleCallback(() => loadInitialData(), { timeout: 2000 });
+    window.requestIdleCallback(() => {
+      loadInitialData();
+      loadFestivalSettings();
+    }, { timeout: 2000 });
   } else {
-    setTimeout(() => loadInitialData(), 300);
+    setTimeout(() => {
+      loadInitialData();
+      loadFestivalSettings();
+    }, 300);
   }
 
   // Initialize SEO Metadata for active view

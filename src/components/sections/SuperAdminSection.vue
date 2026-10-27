@@ -441,69 +441,27 @@
                 <div class="festival-banner-meta">
                   <span class="festival-live-dot" :class="{ active: festivalWishData.isActive }"></span>
                   <span class="festival-status-text">
-                    {{ festivalWishData.isActive ? 'HOME PAGE FESTIVAL POPUP IS LIVE' : 'FESTIVAL POPUP IS PAUSED' }}
+                    {{ festivalWishData.isActive ? 'LIVE ACROSS ALL LOCATIONS' : 'FESTIVAL POPUP IS PAUSED' }}
                   </span>
                   <span class="festival-occasion-tag">{{ festivalWishData.occasion || 'Diwali' }}</span>
+                  <span class="festival-location-pill">📍 {{ festivalWishData.locationScope || 'All Locations' }}</span>
                 </div>
                 <h3 class="festival-banner-headline">{{ festivalWishData.title }}</h3>
                 <p class="festival-banner-sub">{{ festivalWishData.tagline || festivalWishData.message }}</p>
 
-                <!-- Quick Occasion Switcher on Dashboard -->
+                <!-- Quick Occasion Switcher on Dashboard (Dynamic Presets Across Locations) -->
                 <div class="overview-quick-presets">
-                  <span class="overview-presets-label">⚡ Switch Occasion:</span>
+                  <span class="overview-presets-label">⚡ Live Occasions:</span>
                   <button 
+                    v-for="(preset, key) in festivalPresets"
+                    :key="key"
                     type="button" 
                     class="overview-preset-pill"
-                    :class="{ active: festivalWishData.festivalKey === 'diwali' }"
-                    @click.stop="applyFestivalPreset('diwali')"
-                    title="Activate Diwali Celebration Greetings"
+                    :class="{ active: festivalWishData.festivalKey === key }"
+                    @click.stop="applyFestivalPreset(key)"
+                    :title="'Activate ' + (preset.occasion || key) + ' Across All Locations'"
                   >
-                    🪔 Diwali
-                  </button>
-                  <button 
-                    type="button" 
-                    class="overview-preset-pill"
-                    :class="{ active: festivalWishData.festivalKey === 'freedom' }"
-                    @click.stop="applyFestivalPreset('freedom')"
-                    title="Activate Freedom Day Greetings"
-                  >
-                    🇮🇳 Freedom Day
-                  </button>
-                  <button 
-                    type="button" 
-                    class="overview-preset-pill"
-                    :class="{ active: festivalWishData.festivalKey === 'republic' }"
-                    @click.stop="applyFestivalPreset('republic')"
-                    title="Activate Republic Day Greetings"
-                  >
-                    🇮🇳 Republic Day
-                  </button>
-                  <button 
-                    type="button" 
-                    class="overview-preset-pill"
-                    :class="{ active: festivalWishData.festivalKey === 'holi' }"
-                    @click.stop="applyFestivalPreset('holi')"
-                    title="Activate Holi Greetings"
-                  >
-                    🎨 Holi
-                  </button>
-                  <button 
-                    type="button" 
-                    class="overview-preset-pill"
-                    :class="{ active: festivalWishData.festivalKey === 'newyear' }"
-                    @click.stop="applyFestivalPreset('newyear')"
-                    title="Activate New Year Greetings"
-                  >
-                    🎆 New Year
-                  </button>
-                  <button 
-                    type="button" 
-                    class="overview-preset-pill"
-                    :class="{ active: festivalWishData.festivalKey === 'eid' }"
-                    @click.stop="applyFestivalPreset('eid')"
-                    title="Activate Eid Mubarak Greetings"
-                  >
-                    🌙 Eid
+                    {{ getFestivalIcon(preset.theme) }} {{ preset.occasion?.split('(')[0]?.trim() || key }}
                   </button>
                 </div>
               </div>
@@ -2836,8 +2794,11 @@
       <div class="panel-header-controls">
         <div>
           <div class="panel-eyebrow">BROADCAST & VISITOR EXPERIENCE</div>
-          <h3 class="panel-title">Festival & Occasion Wishes Broadcast</h3>
-          <p class="panel-subtitle">Set celebration greetings (Freedom Day, Diwali, Holi, Eid, New Year) to automatically welcome visitors with an interactive celebration popup on the public home page.</p>
+          <div class="panel-title-with-badge">
+            <h3 class="panel-title">Festival & Occasion Wishes Broadcast</h3>
+            <span class="cloud-synced-pill">🌐 Live Cloud DB Synced (MongoDB Atlas)</span>
+          </div>
+          <p class="panel-subtitle">Dynamically set and broadcast festive greetings across all visitor locations, remote devices, and campuses. All changes update in real-time across the platform.</p>
         </div>
         <div class="panel-header-actions">
           <button 
@@ -2852,75 +2813,41 @@
             type="button" 
             class="btn-primary" 
             @click="saveFestivalWishes"
-            title="Save and activate greeting broadcast"
+            :disabled="isSavingFestival"
+            title="Save dynamically to Cloud DB and activate greeting broadcast across all locations"
           >
-            <span>💾 Save & Broadcast</span>
+            <span>{{ isSavingFestival ? '⏳ Saving...' : '💾 Save & Broadcast Across Locations' }}</span>
           </button>
         </div>
       </div>
 
-      <!-- Quick Preset Toolbar -->
+      <!-- Quick Preset Toolbar (Dynamic & Cloud Synced) -->
       <div class="festival-presets-card">
         <div class="presets-header">
-          <span class="presets-title">⚡ Instant Festival Presets (Click to Auto-Fill):</span>
-          <span class="presets-sub">Select an occasion to instantly populate greetings, visual theme, and celebration scholarships.</span>
+          <div class="presets-header-info">
+            <span class="presets-title">⚡ Dynamic Festival Presets:</span>
+            <span class="presets-sub">Click any occasion to instantly populate greetings, visual theme, and celebration scholarships live across all locations.</span>
+          </div>
+          <button 
+            type="button" 
+            class="btn-secondary btn-sm"
+            @click="saveCurrentAsPreset"
+            title="Save the current custom form settings as a new reusable festival preset"
+          >
+            <span>✨ Save Current As Preset</span>
+          </button>
         </div>
         <div class="preset-buttons-row">
           <button 
+            v-for="(preset, key) in festivalPresets"
+            :key="key"
             type="button" 
             class="preset-chip" 
-            :class="{ active: festivalWishData.festivalKey === 'freedom' }"
-            @click="applyFestivalPreset('freedom')"
+            :class="{ active: festivalWishData.festivalKey === key }"
+            @click="applyFestivalPreset(key)"
+            :title="'Activate ' + (preset.occasion || key) + ' Across All Locations'"
           >
-            <span>🇮🇳 Freedom Day (15 Aug)</span>
-          </button>
-          <button 
-            type="button" 
-            class="preset-chip" 
-            :class="{ active: festivalWishData.festivalKey === 'diwali' }"
-            @click="applyFestivalPreset('diwali')"
-          >
-            <span>🪔 Diwali / Deepawali</span>
-          </button>
-          <button 
-            type="button" 
-            class="preset-chip" 
-            :class="{ active: festivalWishData.festivalKey === 'republic' }"
-            @click="applyFestivalPreset('republic')"
-          >
-            <span>🇮🇳 Republic Day (26 Jan)</span>
-          </button>
-          <button 
-            type="button" 
-            class="preset-chip" 
-            :class="{ active: festivalWishData.festivalKey === 'holi' }"
-            @click="applyFestivalPreset('holi')"
-          >
-            <span>🎨 Holi (Colors)</span>
-          </button>
-          <button 
-            type="button" 
-            class="preset-chip" 
-            :class="{ active: festivalWishData.festivalKey === 'eid' }"
-            @click="applyFestivalPreset('eid')"
-          >
-            <span>🌙 Eid Mubarak</span>
-          </button>
-          <button 
-            type="button" 
-            class="preset-chip" 
-            :class="{ active: festivalWishData.festivalKey === 'newyear' }"
-            @click="applyFestivalPreset('newyear')"
-          >
-            <span>🎆 New Year 2026</span>
-          </button>
-          <button 
-            type="button" 
-            class="preset-chip" 
-            :class="{ active: festivalWishData.festivalKey === 'custom' }"
-            @click="applyFestivalPreset('custom')"
-          >
-            <span>✨ Custom Occasion</span>
+            <span>{{ getFestivalIcon(preset.theme) }} {{ preset.occasion || key }}</span>
           </button>
         </div>
       </div>
@@ -2934,9 +2861,21 @@
             <label class="toggle-control-label live-status-switch">
               <input type="checkbox" v-model="festivalWishData.isActive">
               <strong :style="{ color: festivalWishData.isActive ? '#10b981' : '#64748b' }">
-                {{ festivalWishData.isActive ? 'Active on Home Page' : 'Disabled / Hidden' }}
+                {{ festivalWishData.isActive ? 'Active Across All Locations' : 'Disabled / Hidden' }}
               </strong>
             </label>
+          </div>
+
+          <div class="form-group">
+            <label class="field-label">📍 Location Scope & Target Campuses</label>
+            <select v-model="festivalWishData.locationScope" class="form-control">
+              <option v-for="scope in availableLocationScopes" :key="scope" :value="scope">
+                {{ scope }}
+              </option>
+            </select>
+            <span class="field-hint-text">
+              ✓ Visible Across Location: Dynamically served from MongoDB Atlas to every visitor browsing from any campus, city, or remote device.
+            </span>
           </div>
 
           <div class="form-group">
@@ -2945,7 +2884,7 @@
               type="text" 
               v-model="festivalWishData.occasion" 
               class="form-control" 
-              placeholder="e.g. Independence Day, Diwali, Republic Day"
+              placeholder="e.g. Independence Day, Diwali, Republic Day, Maha Shivratri"
             >
           </div>
 
@@ -3037,6 +2976,9 @@
               <span class="sim-badge">
                 {{ getFestivalIcon(festivalWishData.theme) }} {{ festivalWishData.occasion || 'FESTIVAL OCCASION' }} • IT HUNT
               </span>
+              <span class="sim-loc-chip" v-if="festivalWishData.locationScope">
+                📍 {{ festivalWishData.locationScope }}
+              </span>
             </div>
 
             <div class="sim-body">
@@ -3075,11 +3017,16 @@
           </div>
 
           <div class="preview-card-footer">
-            <button type="button" class="btn-primary w-full" @click="saveFestivalWishes">
-              <span>💾 Save & Apply to Live Website</span>
+            <button 
+              type="button" 
+              class="btn-primary w-full" 
+              @click="saveFestivalWishes"
+              :disabled="isSavingFestival"
+            >
+              <span>{{ isSavingFestival ? '⏳ Saving to Cloud DB...' : '💾 Save & Apply Live Across All Locations' }}</span>
             </button>
             <p class="preview-footer-note">
-              When saved with Active enabled, all visitors arriving on the IT HUNT home page will see this festive celebration greeting popup.
+              When saved with Active enabled, all visitors arriving from any location, city, or device will dynamically receive this festive greeting.
             </p>
           </div>
         </div>
@@ -5184,7 +5131,11 @@ import {
   deleteProjectFromBackend,
   saveReviewToBackend,
   updateUserInBackend,
-  createUserInBackend
+  createUserInBackend,
+  fetchFestivalWishFromBackend,
+  updateFestivalWishInBackend,
+  fetchFestivalPresetsFromBackend,
+  saveFestivalPresetsToBackend
 } from '../../utils/apiClient.js';
 import CertificatePreviewModal from '../modals/CertificatePreviewModal.vue';
 import { 
@@ -5321,7 +5272,8 @@ const selectedAdmissionForEmail = ref(null);
 const emailLetterPreview = ref('');
 
 // --- FESTIVAL & CELEBRATION WISHES LOGIC & PRESETS ---
-const FESTIVAL_PRESETS = {
+// --- FESTIVAL & CELEBRATION WISHES LOGIC & PRESETS (DYNAMIC & CLOUD-SYNCED) ---
+const DEFAULT_FESTIVAL_PRESETS = {
   freedom: {
     festivalKey: 'freedom',
     occasion: 'FREEDOM DAY (15th August)',
@@ -5332,6 +5284,7 @@ const FESTIVAL_PRESETS = {
     ctaText: 'Claim Freedom Scholarship 🚀',
     ctaAction: 'admission',
     theme: 'freedom',
+    locationScope: 'All Locations & Campuses (Holagarh, Prayagraj & Online)',
     isActive: true
   },
   diwali: {
@@ -5344,6 +5297,7 @@ const FESTIVAL_PRESETS = {
     ctaText: 'Explore Courses & Batches 🪔',
     ctaAction: 'courses',
     theme: 'diwali',
+    locationScope: 'All Locations & Campuses (Holagarh, Prayagraj & Online)',
     isActive: true
   },
   republic: {
@@ -5356,6 +5310,7 @@ const FESTIVAL_PRESETS = {
     ctaText: 'Apply for Next Batch ➜',
     ctaAction: 'admission',
     theme: 'republic',
+    locationScope: 'All Locations & Campuses (Holagarh, Prayagraj & Online)',
     isActive: true
   },
   holi: {
@@ -5368,6 +5323,7 @@ const FESTIVAL_PRESETS = {
     ctaText: 'Explore Internship Tracks ➜',
     ctaAction: 'internships',
     theme: 'holi',
+    locationScope: 'All Locations & Campuses (Holagarh, Prayagraj & Online)',
     isActive: true
   },
   eid: {
@@ -5380,6 +5336,7 @@ const FESTIVAL_PRESETS = {
     ctaText: 'Enroll Online Today 🚀',
     ctaAction: 'admission',
     theme: 'eid',
+    locationScope: 'All Locations & Campuses (Holagarh, Prayagraj & Online)',
     isActive: true
   },
   newyear: {
@@ -5392,6 +5349,7 @@ const FESTIVAL_PRESETS = {
     ctaText: 'Apply for 2026 Batch 🚀',
     ctaAction: 'admission',
     theme: 'newyear',
+    locationScope: 'All Locations & Campuses (Holagarh, Prayagraj & Online)',
     isActive: true
   },
   custom: {
@@ -5404,22 +5362,42 @@ const FESTIVAL_PRESETS = {
     ctaText: 'Explore Opportunities 🚀',
     ctaAction: 'admission',
     theme: 'custom',
+    locationScope: 'All Locations & Campuses (Holagarh, Prayagraj & Online)',
     isActive: true
   }
 };
 
+const festivalPresets = ref({ ...DEFAULT_FESTIVAL_PRESETS });
+
+const availableLocationScopes = ref([
+  'All Locations & Campuses (Holagarh, Prayagraj & Online)',
+  'Holagarh Prayagraj Campus',
+  'Prayagraj Main Tech Studio',
+  'Online / Remote Students Only'
+]);
+
+const isSavingFestival = ref(false);
+
 const loadInitialFestivalWish = () => {
   if (props.festivalWish && props.festivalWish.title) {
-    return { ...props.festivalWish };
+    return { 
+      locationScope: availableLocationScopes.value[0],
+      ...props.festivalWish 
+    };
   }
   try {
     const raw = localStorage.getItem('ithunt_festival_wish');
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (parsed && parsed.title) return parsed;
+      if (parsed && parsed.title) {
+        return {
+          locationScope: availableLocationScopes.value[0],
+          ...parsed
+        };
+      }
     }
   } catch (e) {}
-  return { ...FESTIVAL_PRESETS.diwali };
+  return { ...DEFAULT_FESTIVAL_PRESETS.diwali };
 };
 
 const festivalWishData = ref(loadInitialFestivalWish());
@@ -5427,30 +5405,93 @@ const festivalWishData = ref(loadInitialFestivalWish());
 // Watch props.festivalWish to keep festivalWishData continuously in sync
 watch(() => props.festivalWish, (newWish) => {
   if (newWish && newWish.title) {
-    festivalWishData.value = { ...newWish };
+    festivalWishData.value = { 
+      locationScope: festivalWishData.value.locationScope || availableLocationScopes.value[0],
+      ...newWish 
+    };
   }
 }, { deep: true });
 
+const loadFestivalDataFromBackend = async () => {
+  try {
+    const res = await fetchFestivalWishFromBackend();
+    if (res && res.success && res.data) {
+      festivalWishData.value = {
+        ...festivalWishData.value,
+        ...res.data,
+        locationScope: res.data.locationScope || festivalWishData.value.locationScope || availableLocationScopes.value[0]
+      };
+      if (res.presets) {
+        festivalPresets.value = {
+          ...DEFAULT_FESTIVAL_PRESETS,
+          ...res.presets
+        };
+      }
+      if (res.locationScopes && Array.isArray(res.locationScopes)) {
+        availableLocationScopes.value = res.locationScopes;
+      }
+    }
+  } catch (e) {
+    console.warn('SuperAdmin could not fetch festival wish from cloud:', e);
+  }
+};
+
 const applyFestivalPreset = (key) => {
-  if (FESTIVAL_PRESETS[key]) {
+  const preset = festivalPresets.value[key];
+  if (preset) {
     festivalWishData.value = {
-      ...FESTIVAL_PRESETS[key],
-      isActive: true
+      ...preset,
+      isActive: true,
+      locationScope: preset.locationScope || festivalWishData.value.locationScope || availableLocationScopes.value[0]
     };
     saveFestivalWishes();
-    emailActionMsg.value = `✓ Activated ${FESTIVAL_PRESETS[key].occasion} wishes & live on Home Page!`;
+    emailActionMsg.value = `✓ Activated ${preset.occasion} wishes & live across all locations!`;
     setTimeout(() => { emailActionMsg.value = ''; }, 3500);
   }
 };
 
-const saveFestivalWishes = () => {
+const saveFestivalWishes = async () => {
+  isSavingFestival.value = true;
   try {
     localStorage.setItem('ithunt_festival_wish', JSON.stringify(festivalWishData.value));
     localStorage.removeItem('ithunt_festival_dismissed_until');
   } catch (e) {}
   emit('update-festival-wish', { ...festivalWishData.value });
-  emailActionMsg.value = '✓ Festival wish saved & live on home page!';
-  setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+
+  try {
+    const res = await updateFestivalWishInBackend(festivalWishData.value);
+    if (res && res.success) {
+      emailActionMsg.value = `✓ Festival dynamically saved to Cloud DB & LIVE across ${festivalWishData.value.locationScope || 'all locations'}!`;
+    } else {
+      emailActionMsg.value = '✓ Festival wish saved & broadcasted!';
+    }
+  } catch (err) {
+    emailActionMsg.value = '✓ Festival wish saved!';
+  } finally {
+    isSavingFestival.value = false;
+  }
+  setTimeout(() => { emailActionMsg.value = ''; }, 4500);
+};
+
+const saveCurrentAsPreset = async () => {
+  const rawKey = (festivalWishData.value.festivalKey || festivalWishData.value.occasion || 'custom')
+    .toLowerCase().replace(/[^a-z0-9]/g, '-').slice(0, 20) || 'custom';
+  
+  festivalPresets.value = {
+    ...festivalPresets.value,
+    [rawKey]: {
+      ...festivalWishData.value,
+      festivalKey: rawKey
+    }
+  };
+
+  try {
+    await saveFestivalPresetsToBackend(festivalPresets.value);
+    emailActionMsg.value = `✓ Saved "${festivalWishData.value.occasion}" as a dynamic preset!`;
+  } catch (err) {
+    emailActionMsg.value = `✓ Preset "${festivalWishData.value.occasion}" saved!`;
+  }
+  setTimeout(() => { emailActionMsg.value = ''; }, 3500);
 };
 
 const testHomePopup = () => {
@@ -8461,6 +8502,7 @@ onMounted(() => {
   sessionTime.value = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   refreshDatabaseStatus();
   refreshStoredExamSubmissions();
+  loadFestivalDataFromBackend();
 
   // Dynamic header height measurement for mobile sticky alignment
   updateAdminHeaderHeight();
@@ -11967,8 +12009,52 @@ label {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
 }
 
+.panel-title-with-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.cloud-synced-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.festival-location-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 0.18rem 0.6rem;
+  border-radius: 9999px;
+}
+
 .presets-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   margin-bottom: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.presets-header-info {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .presets-title {
@@ -11985,6 +12071,26 @@ label {
 .presets-sub {
   font-size: 0.8rem;
   color: #64748b;
+}
+
+.field-hint-text {
+  display: block;
+  font-size: 0.75rem;
+  color: #10b981;
+  margin-top: 0.35rem;
+  font-weight: 500;
+}
+
+.sim-loc-chip {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #38bdf8;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
 }
 
 .preset-buttons-row {

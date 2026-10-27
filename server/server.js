@@ -20,6 +20,7 @@ import projectsRoutes from './routes/projects.routes.js';
 import contactRoutes from './routes/contact.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import coursesRoutes from './routes/courses.routes.js';
+import festivalRoutes from './routes/festival.routes.js';
 import { optionalAuth } from './middleware/auth.js';
 import { enforceRoleSectionPermission } from './middleware/rolePermissions.js';
 
@@ -79,7 +80,7 @@ const healthHandler = async (req, res) => {
       mode: isMongoConnected() ? 'CONNECTED' : 'STANDBY',
       lastError: process.env.NODE_ENV === 'development' ? (getLastMongoError() || dbErr) : undefined
     },
-    endpoints: ['/api/admissions', '/api/students', '/api/courses', '/api/events', '/api/nielit-projects', '/api/careers/applications', '/api/internships/applications', '/api/events/rsvps', '/api/reviews', '/api/fees', '/api/certificates', '/api/projects', '/api/contact', '/api/auth/login', '/api/admin/stats']
+    endpoints: ['/api/admissions', '/api/students', '/api/courses', '/api/events', '/api/nielit-projects', '/api/careers/applications', '/api/internships/applications', '/api/events/rsvps', '/api/reviews', '/api/fees', '/api/certificates', '/api/projects', '/api/contact', '/api/auth/login', '/api/admin/stats', '/api/festival-wish']
   });
 };
 
@@ -101,6 +102,8 @@ app.use('/api/projects', projectsRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/courses', coursesRoutes);
+app.use('/api/festival-wish', festivalRoutes);
+app.use('/api/festivals', festivalRoutes);
 app.use('/api/users', authRoutes);
 
 app.use((req, res) => res.status(404).json({ success: false, message: `API route not found: ${req.method} ${req.originalUrl}` }));

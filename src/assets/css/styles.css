@@ -10285,6 +10285,18 @@ svg {
   border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
+.festive-web-location {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #38bdf8 !important;
+  -webkit-text-fill-color: #38bdf8 !important;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  padding: 0.16rem 0.52rem;
+  border-radius: 9999px;
+  letter-spacing: 0.02em;
+}
+
 .festive-web-title {
   font-size: 0.86rem;
   font-weight: 800;

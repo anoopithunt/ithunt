@@ -27,7 +27,8 @@ const isPublicRoute = (method, path) => {
     if (method === 'GET' && (
         path === '/courses' || path === '/events' || path === '/reviews' ||
         path === '/projects' || path.startsWith('/certificates/verify/') ||
-        path === '/careers' || path === '/health'
+        path === '/careers' || path === '/health' ||
+        path.startsWith('/festival-wish') || path.startsWith('/festivals')
     )) return true;
 
     return method === 'POST' && (
