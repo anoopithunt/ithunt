@@ -10084,8 +10084,7 @@ svg {
   .modal-card,
   .modal-lg,
   .course-detail-popup,
-  .nielit-modal-card,
-  .cv-modal-card {
+  .nielit-modal-card {
     width: min(96vw, 680px) !important;
     max-width: calc(100vw - 1rem) !important;
     margin: 0.5rem auto !important;
@@ -10094,6 +10093,18 @@ svg {
     max-height: 90vh !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
+  }
+
+  .cv-modal-card {
+    width: min(96vw, 930px) !important;
+    max-width: calc(100vw - 1rem) !important;
+    margin: 0.5rem auto !important;
+    padding: 0 !important;
+    max-height: 92dvh !important;
+    max-height: 92vh !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
 
   .modal-actions-group,
