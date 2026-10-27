@@ -2926,12 +2926,13 @@
             <div class="form-group">
               <label class="field-label">Visual Theme & Palette</label>
               <select v-model="festivalWishData.theme" class="form-control">
-                <option value="freedom">🇮🇳 Freedom / Tricolor (Saffron & Emerald)</option>
+                <option value="freedom">🇮🇳 Freedom Day / Tricolor (Saffron & Emerald)</option>
                 <option value="diwali">🪔 Diwali (Warm Gold, Amber & Crimson)</option>
                 <option value="holi">🎨 Holi (Vibrant Rainbow Powder)</option>
                 <option value="eid">🌙 Eid (Emerald & Moonlit Gold)</option>
                 <option value="newyear">🎆 New Year (Midnight & Purple Glow)</option>
                 <option value="republic">🇮🇳 Republic Day (National Pride)</option>
+                <option value="custom">✨ Custom Celebration (Royal Aurora Glow)</option>
               </select>
             </div>
 
@@ -5335,7 +5336,7 @@ const FESTIVAL_PRESETS = {
     specialOffer: '🎁 Limited-Period Special Offer Available for New Enrollments!',
     ctaText: 'Explore Opportunities 🚀',
     ctaAction: 'admission',
-    theme: 'freedom',
+    theme: 'custom',
     isActive: true
   }
 };
@@ -5389,6 +5390,7 @@ const getFestivalIcon = (theme) => {
   if (theme === 'holi') return '🎨';
   if (theme === 'eid') return '🌙';
   if (theme === 'newyear') return '🎆';
+  if (theme === 'custom') return '✨';
   return '🎉';
 };
 
@@ -11895,9 +11897,23 @@ label {
 /* 2-Column Editor Grid */
 .festival-layout-grid {
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 1.5rem;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 1.75rem;
   align-items: start;
+}
+
+.festival-config-card {
+  background: #0d1322;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.admin-shell.light-theme .festival-config-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
 }
 
 .card-section-head {
@@ -11905,73 +11921,173 @@ label {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 1.25rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .admin-shell.light-theme .card-section-head {
-  border-color: #e2e8f0;
+  border-bottom-color: #e2e8f0 !important;
 }
 
 .card-section-title {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 1.05rem;
+  font-weight: 800;
   margin: 0;
-  color: #e2e8f0;
+  color: #f8fafc;
 }
 
 .admin-shell.light-theme .card-section-title {
-  color: #0f172a;
+  color: #0f172a !important;
 }
 
 .preview-badge {
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 800;
   background: rgba(56, 189, 248, 0.15);
   color: #38bdf8;
-  padding: 0.2rem 0.55rem;
+  padding: 0.25rem 0.65rem;
   border-radius: 6px;
   letter-spacing: 0.05em;
 }
 
+/* Festival Config Form Inputs & Explicit Labels */
+.festival-config-card .form-group {
+  margin-bottom: 1.15rem;
+}
+
+.festival-config-card .field-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin-bottom: 0.45rem;
+  letter-spacing: 0.01em;
+}
+
+.admin-shell.light-theme .festival-config-card .field-label {
+  color: #0f172a !important;
+}
+
+.festival-config-card input.form-control,
+.festival-config-card select.form-control,
+.festival-config-card textarea.form-control {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 0.72rem 1rem !important;
+  font-size: 0.88rem !important;
+  border-radius: 10px !important;
+  background: #090e1a !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.admin-shell.light-theme .festival-config-card input.form-control,
+.admin-shell.light-theme .festival-config-card select.form-control,
+.admin-shell.light-theme .festival-config-card textarea.form-control {
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+.festival-config-card input.form-control:focus,
+.festival-config-card select.form-control:focus,
+.festival-config-card textarea.form-control:focus {
+  border-color: #f97316 !important;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.25) !important;
+}
+
+.festival-config-card input.form-control::placeholder,
+.festival-config-card textarea.form-control::placeholder {
+  color: #64748b !important;
+}
+
+.admin-shell.light-theme .festival-config-card input.form-control::placeholder,
+.admin-shell.light-theme .festival-config-card textarea.form-control::placeholder {
+  color: #94a3b8 !important;
+}
+
+.form-subgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.live-status-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.86rem;
+}
+
+.live-status-switch input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #10b981;
+  cursor: pointer;
+}
+
 /* Simulator Box Inside Preview Card */
+.festival-preview-card {
+  background: #0d1322;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.admin-shell.light-theme .festival-preview-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
+}
+
 .preview-simulator-box {
-  background: #070d19;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #090e1a;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   overflow: hidden;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
 }
 
 .admin-shell.light-theme .preview-simulator-box {
-  background: #ffffff;
-  border-color: #cbd5e1;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08) !important;
 }
 
 .sim-banner-strip {
-  padding: 0.85rem 1.25rem;
+  padding: 0.95rem 1.25rem;
 }
 
 .preview-simulator-box.theme-freedom .sim-banner-strip,
 .preview-simulator-box.theme-republic .sim-banner-strip {
-  background: linear-gradient(135deg, rgba(255, 153, 51, 0.9) 0%, rgba(255, 255, 255, 0.85) 50%, rgba(19, 136, 8, 0.9) 100%);
+  background: linear-gradient(90deg, #ff9933 0%, #ffffff 50%, #138808 100%) !important;
 }
 
 .preview-simulator-box.theme-diwali .sim-banner-strip {
-  background: linear-gradient(135deg, #b45309 0%, #f59e0b 50%, #d97706 100%);
+  background: linear-gradient(90deg, #9a3412 0%, #d97706 40%, #f59e0b 80%, #b45309 100%) !important;
 }
 
 .preview-simulator-box.theme-holi .sim-banner-strip {
-  background: linear-gradient(135deg, #ec4899 0%, #f59e0b 50%, #10b981 100%);
+  background: linear-gradient(90deg, #db2777 0%, #9333ea 33%, #06b6d4 66%, #10b981 100%) !important;
 }
 
 .preview-simulator-box.theme-eid .sim-banner-strip {
-  background: linear-gradient(135deg, #065f46 0%, #10b981 50%, #f59e0b 100%);
+  background: linear-gradient(90deg, #064e3b 0%, #059669 50%, #d97706 100%) !important;
 }
 
 .preview-simulator-box.theme-newyear .sim-banner-strip {
-  background: linear-gradient(135deg, #4f46e5 0%, #9333ea 50%, #f59e0b 100%);
+  background: linear-gradient(90deg, #3730a3 0%, #7c3aed 50%, #f59e0b 100%) !important;
+}
+
+.preview-simulator-box.theme-custom .sim-banner-strip {
+  background: linear-gradient(90deg, #ea580c 0%, #7c3aed 50%, #0284c7 100%) !important;
 }
 
 .sim-badge {
@@ -11979,160 +12095,200 @@ label {
   font-size: 0.68rem;
   font-weight: 800;
   text-transform: uppercase;
-  background: rgba(11, 17, 32, 0.9);
-  color: #fff;
-  padding: 0.25rem 0.65rem;
+  background: #090e1a !important;
+  color: #ffffff !important;
+  padding: 0.28rem 0.72rem;
   border-radius: 9999px;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .sim-body {
-  padding: 1.25rem;
+  padding: 1.35rem;
 }
 
 .sim-title-row {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.85rem;
+  gap: 0.85rem;
+  margin-bottom: 0.95rem;
 }
 
 .sim-symbol {
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.45rem;
+  font-size: 1.55rem;
   flex-shrink: 0;
 }
 
+.admin-shell.light-theme .sim-symbol {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
 .sim-title {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 800;
-  color: #fff;
+  color: #ffffff !important;
   line-height: 1.25;
 }
 
 .admin-shell.light-theme .sim-title {
-  color: #0f172a;
+  color: #0f172a !important;
 }
 
 .sim-tagline {
-  font-size: 0.75rem;
-  color: #f59e0b;
-  font-weight: 600;
+  font-size: 0.78rem;
+  color: #fbbf24 !important;
+  font-weight: 700;
+  margin-top: 0.2rem;
+}
+
+.admin-shell.light-theme .sim-tagline {
+  color: #d97706 !important;
 }
 
 .sim-message {
-  font-size: 0.85rem;
-  line-height: 1.55;
-  color: #94a3b8;
-  margin-bottom: 0.95rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: #cbd5e1 !important;
+  margin-bottom: 1.1rem;
 }
 
 .admin-shell.light-theme .sim-message {
-  color: #475569;
+  color: #334155 !important;
 }
 
 .sim-offer-box {
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  border-radius: 10px;
-  padding: 0.65rem 0.85rem;
-  margin-bottom: 0.95rem;
+  background: rgba(245, 158, 11, 0.14);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 12px;
+  padding: 0.75rem 0.95rem;
+  margin-bottom: 1.1rem;
+}
+
+.admin-shell.light-theme .sim-offer-box {
+  background: #fffbeb !important;
+  border: 1.5px solid #fcd34d !important;
 }
 
 .sim-offer-tag {
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   font-weight: 800;
-  color: #f59e0b;
+  color: #fbbf24 !important;
+}
+
+.admin-shell.light-theme .sim-offer-tag {
+  color: #b45309 !important;
 }
 
 .sim-offer-text {
-  font-size: 0.82rem;
+  font-size: 0.86rem;
   font-weight: 700;
-  color: #fbbf24;
+  color: #fef08a !important;
+  margin-top: 0.2rem;
 }
 
 .admin-shell.light-theme .sim-offer-text {
-  color: #b45309;
+  color: #92400e !important;
 }
 
 .sim-signature {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  margin-bottom: 1rem;
+  gap: 0.75rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1.15rem;
+}
+
+.admin-shell.light-theme .sim-signature {
+  border-top-color: #e2e8f0 !important;
 }
 
 .sim-avatar {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid #f97316;
+  border: 1.5px solid #f97316;
 }
 
 .sim-director-name {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: #f8fafc !important;
 }
 
 .admin-shell.light-theme .sim-director-name {
-  color: #1e293b;
+  color: #0f172a !important;
 }
 
 .sim-director-role {
-  font-size: 0.68rem;
-  color: #64748b;
+  font-size: 0.7rem;
+  color: #94a3b8 !important;
+}
+
+.admin-shell.light-theme .sim-director-role {
+  color: #64748b !important;
 }
 
 .sim-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.65rem;
   justify-content: flex-end;
 }
 
 .sim-btn-secondary {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #94a3b8;
-  padding: 0.45rem 0.85rem;
-  border-radius: 8px;
-  font-size: 0.78rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e2e8f0 !important;
+  padding: 0.5rem 0.95rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
   font-weight: 600;
 }
 
+.admin-shell.light-theme .sim-btn-secondary {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #1e293b !important;
+}
+
 .sim-btn-primary {
-  background: linear-gradient(135deg, #f97316 0%, #f59e0b 100%);
-  color: #fff;
+  background: linear-gradient(135deg, #f97316 0%, #f59e0b 100%) !important;
+  color: #ffffff !important;
   border: none;
-  padding: 0.45rem 0.95rem;
-  border-radius: 8px;
-  font-size: 0.8rem;
+  padding: 0.5rem 1.15rem;
+  border-radius: 10px;
+  font-size: 0.82rem;
   font-weight: 700;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
 }
 
 .preview-card-footer {
-  margin-top: 1.25rem;
+  margin-top: 1.35rem;
 }
 
 .preview-footer-note {
-  font-size: 0.75rem;
+  font-size: 0.76rem;
   color: #64748b;
-  margin-top: 0.65rem;
+  margin-top: 0.75rem;
   line-height: 1.45;
   text-align: center;
 }
 
 @media (max-width: 991px) {
   .festival-layout-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-subgrid {
     grid-template-columns: 1fr;
   }
   .overview-festival-banner {
