@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
+import tailwindcss from '@tailwindcss/vite';
 import { fileURLToPath, URL } from 'node:url';
 import { spawn } from 'node:child_process';
 import net from 'node:net';
@@ -30,7 +31,7 @@ function autoBackendPlugin() {
 }
 
 export default defineConfig(({ command }) => ({
-  plugins: [vue(), ...(command === 'serve' ? [autoBackendPlugin()] : [])],
+  plugins: [vue(), tailwindcss(), ...(command === 'serve' ? [autoBackendPlugin()] : [])],
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
   server: {
     port: 5500,

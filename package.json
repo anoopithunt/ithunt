@@ -36,8 +36,10 @@
     "vue": "^3.4.21"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-vue": "^5.2.1",
     "purgecss": "^8.0.0",
+    "tailwindcss": "^4.3.3",
     "vite": "^6.2.0"
   },
   "keywords": [
