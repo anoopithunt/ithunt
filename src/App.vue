@@ -96,7 +96,7 @@
     />
 
     <!-- Main Dynamic Views with Animated Morph Transition -->
-    <main :class="{ 'superadmin-main-active': activeTab === 'superadmin' }">
+    <main id="main-content" :class="{ 'superadmin-main-active': activeTab === 'superadmin' }">
       <Transition name="view-morph" mode="out-in">
         <!-- 1. Home Flow -->
         <HeroSection 
@@ -1827,8 +1827,8 @@ const updateSeoMetadata = (tab) => {
     el.setAttribute('content', contentVal);
   };
 
-  // 2. Robots Indexing Directives (Private vs Public Views)
-  if (tab === 'superadmin' || tab === 'student-portal') {
+  // Hash-based views share one indexable URL; private account views stay out of search.
+  if (tab === 'superadmin' || tab === 'student-portal' || tab === 'login') {
     setMetaTag('meta[name="robots"]', 'name', 'robots', 'noindex, nofollow');
     setMetaTag('meta[name="googlebot"]', 'name', 'googlebot', 'noindex, nofollow');
   } else {
@@ -1836,12 +1836,9 @@ const updateSeoMetadata = (tab) => {
     setMetaTag('meta[name="googlebot"]', 'name', 'googlebot', 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1');
   }
 
-  // 3. Standard Description & Keywords
+  // 3. Standard page description
   if (metaObj.description) {
     setMetaTag('meta[name="description"]', 'name', 'description', metaObj.description);
-  }
-  if (metaObj.keywords) {
-    setMetaTag('meta[name="keywords"]', 'name', 'keywords', metaObj.keywords);
   }
 
   // 4. Open Graph Social Card Tags
@@ -1859,18 +1856,15 @@ const updateSeoMetadata = (tab) => {
   setMetaTag('meta[property="og:image:width"]', 'property', 'og:image:width', '1200');
   setMetaTag('meta[property="og:image:height"]', 'property', 'og:image:height', '630');
   setMetaTag('meta[property="og:image:alt"]', 'property', 'og:image:alt', 'IT HUNT Software Solutions & Tech Academy Prayagraj Campus');
-  if (typeof window !== 'undefined') {
-    const canonicalBase = 'https://ithunt.vercel.app/';
-    const targetUrl = (tab === 'home' || !tab) ? canonicalBase : `${canonicalBase}#${tab}`;
-    setMetaTag('meta[property="og:url"]', 'property', 'og:url', targetUrl);
-    let canonical = document.querySelector('link[rel="canonical"]');
-    if (!canonical) {
-      canonical = document.createElement('link');
-      canonical.setAttribute('rel', 'canonical');
-      document.head.appendChild(canonical);
-    }
-    canonical.setAttribute('href', targetUrl);
+  const canonicalBase = 'https://ithunt.vercel.app/';
+  setMetaTag('meta[property="og:url"]', 'property', 'og:url', canonicalBase);
+  let canonical = document.querySelector('link[rel="canonical"]');
+  if (!canonical) {
+    canonical = document.createElement('link');
+    canonical.setAttribute('rel', 'canonical');
+    document.head.appendChild(canonical);
   }
+  canonical.setAttribute('href', canonicalBase);
 
   // 5. Twitter Card Meta Tags
   setMetaTag('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
@@ -1881,17 +1875,6 @@ const updateSeoMetadata = (tab) => {
   setMetaTag('meta[name="twitter:image"]', 'name', 'twitter:image', 'https://ithunt.vercel.app/img/ithunt.jpg');
   setMetaTag('meta[name="twitter:image:alt"]', 'name', 'twitter:image:alt', 'IT HUNT Computer Institute & Software Solutions Prayagraj');
 
-  // 6. Canonical URL Link Tag
-  if (typeof window !== 'undefined') {
-    let canonicalEl = document.querySelector('link[rel="canonical"]');
-    if (!canonicalEl) {
-      canonicalEl = document.createElement('link');
-      canonicalEl.setAttribute('rel', 'canonical');
-      document.head.appendChild(canonicalEl);
-    }
-    const canonicalBase = 'https://ithunt.vercel.app/';
-    canonicalEl.setAttribute('href', (tab === 'home' || !tab) ? canonicalBase : `${canonicalBase}#${tab}`);
-  }
 };
 
 // Synchronize SEO metadata whenever active tab changes

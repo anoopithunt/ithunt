@@ -155,7 +155,7 @@
             {{ content?.modalTexts?.courseDetail?.guaranteeTitle || 'Verified Internship Certification + Corporate Letter of Recommendation (LOR)' }}
           </div>
           <div style="font-size: 0.85rem; color: var(--text-muted);">
-            {{ content?.modalTexts?.courseDetail?.guaranteeDesc || 'Includes 100% placement assistance, resume masterclass, mock technical interviews, and GitHub production code portfolio review.' }}
+            {{ content?.modalTexts?.courseDetail?.guaranteeDesc || 'Includes interview preparation, resume workshops, mock technical interviews, and GitHub portfolio reviews.' }}
           </div>
         </div>
       </div>
