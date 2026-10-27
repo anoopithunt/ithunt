@@ -80,7 +80,14 @@
     </div>
 
     <!-- 3. VACANCIES SHOWCASE GRID -->
-    <div class="careers-grid anim-stagger-3 reveal-on-scroll" v-else>
+    <div v-if="filteredJobs.length" class="careers-expand-controls">
+      <span>{{ expandedJobIds.size }} of {{ filteredJobs.length }} roles expanded</span>
+      <div>
+        <button type="button" @click="expandAllJobs">Expand all</button>
+        <button type="button" @click="collapseAllJobs">Collapse all</button>
+      </div>
+    </div>
+    <div class="careers-grid anim-stagger-3 reveal-on-scroll" v-if="filteredJobs.length">
       <div class="career-card" v-for="job in filteredJobs" :key="job.id">
         <!-- Top Meta Row -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
@@ -105,30 +112,34 @@
           <span style="color: var(--text-muted);">⏱️ {{ job.type }}</span>
         </div>
 
-        <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.25rem;">
-          {{ job.description }}
-        </p>
+        <button
+          type="button"
+          class="career-details-toggle"
+          :aria-expanded="isJobExpanded(job)"
+          @click="toggleJob(job)"
+        >
+          <span>{{ isJobExpanded(job) ? 'Hide role details' : 'View role details' }}</span>
+          <span class="career-details-chevron" :class="{ expanded: isJobExpanded(job) }" aria-hidden="true">⌄</span>
+        </button>
 
-        <!-- Teaching / Developer Key Focus Points -->
-        <div class="career-points-box" v-if="job.teachingPoints && job.teachingPoints.length">
-          <div class="career-points-title">
-            <span>🎯</span> Key Responsibilities & Role Focus:
+        <div v-show="isJobExpanded(job)" class="career-expanded-details">
+          <p class="career-description">{{ job.description }}</p>
+          <div class="career-points-box" v-if="job.teachingPoints && job.teachingPoints.length">
+            <div class="career-points-title">
+              <span>🎯</span> Key Responsibilities & Role Focus:
+            </div>
+            <ul class="career-points-list">
+              <li v-for="(pt, pIdx) in job.teachingPoints" :key="pIdx">
+                <span class="point-check">✓</span>
+                <span>{{ pt }}</span>
+              </li>
+            </ul>
           </div>
-          <ul class="career-points-list">
-            <li v-for="(pt, pIdx) in job.teachingPoints" :key="pIdx">
-              <span class="point-check">✓</span>
-              <span>{{ pt }}</span>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Skills / Tech Stack Chips -->
-        <div class="career-skills-wrap" v-if="job.skills">
-          <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.4rem;">
-            Required Skills & Tools:
-          </div>
-          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-            <span class="tech-pill" v-for="sk in job.skills" :key="sk">{{ sk }}</span>
+          <div class="career-skills-wrap" v-if="job.skills?.length">
+            <div class="career-skills-heading">Required Skills & Tools</div>
+            <div class="career-skills-list">
+              <span class="tech-pill" v-for="sk in job.skills" :key="sk">{{ sk }}</span>
+            </div>
           </div>
         </div>
 
@@ -224,6 +235,26 @@ defineEmits(['set-tab', 'open-job-modal']);
 
 const selectedCategory = ref('all');
 const searchQuery = ref('');
+const expandedJobIds = ref(new Set());
+
+const jobKey = (job) => String(job.id ?? job._id ?? job.title);
+const isJobExpanded = (job) => expandedJobIds.value.has(jobKey(job));
+
+const toggleJob = (job) => {
+  const next = new Set(expandedJobIds.value);
+  const key = jobKey(job);
+  if (next.has(key)) next.delete(key);
+  else next.add(key);
+  expandedJobIds.value = next;
+};
+
+const expandAllJobs = () => {
+  expandedJobIds.value = new Set(filteredJobs.value.map(jobKey));
+};
+
+const collapseAllJobs = () => {
+  expandedJobIds.value = new Set();
+};
 
 const filteredJobs = computed(() => {
   const jobs = props.content.careersSection?.jobOpenings || [];
