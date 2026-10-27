@@ -432,7 +432,7 @@
           </div>
 
           <!-- Executive Festival Greetings Broadcast Widget -->
-          <div class="overview-festival-banner" :class="{ 'is-active': festivalWishData.isActive }">
+          <div class="overview-festival-banner" :class="['theme-' + (festivalWishData.theme || 'diwali'), { 'is-active': festivalWishData.isActive }]">
             <div class="festival-banner-content">
               <div class="festival-banner-icon-badge">
                 {{ getFestivalIcon(festivalWishData.theme) }}
@@ -443,10 +443,69 @@
                   <span class="festival-status-text">
                     {{ festivalWishData.isActive ? 'HOME PAGE FESTIVAL POPUP IS LIVE' : 'FESTIVAL POPUP IS PAUSED' }}
                   </span>
-                  <span class="festival-occasion-tag">{{ festivalWishData.occasion || 'Freedom Day' }}</span>
+                  <span class="festival-occasion-tag">{{ festivalWishData.occasion || 'Diwali' }}</span>
                 </div>
                 <h3 class="festival-banner-headline">{{ festivalWishData.title }}</h3>
                 <p class="festival-banner-sub">{{ festivalWishData.tagline || festivalWishData.message }}</p>
+
+                <!-- Quick Occasion Switcher on Dashboard -->
+                <div class="overview-quick-presets">
+                  <span class="overview-presets-label">⚡ Switch Occasion:</span>
+                  <button 
+                    type="button" 
+                    class="overview-preset-pill"
+                    :class="{ active: festivalWishData.festivalKey === 'diwali' }"
+                    @click.stop="applyFestivalPreset('diwali')"
+                    title="Activate Diwali Celebration Greetings"
+                  >
+                    🪔 Diwali
+                  </button>
+                  <button 
+                    type="button" 
+                    class="overview-preset-pill"
+                    :class="{ active: festivalWishData.festivalKey === 'freedom' }"
+                    @click.stop="applyFestivalPreset('freedom')"
+                    title="Activate Freedom Day Greetings"
+                  >
+                    🇮🇳 Freedom Day
+                  </button>
+                  <button 
+                    type="button" 
+                    class="overview-preset-pill"
+                    :class="{ active: festivalWishData.festivalKey === 'republic' }"
+                    @click.stop="applyFestivalPreset('republic')"
+                    title="Activate Republic Day Greetings"
+                  >
+                    🇮🇳 Republic Day
+                  </button>
+                  <button 
+                    type="button" 
+                    class="overview-preset-pill"
+                    :class="{ active: festivalWishData.festivalKey === 'holi' }"
+                    @click.stop="applyFestivalPreset('holi')"
+                    title="Activate Holi Greetings"
+                  >
+                    🎨 Holi
+                  </button>
+                  <button 
+                    type="button" 
+                    class="overview-preset-pill"
+                    :class="{ active: festivalWishData.festivalKey === 'newyear' }"
+                    @click.stop="applyFestivalPreset('newyear')"
+                    title="Activate New Year Greetings"
+                  >
+                    🎆 New Year
+                  </button>
+                  <button 
+                    type="button" 
+                    class="overview-preset-pill"
+                    :class="{ active: festivalWishData.festivalKey === 'eid' }"
+                    @click.stop="applyFestivalPreset('eid')"
+                    title="Activate Eid Mubarak Greetings"
+                  >
+                    🌙 Eid
+                  </button>
+                </div>
               </div>
             </div>
             <div class="festival-banner-actions">
@@ -460,10 +519,18 @@
               </button>
               <button 
                 type="button" 
+                class="btn-secondary festival-toggle-btn"
+                @click="testHomePopup"
+                title="Preview popup on Home Page"
+              >
+                👁️ Test Popup
+              </button>
+              <button 
+                type="button" 
                 class="btn-primary festival-edit-btn"
                 @click="currentTab = 'festival-wishes'"
               >
-                <span>Configure Wishes →</span>
+                <span>Full Edit →</span>
               </button>
             </div>
           </div>
@@ -5347,27 +5414,39 @@ const loadInitialFestivalWish = () => {
   }
   try {
     const raw = localStorage.getItem('ithunt_festival_wish');
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.title) return parsed;
+    }
   } catch (e) {}
-  return { ...FESTIVAL_PRESETS.freedom };
+  return { ...FESTIVAL_PRESETS.diwali };
 };
 
 const festivalWishData = ref(loadInitialFestivalWish());
+
+// Watch props.festivalWish to keep festivalWishData continuously in sync
+watch(() => props.festivalWish, (newWish) => {
+  if (newWish && newWish.title) {
+    festivalWishData.value = { ...newWish };
+  }
+}, { deep: true });
 
 const applyFestivalPreset = (key) => {
   if (FESTIVAL_PRESETS[key]) {
     festivalWishData.value = {
       ...FESTIVAL_PRESETS[key],
-      isActive: festivalWishData.value.isActive !== undefined ? festivalWishData.value.isActive : true
+      isActive: true
     };
-    emailActionMsg.value = `✓ Loaded ${FESTIVAL_PRESETS[key].occasion} preset`;
-    setTimeout(() => { emailActionMsg.value = ''; }, 3000);
+    saveFestivalWishes();
+    emailActionMsg.value = `✓ Activated ${FESTIVAL_PRESETS[key].occasion} wishes & live on Home Page!`;
+    setTimeout(() => { emailActionMsg.value = ''; }, 3500);
   }
 };
 
 const saveFestivalWishes = () => {
   try {
     localStorage.setItem('ithunt_festival_wish', JSON.stringify(festivalWishData.value));
+    localStorage.removeItem('ithunt_festival_dismissed_until');
   } catch (e) {}
   emit('update-festival-wish', { ...festivalWishData.value });
   emailActionMsg.value = '✓ Festival wish saved & live on home page!';
@@ -5375,6 +5454,7 @@ const saveFestivalWishes = () => {
 };
 
 const testHomePopup = () => {
+  saveFestivalWishes();
   emit('preview-festival-wish', { ...festivalWishData.value, isActive: true });
   emit('set-tab', 'home');
 };
@@ -11797,6 +11877,58 @@ label {
 
 .admin-shell.light-theme .festival-banner-sub {
   color: #64748b;
+}
+
+.overview-quick-presets {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+}
+
+.overview-presets-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #94a3b8;
+  margin-right: 0.2rem;
+}
+
+.admin-shell.light-theme .overview-presets-label {
+  color: #475569;
+}
+
+.overview-preset-pill {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #cbd5e1;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.admin-shell.light-theme .overview-preset-pill {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.overview-preset-pill:hover {
+  background: rgba(249, 115, 22, 0.2);
+  border-color: #f97316;
+  color: #f97316;
+  transform: translateY(-1px);
+}
+
+.overview-preset-pill.active {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
+  border-color: #f97316 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.35);
 }
 
 .festival-banner-actions {

@@ -127,14 +127,14 @@ const dismissForSession = ref(false);
 const currentWish = computed(() => {
   const w = props.wish || {};
   return {
-    title: w.title || '🇮🇳 Happy Independence Day from IT HUNT!',
-    occasion: w.occasion || 'FREEDOM CELEBRATION',
-    tagline: w.tagline || 'Freedom to Code, Innovate & Build the Future',
-    message: w.message || 'On this auspicious occasion, celebrate freedom with knowledge and skills. Join our elite software engineering internships, AI tracks, and industry programs.',
-    specialOffer: w.specialOffer || 'Special Festive Scholarship: Up to 25% Fee Waiver on All Coding Bootcamps!',
-    ctaText: w.ctaText || 'Claim Festive Scholarship 🚀',
-    ctaAction: w.ctaAction || 'admission',
-    theme: w.theme || 'freedom'
+    title: w.title || '🪔 Shubh Deepawali & Happy Diwali from IT HUNT!',
+    occasion: w.occasion || 'DIWALI (Festival of Lights)',
+    tagline: w.tagline || 'Illuminating Your Career with Knowledge, Code & Technology',
+    message: w.message || 'May the divine light of Diwali illuminate your future with endless career opportunities, technical mastery, and good fortune. Wishing all our students, interns, and partners a joyful and prosperous celebration!',
+    specialOffer: w.specialOffer || '🪔 Diwali Special: Free Certification Voucher & Up to 20% Course Discount!',
+    ctaText: w.ctaText || 'Explore Courses & Batches 🪔',
+    ctaAction: w.ctaAction || 'courses',
+    theme: w.theme || 'diwali'
   };
 });
 
