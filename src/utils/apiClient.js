@@ -486,34 +486,8 @@ export async function ensureAuthToken(forceFresh = false) {
         if (memoryToken) return memoryToken;
       }
 
-      const baseUrl = (API_BASE_URL || '/api').replace(/\/+$/, '');
-      const loginUrls = [
-        `${baseUrl}/auth/login`,
-        `http://127.0.0.1:3000/api/auth/login`,
-        `http://localhost:3000/api/auth/login`
-      ];
-
-      for (const loginUrl of loginUrls) {
-        try {
-          const res = await fetch(loginUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({ email: 'admin@ithunt.com', password: 'admin@ithunt2026' })
-          });
-          if (res && res.ok) {
-            const json = await res.json().catch(() => null);
-            if (json && json.success && json.data?.token) {
-              memoryToken = json.data.token;
-              if (typeof localStorage !== 'undefined') {
-                localStorage.setItem('token', memoryToken);
-                localStorage.setItem('authToken', memoryToken);
-                localStorage.setItem('adminToken', memoryToken);
-              }
-              return memoryToken;
-            }
-          }
-        } catch (e) { }
       }
+      return memoryToken || null;
     } catch (e) { }
     return null;
   })().finally(() => {
