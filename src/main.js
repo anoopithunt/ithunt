@@ -3,6 +3,7 @@ import App from './App.vue';
 import './assets/css/tailwind.css';
 import './assets/css/theme-colors.css';
 import './assets/css/styles.css';
+import './assets/css/professional-polish.css';
 import { initImageProtection, protectedImageDirective } from './utils/imageProtection.js';
 import { inject } from '@vercel/analytics';
 

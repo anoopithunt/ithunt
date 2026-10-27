@@ -7,11 +7,10 @@
 export function initImageProtection() {
   if (typeof window === 'undefined') return;
 
-  // 1. Prevent Right-Click Context Menu on Images and Image Wrappers
-  document.addEventListener('contextmenu', (event) => {
-    const target = event.target;
-    // Check if target is an image, inside an image wrapper, or has protected class
-    if (
+  const isProtectedImageTarget = (target) => {
+    if (!(target instanceof Element)) return false;
+
+    return (
       target.tagName === 'IMG' ||
       target.closest('img') ||
       target.closest('.protected-img') ||
@@ -19,7 +18,13 @@ export function initImageProtection() {
       target.closest('.event-card-img-wrapper') ||
       target.closest('.course-card-img') ||
       target.closest('.protected-img-overlay')
-    ) {
+    );
+  };
+
+  // 1. Prevent Right-Click Context Menu on Images and Image Wrappers
+  document.addEventListener('contextmenu', (event) => {
+    const target = event.target;
+    if (isProtectedImageTarget(target)) {
       event.preventDefault();
       return false;
     }
@@ -28,11 +33,7 @@ export function initImageProtection() {
   // 2. Prevent Drag and Drop of Images
   document.addEventListener('dragstart', (event) => {
     const target = event.target;
-    if (
-      target.tagName === 'IMG' ||
-      target.closest('img') ||
-      target.closest('.protected-img')
-    ) {
+    if (isProtectedImageTarget(target)) {
       event.preventDefault();
       return false;
     }
@@ -57,11 +58,7 @@ export function initImageProtection() {
   // 4. Touch Device Long-Press Protection (iOS / Android)
   document.addEventListener('touchstart', (event) => {
     const target = event.target;
-    if (
-      target.tagName === 'IMG' ||
-      target.closest('img') ||
-      target.closest('.protected-img')
-    ) {
+    if (isProtectedImageTarget(target)) {
       // Prevent callout popup on touch devices
       target.style.webkitTouchCallout = 'none';
     }
