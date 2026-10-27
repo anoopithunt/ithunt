@@ -485,8 +485,6 @@ export async function ensureAuthToken(forceFresh = false) {
         }
         if (memoryToken) return memoryToken;
       }
-
-      }
       return memoryToken || null;
     } catch (e) { }
     return null;
