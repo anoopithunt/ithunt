@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { SystemSetting } from '../models/SystemSetting.js';
-import { optionalAuth } from '../middleware/auth.js';
+import { verifyToken, requireAdmin } from '../middleware/auth.js';
 
 const router = Router();
 const FESTIVAL_WISH_SETTING_KEY = 'festival_wish';
@@ -190,8 +190,8 @@ const updateFestivalWishHandler = async (req, res) => {
   }
 };
 
-router.put('/', updateFestivalWishHandler);
-router.post('/', updateFestivalWishHandler);
+router.put('/', verifyToken, requireAdmin, updateFestivalWishHandler);
+router.post('/', verifyToken, requireAdmin, updateFestivalWishHandler);
 
 /**
  * GET /api/festival-wish/presets
@@ -242,7 +242,7 @@ const updatePresetsHandler = async (req, res) => {
   }
 };
 
-router.put('/presets', updatePresetsHandler);
-router.post('/presets', updatePresetsHandler);
+router.put('/presets', verifyToken, requireAdmin, updatePresetsHandler);
+router.post('/presets', verifyToken, requireAdmin, updatePresetsHandler);
 
 export default router;
