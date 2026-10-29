@@ -345,7 +345,17 @@ const handleUnifiedLogin = async () => {
       errorMessage.value = apiRes.message || apiRes.data?.message || 'Your admission is pending review by SuperAdmin.';
       return;
     }
-    errorMessage.value = apiRes?.data?.error || apiRes?.error || 'Invalid email or password.';
+    if (apiRes?.status === 503 || (apiRes?.status >= 500 && apiRes?.status < 600)) {
+      isLoading.value = false;
+      errorMessage.value = apiRes.error || 'The authentication service is temporarily unavailable. Please try again shortly.';
+      return;
+    }
+    if (apiRes?.status === 429) {
+      isLoading.value = false;
+      errorMessage.value = apiRes.error || 'Too many login attempts. Please wait before trying again.';
+      return;
+    }
+    errorMessage.value = apiRes?.error || apiRes?.data?.error || 'Invalid email or password.';
   } catch (apiErr) {
     console.warn('Backend API auth note:', apiErr.message);
     errorMessage.value = 'The authentication service is unavailable. Please try again shortly.';
