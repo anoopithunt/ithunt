@@ -102,6 +102,12 @@ Then update the values in `.env` with your local environment details, especially
 Never commit `.env` or production secrets to the repository.
 Login requests are limited using MongoDB-backed counters shared across serverless instances. The API fails closed if this store is unavailable. Provisioned user accounts must have bcrypt-hashed passwords; old demo/default credentials are no longer accepted.
 
+### Provision a SuperAdmin account
+
+Run `npm run admin:bootstrap` from a trusted interactive terminal with `MONGODB_ATLAS_URI` or `MONGODB_URI` configured. The command defaults to `admin@ithunt.com` (override with `SUPERADMIN_EMAIL`), prompts twice for a new password without echoing it, and writes only the bcrypt hash to the `users` collection. Use a unique password of at least 16 characters. The command does not print, persist, or transmit the password.
+
+Production login also requires a valid `JWT_SECRET` configured in the hosting provider's Production environment.
+
 ## Run the Project
 
 ### Start the frontend
