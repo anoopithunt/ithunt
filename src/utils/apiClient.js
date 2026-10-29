@@ -342,6 +342,7 @@ export async function apiRequest(endpoint, options = {}, isRetry = false) {
       return {
         success: false,
         error: data.message || 'API request failed',
+        status: response.status,
         ...(data.pending ? { pending: true } : {})
       };
     }
@@ -1335,7 +1336,14 @@ export async function updateStudentProfile(studentData) {
 export async function loginUserWithBackend(email, password) {
   try {
     const data = await API.login({ email, password });
-    return { success: true, data };
+    const userData = data?.user || data?.data?.user;
+    const token = data?.token || data?.data?.token;
+    return {
+      success: Boolean(data?.success !== false && userData && token),
+      data,
+      error: data?.error || data?.message,
+      status: data?.status
+    };
   } catch (error) {
     console.warn('Backend API connection warning (Login):', error.message);
     return { success: false, error: error.message };
