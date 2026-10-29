@@ -66,7 +66,7 @@ export function createLoginRateLimitMiddleware(consumeAttempt = consumePersisten
     const windowStart = Math.floor(now / WINDOW_MS) * WINDOW_MS;
     const expiresAt = windowStart + WINDOW_MS;
     const body = req.body || {};
-    const identifierValue = body.email || body.username || body.userId || body.identifier || body.loginId;
+    const identifierValue = body.email || body.username || body.userId || body.identifier || body.loginId || body.token;
     const identifier = typeof identifierValue === 'string'
       ? identifierValue.trim().toLowerCase().slice(0, 320)
       : '';
@@ -83,7 +83,7 @@ export function createLoginRateLimitMiddleware(consumeAttempt = consumePersisten
         res.set('Retry-After', String(retryAfter));
         return res.status(429).json({
           success: false,
-          message: 'Too many login attempts. Please try again later.',
+          message: 'Too many authentication attempts. Please try again later.',
           retryAfter
         });
       }
