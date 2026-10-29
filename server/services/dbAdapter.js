@@ -67,6 +67,22 @@ export const dbAdapter = {
     return null;
   },
 
+  async resetUserPassword(tokenHash, passwordHash) {
+    await ensureConnection();
+    const user = await User.findOneAndUpdate(
+      {
+        passwordResetTokenHash: tokenHash,
+        passwordResetExpiresAt: { $gt: new Date() }
+      },
+      {
+        $set: { password: passwordHash, updatedAt: new Date().toISOString() },
+        $unset: { passwordResetTokenHash: 1, passwordResetExpiresAt: 1 }
+      },
+      { new: true }
+    ).select('_id').lean();
+    return Boolean(user);
+  },
+
   /**
    * Find record by ID or registration number (100% Direct from MongoDB Atlas)
    */
