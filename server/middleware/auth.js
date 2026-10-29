@@ -1,22 +1,39 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET?.trim();
-if (!JWT_SECRET || Buffer.byteLength(JWT_SECRET) < 32) {
-  throw new Error('JWT_SECRET must be configured with at least 32 bytes of cryptographically random data.');
-}
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+
+function getJwtSecret() {
+  const secret = process.env.JWT_SECRET?.trim();
+  if (!secret || Buffer.byteLength(secret) < 32) {
+    const error = new Error('JWT_SECRET must be configured with at least 32 bytes of cryptographically random data.');
+    error.code = 'JWT_SECRET_CONFIGURATION';
+    throw error;
+  }
+  return secret;
+}
 
 /**
  * Generate JWT token for user
  */
 export function generateToken(payload) {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  return jwt.sign(payload, getJwtSecret(), { expiresIn: JWT_EXPIRES_IN });
 }
 
 /**
  * Middleware: Verify JWT Authentication
  */
 export function verifyToken(req, res, next) {
+  let secret;
+  try {
+    secret = getJwtSecret();
+  } catch (error) {
+    console.error('[Security] JWT configuration error:', error.message);
+    return res.status(503).json({
+      success: false,
+      message: 'Authentication is temporarily unavailable. Please contact the administrator.'
+    });
+  }
+
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({
@@ -27,7 +44,7 @@ export function verifyToken(req, res, next) {
 
   const token = authHeader.split(' ')[1];
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, secret);
     req.user = decoded;
     next();
   } catch (error) {
@@ -59,7 +76,7 @@ export function optionalAuth(req, res, next) {
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1];
     try {
-      req.user = jwt.verify(token, JWT_SECRET);
+      req.user = jwt.verify(token, getJwtSecret());
     } catch (_) {}
   }
   next();
