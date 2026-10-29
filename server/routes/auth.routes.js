@@ -71,6 +71,13 @@ router.post('/login', loginRateLimit, async (req, res) => {
       data: { token, user: safeUser }
     });
   } catch (error) {
+    if (error.code === 'JWT_SECRET_CONFIGURATION') {
+      console.error('[Security] JWT configuration error:', error.message);
+      return res.status(503).json({
+        success: false,
+        message: 'Authentication is temporarily unavailable. Please contact the administrator.'
+      });
+    }
     res.status(500).json({ success: false, message: 'Authentication error', error: error.message });
   }
 });

@@ -25,6 +25,10 @@ import { enforceRoleSectionPermission } from './middleware/rolePermissions.js';
 const app = express();
 const PORT = process.env.BACKEND_PORT || process.env.PORT || 3000;
 app.set('trust proxy', process.env.VERCEL ? 1 : false);
+const hasValidJwtSecret = () => {
+  const secret = process.env.JWT_SECRET?.trim();
+  return Boolean(secret && Buffer.byteLength(secret) >= 32);
+};
 
 const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5500,http://localhost:5173,https://ithunt.vercel.app')
   .split(',').map(origin => origin.trim()).filter(Boolean);
@@ -78,6 +82,9 @@ const healthHandler = async (req, res) => {
       type: isAtlas() ? 'MongoDB Atlas Cloud' : 'MongoDB',
       mode: isMongoConnected() ? 'CONNECTED' : 'STANDBY',
       lastError: process.env.NODE_ENV === 'development' ? (getLastMongoError() || dbErr) : undefined
+    },
+    authentication: {
+      jwtSecretConfigured: hasValidJwtSecret()
     },
     endpoints: ['/api/admissions', '/api/students', '/api/courses', '/api/events', '/api/nielit-projects', '/api/careers/applications', '/api/internships/applications', '/api/events/rsvps', '/api/reviews', '/api/fees', '/api/certificates', '/api/projects', '/api/contact', '/api/auth/login', '/api/admin/stats', '/api/festival-wish']
   });
