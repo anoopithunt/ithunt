@@ -1,5 +1,10 @@
 import fetch from 'node-fetch';
 
+const SEED_ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD;
+if (!SEED_ADMIN_PASSWORD) {
+  throw new Error('Set SEED_ADMIN_PASSWORD to the configured SuperAdmin password before running HTTP scenarios.');
+}
+
 let passed = 0;
 let failed = 0;
 
@@ -49,7 +54,7 @@ async function testHttpEndpoints() {
     const adminLoginRes = await fetch(`${BASE_URL}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'admin@ithunt.com', password: 'admin@ithunt2026' })
+      body: JSON.stringify({ email: 'admin@ithunt.com', password: SEED_ADMIN_PASSWORD })
     });
     const adminLoginData = await adminLoginRes.json();
     assert(adminLoginRes.status === 200, 'SuperAdmin login returned HTTP 200');
@@ -110,7 +115,7 @@ async function testHttpEndpoints() {
     assert(confirmData.success === true, 'Admission marked confirmed');
     const creds = confirmData.data?.credentials || {};
     const generatedUser = creds.userId || testRegNo;
-    const generatedPass = creds.password || 'Ithunt@123';
+    const generatedPass = creds.password;
     assert(!!generatedUser, `Generated User ID: ${generatedUser}`);
     assert(!!generatedPass, `Generated Student Password: ${generatedPass}`);
 

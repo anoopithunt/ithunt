@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { dbAdapter } from '../services/dbAdapter.js';
 import { generateToken, verifyToken, requireAdmin } from '../middleware/auth.js';
+import { loginRateLimit } from '../middleware/loginRateLimit.js';
 import bcrypt from 'bcryptjs';
 
 const router = Router();
@@ -8,86 +9,17 @@ const router = Router();
 /**
  * POST /api/auth/login
  */
-router.post('/login', async (req, res) => {
+router.post('/login', loginRateLimit, async (req, res) => {
   try {
     const identifier = req.body?.email || req.body?.username || req.body?.userId || req.body?.loginId;
     const password = req.body?.password;
-    if (!identifier || !password) {
+    if (typeof identifier !== 'string' || typeof password !== 'string' || !identifier.trim() || !password || password.length > 1024) {
       return res.status(400).json({ success: false, message: 'Email/User ID and password are required.' });
     }
 
     const normEmail = String(identifier).toLowerCase().trim();
 
-    // 1. Check Default Super Admin credentials
-    if (
-      (normEmail === 'admin@ithunt.com' || normEmail === 'admin') &&
-      (password === 'admin@ithunt2026' || password === 'admin')
-    ) {
-      const adminUser = {
-        id: 'usr-admin-default',
-        name: 'IT HUNT Super Admin',
-        email: 'admin@ithunt.com',
-        role: 'superadmin',
-        roleType: 'superadmin',
-        verified: true
-      };
-      const token = generateToken(adminUser);
-      return res.json({
-        success: true,
-        message: 'Authentication successful',
-        data: { token, user: adminUser }
-      });
-    }
-
-    // 2. Check Default Teacher / Faculty credentials
-    if (
-      (normEmail === 'teacher@ithunt.com' || normEmail === 'teacher' || normEmail === 'faculty@ithunt.com' || normEmail === 'faculty') &&
-      (password === 'teacher@ithunt2026' || password === 'teacher@123' || password === 'teacher' || password === 'faculty@123' || password === 'faculty')
-    ) {
-      const teacherUser = {
-        id: 'usr-teacher-default',
-        name: 'Er. Sandeep Srivastava (Teacher)',
-        email: 'teacher@ithunt.com',
-        role: 'teacher',
-        roleType: 'teacher',
-        designation: 'Senior Faculty Lead & Technical Mentor',
-        verified: true
-      };
-      const token = generateToken(teacherUser);
-      return res.json({
-        success: true,
-        message: 'Authentication successful',
-        data: { token, user: teacherUser }
-      });
-    }
-
-    // 3. Check Default Demo Student credentials
-    if (
-      (normEmail === 'student@ithunt.com' || normEmail === 'student') &&
-      (password === 'Ithunt@123' || password === 'student123' || password === 'student' || password === 'password')
-    ) {
-      const demoStudent = {
-        id: 'STU-DEMO-01',
-        userId: 'student@ithunt.com',
-        name: 'Aditya Kumar Sharma',
-        fullName: 'Aditya Kumar Sharma',
-        candidateName: 'Aditya Kumar Sharma',
-        email: 'student@ithunt.com',
-        role: 'student',
-        roleType: 'student',
-        registrationNo: 'ITH-2026-004',
-        course: '3-Month MERN Stack Web Engineer',
-        verified: true
-      };
-      const token = generateToken(demoStudent);
-      return res.json({
-        success: true,
-        message: 'Authentication successful',
-        data: { token, user: demoStudent }
-      });
-    }
-
-    // 4. Check Database Users, Students, and Admissions
+    // Only provisioned user accounts can authenticate; profile records are not credentials.
     const allUsers = await dbAdapter.find('users');
     let user = allUsers.find(u =>
       (u.userId && u.userId.toLowerCase() === normEmail) ||
@@ -98,59 +30,7 @@ router.post('/login', async (req, res) => {
     );
 
     if (!user) {
-      const allStudents = await dbAdapter.find('students');
-      const stu = allStudents.find(s =>
-        (s.userId && s.userId.toLowerCase() === normEmail) ||
-        (s.email && s.email.toLowerCase() === normEmail) ||
-        (s.registrationNo && s.registrationNo.toLowerCase() === normEmail) ||
-        (s.enrollmentNumber && s.enrollmentNumber.toLowerCase() === normEmail) ||
-        (s.id && s.id.toLowerCase() === normEmail)
-      );
-      if (stu) {
-        user = {
-          id: stu.userId || stu.id,
-          userId: stu.userId || stu.id,
-          name: stu.name || stu.fullName || stu.candidateName || 'Student',
-          email: stu.email,
-          password: stu.password || 'Ithunt@123',
-          role: 'student',
-          roleType: 'student',
-          registrationNo: stu.registrationNo || stu.id,
-          enrollmentNumber: stu.enrollmentNumber || stu.userId || '',
-          course: stu.course || 'Software Engineering',
-          verified: true
-        };
-      }
-    }
-
-    if (!user) {
-      const allAdmissions = await dbAdapter.find('admissions');
-      const adm = allAdmissions.find(a =>
-        (a.userId && a.userId.toLowerCase() === normEmail) ||
-        (a.email && a.email.toLowerCase() === normEmail) ||
-        (a.registrationNo && a.registrationNo.toLowerCase() === normEmail) ||
-        (a.enrollmentNumber && a.enrollmentNumber.toLowerCase() === normEmail) ||
-        (a.id && a.id.toLowerCase() === normEmail)
-      );
-      if (adm) {
-        user = {
-          id: adm.userId || adm.registrationNo || adm.id,
-          userId: adm.userId || adm.registrationNo || adm.id,
-          name: adm.candidateName || adm.fullName || 'Student',
-          email: adm.email,
-          password: adm.password || 'Ithunt@123',
-          role: 'student',
-          roleType: 'student',
-          registrationNo: adm.registrationNo || adm.id,
-          enrollmentNumber: adm.enrollmentNumber || adm.userId || adm.registrationNo || '',
-          course: adm.course || 'Software Engineering',
-          verified: adm.status === 'Confirmed' || adm.admissionConfirmed
-        };
-      }
-    }
-
-    if (!user) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials. User not found.' });
+      return res.status(401).json({ success: false, message: 'Invalid email or password.' });
     }
 
     if (user.role === 'student' && user.verified === false) {
@@ -161,16 +41,11 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    let isMatch = false;
-    const userPass = user.password || 'Ithunt@123';
-    if (userPass.startsWith('$2a$') || userPass.startsWith('$2b$')) {
-      isMatch = await bcrypt.compare(password, userPass);
-    } else {
-      isMatch = userPass === password || password === 'Ithunt@123';
-    }
+    const userPass = typeof user.password === 'string' ? user.password : '';
+    const isMatch = /^\$2[aby]\$\d{2}\$/.test(userPass) && await bcrypt.compare(password, userPass);
 
     if (!isMatch) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials. Incorrect password.' });
+      return res.status(401).json({ success: false, message: 'Invalid email or password.' });
     }
 
     const safeUser = {
@@ -203,7 +78,7 @@ router.post('/login', async (req, res) => {
 /**
  * GET /api/auth/users and /api/users
  */
-router.get(['/users', '/'], verifyToken, async (req, res) => {
+router.get(['/users', '/'], verifyToken, requireAdmin, async (req, res) => {
   try {
     const users = await dbAdapter.find('users');
     const sanitized = users.map(u => ({
@@ -229,8 +104,8 @@ router.get(['/users', '/'], verifyToken, async (req, res) => {
 router.post(['/users', '/'], verifyToken, requireAdmin, async (req, res) => {
   try {
     const { name, email, password, role, phone, designation, verified } = req.body || {};
-    if (!email) {
-      return res.status(400).json({ success: false, error: 'Email address is required.' });
+    if (typeof email !== 'string' || !email.trim() || typeof password !== 'string' || password.length < 12) {
+      return res.status(400).json({ success: false, error: 'A valid email address and password of at least 12 characters are required.' });
     }
 
     const normEmail = email.toLowerCase().trim();
@@ -244,7 +119,7 @@ router.post(['/users', '/'], verifyToken, requireAdmin, async (req, res) => {
       id: `USR-${Date.now()}`,
       name: (name || 'Staff Member').trim(),
       email: normEmail,
-      password: password || 'Ithunt@123',
+      password,
       role: role || 'teacher',
       phone: phone || '',
       designation: designation || '',
@@ -276,7 +151,12 @@ router.put(['/users/:id', '/:id'], verifyToken, requireAdmin, async (req, res) =
     if (status !== undefined) updateData.status = status;
     if (verified !== undefined) updateData.verified = verified;
     if (designation !== undefined) updateData.designation = designation;
-    if (password !== undefined) updateData.password = password;
+    if (password !== undefined) {
+      if (typeof password !== 'string' || password.length < 12) {
+        return res.status(400).json({ success: false, error: 'Password must be at least 12 characters.' });
+      }
+      updateData.password = await bcrypt.hash(password, 12);
+    }
 
     const allUsers = await dbAdapter.find('users');
     const user = allUsers.find(u => u.id === id || u._id === id || u.email === id);

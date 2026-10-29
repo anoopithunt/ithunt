@@ -21,6 +21,17 @@ import bcrypt from 'bcryptjs';
 const MONGODB_URI = (process.env.MONGODB_ATLAS_URI || process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/ithunt').trim();
 
 export async function seedDatabase() {
+  const seedPasswords = {
+    admin: process.env.SEED_ADMIN_PASSWORD,
+    teacher: process.env.SEED_TEACHER_PASSWORD,
+    student: process.env.SEED_STUDENT_PASSWORD
+  };
+  for (const [role, password] of Object.entries(seedPasswords)) {
+    if (typeof password !== 'string' || password.length < 16) {
+      throw new Error(`SEED_${role.toUpperCase()}_PASSWORD must be configured with at least 16 characters before seeding.`);
+    }
+  }
+
   const isAtlas = MONGODB_URI.startsWith('mongodb+srv://') || MONGODB_URI.includes('.mongodb.net');
   console.log(`\n=============================================================`);
   console.log(`  🌱 IT HUNT Database Seeder`);
@@ -34,8 +45,9 @@ export async function seedDatabase() {
 
     // 1. SEED USERS
     console.log('👤 Seeding Users & SuperAdmin accounts...');
-    const hashedAdminPassword = await bcrypt.hash('admin@ithunt2026', 10);
-    const hashedStudentPassword = await bcrypt.hash('Ithunt@123', 10);
+    const hashedAdminPassword = await bcrypt.hash(seedPasswords.admin, 12);
+    const hashedTeacherPassword = await bcrypt.hash(seedPasswords.teacher, 12);
+    const hashedStudentPassword = await bcrypt.hash(seedPasswords.student, 12);
 
     const usersData = [
       {
@@ -55,7 +67,7 @@ export async function seedDatabase() {
         userId: 'usr-admin-director',
         name: 'Mr. Lakshman Singh Chauhan',
         email: 'director@ithunt.com',
-        password: hashedAdminPassword,
+        password: hashedTeacherPassword,
         role: 'admin',
         phone: '+91 9795771806',
         course: 'Director & Founder, IT HUNT | MCA (Computer Science)',

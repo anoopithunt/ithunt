@@ -1,15 +1,23 @@
 import { Router } from 'express';
 import { dbAdapter } from '../services/dbAdapter.js';
 import { sendAdmissionNotificationEmail } from '../services/systemMailer.js';
+import { verifyToken, requireAdmin } from '../middleware/auth.js';
 
 const router = Router();
+
+const sanitizeRecord = (record) => {
+  if (!record || typeof record !== 'object') return record;
+  const safeRecord = { ...record };
+  delete safeRecord.password;
+  return safeRecord;
+};
 
 /**
  * GET /api/admissions
  */
-router.get('/', async (req, res) => {
+router.get('/', verifyToken, requireAdmin, async (req, res) => {
   try {
-    const list = await dbAdapter.find('admissions');
+    const list = (await dbAdapter.find('admissions')).map(sanitizeRecord);
     res.json({ success: true, admissions: list, data: list });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -19,11 +27,11 @@ router.get('/', async (req, res) => {
 /**
  * GET /api/admissions/:id
  */
-router.get('/:id', async (req, res) => {
+router.get('/:id', verifyToken, requireAdmin, async (req, res) => {
   try {
     const item = await dbAdapter.findById('admissions', req.params.id);
     if (!item) return res.status(404).json({ success: false, message: 'Admission record not found' });
-    res.json({ success: true, data: item });
+    res.json({ success: true, data: sanitizeRecord(item) });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -35,6 +43,11 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const body = req.body || {};
+    if (typeof body.password !== 'string' || body.password.length < 12 || body.password.length > 1024) {
+      return res.status(400).json({ success: false, message: 'Create a password of at least 12 characters before submitting.' });
+    }
+    const admissionFields = { ...body };
+    delete admissionFields.password;
     const regNo = body.registrationNo || body.registrationNumber || `ITH-${Math.floor(100000 + Math.random() * 900000)}`;
     const candidateName = body.candidateName || body.fullName || 'Candidate';
     const email = (body.email || `${regNo.toLowerCase()}@ithunt.com`).toLowerCase().trim();
@@ -42,7 +55,7 @@ router.post('/', async (req, res) => {
     const mobile = body.mobile || body.phone || phone;
 
     const admissionRecord = {
-      ...body,
+      ...admissionFields,
       id: regNo,
       registrationNo: regNo,
       registrationNumber: regNo,
@@ -91,7 +104,7 @@ router.post('/', async (req, res) => {
         name: candidateName,
         email,
         phone,
-        password: body.password || 'Ithunt@123',
+        password,
         role: 'student',
         registrationNo: regNo,
         course: admissionRecord.course,
@@ -115,8 +128,7 @@ router.post('/', async (req, res) => {
     try {
       await sendAdmissionNotificationEmail({
         ...admissionRecord,
-        userId: email,
-        password: body.password || 'Ithunt@123'
+        userId: email
       });
       emailSent = true;
     } catch (mailErr) {
@@ -140,21 +152,10 @@ router.post('/', async (req, res) => {
 });
 
 /**
- * Helper to generate secure credentials for admitted student
- */
-function generateStudentCredentials(adm = {}) {
-  const cleanId = (adm.registrationNo || adm.id || '').replace(/^ITH-?/i, '');
-  const suffix = cleanId && cleanId.length >= 3 ? cleanId.slice(-4) : Math.floor(1000 + Math.random() * 9000);
-  const userId = adm.userId || adm.enrollmentNumber || `ITH-2026-STU${suffix}`;
-  const password = adm.password || `ITH@${Math.floor(1000 + Math.random() * 9000)}`;
-  return { userId, password };
-}
-
-/**
  * POST /api/admissions/:id/confirm
- * Admin confirms admission: automatically generates Student User ID & Password and saves accounts to DB
+ * Admin confirms admission without resetting or exposing the student's password.
  */
-router.post('/:id/confirm', async (req, res) => {
+router.post('/:id/confirm', verifyToken, requireAdmin, async (req, res) => {
   try {
     const targetId = req.params.id;
     let adm = await dbAdapter.findById('admissions', targetId);
@@ -166,10 +167,16 @@ router.post('/:id/confirm', async (req, res) => {
       return res.status(404).json({ success: false, message: 'Admission record not found' });
     }
 
-    const { userId: reqUserId, password: reqPassword, feeStatus, confirmedBy } = req.body || {};
-    const autoCreds = generateStudentCredentials(adm);
-    const finalUserId = reqUserId || adm.userId || autoCreds.userId;
-    const finalPassword = reqPassword || (adm.password && adm.password !== 'Ithunt@123' ? adm.password : autoCreds.password);
+    const { userId: reqUserId, feeStatus, confirmedBy } = req.body || {};
+    const finalUserId = reqUserId || adm.userId || adm.enrollmentNumber || adm.email;
+    const email = (adm.email || `${finalUserId.toLowerCase()}@ithunt.com`).toLowerCase();
+    const user = await dbAdapter.findOne('users', { email });
+    if (!user) {
+      return res.status(409).json({
+        success: false,
+        message: 'No registered account exists for this admission. Ask the applicant to complete account registration first.'
+      });
+    }
 
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-GB');
@@ -180,7 +187,6 @@ router.post('/:id/confirm', async (req, res) => {
       feeStatus: feeStatus || adm.feeStatus || 'Verified & Paid',
       userId: finalUserId,
       enrollmentNumber: finalUserId,
-      password: finalPassword,
       admissionConfirmed: true,
       admissionConfirmedDate: dateStr,
       admissionConfirmedTime: timeStr,
@@ -196,7 +202,6 @@ router.post('/:id/confirm', async (req, res) => {
       enrollmentNumber: finalUserId,
       registrationNo: adm.registrationNo || targetId,
       userId: finalUserId,
-      password: finalPassword,
       name: adm.candidateName || adm.fullName || 'Student',
       fullName: adm.fullName || adm.candidateName || 'Student',
       email: adm.email || `${finalUserId.toLowerCase()}@ithunt.com`,
@@ -214,39 +219,23 @@ router.post('/:id/confirm', async (req, res) => {
     };
     await dbAdapter.create('students', studentRecord);
 
-    // 2. Sync or Create User Authentication Account in MongoDB
-    const userRecord = {
-      id: finalUserId,
+    await dbAdapter.update('users', user.id || user._id, {
       userId: finalUserId,
-      name: adm.candidateName || adm.fullName || 'Student',
-      email: (adm.email || `${finalUserId.toLowerCase()}@ithunt.com`).toLowerCase(),
-      password: finalPassword,
-      role: 'student',
       status: 'ACTIVE',
       verified: true,
       registrationNo: adm.registrationNo || targetId,
       enrollmentNumber: finalUserId,
       confirmedAt: now.toISOString()
-    };
-    await dbAdapter.create('users', userRecord);
-
-    // Also register user record under their email for dual lookup
-    if (adm.email) {
-      await dbAdapter.create('users', {
-        ...userRecord,
-        id: adm.email.toLowerCase()
-      });
-    }
+    });
 
     res.json({
       success: true,
-      message: 'Admission confirmed successfully! Student User ID and Password generated.',
+      message: 'Admission confirmed. The student can sign in using the password created during registration.',
       data: {
-        admission: updatedAdmission,
+        admission: sanitizeRecord(updatedAdmission),
         student: studentRecord,
         credentials: {
           userId: finalUserId,
-          password: finalPassword,
           candidateName: adm.candidateName || adm.fullName || 'Student',
           email: adm.email,
           mobile: adm.mobile || adm.phone,
@@ -264,7 +253,7 @@ router.post('/:id/confirm', async (req, res) => {
  * PUT /api/admissions/:id
  * Full update of an admission record by admin
  */
-router.put('/:id', async (req, res) => {
+router.put('/:id', verifyToken, requireAdmin, async (req, res) => {
   try {
     const targetId = req.params.id;
     const body = req.body || {};
@@ -285,7 +274,11 @@ router.put('/:id', async (req, res) => {
     }
 
     // Strip fields that should NOT be changed by a plain edit
-    const { _id, __v, createdAt, ...safeUpdates } = body;
+    const safeUpdates = { ...body };
+    delete safeUpdates._id;
+    delete safeUpdates.__v;
+    delete safeUpdates.createdAt;
+    delete safeUpdates.password;
 
     const updated = await dbAdapter.update('admissions', adm.id || targetId, safeUpdates);
 
@@ -317,7 +310,7 @@ router.put('/:id', async (req, res) => {
       }
     }
 
-    res.json({ success: true, data: updated, message: 'Admission record updated successfully' });
+    res.json({ success: true, data: sanitizeRecord(updated), message: 'Admission record updated successfully' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -326,55 +319,22 @@ router.put('/:id', async (req, res) => {
 /**
  * PATCH /api/admissions/:id/status
  */
-router.patch('/:id/status', async (req, res) => {
+router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
   try {
-    const { status, feeStatus, password, userId } = req.body || {};
+    const { status, feeStatus } = req.body || {};
+    if (status === 'Confirmed') {
+      return res.status(400).json({ success: false, message: 'Use the admission confirmation endpoint to activate a registered student account.' });
+    }
     const updates = {};
     if (status) updates.status = status;
     if (feeStatus) updates.feeStatus = feeStatus;
-
-    if (status === 'Confirmed') {
-      const existing = await dbAdapter.findById('admissions', req.params.id) || {};
-      const creds = generateStudentCredentials(existing);
-      updates.userId = userId || existing.userId || creds.userId;
-      updates.enrollmentNumber = updates.userId;
-      updates.password = password || existing.password || creds.password;
-      updates.admissionConfirmed = true;
-      updates.confirmedAt = new Date().toISOString();
-
-      // Ensure user and student records exist
-      await dbAdapter.create('students', {
-        id: updates.userId,
-        enrollmentNumber: updates.userId,
-        registrationNo: existing.registrationNo || req.params.id,
-        userId: updates.userId,
-        password: updates.password,
-        name: existing.candidateName || existing.fullName || 'Student',
-        email: existing.email,
-        mobile: existing.mobile,
-        course: existing.course,
-        academicStatus: 'ACTIVE',
-        status: 'ACTIVE'
-      });
-
-      await dbAdapter.create('users', {
-        id: updates.userId,
-        userId: updates.userId,
-        name: existing.candidateName || existing.fullName || 'Student',
-        email: existing.email,
-        password: updates.password,
-        role: 'student',
-        status: 'ACTIVE',
-        verified: true
-      });
-    }
 
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({ success: false, message: 'Status or feeStatus is required' });
     }
 
     const updated = await dbAdapter.update('admissions', req.params.id, updates);
-    res.json({ success: true, data: updated, message: 'Admission status updated and synchronized' });
+    res.json({ success: true, data: sanitizeRecord(updated), message: 'Admission status updated' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -383,7 +343,7 @@ router.patch('/:id/status', async (req, res) => {
 /**
  * DELETE /api/admissions/:id
  */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verifyToken, requireAdmin, async (req, res) => {
   try {
     await dbAdapter.delete('admissions', req.params.id);
     res.json({ success: true, message: `Admission ${req.params.id} deleted.` });

@@ -205,9 +205,9 @@ Admission Status      : Confirmed & Active ✓
 ==================================================
 Portal Access URL     : https://ithunt.vercel.app/#login
 Student User ID       : ${adm.userId || adm.enrollmentNumber || adm.registrationNo || email}
-Student Password      : ${adm.password || 'Ithunt@123'}
+Student Password      : Set during registration. For security, passwords are not sent by email.
 
-(You can sign in to your Student Dashboard using your User ID / Email and your Password, and can update your password anytime.)
+(After your account is approved, sign in using the password you created during registration.)
 
 ==================================================
            DAY 1 ONBOARDING INSTRUCTIONS
@@ -241,7 +241,6 @@ export function getStudentAdmissionWhatsAppUrl(adm) {
   const regNo = adm.registrationNo || adm.id || 'ITH-2026';
   const course = adm.course || adm.track || 'Software Engineering';
   const userId = adm.userId || adm.enrollmentNumber || adm.registrationNo || adm.email || regNo;
-  const password = adm.password || 'Ithunt@123';
   const rawMobile = (adm.mobile || adm.phone || '').replace(/\D/g, '');
   const cleanMobile = rawMobile.length === 10 ? `91${rawMobile}` : rawMobile;
 
@@ -253,10 +252,10 @@ Congratulations! Your admission application has been officially APPROVED & CONFI
 📚 *Enrolled Program:* ${course}
 📋 *Registration No:* ${regNo}
 
-🔐 *YOUR STUDENT PORTAL LOGIN CREDENTIALS:*
+🔐 *STUDENT PORTAL ACCESS:*
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 👤 *User ID:* ${userId}
-🔑 *Password:* ${password}
+🔑 Use the password you created during registration. Passwords are not shared over messaging.
 🌐 *Login Portal:* https://ithunt.vercel.app/#login
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -722,4 +721,3 @@ export default {
   sendNielitProjectEmailNotification,
   sendFeeReceiptJpgEmail
 };
-

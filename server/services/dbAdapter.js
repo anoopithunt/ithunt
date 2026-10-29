@@ -14,6 +14,7 @@ import { EventRsvp } from '../models/EventRsvp.js';
 import { Course } from '../models/Course.js';
 import { Event } from '../models/Event.js';
 import { SystemSetting } from '../models/SystemSetting.js';
+import bcrypt from 'bcryptjs';
 
 // Model map (All 14 IT HUNT database collections in MongoDB Atlas)
 export const MODELS = {
@@ -144,7 +145,9 @@ export const dbAdapter = {
       payload.userId = payload.userId || cleanId;
       payload.name = payload.name || payload.fullName || 'User';
       payload.email = (payload.email || `${cleanId.toLowerCase()}@ithunt.com`).toLowerCase();
-      payload.password = payload.password || 'Ithunt@123';
+      if (typeof payload.password !== 'string' || !payload.password) {
+        throw new Error('A password is required when creating a user account.');
+      }
     } else if (collectionName === 'courses') {
       payload.code = payload.code || cleanId;
       payload.title = payload.title || payload.name || 'Software Course';
@@ -171,7 +174,15 @@ export const dbAdapter = {
             ...(payload.email ? [{ email: payload.email.toLowerCase() }] : [])
           ]
         };
-        const updated = await Model.findOneAndUpdate(filter, payload, { new: true });
+        const upsertPayload = { ...payload };
+        if (
+          collectionName === 'users' &&
+          typeof upsertPayload.password === 'string' &&
+          !/^\$2[aby]\$\d{2}\$/.test(upsertPayload.password)
+        ) {
+          upsertPayload.password = await bcrypt.hash(upsertPayload.password, 12);
+        }
+        const updated = await Model.findOneAndUpdate(filter, upsertPayload, { new: true });
         if (updated) {
           console.log(`✓ Upserted record in MongoDB Atlas "${collectionName}" (${cleanId})`);
           return { ...updated.toObject(), id: updated._id?.toString() || cleanId };
@@ -206,16 +217,25 @@ export const dbAdapter = {
         ]
       };
 
+    const safeUpdates = { ...updates };
+    if (
+      collectionName === 'users' &&
+      typeof safeUpdates.password === 'string' &&
+      !/^\$2[aby]\$\d{2}\$/.test(safeUpdates.password)
+    ) {
+      safeUpdates.password = await bcrypt.hash(safeUpdates.password, 12);
+    }
+
     updatedDoc = await Model.findOneAndUpdate(
       filter,
-      { ...updates, updatedAt: new Date().toISOString() },
+      { ...safeUpdates, updatedAt: new Date().toISOString() },
       { new: true }
     ).lean();
 
     if (updatedDoc) {
       return { ...updatedDoc, id: updatedDoc._id?.toString() || id };
     }
-    return { ...updates, id };
+    return { ...safeUpdates, id };
   },
 
   /**

@@ -1435,7 +1435,7 @@ const submitAdmission = async (formData) => {
   const course = sanitizeInput(formData.course || '');
   const track = sanitizeInput(formData.track || formData.course || '');
   const qualification = sanitizeInput(formData.qualification || '');
-  const studentPassword = (formData.password || '').trim() || 'Ithunt@123';
+  const studentPassword = (formData.password || '').trim();
 
   if (!candidateName || candidateName.length < 2) {
     showToast('Please enter your full legal candidate name.', 'error');
@@ -1447,6 +1447,10 @@ const submitAdmission = async (formData) => {
   }
   if (!isValidPhone(mobile)) {
     showToast('Please provide a valid 10-digit mobile number.', 'error');
+    return;
+  }
+  if (studentPassword.length < 12) {
+    showToast('Create a student portal password of at least 12 characters.', 'error');
     return;
   }
 
@@ -1472,7 +1476,6 @@ const submitAdmission = async (formData) => {
     phone: mobile,
     email,
     userId: email,
-    password: studentPassword,
     district,
     address,
     status: formData.status || 'Pending Verification',
@@ -1481,7 +1484,7 @@ const submitAdmission = async (formData) => {
   };
 
   // Save admission record to backend API & Database
-  const apiRes = await saveAdmissionRecord(newAdmissionRecord);
+  const apiRes = await saveAdmissionRecord({ ...newAdmissionRecord, password: studentPassword });
 
   if (apiRes && apiRes.success) {
     const finalRegNo = apiRes.record?.registrationNo || apiRes.id || randomRegId;
@@ -1496,7 +1499,7 @@ const submitAdmission = async (formData) => {
     }
 
     modalTitle.value = '🎉 Admission Application Submitted Successfully!';
-    modalBody.value = `Congratulations ${newAdmissionRecord.candidateName}! Your admission application for "${newAdmissionRecord.course}" has been successfully submitted to IT HUNT.\n\n📋 Registration ID: ${finalRegNo}\n⏳ Status: Pending SuperAdmin Confirmation\n\nOur SuperAdmin will review and confirm your admission. Once confirmed, your unique Student User ID & Password will be automatically generated and activated for your portal login.`;
+    modalBody.value = `Congratulations ${newAdmissionRecord.candidateName}! Your admission application for "${newAdmissionRecord.course}" has been submitted to IT HUNT.\n\n📋 Registration ID: ${finalRegNo}\n⏳ Status: Pending SuperAdmin Confirmation\n\nAfter your account is approved, sign in with the password you created during registration.`;
     showModal.value = true;
     triggerConfetti();
   } else {
@@ -1509,12 +1512,12 @@ const submitAdmission = async (formData) => {
 const handleLoginAsStudent = (admission) => {
   if (!admission) return;
   const normEmail = (admission.email || admission.userId || '').toLowerCase().trim();
+  const { password: _password, ...admissionProfile } = admission;
   const currentStudent = {
     ...DEFAULT_DEMO_STUDENT,
-    ...admission,
+    ...admissionProfile,
     userId: normEmail,
     email: normEmail,
-    password: admission.password || 'Ithunt@123',
     candidateName: admission.candidateName || admission.fullName || 'Student',
     fullName: admission.fullName || admission.candidateName || 'Student',
     registrationNo: admission.registrationNo || admission.id || 'ITH-2026-001',
@@ -1593,59 +1596,48 @@ const handleDirectAdmission = async (newAdm) => {
   newAdm.id = newAdm.id || newAdm.registrationNo;
   newAdm.registrationNumber = newAdm.registrationNumber || newAdm.registrationNo;
   newAdm.userId = newAdm.email;
-  newAdm.password = newAdm.password || 'Ithunt@123';
-  lastSubmittedAdmission.value = newAdm;
-  
-  // 1. Immediately update local state to show in admissions list
-  const existingIdx = liveAdmissionsList.value.findIndex(a => 
-    (a.registrationNo && a.registrationNo === newAdm.registrationNo) || 
-    (a.id && a.id === newAdm.id)
+  const safeAdmission = { ...newAdm };
+  delete safeAdmission.password;
+  lastSubmittedAdmission.value = safeAdmission;
+  const existingIdx = liveAdmissionsList.value.findIndex(a =>
+    (a.registrationNo && a.registrationNo === safeAdmission.registrationNo) ||
+    (a.id && a.id === safeAdmission.id)
   );
   if (existingIdx === -1) {
-    liveAdmissionsList.value.unshift(newAdm);
-  }
-
-  // 2. Persist student account for Student Portal login
-  saveStudentAccount(newAdm);
-
-  // 3. Persist directly to MongoDB database & REST API backend
-  try {
-    await saveAdmissionRecord(newAdm);
-    console.log('✓ Admin direct admission saved to MongoDB database (ithunt):', newAdm.registrationNo);
-  } catch (err) {
-    console.warn('Database save warning (Direct Admission):', err.message);
+    liveAdmissionsList.value.unshift(safeAdmission);
   }
 
   triggerConfetti();
-  showToast(`Direct admission registered and saved to database! Student User ID: ${newAdm.userId || newAdm.email} | Password: ${newAdm.password || 'Ithunt@123'}`, 'success', 6000);
+  showToast(`Direct admission registered. Student User ID: ${newAdm.userId || newAdm.email}`, 'success', 6000);
 };
 
 const handleConfirmAdmission = (confirmedData) => {
   if (!confirmedData) return;
-  const targetId = confirmedData.registrationNo || confirmedData.id;
+  const { password: _password, ...safeConfirmedData } = confirmedData;
+  const targetId = safeConfirmedData.registrationNo || safeConfirmedData.id;
   const idx = liveAdmissionsList.value.findIndex(a => (a.registrationNo === targetId) || (a.id === targetId));
   if (idx !== -1) {
     liveAdmissionsList.value[idx] = { 
       ...liveAdmissionsList.value[idx], 
-      ...confirmedData, 
+      ...safeConfirmedData,
       status: 'Confirmed', 
       admissionConfirmed: true 
     };
   } else {
     liveAdmissionsList.value.unshift({ 
-      ...confirmedData, 
+      ...safeConfirmedData,
       status: 'Confirmed', 
       admissionConfirmed: true 
     });
   }
 
   // Sync to liveStudentsList
-  const finalUserId = confirmedData.userId || targetId;
+  const finalUserId = safeConfirmedData.userId || targetId;
   const sIdx = liveStudentsList.value.findIndex(s => s.userId === finalUserId || s.id === finalUserId || s.registrationNo === targetId);
   if (sIdx !== -1) {
     liveStudentsList.value[sIdx] = { 
       ...liveStudentsList.value[sIdx], 
-      ...confirmedData, 
+      ...safeConfirmedData,
       academicStatus: 'ACTIVE', 
       status: 'ACTIVE' 
     };
@@ -1655,17 +1647,17 @@ const handleConfirmAdmission = (confirmedData) => {
       userId: finalUserId,
       enrollmentNumber: finalUserId,
       registrationNo: targetId,
-      name: confirmedData.candidateName || confirmedData.fullName || 'Student',
-      email: confirmedData.email,
-      mobile: confirmedData.mobile,
-      course: confirmedData.course,
+      name: safeConfirmedData.candidateName || safeConfirmedData.fullName || 'Student',
+      email: safeConfirmedData.email,
+      mobile: safeConfirmedData.mobile,
+      course: safeConfirmedData.course,
       academicStatus: 'ACTIVE',
       status: 'ACTIVE'
     });
   }
 
   triggerConfetti();
-  showToast(`Admission Confirmed! Student User ID: ${finalUserId} | Password: ${confirmedData.password}`, 'success', 6000);
+  showToast(`Admission confirmed. Student User ID: ${finalUserId}`, 'success', 6000);
 };
 
 const handleDeleteAdmission = async (adm) => {

@@ -26,6 +26,7 @@ import { enforceRoleSectionPermission } from './middleware/rolePermissions.js';
 
 const app = express();
 const PORT = process.env.BACKEND_PORT || process.env.PORT || 3000;
+app.set('trust proxy', process.env.VERCEL ? 1 : false);
 
 const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5500,http://localhost:5173,https://ithunt.vercel.app')
   .split(',').map(origin => origin.trim()).filter(Boolean);

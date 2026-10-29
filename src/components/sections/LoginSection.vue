@@ -105,23 +105,6 @@
             </button>
           </div>
 
-          <!-- Quick 1-Click Demo Credentials Pill Helpers -->
-          <div class="login-demo-helper">
-            <div class="demo-cred-title">
-              ⚡ Demo Portal Shortcut:
-            </div>
-            <div class="demo-chips-grid">
-              <button 
-                type="button" 
-                class="demo-chip-btn chip-student" 
-                @click="quickFillRole('student')"
-                title="Fill Student demo profile"
-              >
-                <span>🎓 Student Demo Access</span>
-              </button>
-            </div>
-          </div>
-
           <!-- Student Registration Prompt -->
           <div class="new-student-callout">
             <span>New Student seeking admission?</span>
@@ -162,7 +145,7 @@
 
           <div class="form-group" style="margin-bottom: 1.25rem;">
             <label class="form-label">Create Password <span class="req">*</span></label>
-            <input type="password" v-model="studentSignup.password" required class="form-control" placeholder="At least 6 characters">
+            <input type="password" v-model="studentSignup.password" minlength="12" required class="form-control" placeholder="At least 12 characters">
           </div>
 
           <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
@@ -192,8 +175,7 @@
 
 <script setup>
 import { ref, reactive } from 'vue';
-import { loginUserWithBackend, loginStudentUser, registerStudentUser } from '../../utils/apiClient.js';
-import { DEFAULT_DEMO_STUDENT } from '../../data/studentAcademicData.js';
+import { loginUserWithBackend, registerStudentUser } from '../../utils/apiClient.js';
 import { sanitizeInput, checkLoginRateLimit, recordLoginAttempt, isValidEmail, isValidPhone } from '../../utils/security.js';
 
 const props = defineProps({
@@ -225,19 +207,6 @@ const studentSignup = reactive({
   course: '3-Month MERN Stack Web Engineer',
   password: ''
 });
-
-// Quick 1-Click Demo Credentials (Student demo only - administrative access strictly requires verified server auth)
-const quickFillRole = (role) => {
-  errorMessage.value = '';
-  successMessage.value = '';
-  authMode.value = 'login';
-
-  if (role === 'student') {
-    loginIdentifier.value = 'student@ithunt.com';
-    loginPassword.value = 'Ithunt@123';
-    successMessage.value = '🎓 Student demo credentials loaded';
-  }
-};
 
 /**
  * Route user based on their detected role:
@@ -349,8 +318,6 @@ const handleUnifiedLogin = async () => {
 
   const rawIdentifier = sanitizeInput(loginIdentifier.value);
   const rawPassword = loginPassword.value.trim();
-  const norm = rawIdentifier.toLowerCase();
-
   if (!rawIdentifier || !rawPassword) {
     isLoading.value = false;
     errorMessage.value = 'Please enter your User ID / Email and password.';
@@ -360,7 +327,7 @@ const handleUnifiedLogin = async () => {
   // 1. Authenticate with backend API: POST /api/auth/login
   try {
     const apiRes = await loginUserWithBackend(rawIdentifier, rawPassword);
-    if (apiRes && apiRes.success) {
+    if (apiRes?.success && apiRes.data?.success !== false) {
       recordLoginAttempt(true);
       const userData = apiRes.data?.user || apiRes.data || {};
       const token = apiRes.data?.token || '';
@@ -372,58 +339,26 @@ const handleUnifiedLogin = async () => {
       }
       routeUserByRole(userData);
       return;
-    } else if (apiRes && (apiRes.pending || apiRes.error || apiRes.message)) {
-      if (apiRes.pending) {
-        isLoading.value = false;
-        errorMessage.value = apiRes.message || 'Your admission is pending review by SuperAdmin.';
-        return;
-      }
     }
-  } catch (apiErr) {
-    console.warn('Backend API auth note:', apiErr.message);
-  }
-
-  // 2. Client-Side Fallback Verification (Offline & Demo Student Only)
-  // 2.A Strict Security: SuperAdmin accounts require verified server-side authentication.
-  if (norm === 'admin' || norm === 'admin@ithunt.com' || norm === 'superadmin') {
-    recordLoginAttempt(false);
-    isLoading.value = false;
-    errorMessage.value = 'Invalid administrator credentials. Administrator accounts require verified server-side authentication.';
-    return;
-  }
-
-  // 2.C Check Student fallback (queries student API & localStorage)
-  try {
-    const stuRes = await loginStudentUser(rawIdentifier, rawPassword);
-    if (stuRes && stuRes.success && stuRes.user) {
-      recordLoginAttempt(true);
-      routeUserByRole({
-        ...stuRes.user,
-        role: 'student',
-        roleType: 'student'
-      });
+    if (apiRes?.pending || apiRes?.data?.pending) {
+      isLoading.value = false;
+      errorMessage.value = apiRes.message || apiRes.data?.message || 'Your admission is pending review by SuperAdmin.';
       return;
     }
-  } catch (e) {}
-
-  // 2.D Default demo student fallback
-  if (norm === 'student@ithunt.com' && (rawPassword === 'Ithunt@123' || rawPassword === 'student123' || rawPassword === 'student' || rawPassword === 'password')) {
-    recordLoginAttempt(true);
-    routeUserByRole({
-      ...DEFAULT_DEMO_STUDENT,
-      role: 'student',
-      roleType: 'student'
-    });
+    errorMessage.value = apiRes?.data?.error || apiRes?.error || 'Invalid email or password.';
+  } catch (apiErr) {
+    console.warn('Backend API auth note:', apiErr.message);
+    errorMessage.value = 'The authentication service is unavailable. Please try again shortly.';
+    isLoading.value = false;
     return;
   }
 
-  // Failed login attempt: record in rate limiter
   const attemptResult = recordLoginAttempt(false);
   isLoading.value = false;
   if (attemptResult.isLocked) {
     errorMessage.value = `🔒 Security Lockout: Multiple failed login attempts detected. For your account security, authentication is temporarily locked for ${attemptResult.remainingSeconds} seconds.`;
   } else {
-    errorMessage.value = `Invalid credentials. Please verify your credentials or use the demo shortcuts below (${attemptResult.attemptsLeft} attempts remaining).`;
+    errorMessage.value = `Invalid email or password. ${attemptResult.attemptsLeft} attempts remain before this browser applies a temporary cooldown.`;
   }
 };
 
@@ -454,8 +389,8 @@ const handleStudentSignupSubmit = async () => {
     return;
   }
 
-  if (!cleanPassword || cleanPassword.length < 6) {
-    errorMessage.value = 'For your security, please create a password of at least 6 characters.';
+  if (!cleanPassword || cleanPassword.length < 12) {
+    errorMessage.value = 'For your security, please create a password of at least 12 characters.';
     return;
   }
 
@@ -477,28 +412,15 @@ const handleStudentSignupSubmit = async () => {
       time: timeStr
     };
     const res = await registerStudentUser(signupPayload);
-    const studentUser = (res && res.user) ? { ...res.user, admission: res.admission } : {
-      ...DEFAULT_DEMO_STUDENT,
-      candidateName: cleanName,
-      userId: cleanEmail,
-      email: cleanEmail,
-      password: cleanPassword,
-      mobile: cleanMobile,
-      course: cleanCourse,
-      date: dateStr,
-      time: timeStr,
-      registrationNo: 'ITH-2026-' + Math.floor(100 + Math.random() * 900)
-    };
-
-    if (rememberMe.value) {
-      try {
-        localStorage.setItem('ithunt_student_user', JSON.stringify(studentUser));
-      } catch (e) {}
+    if (!res?.success || !res.user) {
+      throw new Error(res?.error || 'Registration could not be completed. Please try again.');
     }
-
     isLoading.value = false;
-    emit('role-change', 'student');
-    emit('student-login-success', studentUser);
+    studentSignup.password = '';
+    loginPassword.value = '';
+    loginIdentifier.value = cleanEmail;
+    authMode.value = 'login';
+    successMessage.value = 'Registration submitted for review. You can sign in once your account is approved.';
   } catch (err) {
     isLoading.value = false;
     errorMessage.value = err.message || 'Registration failed. Please try again.';
