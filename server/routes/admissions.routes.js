@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { dbAdapter } from '../services/dbAdapter.js';
 import { sendAdmissionNotificationEmail } from '../services/systemMailer.js';
 import { verifyToken, requireAdmin } from '../middleware/auth.js';
+import { buildPendingAdmissionRecord } from '../services/admissionSubmission.js';
 
 const router = Router();
 
@@ -46,32 +47,22 @@ router.post('/', async (req, res) => {
     if (typeof body.password !== 'string' || body.password.length < 12 || body.password.length > 1024) {
       return res.status(400).json({ success: false, message: 'Create a password of at least 12 characters before submitting.' });
     }
-    const admissionFields = { ...body };
-    delete admissionFields.password;
     const regNo = body.registrationNo || body.registrationNumber || `ITH-${Math.floor(100000 + Math.random() * 900000)}`;
     const candidateName = body.candidateName || body.fullName || 'Candidate';
     const email = (body.email || `${regNo.toLowerCase()}@ithunt.com`).toLowerCase().trim();
     const phone = body.phone || body.mobile || '+91 9795771806';
     const mobile = body.mobile || body.phone || phone;
-
-    const admissionRecord = {
-      ...admissionFields,
-      id: regNo,
+    const now = new Date();
+    const admissionRecord = buildPendingAdmissionRecord(body, {
       registrationNo: regNo,
-      registrationNumber: regNo,
       candidateName,
-      fullName: candidateName,
       email,
       phone,
       mobile,
-      course: body.course || body.track || "NIELIT 'A' Level Diploma",
-      status: body.status || 'Pending Verification',
-      feeStatus: body.feeStatus || 'Pending Verification',
-      amountPaid: body.amountPaid || '₹0',
-      date: body.date || new Date().toLocaleDateString('en-GB'),
-      time: body.time || new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-      createdAt: new Date().toISOString()
-    };
+      date: now.toLocaleDateString('en-GB'),
+      time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+      createdAt: now.toISOString()
+    });
 
     const saved = await dbAdapter.create('admissions', admissionRecord);
 
@@ -87,8 +78,9 @@ router.post('/', async (req, res) => {
       mobile,
       course: admissionRecord.course,
       batch: '2026',
-      academicStatus: 'ACTIVE',
-      status: 'ACTIVE',
+      academicStatus: 'PENDING_REVIEW',
+      status: 'PENDING_REVIEW',
+      admissionConfirmed: false,
       gender: body.gender || 'Male',
       dob: body.dob || '2004-01-01',
       address: body.address || 'Prayagraj, UP',
@@ -96,8 +88,7 @@ router.post('/', async (req, res) => {
     };
     await dbAdapter.create('students', studentRecord);
 
-    // Create user account with PENDING_REVIEW if not yet confirmed by SuperAdmin
-    const isConfirmed = admissionRecord.status === 'Confirmed' || admissionRecord.admissionConfirmed;
+    // Admission submissions stay pending until the authenticated admin confirmation flow.
     if (email) {
       await dbAdapter.create('users', {
         id: email,
@@ -108,8 +99,8 @@ router.post('/', async (req, res) => {
         role: 'student',
         registrationNo: regNo,
         course: admissionRecord.course,
-        verified: !!isConfirmed,
-        status: isConfirmed ? 'ACTIVE' : 'PENDING_REVIEW'
+        verified: false,
+        status: 'PENDING_REVIEW'
       });
     }
 
