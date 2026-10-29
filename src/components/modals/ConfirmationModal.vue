@@ -71,12 +71,12 @@
               <strong style="color: var(--text-main); word-break: break-all;">{{ admission.email || admission.userId || '—' }}</strong>
             </div>
             <div>
-              <span style="color: var(--text-muted); font-size: 0.72rem; display: block;">Default Password:</span>
-              <strong style="color: #34d399; font-family: var(--font-mono); font-size: 0.95rem;">{{ admission.password || 'Ithunt@123' }}</strong>
+              <span style="color: var(--text-muted); font-size: 0.72rem; display: block;">Portal Password:</span>
+              <strong style="color: #34d399; font-size: 0.85rem;">Set during registration; not displayed here.</strong>
             </div>
           </div>
           <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.35rem;">
-            💡 You can log in anytime to your Student Dashboard using this email & password.
+            💡 After approval, sign in using the password you created during registration.
           </div>
         </div>
       </div>

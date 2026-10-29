@@ -69,7 +69,7 @@ router.put('/role-permissions', verifyToken, requireAdmin, async (req, res) => {
 /**
  * GET /api/admin/stats
  */
-router.get('/stats', async (req, res) => {
+router.get('/stats', verifyToken, requireAdmin, async (req, res) => {
   try {
     const [
       studentsCount,
@@ -134,7 +134,7 @@ router.get('/stats', async (req, res) => {
 /**
  * GET /api/admin/users
  */
-router.get('/users', verifyToken, async (req, res) => {
+router.get('/users', verifyToken, requireAdmin, async (req, res) => {
   try {
     const list = await dbAdapter.find('users');
     const safeUsers = list.map(u => {

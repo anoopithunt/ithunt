@@ -1429,17 +1429,6 @@
                   <div v-if="adm.userId || adm.enrollmentNumber" style="font-size: 0.72rem; font-family: var(--font-mono); color: #38bdf8; margin-top: 4px; font-weight: 700;">
                     🆔 {{ adm.userId || adm.enrollmentNumber }}
                   </div>
-                  <div v-if="adm.password" style="font-size: 0.72rem; font-family: var(--font-mono); color: #34d399; margin-top: 2px; display: flex; align-items: center; gap: 4px;">
-                    <span>🔑 {{ showPasswordFor[adm.registrationNo || adm.id] ? adm.password : '••••••••' }}</span>
-                    <button 
-                      type="button" 
-                      @click="togglePassword(adm.registrationNo || adm.id)" 
-                      style="background: none; border: none; cursor: pointer; font-size: 0.75rem; padding: 0;" 
-                      :title="showPasswordFor[adm.registrationNo || adm.id] ? 'Hide Password' : 'Show Password'"
-                    >
-                      {{ showPasswordFor[adm.registrationNo || adm.id] ? '👁️' : '🙈' }}
-                    </button>
-                  </div>
                 </td>
                 <td>
                   <div style="font-weight: 800; color: var(--text-main);">{{ adm.candidateName || adm.fullName }}</div>
@@ -3555,6 +3544,10 @@
                 <input type="email" v-model="quickForm.email" required class="form-control" placeholder="email@example.com">
               </div>
               <div class="form-group full-width">
+                <label class="form-label">Initial Password <span class="req">*</span></label>
+                <input type="password" v-model="quickForm.password" minlength="12" required class="form-control" autocomplete="new-password" placeholder="At least 12 characters">
+              </div>
+              <div class="form-group full-width">
                 <label class="form-label">Target Program / Track <span class="req">*</span></label>
                 <select v-model="quickForm.course" class="form-control" required>
                   <option v-for="c in coursesList" :key="c.id || c.code" :value="c.title || c.name">
@@ -3574,8 +3567,8 @@
               </div>
               <div style="color: var(--text-muted);">
                 • <strong>Student User ID:</strong> <span style="color: var(--color-ai-cyan); font-weight: 700;">{{ quickForm.email || 'Candidate Email Address' }}</span><br>
-                • <strong>Default Password:</strong> <code style="color: var(--color-ai-orange); font-weight: 800; background: rgba(0,0,0,0.3); padding: 0.15rem 0.45rem; border-radius: 4px;">Ithunt@123</code><br>
-                • <em>The student can log in immediately using their email & this default password, and can change it anytime from their Student Dashboard.</em>
+                • <strong>Password:</strong> Set privately by the student during registration.<br>
+                • <em>Accounts become available after admission approval. Passwords are never displayed or sent in messages.</em>
               </div>
             </div>
 
@@ -3752,7 +3745,7 @@
               ✉️ Official Admission Confirmation Dispatch
             </h3>
             <p style="margin: 0.2rem 0 0 0; font-size: 0.8rem; color: var(--text-muted);">
-              Dispatch authentic admission letter from <strong>softtechithunt@gmail.com</strong> with candidate portal credentials.
+              Dispatch the admission letter from <strong>softtechithunt@gmail.com</strong>. Passwords are never included in email.
             </p>
           </div>
           <button class="modal-close-btn" @click="showAdmissionEmailModal = false">✕</button>
@@ -3763,7 +3756,7 @@
             <div><span style="color: var(--text-muted); font-size: 0.72rem; display: block;">Candidate:</span><strong>{{ selectedAdmissionForEmail.candidateName || selectedAdmissionForEmail.fullName }}</strong></div>
             <div><span style="color: var(--text-muted); font-size: 0.72rem; display: block;">Registration No:</span><strong style="color: var(--color-ai-yellow); font-family: var(--font-mono);">{{ selectedAdmissionForEmail.registrationNo }}</strong></div>
             <div><span style="color: var(--text-muted); font-size: 0.72rem; display: block;">Student Portal User ID:</span><strong style="color: #38bdf8;">{{ selectedAdmissionForEmail.email }}</strong></div>
-            <div><span style="color: var(--text-muted); font-size: 0.72rem; display: block;">Default Password:</span><strong style="color: #34d399; font-family: var(--font-mono);">Ithunt@123</strong></div>
+            <div><span style="color: var(--text-muted); font-size: 0.72rem; display: block;">Portal Password:</span><strong style="color: #34d399;">Set privately during registration</strong></div>
             <div style="grid-column: 1 / -1;"><span style="color: var(--text-muted); font-size: 0.72rem; display: block;">Course:</span><strong style="color: var(--color-ai-orange);">{{ selectedAdmissionForEmail.course }}</strong></div>
           </div>
 
@@ -3868,29 +3861,11 @@
               </button>
             </div>
 
-            <!-- Password Row -->
+            <!-- Password is not exposed in admin views -->
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0.85rem; background: rgba(0,0,0,0.4); border-radius: var(--radius-sm); margin-bottom: 0.5rem;">
               <div>
-                <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">Login Password:</span>
-                <span style="font-family: var(--font-mono); font-weight: 800; font-size: 1.05rem; color: #34d399;">
-                  {{ showModalPassword ? confirmedStudentData.password : '••••••••••••' }}
-                </span>
-              </div>
-              <div style="display: flex; gap: 0.4rem;">
-                <button 
-                  class="btn-secondary" 
-                  style="padding: 0.3rem 0.6rem; font-size: 0.75rem;" 
-                  @click="showModalPassword = !showModalPassword"
-                >
-                  {{ showModalPassword ? '🙈 Hide' : '👁️ Show' }}
-                </button>
-                <button 
-                  class="btn-secondary" 
-                  style="padding: 0.3rem 0.7rem; font-size: 0.75rem;" 
-                  @click="copyText(confirmedStudentData.password, 'Password')"
-                >
-                  📋 Copy
-                </button>
+                <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">Portal Password:</span>
+                <span style="font-size: 0.85rem; color: #34d399;">Set privately during registration; not shown here.</span>
               </div>
             </div>
 
@@ -3979,21 +3954,14 @@
             <label class="form-label">New Password <span class="req">*</span></label>
             <div style="display: flex; gap: 0.5rem;">
               <input 
-                type="text" 
+                type="password"
                 v-model="newPasswordInput" 
+                minlength="12"
                 required 
                 class="form-control" 
-                style="font-family: var(--font-mono); font-weight: 700; color: #10b981;"
-                placeholder="Enter new password"
+                autocomplete="new-password"
+                placeholder="At least 12 characters"
               >
-              <button 
-                type="button" 
-                class="btn-secondary" 
-                style="white-space: nowrap; padding: 0.5rem 0.75rem;" 
-                @click="newPasswordInput = 'ITH@' + Math.floor(1000 + Math.random() * 9000)"
-              >
-                🎲 Random
-              </button>
             </div>
           </div>
         </div>
@@ -5031,12 +4999,7 @@
 
               <div class="form-group">
                 <label class="form-label">Initial Password <span class="req">*</span></label>
-                <div style="display: flex; gap: 0.5rem;">
-                  <input type="text" v-model="newUserForm.password" required class="form-control" placeholder="Password">
-                  <button type="button" class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" @click="newUserForm.password = `ITH@${Math.floor(1000 + Math.random() * 9000)}`">
-                    🎲
-                  </button>
-                </div>
+                <input type="password" v-model="newUserForm.password" minlength="12" required class="form-control" autocomplete="new-password" placeholder="At least 12 characters">
               </div>
 
               <!-- Assign Role Dropdown -->
@@ -5135,7 +5098,8 @@ import {
   fetchFestivalWishFromBackend,
   updateFestivalWishInBackend,
   fetchFestivalPresetsFromBackend,
-  saveFestivalPresetsToBackend
+  saveFestivalPresetsToBackend,
+  saveAdmissionRecord
 } from '../../utils/apiClient.js';
 import CertificatePreviewModal from '../modals/CertificatePreviewModal.vue';
 import { 
@@ -5518,19 +5482,11 @@ const getFestivalIcon = (theme) => {
 // Confirmed Credentials Modal State
 const showConfirmedCredentialsModal = ref(false);
 const confirmedStudentData = ref(null);
-const showModalPassword = ref(true);
 
 // Reset Password Modal State
 const showResetPasswordModal = ref(false);
 const resetStudentTarget = ref(null);
 const newPasswordInput = ref('');
-
-// Password Visibility toggle map for table rows
-const showPasswordFor = ref({});
-const togglePassword = (key) => {
-  if (!key) return;
-  showPasswordFor.value[key] = !showPasswordFor.value[key];
-};
 
 const copyText = async (text, label = 'Text') => {
   if (!text) return;
@@ -5545,21 +5501,21 @@ const copyText = async (text, label = 'Text') => {
 
 const copyCredentialsText = async (data) => {
   if (!data) return;
-  const text = `🎓 IT HUNT Academy - Official Student Portal Login Credentials
+  const text = `🎓 IT HUNT Academy - Official Student Portal Access
 Candidate Name  : ${data.candidateName || data.fullName || data.name || 'Student'}
 Registration ID : ${data.registrationNo || data.id}
 Enrolled Program: ${data.course}
 
-🔐 STUDENT LOGIN CREDENTIALS:
+🔐 STUDENT PORTAL ACCESS:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 👤 Student User ID : ${data.userId || data.enrollmentNumber || data.registrationNo}
-🔑 Login Password  : ${data.password || 'Ithunt@123'}
+🔑 Password        : Set privately by the student during registration; not shared in messages.
 🌐 Portal Login URL: https://ithunt.vercel.app/#login
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Please sign in and keep your credentials confidential.`;
+After account approval, sign in with the password created during registration.`;
 
-  await copyText(text, 'Full Credentials');
+  await copyText(text, 'Admission Details');
 };
 
 const shareCredentialsOnWhatsApp = (data) => {
@@ -5567,7 +5523,7 @@ const shareCredentialsOnWhatsApp = (data) => {
   const url = getStudentAdmissionWhatsAppUrl(data);
   if (url) {
     window.open(url, '_blank', 'noopener,noreferrer');
-    emailActionMsg.value = `✓ Opened WhatsApp with credentials for ${data.candidateName || data.name || 'Student'}`;
+    emailActionMsg.value = `✓ Opened WhatsApp with admission details for ${data.candidateName || data.name || 'Student'}`;
     setTimeout(() => { emailActionMsg.value = ''; }, 4000);
   } else {
     alert('Candidate record has no valid mobile number for WhatsApp.');
@@ -5579,7 +5535,6 @@ const openCredentialsModal = (adm) => {
   confirmedStudentData.value = {
     ...adm,
     userId: adm.userId || adm.enrollmentNumber || adm.registrationNo || adm.id,
-    password: adm.password || 'Ithunt@123',
     candidateName: adm.candidateName || adm.fullName || 'Student',
     course: adm.course,
     mobile: adm.mobile || adm.phone,
@@ -5587,47 +5542,34 @@ const openCredentialsModal = (adm) => {
     registrationNo: adm.registrationNo || adm.id,
     loginUrl: 'https://ithunt.vercel.app/#login'
   };
-  showModalPassword.value = true;
   showConfirmedCredentialsModal.value = true;
 };
 
 const openResetPasswordModal = (item) => {
   if (!item) return;
   resetStudentTarget.value = item;
-  newPasswordInput.value = `ITH@${Math.floor(1000 + Math.random() * 9000)}`;
+  newPasswordInput.value = '';
   showResetPasswordModal.value = true;
 };
 
 const handleSaveResetPassword = async () => {
-  if (!resetStudentTarget.value || !newPasswordInput.value.trim()) return;
+  if (!resetStudentTarget.value || newPasswordInput.value.length < 12) {
+    emailActionMsg.value = 'Choose a new password of at least 12 characters.';
+    return;
+  }
   const target = resetStudentTarget.value;
   const targetId = target.userId || target.id || target.registrationNo;
-  const newPass = newPasswordInput.value.trim();
+  const newPass = newPasswordInput.value;
 
   emailActionMsg.value = `Updating password for ${target.candidateName || target.name || 'Student'}...`;
 
   try {
-    await resetStudentPasswordInBackend(targetId, newPass);
-    target.password = newPass;
+    const result = await resetStudentPasswordInBackend(targetId, newPass);
+    if (result?.success === false) throw new Error(result.error || result.message || 'Password reset failed.');
 
-    // Sync in admissionsList
-    const aIdx = admissionsList.value.findIndex(a => a.userId === targetId || a.registrationNo === targetId || a.id === targetId);
-    if (aIdx !== -1) {
-      admissionsList.value[aIdx].password = newPass;
-    }
-    // Sync in studentsList
-    const sIdx = studentsList.value.findIndex(s => s.userId === targetId || s.id === targetId || s.registrationNo === targetId);
-    if (sIdx !== -1) {
-      studentsList.value[sIdx].password = newPass;
-    }
-    // Sync in usersList
-    const uIdx = usersList.value.findIndex(u => u.userId === targetId || u.id === targetId || u.email === target.email);
-    if (uIdx !== -1) {
-      usersList.value[uIdx].password = newPass;
-    }
-
-    emailActionMsg.value = `✓ Password reset to "${newPass}" for ${target.candidateName || target.name || 'Student'}!`;
+    emailActionMsg.value = `✓ Password reset for ${target.candidateName || target.name || 'Student'}.`;
     showResetPasswordModal.value = false;
+    newPasswordInput.value = '';
   } catch (err) {
     alert('Failed to reset password: ' + err.message);
   }
@@ -6125,7 +6067,7 @@ const openAddUserModal = () => {
   newUserForm.value = {
     name: '',
     email: '',
-    password: `ITH@${Math.floor(1000 + Math.random() * 9000)}`,
+    password: '',
     role: 'teacher',
     designation: 'Faculty & Technical Mentor',
     phone: ''
@@ -6135,12 +6077,16 @@ const openAddUserModal = () => {
 
 const handleCreateUser = async () => {
   if (!newUserForm.value.email || !newUserForm.value.name) return;
+  if (typeof newUserForm.value.password !== 'string' || newUserForm.value.password.length < 12) {
+    emailActionMsg.value = 'Use an initial password of at least 12 characters.';
+    return;
+  }
 
   const payload = {
     id: `USR-${Date.now()}`,
     name: newUserForm.value.name.trim(),
     email: newUserForm.value.email.toLowerCase().trim(),
-    password: newUserForm.value.password || 'Ithunt@123',
+    password: newUserForm.value.password,
     role: newUserForm.value.role,
     designation: newUserForm.value.designation,
     phone: newUserForm.value.phone,
@@ -6148,25 +6094,19 @@ const handleCreateUser = async () => {
     createdAt: new Date().toLocaleDateString('en-GB')
   };
 
-  usersList.value.unshift(payload);
   showAddUserModal.value = false;
 
   try {
     const res = await createUserInBackend(payload);
     if (res?.data) {
-      const idx = usersList.value.findIndex(u => u.email === payload.email);
-      if (idx !== -1) {
-        usersList.value[idx] = { 
-          ...usersList.value[idx], 
-          ...res.data, 
-          id: res.data.id || res.data._id || payload.id 
-        };
-      }
+      const { password: _password, ...safeUser } = res.data;
+      usersList.value.unshift({ ...safeUser, id: safeUser.id || safeUser._id || payload.id });
     }
   } catch (err) {
     console.error('Error creating user in backend:', err);
   }
 
+  newUserForm.value.password = '';
   emailActionMsg.value = `✓ New staff account created for ${payload.name} (${getRoleMeta(payload.role).label}) and saved to database!`;
   setTimeout(() => { emailActionMsg.value = ''; }, 4000);
 };
@@ -6453,6 +6393,7 @@ const quickForm = ref({
   fatherName: '',
   mobile: '',
   email: '',
+  password: '',
   course: 'Web Development (MERN Stack & Cloud Architecture)'
 });
 
@@ -6854,7 +6795,6 @@ const unifiedStudentsList = computed(() => {
       academicStatus: (adm.status === 'Confirmed' || adm.admissionConfirmed) ? 'ACTIVE' : 'PENDING_REVIEW',
       status: adm.status || (adm.admissionConfirmed ? 'Confirmed' : 'Pending Verification'),
       admissionConfirmed: !!(adm.status === 'Confirmed' || adm.admissionConfirmed),
-      password: adm.password || '',
       gender: adm.gender || 'Male',
       dob: adm.dob || '—',
       address: adm.address || adm.district || 'Prayagraj, UP',
@@ -6888,7 +6828,6 @@ const unifiedStudentsList = computed(() => {
       academicStatus: stu.academicStatus || existing.academicStatus || 'ACTIVE',
       status: stu.status || existing.status || 'ACTIVE',
       admissionConfirmed: stu.admissionConfirmed !== undefined ? stu.admissionConfirmed : (existing.admissionConfirmed !== undefined ? existing.admissionConfirmed : true),
-      password: stu.password || existing.password || '',
       dashboardControls: stu.dashboardControls || existing.dashboardControls || null,
       accountStatus: stu.accountStatus || existing.accountStatus || 'ACTIVE'
     });
@@ -7177,14 +7116,29 @@ const cycleNielitStatus = (p) => {
 };
 
 const cycleAdmissionStatus = async (adm) => {
-  if (adm.status === 'Confirmed') adm.status = 'Verified';
-  else if (adm.status === 'Verified') adm.status = 'Pending Verification';
-  else adm.status = 'Confirmed';
+  const nextStatus = adm.status === 'Confirmed'
+    ? 'Verified'
+    : adm.status === 'Verified'
+      ? 'Pending Verification'
+      : 'Confirmed';
   const targetId = adm.registrationNo || adm.id;
   try {
-    await API.updateAdmissionStatus(targetId, adm.status);
+    if (nextStatus === 'Confirmed') {
+      const result = await confirmAdmissionInBackend(adm, {
+        userId: adm.userId || adm.enrollmentNumber || adm.email || targetId,
+        feeStatus: adm.feeStatus || 'Verified & Paid',
+        confirmedBy: props.adminUser?.name || 'SuperAdmin'
+      });
+      if (result?.success === false) throw new Error(result.error || 'Admission could not be confirmed.');
+    } else {
+      const result = await API.updateAdmissionStatus(targetId, nextStatus);
+      if (result?.success === false) throw new Error(result.error || 'Admission status could not be updated.');
+    }
+    adm.status = nextStatus;
   } catch (e) {
     console.warn('Update admission status error:', e.message);
+    emailActionMsg.value = `Unable to update admission status: ${e.message}`;
+    setTimeout(() => { emailActionMsg.value = ''; }, 5000);
   }
 };
 
@@ -7193,26 +7147,25 @@ const handleConfirmAdmissionAndGenerateCredentials = async (adm) => {
   const targetId = adm.registrationNo || adm.id;
   const candidateName = adm.candidateName || adm.fullName || 'Student';
 
-  const cleanId = String(targetId || '').replace(/^ITH-?/i, '');
-  const suffix = cleanId && cleanId.length >= 3 ? cleanId.slice(-4) : Math.floor(1000 + Math.random() * 9000);
-  const generatedUserId = adm.userId || adm.enrollmentNumber || `ITH-2026-STU${suffix}`;
-  const generatedPassword = (adm.password && adm.password !== 'Ithunt@123') ? adm.password : `ITH@${Math.floor(1000 + Math.random() * 9000)}`;
+  const generatedUserId = adm.userId || adm.enrollmentNumber || adm.email || targetId;
 
-  emailActionMsg.value = `Confirming admission and generating login for ${candidateName}...`;
+  emailActionMsg.value = `Confirming admission for ${candidateName}...`;
 
   try {
-    await confirmAdmissionInBackend(adm, {
+    const confirmation = await confirmAdmissionInBackend(adm, {
       userId: generatedUserId,
-      password: generatedPassword,
       feeStatus: adm.feeStatus || 'Verified & Paid',
       confirmedBy: props.adminUser?.name || 'SuperAdmin'
     });
+    if (confirmation?.success === false) {
+      throw new Error(confirmation.error || 'Admission could not be confirmed.');
+    }
 
     adm.status = 'Confirmed';
     adm.admissionConfirmed = true;
     adm.userId = generatedUserId;
     adm.enrollmentNumber = generatedUserId;
-    adm.password = generatedPassword;
+    delete adm.password;
     adm.confirmedAt = new Date().toISOString();
     adm.admissionConfirmedDate = new Date().toLocaleDateString('en-GB');
     adm.admissionConfirmedTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
@@ -7231,7 +7184,6 @@ const handleConfirmAdmissionAndGenerateCredentials = async (adm) => {
         id: generatedUserId,
         userId: generatedUserId,
         enrollmentNumber: generatedUserId,
-        password: generatedPassword,
         status: 'ACTIVE',
         academicStatus: 'ACTIVE',
         admissionConfirmed: true
@@ -7242,7 +7194,6 @@ const handleConfirmAdmissionAndGenerateCredentials = async (adm) => {
         userId: generatedUserId,
         enrollmentNumber: generatedUserId,
         registrationNo: targetId,
-        password: generatedPassword,
         name: candidateName,
         fullName: candidateName,
         course: adm.course,
@@ -7262,7 +7213,6 @@ const handleConfirmAdmissionAndGenerateCredentials = async (adm) => {
         ...usersList.value[uIdx],
         id: generatedUserId,
         userId: generatedUserId,
-        password: generatedPassword,
         verified: true,
         status: 'ACTIVE'
       };
@@ -7272,19 +7222,17 @@ const handleConfirmAdmissionAndGenerateCredentials = async (adm) => {
         userId: generatedUserId,
         email: adm.email,
         name: candidateName,
-        password: generatedPassword,
         role: 'student',
         verified: true,
         status: 'ACTIVE'
       });
     }
 
-    emit('confirm-admission', { ...adm, userId: generatedUserId, password: generatedPassword });
+    emit('confirm-admission', { ...adm, userId: generatedUserId });
 
     confirmedStudentData.value = {
       ...adm,
       userId: generatedUserId,
-      password: generatedPassword,
       candidateName,
       course: adm.course,
       mobile: adm.mobile || adm.phone,
@@ -7292,9 +7240,8 @@ const handleConfirmAdmissionAndGenerateCredentials = async (adm) => {
       registrationNo: targetId,
       loginUrl: 'https://ithunt.vercel.app/#login'
     };
-    showModalPassword.value = true;
     showConfirmedCredentialsModal.value = true;
-    emailActionMsg.value = `✓ Admission Confirmed! Student User ID: ${generatedUserId} | Password: ${generatedPassword}`;
+    emailActionMsg.value = `✓ Admission confirmed. Student User ID: ${generatedUserId}`;
   } catch (err) {
     console.warn('Admission confirm error:', err.message);
     emailActionMsg.value = `⚠️ Error confirming admission: ${err.message}`;
@@ -7401,12 +7348,19 @@ const openQuickAdmissionModal = () => {
     fatherName: '',
     mobile: '',
     email: '',
+    password: '',
     course: 'Web Development (MERN Stack & Cloud Architecture)'
   };
   showQuickAdmissionModal.value = true;
 };
 
 const handleCreateDirectAdmission = async () => {
+  const studentPassword = quickForm.value.password;
+  if (typeof studentPassword !== 'string' || studentPassword.length < 12) {
+    emailActionMsg.value = 'Use an initial password of at least 12 characters.';
+    return;
+  }
+
   const regId = 'ITH-' + Math.floor(100000 + Math.random() * 900000);
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -7417,9 +7371,7 @@ const handleCreateDirectAdmission = async () => {
   const studentMobile = (quickForm.value.mobile || '').trim();
   const studentCourse = quickForm.value.course;
 
-  const suffix = Math.floor(1000 + Math.random() * 9000);
-  const generatedUserId = `ITH-2026-STU${suffix}`;
-  const generatedPassword = `ITH@${Math.floor(1000 + Math.random() * 9000)}`;
+  const generatedUserId = studentEmail;
 
   const newAdm = {
     id: regId,
@@ -7439,7 +7391,7 @@ const handleCreateDirectAdmission = async () => {
     phone: studentMobile,
     email: studentEmail,
     userId: generatedUserId,
-    password: generatedPassword,
+    password: studentPassword,
     enrollmentNumber: generatedUserId,
     district: 'PRAYAGRAJ',
     address: 'Holagarh Studio, Prayagraj',
@@ -7449,8 +7401,15 @@ const handleCreateDirectAdmission = async () => {
     confirmedAt: now.toISOString()
   };
 
-  admissionsList.value.unshift(newAdm);
-  emit('add-admission', newAdm);
+  const saved = await saveAdmissionRecord(newAdm);
+  if (!saved.success) {
+    emailActionMsg.value = saved.error || 'Admission could not be saved.';
+    return;
+  }
+  const { password: _password, ...safeAdmission } = newAdm;
+  quickForm.value.password = '';
+  admissionsList.value.unshift(safeAdmission);
+  emit('add-admission', safeAdmission);
 
   // Sync into studentsList
   studentsList.value.unshift({
@@ -7458,7 +7417,6 @@ const handleCreateDirectAdmission = async () => {
     userId: generatedUserId,
     enrollmentNumber: generatedUserId,
     registrationNo: regId,
-    password: generatedPassword,
     name: candidateName,
     fullName: candidateName,
     course: studentCourse,
@@ -7476,34 +7434,20 @@ const handleCreateDirectAdmission = async () => {
     userId: generatedUserId,
     email: studentEmail,
     name: candidateName,
-    password: generatedPassword,
     role: 'student',
     verified: true,
     status: 'ACTIVE'
   });
 
-  try {
-    await confirmAdmissionInBackend(newAdm, {
-      userId: generatedUserId,
-      password: generatedPassword,
-      feeStatus: 'Verified & Paid',
-      confirmedBy: props.adminUser?.name || 'SuperAdmin'
-    });
-  } catch (err) {
-    console.warn('Direct admission backend confirm error:', err.message);
-  }
-
   showQuickAdmissionModal.value = false;
 
   confirmedStudentData.value = {
-    ...newAdm,
+    ...safeAdmission,
     userId: generatedUserId,
-    password: generatedPassword,
     loginUrl: 'https://ithunt.vercel.app/#login'
   };
-  showModalPassword.value = true;
   showConfirmedCredentialsModal.value = true;
-  emailActionMsg.value = `✓ Direct Candidate Enrolled! User ID: ${generatedUserId} | Password: ${generatedPassword}`;
+  emailActionMsg.value = `✓ Direct Candidate Enrolled! User ID: ${generatedUserId}`;
   setTimeout(() => { emailActionMsg.value = ''; }, 6000);
 };
 

@@ -37,7 +37,6 @@ UserSchema.pre('validate', function() {
   if (!this.name && this.candidateName) this.name = this.candidateName;
   if (!this.userId && this.registrationNo) this.userId = this.registrationNo;
   if (!this.userId && this.enrollmentNumber) this.userId = this.enrollmentNumber;
-  if (!this.password) this.password = 'Ithunt@123';
 });
 
 UserSchema.pre('save', async function () {
@@ -50,8 +49,6 @@ UserSchema.pre('save', async function () {
 });
 
 UserSchema.methods.comparePassword = async function (candidatePassword) {
-  // Direct match fallback for default admin development credentials
-  if (this.password === candidatePassword) return true;
   return bcrypt.compare(candidatePassword, this.password);
 };
 

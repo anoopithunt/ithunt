@@ -1,5 +1,4 @@
 import { CONTENT_DATA } from '../data/contentData.js';
-import { DEFAULT_DEMO_STUDENT } from '../data/studentAcademicData.js';
 
 const env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : (typeof process !== 'undefined' ? process.env : {});
 const RAW_API_URL = (
@@ -42,36 +41,38 @@ export const normalizeAdmission = (a) => ({
   amountPaid: a.amountPaid || '₹5,000',
   userId: a.userId || (a.admissionConfirmed ? (a.enrollmentNumber || a.registrationNo) : ''),
   enrollmentNumber: a.enrollmentNumber || a.userId || a.registrationNo,
-  password: a.password || '',
   admissionConfirmed: !!(a.admissionConfirmed || a.status === 'Confirmed')
 });
 
-export const normalizeStudent = (s) => ({
-  ...s,
-  id: s.id || s.userId || `STU-${Date.now()}`,
-  userId: s.userId || s.id,
-  enrollmentNumber: s.enrollmentNumber || s.registrationNo || (s.userId && s.userId.startsWith('ITH-') ? s.userId : `ITH-2026-STU${Math.floor(1000 + Math.random() * 9000)}`),
-  name: s.name || s.fullName || s.candidateName || 'Student',
-  fullName: s.fullName || s.name || s.candidateName || 'Student',
-  candidateName: s.candidateName || s.fullName || s.name || 'Student',
-  email: s.email || '',
-  phone: s.phone || s.mobile || '',
-  mobile: s.mobile || s.phone || '',
-  course: s.course || 'MERN Stack Developer',
-  batch: s.batch || '2026',
-  academicStatus: s.academicStatus || s.status || (s.admissionConfirmed ? 'ACTIVE' : 'PENDING_REVIEW'),
-  status: s.status || s.academicStatus || (s.admissionConfirmed ? 'ACTIVE' : 'PENDING_REVIEW'),
-  admissionConfirmed: !!(s.admissionConfirmed || s.status === 'Confirmed' || s.academicStatus === 'ACTIVE'),
-  password: s.password || '',
-  gender: s.gender || 'Male',
-  dob: s.dob || '2004-01-01',
-  address: s.address || 'Holagarh, Prayagraj',
-  guardianName: s.guardianName || '—',
-  guardianPhone: s.guardianPhone || '—',
-  bio: s.bio || '',
-  createdAt: s.createdAt ? (String(s.createdAt).includes('/') ? s.createdAt : new Date(s.createdAt).toLocaleDateString('en-GB')) : new Date().toLocaleDateString('en-GB'),
-  createdAtFormatted: s.createdAt ? (String(s.createdAt).includes('/') ? s.createdAt : new Date(s.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })) : 'Recent'
-});
+export const normalizeStudent = (s) => {
+  const safeStudent = { ...s };
+  delete safeStudent.password;
+  return {
+    ...safeStudent,
+    id: s.id || s.userId || `STU-${Date.now()}`,
+    userId: s.userId || s.id,
+    enrollmentNumber: s.enrollmentNumber || s.registrationNo || (s.userId && s.userId.startsWith('ITH-') ? s.userId : `ITH-2026-STU${Math.floor(1000 + Math.random() * 9000)}`),
+    name: s.name || s.fullName || s.candidateName || 'Student',
+    fullName: s.fullName || s.name || s.candidateName || 'Student',
+    candidateName: s.candidateName || s.fullName || s.name || 'Student',
+    email: s.email || '',
+    phone: s.phone || s.mobile || '',
+    mobile: s.mobile || s.phone || '',
+    course: s.course || 'MERN Stack Developer',
+    batch: s.batch || '2026',
+    academicStatus: s.academicStatus || s.status || (s.admissionConfirmed ? 'ACTIVE' : 'PENDING_REVIEW'),
+    status: s.status || s.academicStatus || (s.admissionConfirmed ? 'ACTIVE' : 'PENDING_REVIEW'),
+    admissionConfirmed: !!(s.admissionConfirmed || s.status === 'Confirmed' || s.academicStatus === 'ACTIVE'),
+    gender: s.gender || 'Male',
+    dob: s.dob || '2004-01-01',
+    address: s.address || 'Holagarh, Prayagraj',
+    guardianName: s.guardianName || '—',
+    guardianPhone: s.guardianPhone || '—',
+    bio: s.bio || '',
+    createdAt: s.createdAt ? (String(s.createdAt).includes('/') ? s.createdAt : new Date(s.createdAt).toLocaleDateString('en-GB')) : new Date().toLocaleDateString('en-GB'),
+    createdAtFormatted: s.createdAt ? (String(s.createdAt).includes('/') ? s.createdAt : new Date(s.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })) : 'Recent'
+  };
+};
 
 export const normalizeNielitProject = (p) => ({
   id: p.id || p.regNo || p.registrationNo || p.nielitRegNo || `NIELIT-${Date.now()}`,
@@ -338,7 +339,11 @@ export async function apiRequest(endpoint, options = {}, isRetry = false) {
 
     const data = await response.json().catch(() => ({ success: response.ok }));
     if (!response.ok && !data.success) {
-      return { success: false, error: data.message || 'API request failed' };
+      return {
+        success: false,
+        error: data.message || 'API request failed',
+        ...(data.pending ? { pending: true } : {})
+      };
     }
 
     return data.data !== undefined ? data.data : data;
@@ -516,7 +521,8 @@ export async function submitAdmissionToBackend(data) {
     district: data.district || '',
     registrationNumber: data.registrationNo || data.registrationNumber || data.id,
     registrationNo: data.registrationNo || data.registrationNumber || data.id,
-    status: data.status || 'Confirmed'
+    status: data.status || 'Pending Verification',
+    password: data.password
   };
 
   try {
@@ -547,13 +553,15 @@ export async function saveAdmissionRecord(data) {
   if (!data) return { success: false, error: 'No form data provided' };
 
   const normEmail = (data.email || '').toLowerCase().trim();
-  const defaultPassword = data.password || 'Ithunt@123';
+  if (typeof data.password !== 'string' || data.password.length < 12) {
+    return { success: false, error: 'Create a password of at least 12 characters before submitting.' };
+  }
 
   const payload = {
     ...data,
     email: normEmail,
     userId: normEmail,
-    password: defaultPassword,
+    password: data.password,
     fullName: data.fullName || data.candidateName || data.name || '',
     candidateName: data.candidateName || data.fullName || data.name || '',
     phone: data.phone || data.mobile || '',
@@ -571,10 +579,15 @@ export async function saveAdmissionRecord(data) {
     console.warn('Backend REST admission submit notice:', e.message);
   }
 
-  const backendAdm = (res && res.success && res.admission) ? res.admission : null;
+  if (!res?.success || !res.admission) {
+    return { success: false, error: res?.error || 'The admissions service is unavailable. Please try again shortly.' };
+  }
+  const backendAdm = res.admission;
   const finalRegNo = backendAdm?.registrationNo || backendAdm?.registrationNumber || payload.registrationNo || payload.registrationNumber || payload.id || `ITH-${Math.floor(100000 + Math.random() * 900000)}`;
+  const safePayload = { ...payload };
+  delete safePayload.password;
   const finalRecord = {
-    ...payload,
+    ...safePayload,
     ...(backendAdm || {}),
     id: finalRegNo,
     registrationNo: finalRegNo,
@@ -662,7 +675,7 @@ export async function deleteAdmissionFromBackend(adm) {
 }
 
 /**
- * Confirm admission and auto-generate student login credentials
+ * Confirm a registered student account without exposing credentials
  */
 export async function confirmAdmissionInBackend(adm, creds = {}) {
   if (!adm) return { success: false, error: 'No admission record provided' };
@@ -672,17 +685,6 @@ export async function confirmAdmissionInBackend(adm, creds = {}) {
     const res = await API.confirmAdmission(targetId, creds);
     if (res && res.success) {
       // Sync to local student account
-      if (res.data?.credentials || res.credentials) {
-        const c = res.data?.credentials || res.credentials;
-        saveStudentAccount({
-          ...(typeof adm === 'object' ? adm : {}),
-          userId: c.userId,
-          enrollmentNumber: c.userId,
-          password: c.password,
-          registrationNo: targetId,
-          status: 'Confirmed'
-        });
-      }
       return res;
     }
     return res || { success: false, error: 'Failed to confirm admission' };
@@ -1147,10 +1149,13 @@ export async function registerStudentWithBackend(studentData) {
   // Save via REST API (backend creates student, admission & user records in MongoDB)
   try {
     const data = await API.registerStudent(payload);
+    if (!data?.success) {
+      return { success: false, error: data?.error || 'Registration was rejected by the server.' };
+    }
     return { success: true, data: { ...data, admission: data?.admission || admissionRecord } };
   } catch (error) {
     console.warn('Backend API notice registering student:', error.message);
-    return { success: true, data: { user: payload, student: payload, admission: admissionRecord } };
+    return { success: false, error: 'The registration service is unavailable. Please try again shortly.' };
   }
 }
 
@@ -1190,14 +1195,18 @@ export async function registerStudentUser(signupData) {
   };
 
   const apiRes = await registerStudentWithBackend(studentRecord);
-  if (apiRes && apiRes.success) {
+  const registeredUser = apiRes?.data?.user || apiRes?.data?.student;
+  if (apiRes?.success && registeredUser) {
     return {
       success: true,
-      user: apiRes.data?.user || apiRes.data?.student || studentRecord,
+      user: registeredUser,
       admission: apiRes.data?.admission
     };
   }
-  return { success: true, user: studentRecord };
+  return {
+    success: false,
+    error: apiRes?.error || 'The registration service is unavailable. Please try again shortly.'
+  };
 }
 
 /**
@@ -1231,10 +1240,10 @@ export function saveStudentAccount(account) {
       ...account,
       userId: email,
       email: email,
-      password: account.password || 'Ithunt@123',
       role: 'STUDENT',
       updatedAt: new Date().toISOString()
     };
+    delete userObj.password;
     localStorage.setItem('ithunt_student_user', JSON.stringify(userObj));
   } catch (e) { }
 }
@@ -1245,8 +1254,8 @@ export function saveStudentAccount(account) {
 export async function changeStudentPassword(email, oldPassword, newPassword) {
   const normEmail = (email || '').toLowerCase().trim();
 
-  if (!newPassword || newPassword.length < 6) {
-    return { success: false, error: 'New password must be at least 6 characters long.' };
+  if (!newPassword || newPassword.length < 12) {
+    return { success: false, error: 'New password must be at least 12 characters long.' };
   }
 
   try {
@@ -1259,7 +1268,7 @@ export async function changeStudentPassword(email, oldPassword, newPassword) {
         try {
           const savedStudent = JSON.parse(localStorage.getItem('ithunt_student_user') || 'null');
           if (savedStudent && savedStudent.email?.toLowerCase() === normEmail) {
-            savedStudent.password = newPassword;
+            delete savedStudent.password;
             localStorage.setItem('ithunt_student_user', JSON.stringify(savedStudent));
           }
         } catch (e) { }
@@ -1270,19 +1279,7 @@ export async function changeStudentPassword(email, oldPassword, newPassword) {
     console.warn('Backend password change warning:', e.message);
   }
 
-  // Fallback update in active session
-  if (typeof window !== 'undefined' && window.localStorage) {
-    try {
-      const savedStudent = JSON.parse(localStorage.getItem('ithunt_student_user') || 'null');
-      if (savedStudent && savedStudent.email?.toLowerCase() === normEmail) {
-        savedStudent.password = newPassword;
-        localStorage.setItem('ithunt_student_user', JSON.stringify(savedStudent));
-        return { success: true, message: 'Password updated successfully!' };
-      }
-    } catch (e) { }
-  }
-
-  return { success: true, message: 'Password updated successfully in database!' };
+  return { success: false, error: 'The password could not be updated on the server.' };
 }
 
 /**
@@ -1305,33 +1302,7 @@ export async function loginStudentUser(email, password) {
     } catch (e) { }
   }
 
-  // 2. Check locally saved student account in localStorage
-  if (typeof window !== 'undefined' && window.localStorage) {
-    try {
-      const savedStudent = JSON.parse(localStorage.getItem('ithunt_student_user') || 'null');
-      if (savedStudent) {
-        const sEmail = (savedStudent.email || savedStudent.userId || '').toLowerCase().trim();
-        const sReg = (savedStudent.registrationNo || savedStudent.id || '').toLowerCase().trim();
-        if (sEmail === normEmail || sReg === normEmail) {
-          const expectedPass = savedStudent.password || 'Ithunt@123';
-          if (inputPass === expectedPass || inputPass === 'Ithunt@123' || !inputPass) {
-            return { success: true, user: savedStudent };
-          }
-        }
-      }
-    } catch (e) { }
-  }
-
-  // 3. Default demo student fallback for presentation
-  if (normEmail === 'student@ithunt.com') {
-    if (inputPass === 'Ithunt@123' || inputPass === 'student123' || inputPass === 'student' || inputPass === 'password' || !inputPass) {
-      return { success: true, user: { ...DEFAULT_DEMO_STUDENT } };
-    } else {
-      return { success: false, error: 'Invalid password. Default is Ithunt@123.' };
-    }
-  }
-
-  return { success: false, error: 'No student account found in the database with this Email / Registration ID. Please submit an admission or verify your credentials.' };
+  return { success: false, error: 'Invalid email or password.' };
 }
 
 /**

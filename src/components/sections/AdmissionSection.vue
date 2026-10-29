@@ -214,14 +214,16 @@
               <div class="form-group">
                 <label class="form-label">
                   <span>Portal Password</span>
-                  <span class="optional-tag">(Optional)</span>
+                  <span class="req">*</span>
                 </label>
                 <div class="input-wrap pwd-wrap">
                   <input 
                     :type="showAdmPassword ? 'text' : 'password'" 
                     v-model="form.password" 
+                    minlength="12"
+                    required
                     class="form-control pwd-control" 
-                    placeholder="Default: Ithunt@123"
+                    placeholder="Create a password with at least 12 characters"
                   >
                   <button 
                     type="button" 
@@ -234,7 +236,7 @@
                   </button>
                 </div>
                 <small class="field-hint-pill green">
-                  🔒 Default: Ithunt@123 (or set custom)
+                  🔒 Use a unique password of at least 12 characters.
                 </small>
               </div>
 

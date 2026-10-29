@@ -7,7 +7,10 @@ dotenv.config();
 import { MODELS, dbAdapter } from './services/dbAdapter.js';
 import { connectMongo, isMongoConnected } from './config/db.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'ithunt_super_secure_jwt_secret_2026';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET || Buffer.byteLength(JWT_SECRET) < 32) {
+  throw new Error('Set JWT_SECRET to at least 32 bytes before running authentication scenarios.');
+}
 
 let passedTests = 0;
 let failedTests = 0;

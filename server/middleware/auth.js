@@ -1,6 +1,9 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'ithunt_super_secure_jwt_secret_2026';
+const JWT_SECRET = process.env.JWT_SECRET?.trim();
+if (!JWT_SECRET || Buffer.byteLength(JWT_SECRET) < 32) {
+  throw new Error('JWT_SECRET must be configured with at least 32 bytes of cryptographically random data.');
+}
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
 /**
@@ -30,8 +33,7 @@ export function verifyToken(req, res, next) {
   } catch (error) {
     return res.status(401).json({
       success: false,
-      message: 'Invalid or expired authentication token.',
-      error: error.message
+      message: 'Invalid or expired authentication token.'
     });
   }
 }

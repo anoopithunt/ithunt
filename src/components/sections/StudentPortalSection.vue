@@ -568,7 +568,7 @@
                 <span>🔐</span> Student Security & Login Password
               </h3>
               <p class="panel-subtitle">
-                Your registered email is your student User ID. You can change your default password (<code>Ithunt@123</code>) to your own private password below.
+                Your registered email is your student User ID. Choose a unique password and keep it private.
               </p>
             </div>
             <span class="status-pill status-active">
@@ -586,7 +586,7 @@
                     v-model="passwordForm.oldPassword" 
                     required 
                     class="form-control" 
-                    placeholder="Current password (default: Ithunt@123)"
+                    placeholder="Enter your current password"
                   >
                   <button type="button" class="eye-toggle-btn" @click="showOldPass = !showOldPass" :title="showOldPass ? 'Hide' : 'Show'">
                     {{ showOldPass ? '🙈' : '👁️' }}
@@ -2376,16 +2376,16 @@ const handlePasswordChange = async () => {
   passwordError.value = '';
   passwordSuccess.value = '';
 
-  const oldPass = passwordForm.oldPassword.trim();
-  const newPass = passwordForm.newPassword.trim();
-  const confPass = passwordForm.confirmPassword.trim();
+  const oldPass = passwordForm.oldPassword;
+  const newPass = passwordForm.newPassword;
+  const confPass = passwordForm.confirmPassword;
 
   if (!oldPass) {
-    passwordError.value = 'Please enter your current password (default is Ithunt@123).';
+    passwordError.value = 'Please enter your current password.';
     return;
   }
-  if (!newPass || newPass.length < 6) {
-    passwordError.value = 'New password must be at least 6 characters long.';
+  if (!newPass || newPass.length < 12) {
+    passwordError.value = 'New password must be at least 12 characters long.';
     return;
   }
   if (newPass !== confPass) {
@@ -2403,9 +2403,6 @@ const handlePasswordChange = async () => {
       passwordForm.oldPassword = '';
       passwordForm.newPassword = '';
       passwordForm.confirmPassword = '';
-      if (props.studentUser) {
-        props.studentUser.password = newPass;
-      }
       setTimeout(() => { passwordSuccess.value = ''; }, 6000);
     } else {
       passwordError.value = res?.error || 'Failed to update password.';

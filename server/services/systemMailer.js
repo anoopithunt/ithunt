@@ -81,7 +81,7 @@ Status          : ${adm.status || 'Pending Verification'}
 
 Student Portal  : https://ithunt.vercel.app/#login
 User ID         : ${adm.userId || adm.enrollmentNumber || stuEmail}
-Default Password: ${adm.password || 'Ithunt@123'}
+Password        : Use the password you created during registration.
 
 Our academic directorate will review your particulars and confirm your lab workstation and batch schedule.
 
@@ -126,9 +126,8 @@ IT HUNT Software Solutions & Tech Academy`;
         <div class="row"><span class="label">Email:</span><span class="val">${stuEmail}</span></div>
         <div class="row"><span class="label">Status:</span><span class="val" style="color: #22c55e;">${adm.status || 'Pending Verification'}</span></div>
         <div class="row"><span class="label">Portal User ID:</span><span class="val">${adm.userId || adm.enrollmentNumber || stuEmail}</span></div>
-        <div class="row"><span class="label">Portal Password:</span><span class="val">${adm.password || 'Ithunt@123'}</span></div>
       </div>
-      <p style="font-size: 13px; color: #8b949e;">You can access your student dashboard at <a href="https://ithunt.vercel.app/#login" style="color: #58a6ff;">ithunt.vercel.app/#login</a>.</p>
+      <p style="font-size: 13px; color: #8b949e;">After your account is approved, sign in using the password you created at <a href="https://ithunt.vercel.app/#login" style="color: #58a6ff;">ithunt.vercel.app/#login</a>.</p>
     </div>
     <div class="footer">
       <strong>IT HUNT Software Solutions & Tech Academy</strong><br>

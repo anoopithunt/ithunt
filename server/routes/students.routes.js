@@ -1,15 +1,26 @@
 import { Router } from 'express';
 import { dbAdapter } from '../services/dbAdapter.js';
-import { generateToken } from '../middleware/auth.js';
+import { generateToken, verifyToken, requireAdmin } from '../middleware/auth.js';
+import { loginRateLimit } from '../middleware/loginRateLimit.js';
+import bcrypt from 'bcryptjs';
 
 const router = Router();
+
+const sanitizeRecord = (record) => {
+  if (!record || typeof record !== 'object') return record;
+  const safeRecord = { ...record };
+  delete safeRecord.password;
+  return safeRecord;
+};
+
+const isAdmin = (user) => ['admin', 'superadmin'].includes(String(user?.role || '').toLowerCase());
 
 /**
  * GET /api/students
  */
-router.get('/', async (req, res) => {
+router.get('/', verifyToken, requireAdmin, async (req, res) => {
   try {
-    const list = await dbAdapter.find('students');
+    const list = (await dbAdapter.find('students')).map(sanitizeRecord);
     res.json({ success: true, data: list, students: list });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -19,14 +30,20 @@ router.get('/', async (req, res) => {
 /**
  * GET /api/students/:id
  */
-router.get('/:id', async (req, res) => {
+router.get('/:id', verifyToken, async (req, res) => {
   try {
     let student = await dbAdapter.findById('students', req.params.id);
     if (!student) {
       student = await dbAdapter.findById('admissions', req.params.id);
     }
     if (!student) return res.status(404).json({ success: false, message: 'Student record not found' });
-    res.json({ success: true, data: student, student });
+    const ownsStudentRecord = req.user?.email && student.email &&
+      req.user.email.toLowerCase() === student.email.toLowerCase();
+    if (!isAdmin(req.user) && !ownsStudentRecord) {
+      return res.status(404).json({ success: false, message: 'Student record not found' });
+    }
+    const safeStudent = sanitizeRecord(student);
+    res.json({ success: true, data: safeStudent, student: safeStudent });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -38,9 +55,18 @@ router.get('/:id', async (req, res) => {
 router.post('/register', async (req, res) => {
   try {
     const body = req.body || {};
+    const password = body.password;
+    if (typeof body.email !== 'string' || !body.email.trim() || typeof password !== 'string' || password.length < 12 || password.length > 1024) {
+      return res.status(400).json({ success: false, message: 'A valid email address and password of at least 12 characters are required.' });
+    }
+
     const enrollment = body.enrollmentNumber || body.registrationNo || `ITH-2026-STU${Math.floor(1000 + Math.random() * 9000)}`;
     const name = body.name || body.fullName || body.candidateName || 'Student';
     const email = (body.email || '').toLowerCase().trim();
+    const existingUser = await dbAdapter.findOne('users', { email });
+    if (existingUser) {
+      return res.status(409).json({ success: false, message: 'An account with this email already exists.' });
+    }
 
     const now = new Date();
     let date = body.date;
@@ -62,7 +88,6 @@ router.post('/register', async (req, res) => {
 
     const regNo = body.registrationNo || body.registrationNumber || enrollment;
     const studentRecord = {
-      ...body,
       id: enrollment,
       enrollmentNumber: enrollment,
       registrationNo: regNo,
@@ -72,14 +97,14 @@ router.post('/register', async (req, res) => {
       phone: body.phone || body.mobile || '+91 9795771806',
       mobile: body.mobile || body.phone || '+91 9795771806',
       course: body.course || 'MERN Stack Developer',
-      academicStatus: body.academicStatus || 'ACTIVE',
-      status: body.academicStatus || 'ACTIVE',
+      academicStatus: 'PENDING_REVIEW',
+      status: 'PENDING_REVIEW',
       date,
       time,
       createdAt: body.createdAt || now.toISOString()
     };
 
-    const saved = await dbAdapter.create('students', studentRecord);
+    await dbAdapter.create('students', studentRecord);
 
     // Automatically create Admission record with timing in admissions collection
     const admissionRecord = {
@@ -100,7 +125,7 @@ router.post('/register', async (req, res) => {
       qualification: body.qualification || '',
       gender: body.gender || 'Male',
       dob: body.dob || '2004-01-01',
-      status: body.status || 'Active Registered Student',
+      status: 'Pending Verification',
       feeStatus: body.feeStatus || 'Verified & Paid',
       amountPaid: body.amountPaid || '₹5,000',
       utrNo: body.utrNo || '',
@@ -108,24 +133,41 @@ router.post('/register', async (req, res) => {
       date,
       time,
       userId: body.userId || enrollment,
-      password: body.password || 'Ithunt@123',
       enrollmentNumber: enrollment,
-      admissionConfirmed: true,
-      admissionConfirmedDate: date,
-      admissionConfirmedTime: time,
-      confirmedAt: now.toISOString(),
-      confirmedBy: 'Student Self-Registration',
+      admissionConfirmed: false,
       createdAt: body.createdAt || now.toISOString()
     };
 
-    try {
-      await dbAdapter.create('admissions', admissionRecord);
-    } catch (_) {}
+    await dbAdapter.create('admissions', admissionRecord);
+    await dbAdapter.create('users', {
+      id: email,
+      userId: email,
+      name,
+      email,
+      password,
+      role: 'student',
+      registrationNo: regNo,
+      course: studentRecord.course,
+      verified: false,
+      status: 'PENDING_REVIEW'
+    });
+
+    const safeUser = {
+      id: email,
+      userId: email,
+      name,
+      email,
+      role: 'student',
+      registrationNo: regNo,
+      course: studentRecord.course,
+      verified: false,
+      status: 'PENDING_REVIEW'
+    };
 
     res.status(201).json({
       success: true,
-      message: 'Student registered successfully',
-      data: saved
+      message: 'Registration submitted for review. Sign in after your account is approved.',
+      data: { user: safeUser, admission: admissionRecord }
     });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -135,12 +177,25 @@ router.post('/register', async (req, res) => {
 /**
  * PUT /api/students/profile
  */
-router.put('/profile', async (req, res) => {
+router.put('/profile', verifyToken, async (req, res) => {
   try {
     const body = req.body || {};
-    const targetId = body.id || body.registrationNo || body.email || body.userId;
+    const targetId = isAdmin(req.user)
+      ? body.id || body.registrationNo || body.email || body.userId
+      : req.user?.id || req.user?.userId || req.user?.email;
     if (!targetId) {
       return res.status(400).json({ success: false, message: 'Student ID, Registration Number, or Email required' });
+    }
+    if (!isAdmin(req.user) && (
+      typeof body.email !== 'string' ||
+      body.email.toLowerCase().trim() !== String(req.user.email || '').toLowerCase()
+    )) {
+      return res.status(403).json({ success: false, message: 'You may only update your own student profile.' });
+    }
+
+    const profileFields = {};
+    for (const field of ['name', 'fullName', 'candidateName', 'phone', 'mobile', 'address', 'gender', 'dob', 'guardianName', 'guardianPhone', 'bio']) {
+      if (body[field] !== undefined) profileFields[field] = body[field];
     }
 
     const allStudents = await dbAdapter.find('students');
@@ -152,9 +207,11 @@ router.put('/profile', async (req, res) => {
 
     let updated = null;
     if (student) {
-      updated = await dbAdapter.update('students', student.id, body);
+      updated = await dbAdapter.update('students', student.id, profileFields);
+    } else if (isAdmin(req.user)) {
+      updated = await dbAdapter.create('students', { ...profileFields, id: targetId });
     } else {
-      updated = await dbAdapter.create('students', { ...body, id: targetId });
+      return res.status(404).json({ success: false, message: 'Student record not found.' });
     }
 
     const allAdmissions = await dbAdapter.find('admissions');
@@ -165,17 +222,15 @@ router.put('/profile', async (req, res) => {
     );
     if (admission) {
       await dbAdapter.update('admissions', admission.id, {
-        candidateName: body.candidateName || body.fullName || admission.candidateName,
-        fullName: body.fullName || body.candidateName || admission.fullName,
-        phone: body.phone || body.mobile || admission.phone,
-        mobile: body.mobile || body.phone || admission.mobile,
-        address: body.address !== undefined ? body.address : admission.address,
-        course: body.course || admission.course,
-        dashboardControls: body.dashboardControls !== undefined ? body.dashboardControls : admission.dashboardControls
+        candidateName: profileFields.candidateName || profileFields.fullName || admission.candidateName,
+        fullName: profileFields.fullName || profileFields.candidateName || admission.fullName,
+        phone: profileFields.phone || profileFields.mobile || admission.phone,
+        mobile: profileFields.mobile || profileFields.phone || admission.mobile,
+        address: profileFields.address !== undefined ? profileFields.address : admission.address
       });
     }
 
-    res.json({ success: true, data: updated, message: 'Student profile updated successfully in database' });
+    res.json({ success: true, data: sanitizeRecord(updated), message: 'Student profile updated successfully in database' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -184,10 +239,11 @@ router.put('/profile', async (req, res) => {
 /**
  * PUT /api/students/:id
  */
-router.put('/:id', async (req, res) => {
+router.put('/:id', verifyToken, requireAdmin, async (req, res) => {
   try {
     const id = req.params.id;
-    const body = req.body || {};
+    const body = { ...(req.body || {}) };
+    delete body.password;
     let updated = null;
 
     // Check students first
@@ -217,7 +273,7 @@ router.put('/:id', async (req, res) => {
       updated = await dbAdapter.update('students', id, body);
     }
 
-    res.json({ success: true, data: updated, message: 'Student profile & dashboard controls updated successfully' });
+    res.json({ success: true, data: sanitizeRecord(updated), message: 'Student profile & dashboard controls updated successfully' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -226,7 +282,7 @@ router.put('/:id', async (req, res) => {
 /**
  * DELETE /api/students/:id
  */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verifyToken, requireAdmin, async (req, res) => {
   try {
     await dbAdapter.delete('students', req.params.id);
     res.json({ success: true, message: `Student ${req.params.id} deleted.` });
@@ -238,12 +294,12 @@ router.delete('/:id', async (req, res) => {
 /**
  * POST /api/students/login
  */
-router.post('/login', async (req, res) => {
+router.post('/login', loginRateLimit, async (req, res) => {
   try {
     const identifier = req.body?.email || req.body?.userId || req.body?.username || req.body?.identifier || req.body?.loginId;
     const password = req.body?.password;
-    if (!identifier) {
-      return res.status(400).json({ success: false, message: 'User ID, Email, or Registration Number is required' });
+    if (typeof identifier !== 'string' || !identifier.trim() || typeof password !== 'string' || !password || password.length > 1024) {
+      return res.status(400).json({ success: false, message: 'User ID or email and password are required.' });
     }
     const norm = String(identifier).toLowerCase().trim();
     const inputPass = (password || '').trim();
@@ -278,19 +334,7 @@ router.post('/login', async (req, res) => {
     );
 
     if (!student && !adm && !user) {
-      // Demo student fallback
-      if (norm === 'student@ithunt.com' && (inputPass === 'Ithunt@123' || inputPass === 'student123' || !inputPass)) {
-        const demoUser = {
-          id: 'STU-DEMO-01',
-          name: 'Demo Student',
-          email: 'student@ithunt.com',
-          role: 'student',
-          registrationNo: 'ITH-2026-001'
-        };
-        const token = generateToken(demoUser);
-        return res.json({ success: true, token, user: demoUser, student: demoUser });
-      }
-      return res.status(404).json({ success: false, message: 'No student account found with this User ID / Email' });
+      return res.status(401).json({ success: false, message: 'Invalid email or password.' });
     }
 
     // Check admission confirmation status
@@ -303,12 +347,11 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    const expectedPass = user?.password || adm?.password || student?.password || 'Ithunt@123';
-    const mobilePass = (student?.mobile || student?.phone || adm?.mobile || adm?.phone || '').replace(/\D/g, '');
-    const isMatch = !inputPass || inputPass === expectedPass || inputPass === 'Ithunt@123' || (mobilePass && inputPass === mobilePass);
+    const expectedPass = typeof user?.password === 'string' ? user.password : '';
+    const isMatch = /^\$2[aby]\$\d{2}\$/.test(expectedPass) && await bcrypt.compare(inputPass, expectedPass);
 
     if (!isMatch) {
-      return res.status(401).json({ success: false, message: 'Invalid password. Please check your credentials or contact SuperAdmin.' });
+      return res.status(401).json({ success: false, message: 'Invalid email or password.' });
     }
 
     const resolvedUser = {
@@ -341,36 +384,26 @@ router.post('/login', async (req, res) => {
  * POST /api/students/:id/reset-password
  * SuperAdmin can reset student credentials
  */
-router.post('/:id/reset-password', async (req, res) => {
+router.post('/:id/reset-password', verifyToken, requireAdmin, async (req, res) => {
   try {
     const targetId = req.params.id;
     const { newPassword } = req.body || {};
-    const generatedPass = newPassword || `ITH@${Math.floor(1000 + Math.random() * 9000)}`;
-
-    const allStudents = await dbAdapter.find('students');
-    const student = allStudents.find(s => s.id === targetId || s.userId === targetId || s.registrationNo === targetId || s.email === targetId);
-    if (student) {
-      await dbAdapter.update('students', student.id, { password: generatedPass });
-    }
-
-    const allAdmissions = await dbAdapter.find('admissions');
-    const adm = allAdmissions.find(a => a.id === targetId || a.userId === targetId || a.registrationNo === targetId || a.email === targetId);
-    if (adm) {
-      await dbAdapter.update('admissions', adm.id, { password: generatedPass });
+    if (typeof newPassword !== 'string' || newPassword.length < 12 || newPassword.length > 1024) {
+      return res.status(400).json({ success: false, message: 'Password must be at least 12 characters.' });
     }
 
     const allUsers = await dbAdapter.find('users');
     const user = allUsers.find(u => u.id === targetId || u.userId === targetId || u.registrationNo === targetId || u.email === targetId);
-    if (user) {
-      await dbAdapter.update('users', user.id, { password: generatedPass });
+    if (!user || String(user.role || '').toLowerCase() !== 'student') {
+      return res.status(404).json({ success: false, message: 'Student account not found.' });
     }
+    await dbAdapter.update('users', user.id, { password: newPassword });
 
     res.json({
       success: true,
       message: 'Student password reset successfully by SuperAdmin',
       data: {
-        userId: targetId,
-        newPassword: generatedPass
+        userId: user.userId || user.email
       }
     });
   } catch (error) {
@@ -381,35 +414,33 @@ router.post('/:id/reset-password', async (req, res) => {
 /**
  * POST /api/students/change-password
  */
-router.post('/change-password', async (req, res) => {
+router.post('/change-password', verifyToken, async (req, res) => {
   try {
     const { email, oldPassword, newPassword } = req.body || {};
-    if (!email || !newPassword) {
-      return res.status(400).json({ success: false, message: 'Email and new password are required' });
+    if (
+      typeof email !== 'string' ||
+      typeof oldPassword !== 'string' ||
+      typeof newPassword !== 'string' ||
+      !oldPassword ||
+      newPassword.length < 12 ||
+      newPassword.length > 1024
+    ) {
+      return res.status(400).json({ success: false, message: 'Current password and a new password of at least 12 characters are required.' });
     }
     const norm = email.toLowerCase().trim();
-
-    // Update in users
-    const users = await dbAdapter.find('users');
-    const user = users.find(u => (u.email && u.email.toLowerCase() === norm) || (u.id && u.id.toLowerCase() === norm));
-    if (user) {
-      await dbAdapter.update('users', user.id, { password: newPassword });
+    if (!req.user?.email || req.user.email.toLowerCase() !== norm) {
+      return res.status(403).json({ success: false, message: 'You may only change your own account password.' });
     }
 
-    // Update in admissions
-    const admissions = await dbAdapter.find('admissions');
-    const adm = admissions.find(a => (a.email && a.email.toLowerCase() === norm) || (a.id && a.id.toLowerCase() === norm));
-    if (adm) {
-      await dbAdapter.update('admissions', adm.id, { password: newPassword });
+    const user = await dbAdapter.findOne('users', { email: norm });
+    if (!user || typeof user.password !== 'string' || !/^\$2[aby]\$\d{2}\$/.test(user.password)) {
+      return res.status(401).json({ success: false, message: 'Current password is incorrect.' });
+    }
+    if (!await bcrypt.compare(oldPassword, user.password)) {
+      return res.status(401).json({ success: false, message: 'Current password is incorrect.' });
     }
 
-    // Update in students
-    const students = await dbAdapter.find('students');
-    const student = students.find(s => (s.email && s.email.toLowerCase() === norm) || (s.id && s.id.toLowerCase() === norm));
-    if (student) {
-      await dbAdapter.update('students', student.id, { password: newPassword });
-    }
-
+    await dbAdapter.update('users', user.id, { password: newPassword });
     res.json({ success: true, message: 'Password updated successfully in MongoDB database (ithunt).' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

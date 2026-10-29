@@ -93,12 +93,14 @@ cp .env.example .env
 Then update the values in `.env` with your local environment details, especially:
 
 - `MONGODB_URI`
-- `JWT_SECRET`
+- `JWT_SECRET` — generate a unique secret with `openssl rand -hex 32`; the API refuses to start without at least 32 bytes.
+- `SEED_ADMIN_PASSWORD`, `SEED_TEACHER_PASSWORD`, and `SEED_STUDENT_PASSWORD` — set unique passwords of at least 16 characters before running the seeder.
 - `PORT` / `BACKEND_PORT`
 - email notification credentials
 - any third-party API keys
 
 Never commit `.env` or production secrets to the repository.
+Login requests are limited using MongoDB-backed counters shared across serverless instances. The API fails closed if this store is unavailable. Provisioned user accounts must have bcrypt-hashed passwords; old demo/default credentials are no longer accepted.
 
 ## Run the Project
 
@@ -167,8 +169,8 @@ Recommended deployment checklist:
 
 1. Set production environment variables in Vercel.
 2. Use a secure MongoDB connection string.
-3. Replace all default or sample credentials.
-4. Set a strong `JWT_SECRET`.
+3. Configure unique seeding passwords and rotate any previously used sample credentials.
+4. Set a unique `JWT_SECRET` generated from a cryptographically secure random source.
 5. Verify CORS, API routes, and frontend/backend compatibility before releasing.
 
 ## Contributing
@@ -187,4 +189,3 @@ This project is licensed under the ISC License. See `package.json` for package m
 
 - Live website: https://ithunt.vercel.app/
 - GitHub repository: https://github.com/anoopithunt/ithunt
-
