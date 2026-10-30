@@ -735,6 +735,7 @@ const getStoredAdminAuth = () => {
         'senior-developer', 'intern', 'staff', 'accountant'
       ].some(r => role.includes(r) || roleType === r) || 
       parsed.email === 'admin@ithunt.com' ||
+      parsed.email === 'director@ithunt.com' ||
       parsed.role === 'Director & Chief Administrator';
 
       if (isPrivileged) {
@@ -1185,6 +1186,7 @@ const setTab = (tab) => {
       'senior-developer', 'intern', 'staff', 'accountant'
     ].some(r => role.includes(r) || roleType === r) || 
     user?.email === 'admin@ithunt.com' ||
+    user?.email === 'director@ithunt.com' ||
     user?.role === 'Director & Chief Administrator';
 
     if (!isAdminLoggedIn.value || !isAuthorized) {
@@ -1546,6 +1548,7 @@ const handleLoginSuccess = async (user) => {
     'senior-developer', 'intern', 'staff', 'accountant'
   ].some(r => role.includes(r) || roleType === r) || 
   user.email === 'admin@ithunt.com' ||
+  user.email === 'director@ithunt.com' ||
   user.role === 'Director & Chief Administrator';
 
   if (!isPrivileged) {
@@ -1951,6 +1954,7 @@ onMounted(() => {
         'senior-developer', 'intern', 'staff', 'accountant'
       ].some(r => role.includes(r) || roleType === r) || 
       parsedAdmin.email === 'admin@ithunt.com' ||
+      parsedAdmin.email === 'director@ithunt.com' ||
       parsedAdmin.role === 'Director & Chief Administrator';
 
       if (isPrivileged) {
