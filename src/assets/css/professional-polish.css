@@ -69,16 +69,6 @@ aside {
   min-width: 0;
 }
 
-@media (max-width: 1024px) {
-  :is(.hero-grid, .split-grid, .contact-grid, .about-grid, .admission-grid, .login-grid, .stats-grid, .services-grid, .feature-grid, .course-grid, .testimonial-grid, .review-grid, .footer-grid) {
-    grid-template-columns: 1fr !important;
-  }
-
-  :is(.hero-grid, .split-grid, .contact-grid, .about-grid, .admission-grid, .login-grid, .stats-grid, .services-grid, .feature-grid, .course-grid, .testimonial-grid, .review-grid, .footer-grid) {
-    gap: 1.25rem !important;
-  }
-}
-
 @media (max-width: 820px) {
   .container,
   .section-shell,
