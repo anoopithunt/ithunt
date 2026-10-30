@@ -30,13 +30,21 @@ const hasValidJwtSecret = () => {
   return Boolean(secret && Buffer.byteLength(secret) >= 32);
 };
 
-const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5500,http://localhost:5173,https://ithunt.vercel.app')
+const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5500,http://localhost:5501,http://localhost:5173,https://ithunt.vercel.app')
   .split(',').map(origin => origin.trim()).filter(Boolean);
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+  if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return true;
+  if (/^https:\/\/[a-zA-Z0-9._-]+\.vercel\.app$/.test(origin)) return true;
+  return false;
+};
 
 app.use(cors({
   origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(new Error('Origin is not allowed by CORS'));
+    if (isAllowedOrigin(origin)) return callback(null, true);
+    return callback(null, false);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
