@@ -20,6 +20,11 @@ out/
 .env.*
 !.env.example
 
+# Local editor and agent artifacts
+.agents/
+.kilo/
+skills-lock.json
+
 # Logs & Debugging
 logs/
 *.log
