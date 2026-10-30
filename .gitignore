@@ -20,7 +20,7 @@ out/
 .env.*
 !.env.example
 
-# Local editor and agent artifacts
+# Local tooling and editor artifacts
 .agents/
 .kilo/
 skills-lock.json
