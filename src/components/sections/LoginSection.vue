@@ -13,7 +13,7 @@
           </div>
 
           <h1 class="login-title">
-            Portal <span class="text-gradient">{{ authMode === 'login' ? 'Sign In' : authMode === 'register' ? 'Registration' : authMode === 'forgot' ? 'Forgot Password' : 'Reset Password' }}</span>
+            Portal <span class="text-gradient">{{ authMode === 'login' ? 'Sign In' : 'Registration' }}</span>
           </h1>
 
           <p class="login-subtitle">
@@ -23,11 +23,9 @@
               <strong style="color: #38bdf8;">Teacher Portal</strong>, or 
               <strong style="color: var(--color-ai-orange);">Student Dashboard</strong>.
             </span>
-            <span v-else-if="authMode === 'register'">
+            <span v-else>
               Apply and create your student account to access live course materials, attendance tracking, and batch schedules.
             </span>
-            <span v-else-if="authMode === 'forgot'">Enter your account email and we’ll send a secure password reset link if the account exists.</span>
-            <span v-else>Choose a new password for your IT HUNT Portal account.</span>
           </p>
         </div>
 
@@ -107,10 +105,6 @@
             </button>
           </div>
 
-          <div class="login-recovery-link">
-            <button type="button" class="register-switch-link" @click="openForgotPassword">Forgot your password?</button>
-          </div>
-
           <!-- Student Registration Prompt -->
           <div class="new-student-callout">
             <span>New Student seeking admission?</span>
@@ -123,7 +117,7 @@
         <!-- ================================================================= -->
         <!-- OPTIONAL: NEW STUDENT REGISTRATION FORM                           -->
         <!-- ================================================================= -->
-        <form v-else-if="authMode === 'register'" @submit.prevent="handleStudentSignupSubmit" class="login-form">
+        <form v-else @submit.prevent="handleStudentSignupSubmit" class="login-form">
           <div class="form-group" style="margin-bottom: 1rem;">
             <label class="form-label">Candidate Full Name <span class="req">*</span></label>
             <input type="text" v-model="studentSignup.candidateName" required class="form-control" placeholder="Your full legal name">
@@ -165,42 +159,6 @@
           </div>
         </form>
 
-        <form v-else-if="authMode === 'forgot'" @submit.prevent="handleForgotPassword" class="login-form">
-          <div class="form-group" style="margin-bottom: 1.25rem;">
-            <label class="form-label" for="forgot-password-email">Email Address <span class="req">*</span></label>
-            <input id="forgot-password-email" v-model="resetEmail" type="email" required maxlength="254" autocomplete="email" class="form-control" placeholder="name@example.com">
-          </div>
-          <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
-            <button type="button" class="btn-secondary" style="flex: 1; justify-content: center;" @click="authMode = 'login'; clearFeedback();">
-              ← Back to Sign In
-            </button>
-            <button type="submit" class="btn-primary" style="flex: 2; justify-content: center;" :disabled="isLoading">
-              <span v-if="isLoading" class="spinner-inline"></span>
-              <span>{{ isLoading ? 'Sending Link...' : 'Send Reset Link' }}</span>
-            </button>
-          </div>
-        </form>
-
-        <form v-else @submit.prevent="handleResetPassword" class="login-form">
-          <div class="form-group" style="margin-bottom: 1rem;">
-            <label class="form-label" for="reset-new-password">New Password <span class="req">*</span></label>
-            <input id="reset-new-password" v-model="resetNewPassword" type="password" minlength="12" maxlength="72" required autocomplete="new-password" class="form-control" placeholder="12 to 72 characters">
-          </div>
-          <div class="form-group" style="margin-bottom: 1.25rem;">
-            <label class="form-label" for="reset-confirm-password">Confirm New Password <span class="req">*</span></label>
-            <input id="reset-confirm-password" v-model="resetConfirmPassword" type="password" minlength="12" maxlength="72" required autocomplete="new-password" class="form-control" placeholder="Enter the new password again">
-          </div>
-          <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
-            <button type="button" class="btn-secondary" style="flex: 1; justify-content: center;" @click="authMode = 'login'; clearResetToken(); clearFeedback();">
-              ← Back to Sign In
-            </button>
-            <button type="submit" class="btn-primary" style="flex: 2; justify-content: center;" :disabled="isLoading || !resetToken">
-              <span v-if="isLoading" class="spinner-inline"></span>
-              <span>{{ isLoading ? 'Updating Password...' : 'Reset Password' }}</span>
-            </button>
-          </div>
-        </form>
-
         <!-- Security Footer Notice -->
         <div class="login-card-footer">
           <div class="security-notice-text">
@@ -216,8 +174,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
-import { loginUserWithBackend, registerStudentUser, requestPasswordReset, resetPassword } from '../../utils/apiClient.js';
+import { ref, reactive } from 'vue';
+import { loginUserWithBackend, registerStudentUser } from '../../utils/apiClient.js';
 import { sanitizeInput, checkLoginRateLimit, recordLoginAttempt, isValidEmail, isValidPhone } from '../../utils/security.js';
 
 const props = defineProps({
@@ -240,10 +198,6 @@ const rememberMe = ref(true);
 const isLoading = ref(false);
 const errorMessage = ref('');
 const successMessage = ref('');
-const resetEmail = ref('');
-const resetToken = ref('');
-const resetNewPassword = ref('');
-const resetConfirmPassword = ref('');
 
 // Student Registration State
 const studentSignup = reactive({
@@ -253,88 +207,6 @@ const studentSignup = reactive({
   course: '3-Month MERN Stack Web Engineer',
   password: ''
 });
-
-const clearFeedback = () => {
-  errorMessage.value = '';
-  successMessage.value = '';
-};
-
-const clearResetToken = () => {
-  resetToken.value = '';
-  resetNewPassword.value = '';
-  resetConfirmPassword.value = '';
-};
-
-const openForgotPassword = () => {
-  resetEmail.value = loginIdentifier.value.includes('@') ? loginIdentifier.value.trim() : '';
-  authMode.value = 'forgot';
-  clearFeedback();
-};
-
-onMounted(() => {
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get('resetToken');
-  if (token) {
-    resetToken.value = token;
-    authMode.value = 'reset';
-    params.delete('resetToken');
-    const query = params.toString();
-    window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`);
-  }
-});
-
-const handleForgotPassword = async () => {
-  clearFeedback();
-  const email = resetEmail.value.trim().toLowerCase();
-  if (!isValidEmail(email)) {
-    errorMessage.value = 'Please enter a valid email address.';
-    return;
-  }
-
-  isLoading.value = true;
-  try {
-    const result = await requestPasswordReset(email);
-    if (!result?.success) throw new Error(result?.message || result?.error || 'Could not request a password reset.');
-    successMessage.value = result.message || 'If an account exists for that email, a password reset link will be sent shortly.';
-  } catch (error) {
-    errorMessage.value = error.message || 'Password reset is temporarily unavailable. Please try again shortly.';
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-const handleResetPassword = async () => {
-  clearFeedback();
-  if (!resetToken.value) {
-    errorMessage.value = 'This password reset link is invalid or has expired. Request a new link to continue.';
-    return;
-  }
-  if (resetNewPassword.value.length < 12 || new TextEncoder().encode(resetNewPassword.value).length > 72) {
-    errorMessage.value = 'Choose a password between 12 characters and 72 UTF-8 bytes.';
-    return;
-  }
-  if (resetNewPassword.value !== resetConfirmPassword.value) {
-    errorMessage.value = 'The passwords do not match.';
-    return;
-  }
-
-  isLoading.value = true;
-  try {
-    const result = await resetPassword(resetToken.value, resetNewPassword.value);
-    if (!result?.success) throw new Error(result?.message || result?.error || 'Could not reset the password.');
-    clearResetToken();
-    const params = new URLSearchParams(window.location.search);
-    params.delete('resetToken');
-    const query = params.toString();
-    window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`);
-    authMode.value = 'login';
-    successMessage.value = result.message || 'Your password has been reset. You can now sign in.';
-  } catch (error) {
-    errorMessage.value = error.message || 'Password reset is temporarily unavailable. Please try again shortly.';
-  } finally {
-    isLoading.value = false;
-  }
-};
 
 /**
  * Route user based on their detected role:
@@ -722,12 +594,6 @@ body.light-theme .login-success-alert {
 .login-submit-btn:disabled {
   opacity: 0.7;
   cursor: not-allowed;
-}
-
-.login-recovery-link {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 0.75rem;
 }
 
 .spinner-inline {

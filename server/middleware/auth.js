@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import { createHash, randomBytes } from 'node:crypto';
 
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
@@ -18,16 +17,6 @@ function getJwtSecret() {
  */
 export function generateToken(payload) {
   return jwt.sign(payload, getJwtSecret(), { expiresIn: JWT_EXPIRES_IN });
-}
-
-export function generatePasswordResetToken() {
-  const token = randomBytes(32).toString('hex');
-  const tokenHash = createHash('sha256').update(token).digest('hex');
-  return { token, tokenHash };
-}
-
-export function hashPasswordResetToken(token) {
-  return createHash('sha256').update(token).digest('hex');
 }
 
 /**

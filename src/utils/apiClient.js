@@ -267,7 +267,6 @@ export const normalizeUser = (u) => ({
  * Standard Core API Request Handler with automatic Auth header attachment & response unwrapping
  */
 export async function apiRequest(endpoint, options = {}, isRetry = false) {
-  const { timeoutMs = 3500, ...requestOptions } = options;
   let token = (typeof localStorage !== 'undefined') ? (
     localStorage.getItem('token') ||
     localStorage.getItem('authToken') ||
@@ -281,20 +280,15 @@ export async function apiRequest(endpoint, options = {}, isRetry = false) {
 
   if (!token && memoryToken) token = memoryToken;
 
-  const isPublicGet = (!requestOptions.method || requestOptions.method === 'GET') && (
+  const isPublicGet = (!options.method || options.method === 'GET') && (
     endpoint.includes('/courses') ||
     endpoint.includes('/events') ||
     endpoint.includes('/reviews') ||
     endpoint.includes('/projects') ||
     endpoint.includes('/certificates/verify')
   );
-  const isPublicAuthEndpoint = [
-    '/auth/login',
-    '/auth/forgot-password',
-    '/auth/reset-password'
-  ].includes(endpoint);
 
-  if (!token && !isPublicGet && !isPublicAuthEndpoint) {
+  if (!token && !isPublicGet && !endpoint.includes('/auth/login')) {
     token = await ensureAuthToken();
   }
 
@@ -302,7 +296,7 @@ export async function apiRequest(endpoint, options = {}, isRetry = false) {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...requestOptions.headers
+    ...options.headers
   };
 
   const baseUrl = (API_BASE_URL || '/api').replace(/\/+$/, '');
@@ -310,17 +304,17 @@ export async function apiRequest(endpoint, options = {}, isRetry = false) {
   const url = endpoint.startsWith('http') ? endpoint : `${baseUrl}${cleanEndpoint}`;
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  const timeoutId = setTimeout(() => controller.abort(), 3500);
 
   try {
     let response;
     try {
-      response = await fetch(url, { ...requestOptions, headers, signal: requestOptions.signal || controller.signal });
+      response = await fetch(url, { ...options, headers, signal: options.signal || controller.signal });
     } catch (netErr) {
       // If relative URL failed on localhost, retry directly against port 3000 if dev server exists
       if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
         const directUrl = `http://127.0.0.1:3000${cleanEndpoint.startsWith('/api') ? cleanEndpoint : '/api' + cleanEndpoint}`;
-        response = await fetch(directUrl, { ...requestOptions, headers, signal: requestOptions.signal || controller.signal }).catch(() => null);
+        response = await fetch(directUrl, { ...options, headers, signal: options.signal || controller.signal }).catch(() => null);
         if (!response) throw netErr;
       } else {
         throw netErr;
@@ -330,7 +324,7 @@ export async function apiRequest(endpoint, options = {}, isRetry = false) {
     }
 
     // Handle token expiration / 401 unauthorized gracefully
-    if (response.status === 401 && !isRetry && !isPublicAuthEndpoint) {
+    if (response.status === 401 && !isRetry && !endpoint.includes('/auth/login')) {
       if (typeof localStorage !== 'undefined') {
         localStorage.removeItem('token');
         localStorage.removeItem('authToken');
@@ -452,8 +446,6 @@ export const API = {
 
   // Auth & Admin Users
   login: (credentials) => apiRequest('/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),
-  requestPasswordReset: (email) => apiRequest('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }), timeoutMs: 20000 }),
-  resetPassword: (token, password) => apiRequest('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, password }) }),
   getUsers: () => apiRequest('/auth/users'),
   createUser: (data) => apiRequest('/auth/users', { method: 'POST', body: JSON.stringify(data) }),
   updateUser: (id, data) => apiRequest(`/auth/users/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
@@ -1358,14 +1350,6 @@ export async function loginUserWithBackend(email, password) {
   }
 }
 
-export async function requestPasswordReset(email) {
-  return API.requestPasswordReset(email);
-}
-
-export async function resetPassword(token, password) {
-  return API.resetPassword(token, password);
-}
-
 /**
  * Fetch SuperAdmin executive stats from backend REST API
  */
@@ -1931,8 +1915,6 @@ export default {
   updateStudentProfileWithBackend,
   updateStudentProfile,
   loginUserWithBackend,
-  requestPasswordReset,
-  resetPassword,
   fetchAdminStatsFromBackend,
   deleteUserFromBackend,
   fetchCoursesFromBackend,
