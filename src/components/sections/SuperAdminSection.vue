@@ -909,9 +909,10 @@
       </div>
 
       <!-- Students Data Table Card -->
-      <div class="admin-table-card">
-        <div class="table-responsive-container">
-          <table class="admin-data-table">
+      <div class="admin-table-card student-directory-card">
+        <div class="student-directory-scroll-hint">Swipe or scroll horizontally to view student details and actions.</div>
+        <div class="table-responsive-container student-directory-scroll">
+          <table class="admin-data-table student-directory-table">
             <thead>
               <tr>
                 <th>Enrollment No</th>
@@ -924,7 +925,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="stu in filteredStudents" :key="stu.id || stu.enrollmentNumber">
+              <tr v-for="stu in filteredStudents" :key="stu.id || stu.enrollmentNumber" class="student-directory-row">
                 <!-- Enrollment No -->
                 <td>
                   <span 
@@ -993,7 +994,7 @@
 
                 <!-- Actions -->
                 <td style="text-align: right;">
-                  <div style="display: flex; justify-content: flex-end; gap: 0.4rem; flex-wrap: wrap;">
+                  <div class="student-directory-actions" style="display: flex; justify-content: flex-end; gap: 0.4rem; flex-wrap: wrap;">
                     <!-- If pending candidate: prominent 1-click Confirm & Generate Login -->
                     <button 
                       v-if="!stu.admissionConfirmed && stu.status !== 'Confirmed'"
@@ -1213,18 +1214,19 @@
       </div>
 
       <!-- Submissions Table -->
-      <div class="admin-data-card">
-        <div class="data-table-container">
-          <table class="admin-data-table">
+      <div class="admin-data-card exam-submissions-card">
+        <div class="exam-table-scroll-hint">Swipe or scroll horizontally to see all submission details.</div>
+        <div class="data-table-container exam-submissions-scroll" tabindex="0" role="region" aria-label="Exam submissions table; scroll horizontally to view all columns">
+          <table class="admin-data-table exam-submissions-table">
             <thead>
               <tr>
-                <th>Student Candidate</th>
-                <th>Enrolled Batch / Course</th>
-                <th>Exam Taken & Subject</th>
-                <th>Date & Time</th>
+                <th>Student</th>
+                <th>Batch / Course</th>
+                <th>Exam</th>
+                <th>Submitted</th>
                 <th style="text-align: center;">Score</th>
                 <th style="text-align: center;">Result</th>
-                <th style="text-align: right;">Action: Options Inspection</th>
+                <th style="text-align: right;">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -1237,8 +1239,8 @@
                     </div>
                     <div>
                       <strong class="table-primary-text" style="color: var(--text-main); font-size: 0.95rem;">{{ sub.studentName }}</strong>
-                      <div class="text-dim" style="font-size: 0.78rem; font-family: var(--font-mono); color: var(--text-muted);">
-                        Roll: {{ sub.studentRoll }}
+                      <div v-if="sub.studentRoll || sub.studentId" class="text-dim" style="font-size: 0.78rem; font-family: var(--font-mono); color: var(--text-muted);">
+                        ID: {{ sub.studentRoll || sub.studentId }}
                       </div>
                     </div>
                   </div>
@@ -1279,20 +1281,22 @@
 
                 <!-- Action Button -->
                 <td style="text-align: right;">
-                  <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                  <div class="exam-submission-actions">
                     <button 
                       class="btn-primary" 
                       style="padding: 0.35rem 0.85rem; font-size: 0.82rem;"
                       @click="openTeacherExamInspection(sub)"
                       title="Inspect student's selected options question by question"
+                      :aria-label="'Inspect answers for ' + sub.studentName"
                     >
-                      <span>Inspect Options 🔍</span>
+                      <span>Inspect Answers</span>
                     </button>
                     <button 
                       class="admin-icon-btn" 
                       style="color: #ef4444;"
                       @click="handleDeleteExamSubmission(sub.id)"
                       title="Delete this submission"
+                      :aria-label="'Delete submission for ' + sub.studentName"
                     >
                       🗑️
                     </button>
@@ -12762,6 +12766,196 @@ label {
 
   .admissions-table-hint {
     text-align: left;
+  }
+}
+
+.exam-submissions-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 16px;
+  background: #0d1322;
+}
+
+.exam-table-scroll-hint {
+  display: none;
+  padding: 0.65rem 1rem;
+  color: #94a3b8;
+  background: rgba(15, 23, 42, 0.72);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  font-size: 0.78rem;
+}
+
+.exam-submissions-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.exam-submissions-scroll:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: -2px;
+}
+
+.exam-submissions-table {
+  width: 100%;
+  min-width: 1080px;
+  table-layout: fixed;
+}
+
+.exam-submissions-table th,
+.exam-submissions-table td {
+  overflow-wrap: anywhere;
+}
+
+.exam-submissions-table th {
+  white-space: normal;
+  line-height: 1.35;
+}
+
+.exam-submissions-table th:nth-child(1),
+.exam-submissions-table td:nth-child(1) { width: 17%; }
+.exam-submissions-table th:nth-child(2),
+.exam-submissions-table td:nth-child(2) { width: 17%; }
+.exam-submissions-table th:nth-child(3),
+.exam-submissions-table td:nth-child(3) { width: 20%; }
+.exam-submissions-table th:nth-child(4),
+.exam-submissions-table td:nth-child(4) { width: 13%; }
+.exam-submissions-table th:nth-child(5),
+.exam-submissions-table td:nth-child(5) { width: 9%; }
+.exam-submissions-table th:nth-child(6),
+.exam-submissions-table td:nth-child(6) { width: 9%; }
+.exam-submissions-table th:nth-child(7),
+.exam-submissions-table td:nth-child(7) { width: 15%; }
+
+.exam-submission-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.exam-submission-actions .btn-primary {
+  min-height: 40px;
+}
+
+.admin-shell.light-theme .exam-submissions-card {
+  background: #ffffff;
+  border-color: #dbe3ee;
+}
+
+.admin-shell.light-theme .exam-table-scroll-hint {
+  color: #475569;
+  background: #f8fafc;
+  border-bottom-color: #dbe3ee;
+}
+
+@media (max-width: 1100px) {
+  .exam-table-scroll-hint {
+    display: block;
+  }
+}
+
+@media (max-width: 640px) {
+  .exam-submissions-table {
+    min-width: 980px;
+  }
+
+  .exam-submissions-table th,
+  .exam-submissions-table td {
+    padding: 0.7rem 0.65rem;
+    font-size: 0.78rem;
+  }
+
+  .exam-submission-actions {
+    justify-content: flex-start;
+  }
+}
+
+.student-directory-card {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.student-directory-scroll-hint {
+  display: none;
+  padding: 0.6rem 1rem;
+  color: #94a3b8;
+  background: rgba(15, 23, 42, 0.72);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  font-size: 0.78rem;
+}
+
+.student-directory-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.student-directory-table {
+  width: 100%;
+  min-width: 1180px;
+  height: auto;
+  table-layout: auto;
+}
+
+.student-directory-table th,
+.student-directory-table td {
+  padding: 0.7rem 0.85rem;
+  line-height: 1.4;
+  vertical-align: middle;
+}
+
+.student-directory-table tbody tr {
+  height: auto;
+}
+
+.student-directory-table .student-directory-actions {
+  flex-wrap: nowrap !important;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.student-directory-actions > button {
+  min-height: 36px !important;
+  padding: 0.35rem 0.55rem !important;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.student-directory-table .reg-no-code {
+  overflow-wrap: anywhere;
+}
+
+.admin-shell.light-theme .student-directory-scroll-hint {
+  color: #475569;
+  background: #f8fafc;
+  border-bottom-color: #dbe3ee;
+}
+
+.admin-shell.light-theme .student-directory-table tbody tr:nth-child(even) {
+  background: #f8fafc;
+}
+
+@media (max-width: 1100px) {
+  .student-directory-scroll-hint {
+    display: block;
+  }
+}
+
+@media (max-width: 640px) {
+  .student-directory-table {
+    min-width: 1100px;
+  }
+
+  .student-directory-table th,
+  .student-directory-table td {
+    padding: 0.6rem 0.65rem;
+    font-size: 0.78rem;
   }
 }
 
