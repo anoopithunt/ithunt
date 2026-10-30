@@ -1326,14 +1326,14 @@
     </div>
 
     <!-- TAB 1: ADMISSIONS & STUDENT REGISTRY -->
-    <div v-else-if="currentTab === 'admissions'" class="admin-tab-panel anim-stagger-3">
+    <div v-else-if="currentTab === 'admissions'" class="admin-tab-panel admissions-tab-panel anim-stagger-3">
       <div class="panel-header-controls">
         <div>
           <h3 class="panel-title">🎓 Student Admissions & Candidate Registry</h3>
           <p class="panel-subtitle">Manage registered candidate details, verified ISO registration slips, and program allocations.</p>
         </div>
 
-        <div class="panel-filter-group">
+        <div class="panel-filter-group admissions-filter-group">
           <!-- Search input -->
           <div class="events-search-box" style="margin: 0; min-width: 260px;">
             <span class="events-search-icon">🔍</span>
@@ -1407,9 +1407,10 @@
       </div>
 
       <!-- Admissions Data Table -->
-      <div class="admin-table-card">
-        <div class="table-responsive">
-          <table class="admin-data-table">
+      <div class="admin-table-card admissions-table-card">
+        <div class="admissions-table-hint" aria-hidden="true">↔ Swipe or scroll horizontally when needed to view all columns and actions</div>
+        <div class="table-responsive admissions-table-scroll" tabindex="0" role="region" aria-label="Admissions registry table; scroll horizontally to view all columns">
+          <table class="admin-data-table admissions-table">
             <thead>
               <tr>
                 <th>Reg. / Student ID</th>
@@ -12500,6 +12501,128 @@ label {
   }
   .festival-banner-actions {
     justify-content: flex-end;
+  }
+}
+
+.admissions-tab-panel {
+  min-width: 0;
+}
+
+.admissions-filter-group {
+  flex: 1 1 100%;
+  display: grid;
+  grid-template-columns: minmax(240px, 1.1fr) minmax(220px, 0.9fr) auto;
+  align-items: center;
+  width: 100%;
+}
+
+.admissions-filter-group > .events-search-box,
+.admissions-filter-group > .admin-select-filter {
+  width: 100%;
+  min-width: 0 !important;
+  box-sizing: border-box;
+}
+
+.admissions-table-card {
+  min-width: 0;
+}
+
+.admissions-table-hint {
+  padding: 0.55rem 0.9rem;
+  color: #94a3b8;
+  background: rgba(15, 23, 42, 0.55);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 0.75rem;
+  text-align: right;
+}
+
+.admin-shell.light-theme .admissions-table-hint {
+  color: #475569;
+  background: #f8fafc;
+  border-bottom-color: #e2e8f0;
+}
+
+.admissions-table-scroll {
+  max-width: 100%;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #475569 #0d1322;
+}
+
+.admissions-table-scroll:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: -2px;
+}
+
+.admissions-table-scroll::-webkit-scrollbar {
+  height: 10px;
+}
+
+.admissions-table-scroll::-webkit-scrollbar-track {
+  background: #0d1322;
+}
+
+.admissions-table-scroll::-webkit-scrollbar-thumb {
+  background: #475569;
+  border: 2px solid #0d1322;
+  border-radius: 999px;
+}
+
+.admissions-table {
+  min-width: 1260px;
+  table-layout: fixed;
+}
+
+.admissions-table th,
+.admissions-table td {
+  overflow-wrap: anywhere;
+}
+
+.admissions-table th {
+  white-space: normal;
+  line-height: 1.35;
+}
+
+.admissions-table th:nth-child(1),
+.admissions-table td:nth-child(1) { width: 12%; }
+.admissions-table th:nth-child(2),
+.admissions-table td:nth-child(2) { width: 10%; }
+.admissions-table th:nth-child(3),
+.admissions-table td:nth-child(3) { width: 9%; }
+.admissions-table th:nth-child(4),
+.admissions-table td:nth-child(4) { width: 14%; }
+.admissions-table th:nth-child(5),
+.admissions-table td:nth-child(5) { width: 14%; }
+.admissions-table th:nth-child(6),
+.admissions-table td:nth-child(6) { width: 11%; }
+.admissions-table th:nth-child(7),
+.admissions-table td:nth-child(7) { width: 9%; }
+.admissions-table th:nth-child(8),
+.admissions-table td:nth-child(8) { width: 21%; }
+
+.admissions-table .admin-row-actions {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  max-width: 100%;
+}
+
+.admissions-table .admin-row-actions > * {
+  flex: 0 1 auto;
+  white-space: normal;
+}
+
+@media (max-width: 960px) {
+  .admissions-filter-group {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admissions-filter-group > .btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .admissions-table-hint {
+    text-align: left;
   }
 }
 
