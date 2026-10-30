@@ -12101,9 +12101,15 @@ label {
 /* 2-Column Editor Grid */
 .festival-layout-grid {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
   gap: 1.75rem;
   align-items: start;
+}
+
+.festival-layout-grid > * {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .festival-config-card {
@@ -12124,6 +12130,8 @@ label {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   margin-bottom: 1.25rem;
   padding-bottom: 0.85rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -12238,6 +12246,8 @@ label {
 
 /* Simulator Box Inside Preview Card */
 .festival-preview-card {
+  min-width: 0;
+  overflow: hidden;
   background: #0d1322;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 18px;
@@ -12308,6 +12318,7 @@ label {
 }
 
 .sim-body {
+  min-width: 0;
   padding: 1.35rem;
 }
 
@@ -12316,6 +12327,11 @@ label {
   align-items: center;
   gap: 0.85rem;
   margin-bottom: 0.95rem;
+}
+
+.sim-title-row > div:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .sim-symbol {
@@ -12337,6 +12353,7 @@ label {
 }
 
 .sim-title {
+  overflow-wrap: anywhere;
   font-size: 1.2rem;
   font-weight: 800;
   color: #ffffff !important;
@@ -12348,6 +12365,7 @@ label {
 }
 
 .sim-tagline {
+  overflow-wrap: anywhere;
   font-size: 0.78rem;
   color: #fbbf24 !important;
   font-weight: 700;
@@ -12359,6 +12377,7 @@ label {
 }
 
 .sim-message {
+  overflow-wrap: anywhere;
   font-size: 0.88rem;
   line-height: 1.6;
   color: #cbd5e1 !important;
@@ -12393,6 +12412,7 @@ label {
 }
 
 .sim-offer-text {
+  overflow-wrap: anywhere;
   font-size: 0.86rem;
   font-weight: 700;
   color: #fef08a !important;
@@ -12488,7 +12508,7 @@ label {
   text-align: center;
 }
 
-@media (max-width: 991px) {
+@media (max-width: 1200px) {
   .festival-layout-grid {
     grid-template-columns: 1fr;
   }
