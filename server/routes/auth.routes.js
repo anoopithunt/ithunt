@@ -46,7 +46,11 @@ router.post('/login', loginRateLimit, async (req, res) => {
       (u.email && u.email.toLowerCase() === normEmail) ||
       (u.registrationNo && u.registrationNo.toLowerCase() === normEmail) ||
       (u.enrollmentNumber && u.enrollmentNumber.toLowerCase() === normEmail) ||
-      (u.id && u.id.toLowerCase() === normEmail)
+      (u.id && u.id.toLowerCase() === normEmail) ||
+      (normEmail === 'admin' && (u.email === 'admin@ithunt.com' || u.role === 'superadmin')) ||
+      (normEmail === 'director' && (u.email === 'director@ithunt.com' || u.email === 'admin@ithunt.com')) ||
+      ((normEmail === 'anoop' || normEmail === 'anup') && (u.email === 'anoop@ithunt.com' || u.email === 'anup@codemaya.com')) ||
+      (normEmail === 'teacher' && (u.email === 'teacher@ithunt.com' || u.role === 'teacher'))
     );
 
     if (!user) {
