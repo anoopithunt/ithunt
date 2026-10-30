@@ -9505,12 +9505,12 @@ body.light-theme .course-card:hover .course-action-btn * {
 }
 
 /* Links in Light Mode */
-body.light-theme a:not(.btn):not(.course-action-btn):not(.cta-btn-header):not(.badge):not(.footer-chip):not(.footer-whatsapp-btn):not(.btn-primary *) {
+body.light-theme a:not(.btn):not(.course-action-btn):not(.cta-btn-header):not(.badge):not(.footer-chip):not(.btn-primary *) {
   color: #000000 !important;
   -webkit-text-fill-color: initial !important;
 }
 
-body.light-theme a:not(.btn):not(.course-action-btn):not(.cta-btn-header):not(.badge):not(.footer-chip):not(.footer-whatsapp-btn):not(.btn-primary *):hover {
+body.light-theme a:not(.btn):not(.course-action-btn):not(.cta-btn-header):not(.badge):not(.footer-chip):not(.btn-primary *):hover {
   color: #ea580c !important;
   -webkit-text-fill-color: #ea580c !important;
 }
