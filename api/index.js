@@ -30,8 +30,18 @@ async function ensureDbConnectedWithRetry(maxAttempts = 3, delayMs = 500) {
  */
 export default async function handler(req, res) {
   try {
-    // If Vercel has pre-parsed the body as JSON object, flag for body-parser
-    if (req.body && typeof req.body === 'object') {
+    // Handle pre-parsed body from Vercel (string, Buffer, or Object)
+    if (typeof req.body === 'string' && req.body.trim()) {
+      try {
+        req.body = JSON.parse(req.body);
+        req._body = true;
+      } catch (_) {}
+    } else if (Buffer.isBuffer(req.body)) {
+      try {
+        req.body = JSON.parse(req.body.toString('utf8'));
+        req._body = true;
+      } catch (_) {}
+    } else if (req.body && typeof req.body === 'object') {
       req._body = true;
     }
 
@@ -41,12 +51,16 @@ export default async function handler(req, res) {
     if (pathParam) {
       urlObj.searchParams.delete('path');
       const remainingQuery = urlObj.searchParams.toString();
-      const cleanPath = pathParam.replace(/^\/+/, '');
+      let cleanPath = pathParam.replace(/^\/+/, '');
+      if (!cleanPath.startsWith('api/') && cleanPath !== 'api') {
+        cleanPath = `api/${cleanPath}`;
+      }
       req.url = `/${cleanPath}${remainingQuery ? '?' + remainingQuery : ''}`;
     } else {
       const matchedPath = req.headers['x-matched-path'] || req.headers['x-vercel-matched-path'] || req.headers['x-forwarded-uri'];
       if (matchedPath && (req.url === '/api' || req.url === '/api/')) {
-        req.url = matchedPath.startsWith('/') ? matchedPath : `/${matchedPath}`;
+        const cleanMatched = matchedPath.startsWith('/') ? matchedPath : `/${matchedPath}`;
+        req.url = cleanMatched.startsWith('/api') ? cleanMatched : `/api${cleanMatched}`;
       }
     }
 

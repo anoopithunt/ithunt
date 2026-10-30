@@ -304,7 +304,8 @@ export async function apiRequest(endpoint, options = {}, isRetry = false) {
   const url = endpoint.startsWith('http') ? endpoint : `${baseUrl}${cleanEndpoint}`;
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 3500);
+  // 20-second timeout to comfortably accommodate Vercel serverless cold starts & cloud DB handshakes
+  const timeoutId = setTimeout(() => controller.abort(), 20000);
 
   try {
     let response;
