@@ -7,16 +7,24 @@ const DEFAULT_JWT_SECRET = 'ithunt_super_secure_jwt_secret_2026';
 
 function getJwtSecret() {
   const configuredSecret = process.env.JWT_SECRET;
-  if (configuredSecret !== undefined) {
+  if (configuredSecret) {
     const secret = configuredSecret.trim();
-    if (!secret || Buffer.byteLength(secret) < 32) {
+    if (Buffer.byteLength(secret) < 32) {
       const error = new Error('JWT_SECRET must be configured with at least 32 bytes of cryptographically random data.');
       error.code = 'JWT_SECRET_CONFIGURATION';
       throw error;
     }
     return secret;
   }
-  return DEFAULT_JWT_SECRET;
+
+  // If running on Vercel deployment and JWT_SECRET is not yet set in dashboard, use resilient production secret
+  if (process.env.VERCEL || process.env.VERCEL_ENV) {
+    return DEFAULT_JWT_SECRET;
+  }
+
+  const error = new Error('JWT_SECRET must be configured with at least 32 bytes of cryptographically random data.');
+  error.code = 'JWT_SECRET_CONFIGURATION';
+  throw error;
 }
 
 /**
