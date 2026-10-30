@@ -32,6 +32,25 @@ test('JWT generation fails closed when the secret is missing or too short', () =
   }
 });
 
+test('JWT verification fails closed when the secret is missing', () => {
+  const originalSecret = process.env.JWT_SECRET;
+  try {
+    delete process.env.JWT_SECRET;
+    const response = createResponse();
+    let continued = false;
+    verifyToken({ headers: { authorization: 'Bearer invalid-token' } }, response, () => {
+      continued = true;
+    });
+
+    assert.equal(continued, false);
+    assert.equal(response.statusCode, 503);
+    assert.equal(response.body.message, 'Authentication is temporarily unavailable. Please contact the administrator.');
+  } finally {
+    if (originalSecret === undefined) delete process.env.JWT_SECRET;
+    else process.env.JWT_SECRET = originalSecret;
+  }
+});
+
 test('JWTs use HS256 and verification rejects other signing algorithms', () => {
   const originalSecret = process.env.JWT_SECRET;
   process.env.JWT_SECRET = 'test-only-secret-with-at-least-32-cryptographic-bytes';

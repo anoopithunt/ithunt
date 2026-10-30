@@ -733,7 +733,7 @@
               </div>
 
               <div v-else class="queue-list">
-                <div v-for="adm in recentAdmissions" :key="adm.registrationNo || adm.id" class="queue-item" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.05); gap: 1rem;">
+                <div v-for="adm in recentAdmissions" :key="adm.registrationNo || adm.id" class="queue-item" style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                   <div class="queue-item-info" style="flex: 1; min-width: 0;">
                     <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                       <div class="queue-item-name" style="font-weight: 700; color: var(--text-main);">{{ adm.candidateName || adm.fullName || 'Candidate' }}</div>
@@ -751,7 +751,7 @@
                       <span>💳 {{ adm.feeStatus || 'Pending' }}</span>
                     </div>
                   </div>
-                  <div class="queue-item-actions" style="display: flex; gap: 0.4rem; align-items: center; flex-shrink: 0;">
+                  <div class="queue-item-actions">
                     <button 
                       v-if="!adm.admissionConfirmed && adm.status !== 'Confirmed' && adm.status !== 'Active Registered Student'"
                       class="btn-primary queue-confirm-btn" 
@@ -909,9 +909,10 @@
       </div>
 
       <!-- Students Data Table Card -->
-      <div class="admin-table-card">
-        <div class="table-responsive-container">
-          <table class="admin-data-table">
+      <div class="admin-table-card student-directory-card">
+        <div class="student-directory-scroll-hint">Swipe or scroll horizontally to view student details and actions.</div>
+        <div class="table-responsive-container student-directory-scroll">
+          <table class="admin-data-table student-directory-table">
             <thead>
               <tr>
                 <th>Enrollment No</th>
@@ -924,7 +925,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="stu in filteredStudents" :key="stu.id || stu.enrollmentNumber">
+              <tr v-for="stu in filteredStudents" :key="stu.id || stu.enrollmentNumber" class="student-directory-row">
                 <!-- Enrollment No -->
                 <td>
                   <span 
@@ -993,7 +994,7 @@
 
                 <!-- Actions -->
                 <td style="text-align: right;">
-                  <div style="display: flex; justify-content: flex-end; gap: 0.4rem; flex-wrap: wrap;">
+                  <div class="student-directory-actions" style="display: flex; justify-content: flex-end; gap: 0.4rem; flex-wrap: wrap;">
                     <!-- If pending candidate: prominent 1-click Confirm & Generate Login -->
                     <button 
                       v-if="!stu.admissionConfirmed && stu.status !== 'Confirmed'"
@@ -1213,18 +1214,19 @@
       </div>
 
       <!-- Submissions Table -->
-      <div class="admin-data-card">
-        <div class="data-table-container">
-          <table class="admin-data-table">
+      <div class="admin-data-card exam-submissions-card">
+        <div class="exam-table-scroll-hint">Swipe or scroll horizontally to see all submission details.</div>
+        <div class="data-table-container exam-submissions-scroll" tabindex="0" role="region" aria-label="Exam submissions table; scroll horizontally to view all columns">
+          <table class="admin-data-table exam-submissions-table">
             <thead>
               <tr>
-                <th>Student Candidate</th>
-                <th>Enrolled Batch / Course</th>
-                <th>Exam Taken & Subject</th>
-                <th>Date & Time</th>
+                <th>Student</th>
+                <th>Batch / Course</th>
+                <th>Exam</th>
+                <th>Submitted</th>
                 <th style="text-align: center;">Score</th>
                 <th style="text-align: center;">Result</th>
-                <th style="text-align: right;">Action: Options Inspection</th>
+                <th style="text-align: right;">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -1237,8 +1239,8 @@
                     </div>
                     <div>
                       <strong class="table-primary-text" style="color: var(--text-main); font-size: 0.95rem;">{{ sub.studentName }}</strong>
-                      <div class="text-dim" style="font-size: 0.78rem; font-family: var(--font-mono); color: var(--text-muted);">
-                        Roll: {{ sub.studentRoll }}
+                      <div v-if="sub.studentRoll || sub.studentId" class="text-dim" style="font-size: 0.78rem; font-family: var(--font-mono); color: var(--text-muted);">
+                        ID: {{ sub.studentRoll || sub.studentId }}
                       </div>
                     </div>
                   </div>
@@ -1279,20 +1281,22 @@
 
                 <!-- Action Button -->
                 <td style="text-align: right;">
-                  <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                  <div class="exam-submission-actions">
                     <button 
                       class="btn-primary" 
                       style="padding: 0.35rem 0.85rem; font-size: 0.82rem;"
                       @click="openTeacherExamInspection(sub)"
                       title="Inspect student's selected options question by question"
+                      :aria-label="'Inspect answers for ' + sub.studentName"
                     >
-                      <span>Inspect Options 🔍</span>
+                      <span>Inspect Answers</span>
                     </button>
                     <button 
                       class="admin-icon-btn" 
                       style="color: #ef4444;"
                       @click="handleDeleteExamSubmission(sub.id)"
                       title="Delete this submission"
+                      :aria-label="'Delete submission for ' + sub.studentName"
                     >
                       🗑️
                     </button>
@@ -1326,14 +1330,14 @@
     </div>
 
     <!-- TAB 1: ADMISSIONS & STUDENT REGISTRY -->
-    <div v-else-if="currentTab === 'admissions'" class="admin-tab-panel anim-stagger-3">
+    <div v-else-if="currentTab === 'admissions'" class="admin-tab-panel admissions-tab-panel anim-stagger-3">
       <div class="panel-header-controls">
         <div>
           <h3 class="panel-title">🎓 Student Admissions & Candidate Registry</h3>
           <p class="panel-subtitle">Manage registered candidate details, verified ISO registration slips, and program allocations.</p>
         </div>
 
-        <div class="panel-filter-group">
+        <div class="panel-filter-group admissions-filter-group">
           <!-- Search input -->
           <div class="events-search-box" style="margin: 0; min-width: 260px;">
             <span class="events-search-icon">🔍</span>
@@ -1407,9 +1411,10 @@
       </div>
 
       <!-- Admissions Data Table -->
-      <div class="admin-table-card">
-        <div class="table-responsive">
-          <table class="admin-data-table">
+      <div class="admin-table-card admissions-table-card">
+        <div class="admissions-table-hint" aria-hidden="true">↔ Swipe or scroll horizontally when needed to view all columns and actions</div>
+        <div class="table-responsive admissions-table-scroll" tabindex="0" role="region" aria-label="Admissions registry table; scroll horizontally to view all columns">
+          <table class="admin-data-table admissions-table">
             <thead>
               <tr>
                 <th>Reg. / Student ID</th>
@@ -2857,12 +2862,12 @@
 
           <div class="form-group">
             <label class="field-label">📍 Location Scope & Target Campuses</label>
-            <select v-model="festivalWishData.locationScope" class="form-control">
+            <select v-model="festivalWishData.locationScope" class="form-control location-scope-select">
               <option v-for="scope in availableLocationScopes" :key="scope" :value="scope">
                 {{ scope }}
               </option>
             </select>
-            <span class="field-hint-text">
+            <span class="field-hint-text location-scope-hint">
               ✓ Visible Across Location: Dynamically served from MongoDB Atlas to every visitor browsing from any campus, city, or remote device.
             </span>
           </div>
@@ -9171,6 +9176,7 @@ body.light-theme .admin-data-table th {
   --bg-card-hover: #f1f5f9;
   background: #f4f6fb !important;
   color: #0f172a !important;
+  font-style: normal;
 }
 
 .admin-shell.dark-theme {
@@ -10412,8 +10418,12 @@ body.light-theme .admin-data-table th {
 /* Dual Grid: Queue & System Health */
 .overview-dual-grid {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
   gap: 1.5rem;
+}
+
+.overview-dual-grid > * {
+  min-width: 0;
 }
 
 .overview-box-card {
@@ -10519,7 +10529,7 @@ body.light-theme .admin-data-table th {
 
 .queue-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
   padding: 0.85rem 1rem;
@@ -10594,6 +10604,18 @@ body.light-theme .admin-data-table th {
   align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: 270px;
+}
+
+.queue-item-actions .queue-icon-btn {
+  width: auto;
+  height: auto;
+  min-height: 36px;
+  padding: 0.4rem 0.65rem;
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 .queue-confirm-btn {
@@ -10653,6 +10675,7 @@ body.light-theme .admin-data-table th {
 .health-label {
   display: flex;
   align-items: center;
+  min-width: 0;
   gap: 0.5rem;
   color: #94a3b8;
   font-weight: 600;
@@ -10671,10 +10694,13 @@ body.light-theme .admin-data-table th {
 }
 
 .health-value {
+  min-width: 0;
   font-family: var(--font-mono, monospace);
   font-weight: 700;
   color: #e2e8f0;
   font-size: 0.75rem;
+  text-align: right;
+  overflow-wrap: anywhere;
 }
 
 .admin-shell.light-theme .health-value {
@@ -11507,6 +11533,7 @@ label {
 
   .queue-item-actions {
     width: 100% !important;
+    max-width: none !important;
     display: flex !important;
     justify-content: flex-end !important;
     flex-wrap: wrap !important;
@@ -12079,9 +12106,15 @@ label {
 /* 2-Column Editor Grid */
 .festival-layout-grid {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
   gap: 1.75rem;
   align-items: start;
+}
+
+.festival-layout-grid > * {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .festival-config-card {
@@ -12102,6 +12135,8 @@ label {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   margin-bottom: 1.25rem;
   padding-bottom: 0.85rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -12166,6 +12201,21 @@ label {
   font-family: inherit;
 }
 
+.festival-config-card .location-scope-select {
+  min-width: 0 !important;
+  max-width: 100%;
+  overflow: hidden;
+  padding-right: 2.5rem !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.location-scope-hint {
+  max-width: 100%;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
 .admin-shell.light-theme .festival-config-card input.form-control,
 .admin-shell.light-theme .festival-config-card select.form-control,
 .admin-shell.light-theme .festival-config-card textarea.form-control {
@@ -12216,6 +12266,8 @@ label {
 
 /* Simulator Box Inside Preview Card */
 .festival-preview-card {
+  min-width: 0;
+  overflow: hidden;
   background: #0d1322;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 18px;
@@ -12286,6 +12338,7 @@ label {
 }
 
 .sim-body {
+  min-width: 0;
   padding: 1.35rem;
 }
 
@@ -12294,6 +12347,11 @@ label {
   align-items: center;
   gap: 0.85rem;
   margin-bottom: 0.95rem;
+}
+
+.sim-title-row > div:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .sim-symbol {
@@ -12315,6 +12373,7 @@ label {
 }
 
 .sim-title {
+  overflow-wrap: anywhere;
   font-size: 1.2rem;
   font-weight: 800;
   color: #ffffff !important;
@@ -12326,6 +12385,7 @@ label {
 }
 
 .sim-tagline {
+  overflow-wrap: anywhere;
   font-size: 0.78rem;
   color: #fbbf24 !important;
   font-weight: 700;
@@ -12337,6 +12397,7 @@ label {
 }
 
 .sim-message {
+  overflow-wrap: anywhere;
   font-size: 0.88rem;
   line-height: 1.6;
   color: #cbd5e1 !important;
@@ -12371,6 +12432,7 @@ label {
 }
 
 .sim-offer-text {
+  overflow-wrap: anywhere;
   font-size: 0.86rem;
   font-weight: 700;
   color: #fef08a !important;
@@ -12466,7 +12528,7 @@ label {
   text-align: center;
 }
 
-@media (max-width: 991px) {
+@media (max-width: 1200px) {
   .festival-layout-grid {
     grid-template-columns: 1fr;
   }
@@ -12479,6 +12541,421 @@ label {
   }
   .festival-banner-actions {
     justify-content: flex-end;
+  }
+}
+
+@media (max-width: 640px) {
+  .festival-config-card,
+  .festival-preview-card {
+    padding: 1rem;
+  }
+
+  .festival-config-card .location-scope-select {
+    padding: 0.7rem 2.25rem 0.7rem 0.75rem !important;
+    font-size: 0.82rem !important;
+  }
+
+  .location-scope-hint {
+    font-size: 0.72rem;
+  }
+}
+
+.admissions-tab-panel {
+  min-width: 0;
+}
+
+.admissions-filter-group {
+  flex: 1 1 100%;
+  display: grid;
+  grid-template-columns: minmax(240px, 1.1fr) minmax(220px, 0.9fr) auto;
+  align-items: center;
+  width: 100%;
+}
+
+.admissions-filter-group > .events-search-box,
+.admissions-filter-group > .admin-select-filter {
+  width: 100%;
+  min-width: 0 !important;
+  box-sizing: border-box;
+}
+
+.admissions-table-card {
+  min-width: 0;
+}
+
+.admissions-table-hint {
+  padding: 0.55rem 0.9rem;
+  color: #94a3b8;
+  background: rgba(15, 23, 42, 0.55);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 0.75rem;
+  text-align: right;
+}
+
+.admin-shell.light-theme .admissions-table-hint {
+  color: #475569;
+  background: #f8fafc;
+  border-bottom-color: #e2e8f0;
+}
+
+.admissions-table-scroll {
+  max-width: 100%;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #475569 #0d1322;
+}
+
+.admissions-table-scroll:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: -2px;
+}
+
+.admissions-table-scroll::-webkit-scrollbar {
+  height: 10px;
+}
+
+.admissions-table-scroll::-webkit-scrollbar-track {
+  background: #0d1322;
+}
+
+.admissions-table-scroll::-webkit-scrollbar-thumb {
+  background: #475569;
+  border: 2px solid #0d1322;
+  border-radius: 999px;
+}
+
+.admissions-table {
+  min-width: 1260px;
+  table-layout: fixed;
+}
+
+.admissions-table th,
+.admissions-table td {
+  overflow-wrap: anywhere;
+}
+
+.admissions-table th {
+  white-space: normal;
+  line-height: 1.35;
+}
+
+.admissions-table th:nth-child(1),
+.admissions-table td:nth-child(1) { width: 10%; }
+.admissions-table th:nth-child(2),
+.admissions-table td:nth-child(2) { width: 10%; }
+.admissions-table th:nth-child(3),
+.admissions-table td:nth-child(3) { width: 8%; }
+.admissions-table th:nth-child(4),
+.admissions-table td:nth-child(4) { width: 13%; }
+.admissions-table th:nth-child(5),
+.admissions-table td:nth-child(5) { width: 13%; }
+.admissions-table th:nth-child(6),
+.admissions-table td:nth-child(6) { width: 10%; }
+.admissions-table th:nth-child(7),
+.admissions-table td:nth-child(7) { width: 9%; }
+.admissions-table th:nth-child(8),
+.admissions-table td:nth-child(8) { width: 27%; }
+
+.admissions-table .admin-row-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  justify-content: stretch;
+  align-items: start;
+  gap: 0.45rem;
+  max-width: 100%;
+}
+
+.admissions-table .admin-row-actions > * {
+  width: 100%;
+  min-width: 0;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.admin-shell.light-theme .admissions-tab-panel {
+  color: #172033;
+  font-style: normal;
+}
+
+.admin-shell.light-theme .admissions-table-card {
+  background: #ffffff !important;
+  border-color: #d7e0ec !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07) !important;
+}
+
+.admin-shell.light-theme .admissions-table-hint {
+  color: #475569 !important;
+  background: #f1f5f9 !important;
+  border-bottom-color: #dbe3ee !important;
+}
+
+.admin-shell.light-theme .admissions-table th {
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+  border-bottom-color: #cbd5e1 !important;
+}
+
+.admin-shell.light-theme .admissions-table td {
+  color: #1e293b !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+.admin-shell.light-theme .admissions-table tbody tr:nth-child(even) {
+  background: #f8fafc;
+}
+
+.admin-shell.light-theme .admissions-table tbody tr:hover {
+  background: #eff6ff !important;
+}
+
+.admin-shell.light-theme .admissions-table td [style*="color: var(--text-dim)"] {
+  color: #475569 !important;
+}
+
+.admin-shell.light-theme .admissions-table td [style*="color: var(--color-ai-cyan)"] {
+  color: #0369a1 !important;
+}
+
+.admin-shell.light-theme .admissions-table .admin-reg-pill {
+  color: #9a3412 !important;
+  background: #ffedd5 !important;
+}
+
+.admin-shell.light-theme .admissions-table .admin-status-chip.status-confirmed {
+  color: #166534 !important;
+  background: #dcfce7 !important;
+  border-color: #86efac !important;
+}
+
+.admin-shell.light-theme .admissions-table .admin-status-chip.status-verified {
+  color: #075985 !important;
+  background: #e0f2fe !important;
+  border-color: #7dd3fc !important;
+}
+
+.admin-shell.light-theme .admissions-table .admin-status-chip.status-pending {
+  color: #92400e !important;
+  background: #fef3c7 !important;
+  border-color: #fcd34d !important;
+}
+
+.admin-shell.light-theme .admissions-table .admin-icon-btn {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+.admin-shell.light-theme .admissions-table .admin-icon-btn:hover {
+  background: #eff6ff !important;
+  border-color: #60a5fa !important;
+}
+
+.admin-shell.light-theme .admissions-table .btn-primary {
+  color: #ffffff !important;
+}
+
+@media (max-width: 960px) {
+  .admissions-filter-group {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admissions-filter-group > .btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .admissions-table-hint {
+    text-align: left;
+  }
+}
+
+.exam-submissions-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 16px;
+  background: #0d1322;
+}
+
+.exam-table-scroll-hint {
+  display: none;
+  padding: 0.65rem 1rem;
+  color: #94a3b8;
+  background: rgba(15, 23, 42, 0.72);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  font-size: 0.78rem;
+}
+
+.exam-submissions-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.exam-submissions-scroll:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: -2px;
+}
+
+.exam-submissions-table {
+  width: 100%;
+  min-width: 1080px;
+  table-layout: fixed;
+}
+
+.exam-submissions-table th,
+.exam-submissions-table td {
+  overflow-wrap: anywhere;
+}
+
+.exam-submissions-table th {
+  white-space: normal;
+  line-height: 1.35;
+}
+
+.exam-submissions-table th:nth-child(1),
+.exam-submissions-table td:nth-child(1) { width: 17%; }
+.exam-submissions-table th:nth-child(2),
+.exam-submissions-table td:nth-child(2) { width: 17%; }
+.exam-submissions-table th:nth-child(3),
+.exam-submissions-table td:nth-child(3) { width: 20%; }
+.exam-submissions-table th:nth-child(4),
+.exam-submissions-table td:nth-child(4) { width: 13%; }
+.exam-submissions-table th:nth-child(5),
+.exam-submissions-table td:nth-child(5) { width: 9%; }
+.exam-submissions-table th:nth-child(6),
+.exam-submissions-table td:nth-child(6) { width: 9%; }
+.exam-submissions-table th:nth-child(7),
+.exam-submissions-table td:nth-child(7) { width: 15%; }
+
+.exam-submission-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.exam-submission-actions .btn-primary {
+  min-height: 40px;
+}
+
+.admin-shell.light-theme .exam-submissions-card {
+  background: #ffffff;
+  border-color: #dbe3ee;
+}
+
+.admin-shell.light-theme .exam-table-scroll-hint {
+  color: #475569;
+  background: #f8fafc;
+  border-bottom-color: #dbe3ee;
+}
+
+@media (max-width: 1100px) {
+  .exam-table-scroll-hint {
+    display: block;
+  }
+}
+
+@media (max-width: 640px) {
+  .exam-submissions-table {
+    min-width: 980px;
+  }
+
+  .exam-submissions-table th,
+  .exam-submissions-table td {
+    padding: 0.7rem 0.65rem;
+    font-size: 0.78rem;
+  }
+
+  .exam-submission-actions {
+    justify-content: flex-start;
+  }
+}
+
+.student-directory-card {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.student-directory-scroll-hint {
+  display: none;
+  padding: 0.6rem 1rem;
+  color: #94a3b8;
+  background: rgba(15, 23, 42, 0.72);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  font-size: 0.78rem;
+}
+
+.student-directory-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.student-directory-table {
+  width: 100%;
+  min-width: 1180px;
+  height: auto;
+  table-layout: auto;
+}
+
+.student-directory-table th,
+.student-directory-table td {
+  padding: 0.7rem 0.85rem;
+  line-height: 1.4;
+  vertical-align: middle;
+}
+
+.student-directory-table tbody tr {
+  height: auto;
+}
+
+.student-directory-table .student-directory-actions {
+  flex-wrap: nowrap !important;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.student-directory-actions > button {
+  min-height: 36px !important;
+  padding: 0.35rem 0.55rem !important;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.student-directory-table .reg-no-code {
+  overflow-wrap: anywhere;
+}
+
+.admin-shell.light-theme .student-directory-scroll-hint {
+  color: #475569;
+  background: #f8fafc;
+  border-bottom-color: #dbe3ee;
+}
+
+.admin-shell.light-theme .student-directory-table tbody tr:nth-child(even) {
+  background: #f8fafc;
+}
+
+@media (max-width: 1100px) {
+  .student-directory-scroll-hint {
+    display: block;
+  }
+}
+
+@media (max-width: 640px) {
+  .student-directory-table {
+    min-width: 1100px;
+  }
+
+  .student-directory-table th,
+  .student-directory-table td {
+    padding: 0.6rem 0.65rem;
+    font-size: 0.78rem;
   }
 }
 

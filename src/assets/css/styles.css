@@ -99,7 +99,7 @@ h6,
 .section-title {
   overflow-wrap: break-word;
   word-wrap: break-word;
-  word-break: break-word;
+  word-break: normal;
 }
 
 .subtle-bg-gradient {
@@ -7478,7 +7478,6 @@ body.light-theme input[type="date"]::-webkit-calendar-picker-indicator {
     gap: 2rem;
   }
 
-  .internship-tracks-grid,
   .alumni-cards-grid {
     grid-template-columns: 1fr !important;
     gap: 1.5rem;
