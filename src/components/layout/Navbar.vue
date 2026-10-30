@@ -27,16 +27,6 @@
 
       <!-- Action Buttons (ITHUNT Style: Clean, Modern & Responsive) -->
       <div class="nav-actions">
-        <!-- Theme Toggle -->
-        <button 
-          class="theme-toggle-btn" 
-          @click="$emit('toggle-theme')" 
-          :aria-label="isDarkMode ? (content.navbar?.lightModeTitle || 'Switch to Light Mode') : (content.navbar?.darkModeTitle || 'Switch to Dark Mode')"
-          :title="isDarkMode ? (content.navbar?.lightModeTitle || 'Switch to Light Mode') : (content.navbar?.darkModeTitle || 'Switch to Dark Mode')"
-        >
-          <span>{{ isDarkMode ? '☀️' : '🌙' }}</span>
-        </button>
-        
         <!-- Unified Single Login / Portal Button (Desktop) -->
         <button 
           v-if="isAdminLoggedIn"
@@ -123,7 +113,6 @@
           >
           <div>
             <div class="sidebar-brand-title">IT <span class="text-gradient">{{ content.brand?.nameHighlight }}</span></div>
-            <div class="sidebar-brand-sub">{{ content.brand?.tagline || 'Software Solutions & Tech Academy' }}</div>
           </div>
         </div>
 
@@ -137,233 +126,79 @@
         </button>
       </div>
 
-      <!-- User / Portal Status Banner -->
-      <div class="sidebar-user-card" v-if="isAdminLoggedIn">
-        <div class="sidebar-user-avatar admin">⚡</div>
-        <div class="sidebar-user-details">
-          <div class="sidebar-user-badge admin">🛡️ SuperAdmin Active</div>
-          <div class="sidebar-user-name">{{ content.adminAuth?.superAdminName || 'Administrator' }}</div>
-          <div class="sidebar-user-sub">Directorate Console</div>
-        </div>
-        <button 
-          class="sidebar-user-btn" 
-          @click="$emit('set-tab', 'superadmin'); closeMobileNav();"
-        >
-          Open Console →
-        </button>
-      </div>
-
-      <div class="sidebar-user-card" v-else-if="studentUser">
-        <div class="sidebar-user-avatar student">🎓</div>
-        <div class="sidebar-user-details">
-          <div class="sidebar-user-badge student">● Active Student</div>
-          <div class="sidebar-user-name">{{ studentUser.candidateName || 'Enrolled Student' }}</div>
-          <div class="sidebar-user-sub">ID: {{ studentUser.registrationNo || 'ITH-STUDENT' }}</div>
-        </div>
-        <button 
-          class="sidebar-user-btn" 
-          @click="$emit('set-tab', 'student-portal'); closeMobileNav();"
-        >
-          My Dashboard →
-        </button>
-      </div>
-
-      <div class="sidebar-user-card guest" v-else>
-        <div class="sidebar-user-avatar guest">👤</div>
-        <div class="sidebar-user-details">
-          <div class="sidebar-user-badge guest">Guest Visitor</div>
-          <div class="sidebar-user-name">Welcome to IT HUNT</div>
-          <div class="sidebar-user-sub">Software Studio & Academy</div>
-        </div>
-        <div class="sidebar-guest-actions">
-          <button 
-            class="sidebar-guest-btn primary"
-            @click="$emit('set-tab', 'login'); closeMobileNav();"
-          >
-            🔐 Sign In
-          </button>
-          <button 
-            class="sidebar-guest-btn secondary"
-            @click="$emit('set-tab', 'admission'); closeMobileNav();"
-          >
-            📝 Apply
-          </button>
-        </div>
-      </div>
-
-      <!-- Scrollable Sidebar Navigation Links -->
+      <!-- Compact navigation links -->
       <div class="sidebar-nav-body">
-        <!-- Section: Core Academic Programs -->
-        <div class="sidebar-nav-section">
-          <div class="sidebar-nav-heading">Academic & Training Programs</div>
-          <ul class="sidebar-nav-list">
-            <li>
-              <button 
-                class="sidebar-nav-item" 
-                :class="{ active: activeTab === 'home' }"
-                @click="$emit('set-tab', 'home'); closeMobileNav();"
-              >
-                <span class="sidebar-item-icon">🏠</span>
-                <span class="sidebar-item-label">Home</span>
-              </button>
-            </li>
-            <li>
-              <button 
-                class="sidebar-nav-item" 
-                :class="{ active: activeTab === 'courses' }"
-                @click="$emit('set-tab', 'courses'); closeMobileNav();"
-              >
-                <span class="sidebar-item-icon">📚</span>
-                <span class="sidebar-item-label">Courses & Curriculum</span>
-              </button>
-            </li>
-            <li>
-              <button 
-                class="sidebar-nav-item" 
-                :class="{ active: activeTab === 'internships' }"
-                @click="$emit('set-tab', 'internships'); closeMobileNav();"
-              >
-                <span class="sidebar-item-icon">🚀</span>
-                <span class="sidebar-item-label">Production Internships</span>
-                <span class="sidebar-item-pill">Incubator</span>
-              </button>
-            </li>
-            <li>
-              <button 
-                class="sidebar-nav-item" 
-                :class="{ active: activeTab === 'events' }"
-                @click="$emit('set-tab', 'events'); closeMobileNav();"
-              >
-                <span class="sidebar-item-icon">🎪</span>
-                <span class="sidebar-item-label">Campus Events & Gallery</span>
-                <span class="sidebar-item-pill gold">2026</span>
-              </button>
-            </li>
-            <li>
-              <button 
-                class="sidebar-nav-item" 
-                :class="{ active: activeTab === 'admission' }"
-                @click="$emit('set-tab', 'admission'); closeMobileNav();"
-              >
-                <span class="sidebar-item-icon">📝</span>
-                <span class="sidebar-item-label">Apply for admission</span>
-                <span class="sidebar-item-pill pulse">Open</span>
-              </button>
-            </li>
-            <li>
-              <button 
-                class="sidebar-nav-item" 
-                style="background: rgba(249, 115, 22, 0.1); border-color: rgba(249, 115, 22, 0.3); color: var(--color-ai-orange);"
-                @click="$emit('open-cv-modal'); closeMobileNav();"
-              >
-                <span class="sidebar-item-icon">📄</span>
-                <span class="sidebar-item-label" style="font-weight: 700;">Generate Professional CV</span>
-                <span class="sidebar-item-pill orange" style="background: var(--color-ai-orange); color: white;">PDF</span>
-              </button>
-            </li>
-          </ul>
-        </div>
+        <ul class="sidebar-nav-list">
+          <li>
+            <button class="sidebar-nav-item" :class="{ active: activeTab === 'home' }" @click="$emit('set-tab', 'home'); closeMobileNav();">
+              <span class="sidebar-item-icon">🏠</span><span class="sidebar-item-label">Home</span>
+            </button>
+          </li>
+          <li>
+            <button class="sidebar-nav-item" :class="{ active: activeTab === 'courses' }" @click="$emit('set-tab', 'courses'); closeMobileNav();">
+              <span class="sidebar-item-icon">📚</span><span class="sidebar-item-label">Courses</span>
+            </button>
+          </li>
+          <li>
+            <button class="sidebar-nav-item" :class="{ active: activeTab === 'internships' }" @click="$emit('set-tab', 'internships'); closeMobileNav();">
+              <span class="sidebar-item-icon">🚀</span><span class="sidebar-item-label">Internships</span>
+            </button>
+          </li>
+          <li>
+            <button class="sidebar-nav-item" :class="{ active: activeTab === 'events' }" @click="$emit('set-tab', 'events'); closeMobileNav();">
+              <span class="sidebar-item-icon">🎪</span><span class="sidebar-item-label">Events</span>
+            </button>
+          </li>
+          <li>
+            <button class="sidebar-nav-item" :class="{ active: activeTab === 'admission' }" @click="$emit('set-tab', 'admission'); closeMobileNav();">
+              <span class="sidebar-item-icon">📝</span><span class="sidebar-item-label">Admission</span>
+            </button>
+          </li>
+          <li>
+            <button class="sidebar-nav-item" @click="$emit('open-cv-modal'); closeMobileNav();">
+              <span class="sidebar-item-icon">📄</span><span class="sidebar-item-label">Create a CV</span>
+            </button>
+          </li>
+          <li>
+            <button class="sidebar-nav-item" :class="{ active: activeTab === 'testimonials' }" @click="$emit('set-tab', 'testimonials'); closeMobileNav();">
+              <span class="sidebar-item-icon">⭐</span><span class="sidebar-item-label">Success stories</span>
+            </button>
+          </li>
+          <li>
+            <button class="sidebar-nav-item" :class="{ active: activeTab === 'reviews' }" @click="$emit('set-tab', 'reviews'); closeMobileNav();">
+              <span class="sidebar-item-icon">🌟</span><span class="sidebar-item-label">Reviews</span>
+            </button>
+          </li>
+          <li>
+            <button class="sidebar-nav-item" :class="{ active: activeTab === 'careers' }" @click="$emit('set-tab', 'careers'); closeMobileNav();">
+              <span class="sidebar-item-icon">💼</span><span class="sidebar-item-label">Careers</span>
+            </button>
+          </li>
+          <li v-if="isAdminLoggedIn">
+            <button class="sidebar-nav-item" :class="{ active: activeTab === 'superadmin' }" @click="$emit('set-tab', 'superadmin'); closeMobileNav();">
+              <span class="sidebar-item-icon">{{ isTeacher ? '👨‍🏫' : '⚡' }}</span>
+              <span class="sidebar-item-label">{{ isTeacher ? 'Teacher console' : 'Admin dashboard' }}</span>
+            </button>
+          </li>
+          <li v-if="studentUser">
+            <button class="sidebar-nav-item" :class="{ active: activeTab === 'student-portal' }" @click="$emit('set-tab', 'student-portal'); closeMobileNav();">
+              <span class="sidebar-item-icon">🎓</span><span class="sidebar-item-label">Student portal</span>
+            </button>
+          </li>
+          <li v-if="!isAdminLoggedIn && !studentUser">
+            <button class="sidebar-nav-item" :class="{ active: activeTab === 'login' }" @click="$emit('set-tab', 'login'); closeMobileNav();">
+              <span class="sidebar-item-icon">🔐</span><span class="sidebar-item-label">Sign in</span>
+            </button>
+          </li>
+        </ul>
 
-        <!-- Section: Institute & Community -->
-        <div class="sidebar-nav-section">
-          <div class="sidebar-nav-heading">Institute & Placements</div>
-          <ul class="sidebar-nav-list">
-            <li>
-              <button 
-                class="sidebar-nav-item" 
-                :class="{ active: activeTab === 'testimonials' }"
-                @click="$emit('set-tab', 'testimonials'); closeMobileNav();"
-              >
-                <span class="sidebar-item-icon">⭐</span>
-                <span class="sidebar-item-label">Placement Stories</span>
-              </button>
-            </li>
-            <li>
-              <button 
-                class="sidebar-nav-item" 
-                :class="{ active: activeTab === 'reviews' }"
-                @click="$emit('set-tab', 'reviews'); closeMobileNav();"
-              >
-                <span class="sidebar-item-icon">🌟</span>
-                <span class="sidebar-item-label">Student Reviews & Ratings</span>
-              </button>
-            </li>
-            <li>
-              <button 
-                class="sidebar-nav-item" 
-                :class="{ active: activeTab === 'careers' }"
-                @click="$emit('set-tab', 'careers'); closeMobileNav();"
-              >
-                <span class="sidebar-item-icon">💼</span>
-                <span class="sidebar-item-label">Careers & Faculty Hiring</span>
-              </button>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Section: Portals & Gateways -->
-        <div class="sidebar-nav-section">
-          <div class="sidebar-nav-heading">Portals & Login</div>
-          <ul class="sidebar-nav-list">
-            <li v-if="isAdminLoggedIn">
-              <button 
-                class="sidebar-nav-item highlight-admin" 
-                :class="{ active: activeTab === 'superadmin' }"
-                @click="$emit('set-tab', 'superadmin'); closeMobileNav();"
-              >
-                <span class="sidebar-item-icon">{{ isTeacher ? '👨‍🏫' : '⚡' }}</span>
-                <span class="sidebar-item-label">{{ isTeacher ? 'Teacher Console' : 'SuperAdmin Dashboard' }}</span>
-              </button>
-            </li>
-            <li v-if="studentUser">
-              <button 
-                class="sidebar-nav-item highlight-student" 
-                :class="{ active: activeTab === 'student-portal' }"
-                @click="$emit('set-tab', 'student-portal'); closeMobileNav();"
-              >
-                <span class="sidebar-item-icon">🎓</span>
-                <span class="sidebar-item-label">Student Portal Dashboard</span>
-              </button>
-            </li>
-            <li v-if="!isAdminLoggedIn && !studentUser">
-              <button 
-                class="sidebar-nav-item" 
-                :class="{ active: activeTab === 'login' }"
-                @click="$emit('set-tab', 'login'); closeMobileNav();"
-              >
-                <span class="sidebar-item-icon">🔐</span>
-                <span class="sidebar-item-label">Portal Sign In</span>
-              </button>
-            </li>
-          </ul>
-        </div>
-
-        <!-- NIELIT Apply CTA Button (Mobile Sidebar) -->
-        <div class="sidebar-cta-wrap">
-          <button 
-            class="sidebar-cta-btn" 
-            @click="$emit('open-nielit-modal'); closeMobileNav();"
-          >
-            <span>✨ Apply NIELIT Project 🚀</span>
-          </button>
-        </div>
+        <button class="sidebar-cta-btn" @click="$emit('open-nielit-modal'); closeMobileNav();">
+          Apply for NIELIT project
+        </button>
       </div>
 
-      <!-- Sidebar Footer with Theme Toggle & Contact -->
+      <!-- Sidebar Footer with Contact -->
       <div class="sidebar-footer">
-        <div class="sidebar-theme-row">
-          <span class="sidebar-theme-label">
-            {{ isDarkMode ? '🌙 Dark Mode Active' : '☀️ Light Mode Active' }}
-          </span>
-          <button 
-            class="sidebar-theme-btn" 
-            @click="$emit('toggle-theme')" 
-            :title="isDarkMode ? 'Switch to Light Theme' : 'Switch to Dark Theme'"
-          >
-            <span>{{ isDarkMode ? '☀️ Switch to Light' : '🌙 Switch to Dark' }}</span>
-          </button>
-        </div>
-
         <div class="sidebar-contact-grid">
           <a href="tel:+919795771806" class="sidebar-contact-btn">
             <span>📞 Call Us</span>
@@ -378,9 +213,6 @@
           </a>
         </div>
 
-        <div class="sidebar-location-tag">
-          📍 Holagarh, Prayagraj, UP • ISO 9001:2015
-        </div>
       </div>
     </aside>
     </Teleport>
@@ -398,10 +230,6 @@ const props = defineProps({
   activeTab: {
     type: String,
     required: true
-  },
-  isDarkMode: {
-    type: Boolean,
-    default: false
   },
   studentUser: {
     type: Object,
@@ -461,7 +289,7 @@ const isTeacher = computed(() => {
          role.toLowerCase().includes('teacher') || role.toLowerCase().includes('faculty');
 });
 
-defineEmits(['set-tab', 'toggle-theme', 'open-nielit-modal', 'open-cv-modal']);
+defineEmits(['set-tab', 'open-nielit-modal', 'open-cv-modal']);
 
 const isMobileNavOpen = ref(false);
 const isScrolled = ref(false);
