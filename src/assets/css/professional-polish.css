@@ -246,36 +246,6 @@ main.superadmin-main-active {
   min-width: 0;
 }
 
-.student-welcome-banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: clamp(1rem, 2.2vw, 1.5rem);
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 22px;
-  background: rgba(15, 23, 42, 0.55);
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
-}
-
-.dashboard-tab-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-bottom: 1.5rem;
-}
-
-.dash-nav-btn {
-  min-height: 44px;
-  border-radius: 12px;
-  padding: 0.7rem 0.9rem;
-  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-}
-
-.dash-nav-btn:hover {
-  transform: translateY(-1px);
-}
-
 @media (max-width: 768px) {
   .ithunt-home-section {
     padding-block: 3.5rem;
@@ -283,21 +253,6 @@ main.superadmin-main-active {
 
   .section-title-wrap {
     margin-bottom: 1.75rem;
-  }
-
-  .student-welcome-banner {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .dashboard-tab-nav {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .dash-nav-btn {
-    width: 100%;
-    justify-content: center;
   }
 }
 
@@ -323,9 +278,6 @@ main.superadmin-main-active {
     width: 100%;
   }
 
-  .dashboard-tab-nav {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* Final luxury pass: hero storytelling, cards, admissions, testimonials and dashboard polish */
@@ -884,5 +836,17 @@ body.light-theme .admin-shell .admin-data-table tbody tr:hover {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .starfield-wrapper,
+  .ambient-glow-container {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .starfield-wrapper,
+  .ambient-glow-container {
+    display: none;
   }
 }
