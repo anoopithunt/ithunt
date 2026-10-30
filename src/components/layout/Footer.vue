@@ -9,7 +9,7 @@
     <div class="container footer-grid">
 
       <!-- Brand + Socials -->
-      <div class="footer-col">
+      <div class="footer-col footer-brand-col">
         <div class="brand-logo">
           <img :src="content.brand?.logoImage" :alt="(content.brand?.name || 'IT HUNT') + ' Logo'" class="brand-logo-img" @error="onImgError">
           <div>
@@ -32,23 +32,23 @@
       </div>
 
       <!-- Quick Links -->
-      <div class="footer-col">
+      <div class="footer-col footer-links-col">
         <h4>Quick Links</h4>
         <ul class="footer-links">
           <li><a href="#" @click.prevent="$emit('set-tab', 'home')">Home</a></li>
           <li><a href="#" @click.prevent="$emit('set-tab', 'internships')">Internships</a></li>
           <li><a href="#" @click.prevent="$emit('set-tab', 'courses')">Courses</a></li>
-          <li><a href="#" @click.prevent="$emit('set-tab', 'events')">Events & Gallery</a></li>
-          <li><a href="#" @click.prevent="$emit('set-tab', 'testimonials')">Alumni Testimonials</a></li>
+          <li><a href="#" @click.prevent="$emit('set-tab', 'events')">Events</a></li>
+          <li><a href="#" @click.prevent="$emit('set-tab', 'testimonials')">Alumni</a></li>
           <li><a href="#" @click.prevent="$emit('set-tab', 'reviews')">Reviews</a></li>
           <li><a href="#" @click.prevent="$emit('set-tab', 'careers')">Careers</a></li>
           <li><a href="#" @click.prevent="$emit('set-tab', 'admission')">Admission</a></li>
-          <li><a href="#" @click.prevent="$emit('open-cv-modal')" class="footer-link-cta">📄 Generate CV (PDF)</a></li>
+          <li><a href="#" @click.prevent="$emit('open-cv-modal')" class="footer-link-cta">Build a CV</a></li>
         </ul>
       </div>
 
       <!-- Contact -->
-      <div class="footer-col">
+      <div class="footer-col footer-contact-col">
         <h4>Contact & Location</h4>
         <p class="footer-contact-item">📍 {{ content.contact?.location }}</p>
         <a
@@ -318,7 +318,39 @@ body.light-theme .footer-sep { color: #cbd5e1; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 600px) {
-  .footer-grid { grid-template-columns: 1fr; gap: 1.75rem; }
+  .footer-section {
+    padding-top: 2.25rem;
+  }
+  .footer-section .footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+    padding-bottom: 1.5rem;
+  }
+  .footer-brand-col .brand-logo {
+    margin-bottom: 0.65rem;
+  }
+  .footer-brand-col .footer-about-text {
+    margin-bottom: 0.8rem;
+  }
+  .footer-col h4 {
+    margin-bottom: 0.65rem;
+  }
+  .footer-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1rem;
+    row-gap: 0.45rem;
+  }
+  .footer-links li {
+    min-width: 0;
+  }
+  .footer-links a {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  .footer-contact-item {
+    overflow-wrap: anywhere;
+  }
   .footer-bottom { 
     flex-direction: column; 
     align-items: flex-start; 
