@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import { dbAdapter } from '../services/dbAdapter.js';
-import { generateToken, generatePasswordResetToken, hashPasswordResetToken, verifyToken, requireAdmin } from '../middleware/auth.js';
+import { generateToken, verifyToken, requireAdmin } from '../middleware/auth.js';
 import { loginRateLimit } from '../middleware/loginRateLimit.js';
-import { sendPasswordResetEmail } from '../services/systemMailer.js';
 import bcrypt from 'bcryptjs';
 
 const router = Router();
@@ -80,88 +79,6 @@ router.post('/login', loginRateLimit, async (req, res) => {
       });
     }
     res.status(500).json({ success: false, message: 'Authentication error', error: error.message });
-  }
-});
-
-/**
- * POST /api/auth/forgot-password
- */
-router.post('/forgot-password', loginRateLimit, async (req, res) => {
-  const genericResponse = {
-    success: true,
-    message: 'If an account exists for that email, a password reset link will be sent shortly.'
-  };
-  const email = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
-  if (!email || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return res.status(400).json({ success: false, message: 'Enter a valid email address.' });
-  }
-
-  try {
-    const emailPattern = new RegExp(`^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
-    const user = await dbAdapter.findOne('users', { email: emailPattern });
-    if (!user) return res.json(genericResponse);
-
-    const { token, tokenHash } = generatePasswordResetToken();
-    const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
-    await dbAdapter.update('users', user.id || user._id, {
-      passwordResetTokenHash: tokenHash,
-      passwordResetExpiresAt: expiresAt
-    });
-
-    const resetUrl = new URL('/', process.env.FRONTEND_URL || 'https://ithunt.vercel.app');
-    resetUrl.searchParams.set('resetToken', token);
-    resetUrl.hash = 'login';
-    const result = await sendPasswordResetEmail(email, resetUrl.toString());
-    if (!result.success) {
-      console.error('[Auth] Password reset email delivery failed:', result.error || result.reason || 'Unknown mail delivery error');
-    }
-
-    return res.json(genericResponse);
-  } catch (error) {
-    console.error('[Auth] Password reset request failed:', error.message);
-    return res.status(503).json({
-      success: false,
-      message: 'Password reset is temporarily unavailable. Please try again shortly.'
-    });
-  }
-});
-
-/**
- * POST /api/auth/reset-password
- */
-router.post('/reset-password', loginRateLimit, async (req, res) => {
-  const { token, password } = req.body || {};
-  if (
-    typeof token !== 'string' ||
-    !/^[a-f0-9]{64}$/i.test(token) ||
-    typeof password !== 'string' ||
-    password.length < 12 ||
-    Buffer.byteLength(password, 'utf8') > 72
-  ) {
-    return res.status(400).json({
-      success: false,
-      message: 'A valid reset link and a password of 12 to 72 UTF-8 bytes are required.'
-    });
-  }
-
-  try {
-    const tokenHash = hashPasswordResetToken(token);
-    const passwordHash = await bcrypt.hash(password, 12);
-    const updated = await dbAdapter.resetUserPassword(tokenHash, passwordHash);
-    if (!updated) {
-      return res.status(400).json({
-        success: false,
-        message: 'This password reset link is invalid or has expired. Request a new link to continue.'
-      });
-    }
-
-    return res.json({ success: true, message: 'Your password has been reset. You can now sign in.' });
-  } catch (error) {
-    console.error('[Auth] Password reset failed:', error.message);
-    return res.status(503).json({
-      success: false,
-      message: 'Password reset is temporarily unavailable. Please try again shortly.'
-    });
   }
 });
 

@@ -86,7 +86,7 @@ const healthHandler = async (req, res) => {
     authentication: {
       jwtSecretConfigured: hasValidJwtSecret()
     },
-    endpoints: ['/api/admissions', '/api/students', '/api/courses', '/api/events', '/api/nielit-projects', '/api/careers/applications', '/api/internships/applications', '/api/events/rsvps', '/api/reviews', '/api/fees', '/api/certificates', '/api/projects', '/api/contact', '/api/auth/login', '/api/auth/forgot-password', '/api/auth/reset-password', '/api/admin/stats', '/api/festival-wish']
+    endpoints: ['/api/admissions', '/api/students', '/api/courses', '/api/events', '/api/nielit-projects', '/api/careers/applications', '/api/internships/applications', '/api/events/rsvps', '/api/reviews', '/api/fees', '/api/certificates', '/api/projects', '/api/contact', '/api/auth/login', '/api/admin/stats', '/api/festival-wish']
   });
 };
 

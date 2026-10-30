@@ -157,8 +157,6 @@ function generateApiPdf() {
       title: '4. Authentication & User Accounts',
       routes: [
         { method: 'POST', path: '/api/auth/login', desc: 'Authenticate student or admin; returns JWT bearer token' },
-        { method: 'POST', path: '/api/auth/forgot-password', desc: 'Send a time-limited password reset link when an account exists for the email' },
-        { method: 'POST', path: '/api/auth/reset-password', desc: 'Set a new password with a valid one-time reset token' },
         { method: 'GET', path: '/api/auth/me', desc: 'Get currently authenticated user details from token' },
         { method: 'GET', path: '/api/auth/users', desc: 'List all registered portal accounts (Requires SuperAdmin token)' },
         { method: 'DELETE', path: '/api/auth/users/:id', desc: 'Delete user account from MongoDB Atlas' }
