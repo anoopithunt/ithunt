@@ -1,11 +1,7 @@
 <template>
-  <div 
-    class="admin-shell" 
-    :class="{ 
-      'sidebar-collapsed': isSidebarCollapsed, 
-      'light-theme': !isDarkMode, 
-      'dark-theme': isDarkMode 
-    }"
+  <div
+    class="admin-shell dark-theme"
+    :class="{ 'sidebar-collapsed': isSidebarCollapsed }"
     :style="{ '--admin-header-height': adminHeaderHeight + 'px' }"
   >
     <!-- 1. LEFT ENTERPRISE SIDEBAR NAVIGATION -->
@@ -385,14 +381,6 @@
             <span :style="isRefreshing ? 'display: inline-block; animation: spin 1s linear infinite;' : ''">🔄</span>
           </button>
 
-          <!-- Theme Toggle -->
-          <button 
-            class="command-icon-btn" 
-            @click="$emit('toggle-theme')" 
-            :title="isDarkMode ? 'Switch to Light Theme' : 'Switch to Dark Theme'"
-          >
-            <span>{{ isDarkMode ? '☀️' : '🌙' }}</span>
-          </button>
         </div>
       </header>
 
@@ -5187,10 +5175,6 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
-  isDarkMode: {
-    type: Boolean,
-    default: true
-  },
   festivalWish: {
     type: Object,
     default: () => ({})
@@ -5230,7 +5214,6 @@ const emit = defineEmits([
   'delete-contact',
   'refresh-data',
   'set-tab',
-  'toggle-theme',
   'update-festival-wish',
   'preview-festival-wish'
 ]);

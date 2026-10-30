@@ -85,12 +85,10 @@
       v-if="activeTab !== 'superadmin'"
       :content="content" 
       :activeTab="activeTab" 
-      :isDarkMode="isDarkMode" 
       :studentUser="studentUser" 
       :isAdminLoggedIn="isAdminLoggedIn"
       :adminUser="adminUser"
       @set-tab="setTab" 
-      @toggle-theme="toggleTheme" 
       @open-nielit-modal="setTab('nielit-project')"
       @open-cv-modal="showCvModal = true"
     />
@@ -197,7 +195,6 @@
           key="superadmin"
           :content="content" 
           :adminUser="adminUser"
-          :isDarkMode="isDarkMode"
           :allCourses="liveCoursesList"
           :allAdmissions="liveAdmissionsList"
           :allJobApplications="liveJobApplicationsList"
@@ -213,7 +210,6 @@
           :allReviews="liveReviewsList"
           :allUsers="liveUsersList"
           @logout="handleAdminLogout"
-          @toggle-theme="toggleTheme"
           @download-slip="downloadCustomAdmissionSlip"
           @download-nielit-pdf="downloadNielitProjectPdfDoc"
           @add-admission="handleDirectAdmission"
@@ -601,7 +597,6 @@ const CvBuilderModal = defineAsyncComponent(() => import('./components/modals/Cv
 const FestivalWishModal = defineAsyncComponent(() => import('./components/modals/FestivalWishModal.vue'));
 
 const content = ref(CONTENT_DATA);
-const isDarkMode = ref(true);
 const scrollProgress = ref(0);
 const showBackToTop = ref(false);
 const showConfetti = ref(false);
@@ -1215,14 +1210,6 @@ const setTab = (tab) => {
     checkAndShowFestivalModal(true);
   }
   window.scrollTo({ top: 0, behavior: 'smooth' });
-};
-
-const toggleTheme = () => {
-  isDarkMode.value = !isDarkMode.value;
-  document.body.classList.toggle('light-theme', !isDarkMode.value);
-  try {
-    localStorage.setItem('ithunt_theme', isDarkMode.value ? 'dark' : 'light');
-  } catch (e) {}
 };
 
 const applyForCourse = (courseName) => {
@@ -1893,20 +1880,7 @@ const handlePopState = () => {
 };
 
 onMounted(() => {
-  // Default to Dark Mode SaaS theme unless explicitly set to 'light' by user preference
-  try {
-    const savedTheme = localStorage.getItem('ithunt_theme');
-    if (savedTheme === 'light') {
-      isDarkMode.value = false;
-      document.body.classList.add('light-theme');
-    } else {
-      isDarkMode.value = true;
-      document.body.classList.remove('light-theme');
-    }
-  } catch (e) {
-    isDarkMode.value = true;
-    document.body.classList.remove('light-theme');
-  }
+  document.body.classList.remove('light-theme');
 
   window.addEventListener('scroll', handleScroll, { passive: true });
   handleScroll();
