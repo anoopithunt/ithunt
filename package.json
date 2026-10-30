@@ -17,6 +17,7 @@
     "db:clean": "node server/cleanup-dbs.js",
     "db:test": "node server/test-all-tables.js",
     "pdf:api": "node server/generate-api-pdf.js",
+    "docs:pdf": "node server/generate-project-documentation-pdf.js",
     "build": "vite build",
     "preview": "vite preview",
     "test": "node --test server/middleware/*.test.js server/routes/*.test.js"

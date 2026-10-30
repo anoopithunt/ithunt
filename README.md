@@ -166,8 +166,11 @@ This project includes API documentation for the backend services:
 
 - `API_DOCUMENTATION.md`
 - `IT_HUNT_API_Documentation.pdf`
+- [Full project documentation](docs/PROJECT_DOCUMENTATION.md)
+- [Two-month change history PDF](docs/IT_HUNT_Changes_August-October_2026.pdf)
 
 Use these files to understand the exposed routes, payloads, and service behavior for the application backend.
+The API references are historical; verify current request behavior in `server/routes/` and `server/middleware/`.
 
 ## Deployment
 
