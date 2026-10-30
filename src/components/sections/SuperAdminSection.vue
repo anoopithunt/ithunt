@@ -733,7 +733,7 @@
               </div>
 
               <div v-else class="queue-list">
-                <div v-for="adm in recentAdmissions" :key="adm.registrationNo || adm.id" class="queue-item" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.05); gap: 1rem;">
+                <div v-for="adm in recentAdmissions" :key="adm.registrationNo || adm.id" class="queue-item" style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                   <div class="queue-item-info" style="flex: 1; min-width: 0;">
                     <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                       <div class="queue-item-name" style="font-weight: 700; color: var(--text-main);">{{ adm.candidateName || adm.fullName || 'Candidate' }}</div>
@@ -751,7 +751,7 @@
                       <span>💳 {{ adm.feeStatus || 'Pending' }}</span>
                     </div>
                   </div>
-                  <div class="queue-item-actions" style="display: flex; gap: 0.4rem; align-items: center; flex-shrink: 0;">
+                  <div class="queue-item-actions">
                     <button 
                       v-if="!adm.admissionConfirmed && adm.status !== 'Confirmed' && adm.status !== 'Active Registered Student'"
                       class="btn-primary queue-confirm-btn" 
@@ -10412,8 +10412,12 @@ body.light-theme .admin-data-table th {
 /* Dual Grid: Queue & System Health */
 .overview-dual-grid {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
   gap: 1.5rem;
+}
+
+.overview-dual-grid > * {
+  min-width: 0;
 }
 
 .overview-box-card {
@@ -10519,7 +10523,7 @@ body.light-theme .admin-data-table th {
 
 .queue-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
   padding: 0.85rem 1rem;
@@ -10594,6 +10598,18 @@ body.light-theme .admin-data-table th {
   align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: 270px;
+}
+
+.queue-item-actions .queue-icon-btn {
+  width: auto;
+  height: auto;
+  min-height: 36px;
+  padding: 0.4rem 0.65rem;
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 .queue-confirm-btn {
@@ -10653,6 +10669,7 @@ body.light-theme .admin-data-table th {
 .health-label {
   display: flex;
   align-items: center;
+  min-width: 0;
   gap: 0.5rem;
   color: #94a3b8;
   font-weight: 600;
@@ -10671,10 +10688,13 @@ body.light-theme .admin-data-table th {
 }
 
 .health-value {
+  min-width: 0;
   font-family: var(--font-mono, monospace);
   font-weight: 700;
   color: #e2e8f0;
   font-size: 0.75rem;
+  text-align: right;
+  overflow-wrap: anywhere;
 }
 
 .admin-shell.light-theme .health-value {
@@ -11507,6 +11527,7 @@ label {
 
   .queue-item-actions {
     width: 100% !important;
+    max-width: none !important;
     display: flex !important;
     justify-content: flex-end !important;
     flex-wrap: wrap !important;
