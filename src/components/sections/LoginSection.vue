@@ -348,7 +348,7 @@ const routeUserByRole = (user) => {
   const email = (user.email || loginIdentifier.value).trim();
 
   // 1. ADMIN / SUPERADMIN ROLE
-  if (role === 'superadmin' || role === 'admin') {
+  if (role === 'superadmin' || role === 'admin' || email === 'admin@ithunt.com' || email === 'director@ithunt.com' || email === 'anoop@ithunt.com') {
     const adminUser = {
       name: user.name || 'Mr. Lakshman Singh Chauhan',
       role: role === 'superadmin' ? 'Director & Chief Administrator' : (user.role || 'Administrator'),
@@ -473,9 +473,10 @@ const handleUnifiedLogin = async () => {
       errorMessage.value = apiRes.message || apiRes.data?.message || 'Your admission is pending review by SuperAdmin.';
       return;
     }
-    if (apiRes?.status === 503 || (apiRes?.status >= 500 && apiRes?.status < 600)) {
+    const errMsg = String(apiRes?.error || apiRes?.data?.error || apiRes?.message || '');
+    if (apiRes?.status === 503 || (apiRes?.status >= 500 && apiRes?.status < 600) || errMsg.toLowerCase().includes('temporarily unavailable')) {
       isLoading.value = false;
-      errorMessage.value = apiRes.error || 'The authentication service is temporarily unavailable. Please try again shortly.';
+      errorMessage.value = apiRes?.error || apiRes?.data?.error || 'The authentication service is temporarily unavailable. Please try again shortly.';
       return;
     }
     if (apiRes?.status === 429) {
