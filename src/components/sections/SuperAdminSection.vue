@@ -2858,12 +2858,12 @@
 
           <div class="form-group">
             <label class="field-label">📍 Location Scope & Target Campuses</label>
-            <select v-model="festivalWishData.locationScope" class="form-control">
+            <select v-model="festivalWishData.locationScope" class="form-control location-scope-select">
               <option v-for="scope in availableLocationScopes" :key="scope" :value="scope">
                 {{ scope }}
               </option>
             </select>
-            <span class="field-hint-text">
+            <span class="field-hint-text location-scope-hint">
               ✓ Visible Across Location: Dynamically served from MongoDB Atlas to every visitor browsing from any campus, city, or remote device.
             </span>
           </div>
@@ -12196,6 +12196,21 @@ label {
   font-family: inherit;
 }
 
+.festival-config-card .location-scope-select {
+  min-width: 0 !important;
+  max-width: 100%;
+  overflow: hidden;
+  padding-right: 2.5rem !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.location-scope-hint {
+  max-width: 100%;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
 .admin-shell.light-theme .festival-config-card input.form-control,
 .admin-shell.light-theme .festival-config-card select.form-control,
 .admin-shell.light-theme .festival-config-card textarea.form-control {
@@ -12521,6 +12536,22 @@ label {
   }
   .festival-banner-actions {
     justify-content: flex-end;
+  }
+}
+
+@media (max-width: 640px) {
+  .festival-config-card,
+  .festival-preview-card {
+    padding: 1rem;
+  }
+
+  .festival-config-card .location-scope-select {
+    padding: 0.7rem 2.25rem 0.7rem 0.75rem !important;
+    font-size: 0.82rem !important;
+  }
+
+  .location-scope-hint {
+    font-size: 0.72rem;
   }
 }
 
