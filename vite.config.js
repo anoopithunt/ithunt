@@ -32,7 +32,12 @@ function autoBackendPlugin() {
 
 export default defineConfig(({ command }) => ({
   plugins: [vue(), tailwindcss(), ...(command === 'serve' ? [autoBackendPlugin()] : [])],
-  resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
+  resolve: { 
+    alias: { 
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      'jspdf': fileURLToPath(new URL('./node_modules/jspdf/dist/jspdf.umd.min.js', import.meta.url))
+    } 
+  },
   server: {
     port: 5500,
     host: true,
