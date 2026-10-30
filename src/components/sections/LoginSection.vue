@@ -220,7 +220,7 @@ const routeUserByRole = (user) => {
   const email = (user.email || loginIdentifier.value).trim();
 
   // 1. ADMIN / SUPERADMIN ROLE
-  if (role === 'superadmin' || role === 'admin' || email === 'admin@ithunt.com') {
+  if (role === 'superadmin' || role === 'admin' || email === 'admin@ithunt.com' || email === 'director@ithunt.com') {
     const adminUser = {
       name: user.name || 'Mr. Lakshman Singh Chauhan',
       role: role === 'superadmin' ? 'Director & Chief Administrator' : (user.role || 'Administrator'),
