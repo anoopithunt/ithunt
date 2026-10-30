@@ -44,7 +44,8 @@ router.get('/:id', verifyToken, requireAdmin, async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const body = req.body || {};
-    if (typeof body.password !== 'string' || body.password.length < 12 || body.password.length > 1024) {
+    const password = body.password;
+    if (typeof password !== 'string' || password.length < 12 || password.length > 1024) {
       return res.status(400).json({ success: false, message: 'Create a password of at least 12 characters before submitting.' });
     }
     const regNo = body.registrationNo || body.registrationNumber || `ITH-${Math.floor(100000 + Math.random() * 900000)}`;
@@ -86,12 +87,18 @@ router.post('/', async (req, res) => {
       address: body.address || 'Prayagraj, UP',
       createdAt: new Date().toISOString()
     };
-    await dbAdapter.create('students', studentRecord);
+    const existingStudent = await dbAdapter.findOne('students', { registrationNo: regNo }) ||
+      await dbAdapter.findOne('students', { email });
+    if (existingStudent) {
+      await dbAdapter.update('students', existingStudent.id || existingStudent._id || regNo, studentRecord);
+    } else {
+      await dbAdapter.create('students', studentRecord);
+    }
 
     // Admission submissions stay pending until the authenticated admin confirmation flow.
     if (email) {
-      await dbAdapter.create('users', {
-        id: email,
+      const existingUser = await dbAdapter.findOne('users', { email });
+      const userPayload = {
         name: candidateName,
         email,
         phone,
@@ -101,7 +108,16 @@ router.post('/', async (req, res) => {
         course: admissionRecord.course,
         verified: false,
         status: 'PENDING_REVIEW'
-      });
+      };
+      if (existingUser) {
+        await dbAdapter.update('users', existingUser.id || existingUser._id || email, userPayload);
+      } else {
+        await dbAdapter.create('users', {
+          id: email,
+          userId: regNo,
+          ...userPayload
+        });
+      }
     }
 
     const registrationSlip = {
