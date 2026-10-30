@@ -93,7 +93,7 @@ cp .env.example .env
 Then update the values in `.env` with your local environment details, especially:
 
 - `MONGODB_URI`
-- `JWT_SECRET` — generate a unique secret with `openssl rand -hex 32`; the API refuses to start without at least 32 bytes.
+- `JWT_SECRET` — generate a unique secret with `openssl rand -hex 32`; authentication fails closed unless at least 32 bytes are configured.
 - `PASSWORD_RESET_BASE_URL` — public app URL used in password reset links; local development can use `http://localhost:5500`.
 - `SEED_ADMIN_PASSWORD`, `SEED_TEACHER_PASSWORD`, and `SEED_STUDENT_PASSWORD` — set unique passwords of at least 16 characters before running the seeder.
 - `PORT` / `BACKEND_PORT`
@@ -107,8 +107,8 @@ Login requests are limited using MongoDB-backed counters shared across serverles
 
 Run `npm run admin:bootstrap` from a trusted interactive terminal with `MONGODB_ATLAS_URI` or `MONGODB_URI` configured. The command defaults to `admin@ithunt.com` (override with `SUPERADMIN_EMAIL`), prompts twice for a new password without echoing it, and writes only the bcrypt hash to the `users` collection. Use a unique password of at least 16 characters. The command does not print, persist, or transmit the password.
 
-Production login also requires a valid `JWT_SECRET` configured in the hosting provider's Production environment.
-Password recovery emails use `SMTP_USER` and `SMTP_PASS`; links expire after 30 minutes. `PASSWORD_RESET_BASE_URL` is optional and should be set to the public app URL if the deployment uses a domain other than `https://ithunt.vercel.app`.
+Production login requires a unique `JWT_SECRET` (at least 32 bytes) configured in the hosting provider's Production environment. Never use a default or shared JWT secret.
+Password recovery emails use `SMTP_USER` and `SMTP_PASS`; links expire after 30 minutes. Configure `PASSWORD_RESET_BASE_URL` as the public app URL (defaults to `https://ithunt.vercel.app`).
 
 ## Run the Project
 

@@ -1,10 +1,31 @@
 import { Router } from 'express';
 import { dbAdapter } from '../services/dbAdapter.js';
-import { generateToken, verifyToken, requireAdmin } from '../middleware/auth.js';
+import { generateToken, generatePasswordResetToken, hashPasswordResetToken, verifyToken, requireAdmin } from '../middleware/auth.js';
 import { loginRateLimit } from '../middleware/loginRateLimit.js';
+import { sendPasswordResetEmail } from '../services/systemMailer.js';
 import bcrypt from 'bcryptjs';
 
 const router = Router();
+
+function getPasswordResetBaseUrl() {
+  const baseUrl = new URL(
+    process.env.PASSWORD_RESET_BASE_URL ||
+    process.env.FRONTEND_URL ||
+    'https://ithunt.vercel.app'
+  );
+  const isLocalHost = baseUrl.hostname === 'localhost' || baseUrl.hostname === '127.0.0.1';
+  if (
+    baseUrl.username ||
+    baseUrl.password ||
+    (baseUrl.protocol !== 'https:' && !(isLocalHost && baseUrl.protocol === 'http:'))
+  ) {
+    throw new Error('PASSWORD_RESET_BASE_URL must use HTTPS (HTTP is allowed only for localhost).');
+  }
+  baseUrl.pathname = '/';
+  baseUrl.search = '';
+  baseUrl.hash = '';
+  return baseUrl;
+}
 
 /**
  * POST /api/auth/login
@@ -18,11 +39,8 @@ router.post('/login', loginRateLimit, async (req, res) => {
     }
 
     const normEmail = String(identifier).toLowerCase().trim();
-    const isDirectorOrAdmin = normEmail === 'admin@ithunt.com' || normEmail === 'director@ithunt.com';
-    const defaultAdminPassword = (process.env.SEED_ADMIN_PASSWORD || 'admin@ithunt2026').trim();
-
     // Only provisioned user accounts can authenticate; profile records are not credentials.
-    let allUsers = await dbAdapter.find('users');
+    const allUsers = await dbAdapter.find('users');
     let user = allUsers.find(u =>
       (u.userId && u.userId.toLowerCase() === normEmail) ||
       (u.email && u.email.toLowerCase() === normEmail) ||
@@ -30,34 +48,6 @@ router.post('/login', loginRateLimit, async (req, res) => {
       (u.enrollmentNumber && u.enrollmentNumber.toLowerCase() === normEmail) ||
       (u.id && u.id.toLowerCase() === normEmail)
     );
-
-    // Auto-bootstrap / self-heal SuperAdmin account if missing in cloud DB
-    if (!user && (isDirectorOrAdmin || allUsers.length === 0)) {
-      if (password === defaultAdminPassword || password === 'admin@ithunt2026') {
-        try {
-          const salt = await bcrypt.genSalt(12);
-          const hashedPassword = await bcrypt.hash(password, salt);
-          const bootstrappedUser = {
-            userId: normEmail === 'director@ithunt.com' ? 'usr-admin-director' : 'usr-admin-default',
-            name: 'Mr. Lakshman Singh Chauhan',
-            email: isDirectorOrAdmin ? normEmail : 'admin@ithunt.com',
-            password: hashedPassword,
-            role: 'superadmin',
-            roleType: 'superadmin',
-            phone: '+91 9795771806',
-            course: 'Directorate & Leadership',
-            registrationNo: normEmail === 'director@ithunt.com' ? 'ITH-ADMIN-02' : 'ITH-ADMIN-01',
-            verified: true,
-            status: 'ACTIVE',
-            avatar: 'img/ithunt.jpg'
-          };
-          await dbAdapter.create('users', bootstrappedUser);
-          user = bootstrappedUser;
-        } catch (bootstrapErr) {
-          console.warn('[Auth] SuperAdmin account auto-provision notice:', bootstrapErr.message);
-        }
-      }
-    }
 
     if (!user) {
       return res.status(401).json({ success: false, message: 'Invalid email or password.' });
@@ -72,34 +62,20 @@ router.post('/login', loginRateLimit, async (req, res) => {
     }
 
     const userPass = typeof user.password === 'string' ? user.password : '';
-    let isMatch = /^\$2[aby]\$\d{2}\$/.test(userPass) && await bcrypt.compare(password, userPass);
-
-    // Self-heal: If director account had legacy hash or password matches valid admin password, synchronize
-    if (!isMatch && isDirectorOrAdmin && (password === defaultAdminPassword || password === 'admin@ithunt2026')) {
-      isMatch = true;
-      try {
-        const salt = await bcrypt.genSalt(12);
-        const newHashed = await bcrypt.hash(password, salt);
-        const targetId = user.id || user._id;
-        if (targetId) {
-          await dbAdapter.update('users', targetId, { password: newHashed, role: 'superadmin' });
-        }
-      } catch (_) {}
-    }
+    const isMatch = /^\$2[aby]\$\d{2}\$/.test(userPass) && await bcrypt.compare(password, userPass);
 
     if (!isMatch) {
       return res.status(401).json({ success: false, message: 'Invalid email or password.' });
     }
 
-    const isSuperAdminEmail = normEmail === 'admin@ithunt.com' || normEmail === 'director@ithunt.com';
-    const effectiveRole = isSuperAdminEmail ? 'superadmin' : (user.role || 'student');
+    const effectiveRole = user.role || 'student';
 
     const safeUser = {
-      id: user.id || user._id || (isSuperAdminEmail ? 'usr-admin-default' : 'user-001'),
-      userId: user.userId || user.id || (isSuperAdminEmail ? 'usr-admin-default' : ''),
-      name: user.name || user.candidateName || (isSuperAdminEmail ? 'Mr. Lakshman Singh Chauhan' : 'User'),
-      fullName: user.name || user.candidateName || (isSuperAdminEmail ? 'Mr. Lakshman Singh Chauhan' : 'User'),
-      candidateName: user.candidateName || user.name || (isSuperAdminEmail ? 'Mr. Lakshman Singh Chauhan' : 'User'),
+      id: user.id || user._id,
+      userId: user.userId || user.id,
+      name: user.name || user.candidateName || 'User',
+      fullName: user.name || user.candidateName || 'User',
+      candidateName: user.candidateName || user.name || 'User',
       email: user.email || normEmail,
       role: effectiveRole,
       roleType: effectiveRole,
@@ -124,7 +100,90 @@ router.post('/login', loginRateLimit, async (req, res) => {
         message: 'Authentication is temporarily unavailable. Please contact the administrator.'
       });
     }
-    res.status(500).json({ success: false, message: 'Authentication error', error: error.message });
+    console.error('[Auth] Login failed:', error.message);
+    res.status(500).json({ success: false, message: 'Authentication is temporarily unavailable.' });
+  }
+});
+
+/**
+ * POST /api/auth/forgot-password
+ */
+router.post('/forgot-password', loginRateLimit, async (req, res) => {
+  const genericResponse = {
+    success: true,
+    message: 'If an account exists for that email, a password reset link will be sent shortly.'
+  };
+  const email = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
+  if (!email || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ success: false, message: 'Enter a valid email address.' });
+  }
+
+  try {
+    const resetUrl = getPasswordResetBaseUrl();
+    const emailPattern = new RegExp(`^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
+    const { token, tokenHash } = generatePasswordResetToken();
+    const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
+    const user = await dbAdapter.createPasswordResetToken(emailPattern, tokenHash, expiresAt);
+    if (!user) return res.json(genericResponse);
+
+    resetUrl.searchParams.set('resetToken', token);
+    resetUrl.hash = 'login';
+    const result = await sendPasswordResetEmail(user.email, resetUrl.toString());
+    if (!result.success) {
+      console.error('[Auth] Password reset email delivery failed:', result.error || result.reason || 'Unknown mail delivery error');
+      try {
+        await dbAdapter.clearPasswordResetToken(tokenHash);
+      } catch (clearError) {
+        console.error('[Auth] Could not invalidate undelivered password reset token:', clearError.message);
+      }
+    }
+
+    return res.json(genericResponse);
+  } catch (error) {
+    console.error('[Auth] Password reset request failed:', error.message);
+    return res.status(503).json({
+      success: false,
+      message: 'Password reset is temporarily unavailable. Please try again shortly.'
+    });
+  }
+});
+
+/**
+ * POST /api/auth/reset-password
+ */
+router.post('/reset-password', loginRateLimit, async (req, res) => {
+  const { token, password } = req.body || {};
+  if (
+    typeof token !== 'string' ||
+    !/^[a-f0-9]{64}$/i.test(token) ||
+    typeof password !== 'string' ||
+    password.length < 12 ||
+    Buffer.byteLength(password, 'utf8') > 72
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: 'A valid reset link and a password of 12 to 72 UTF-8 bytes are required.'
+    });
+  }
+
+  try {
+    const tokenHash = hashPasswordResetToken(token);
+    const passwordHash = await bcrypt.hash(password, 12);
+    const updated = await dbAdapter.resetUserPassword(tokenHash, passwordHash);
+    if (!updated) {
+      return res.status(400).json({
+        success: false,
+        message: 'This password reset link is invalid or has expired. Request a new link to continue.'
+      });
+    }
+
+    return res.json({ success: true, message: 'Your password has been reset. You can now sign in.' });
+  } catch (error) {
+    console.error('[Auth] Password reset failed:', error.message);
+    return res.status(503).json({
+      success: false,
+      message: 'Password reset is temporarily unavailable. Please try again shortly.'
+    });
   }
 });
 
@@ -157,8 +216,14 @@ router.get(['/users', '/'], verifyToken, requireAdmin, async (req, res) => {
 router.post(['/users', '/'], verifyToken, requireAdmin, async (req, res) => {
   try {
     const { name, email, password, role, phone, designation, verified } = req.body || {};
-    if (typeof email !== 'string' || !email.trim() || typeof password !== 'string' || password.length < 12) {
-      return res.status(400).json({ success: false, error: 'A valid email address and password of at least 12 characters are required.' });
+    if (
+      typeof email !== 'string' ||
+      !email.trim() ||
+      typeof password !== 'string' ||
+      password.length < 12 ||
+      Buffer.byteLength(password, 'utf8') > 72
+    ) {
+      return res.status(400).json({ success: false, error: 'A valid email address and password of 12 to 72 UTF-8 bytes are required.' });
     }
 
     const normEmail = email.toLowerCase().trim();
@@ -205,10 +270,12 @@ router.put(['/users/:id', '/:id'], verifyToken, requireAdmin, async (req, res) =
     if (verified !== undefined) updateData.verified = verified;
     if (designation !== undefined) updateData.designation = designation;
     if (password !== undefined) {
-      if (typeof password !== 'string' || password.length < 12) {
-        return res.status(400).json({ success: false, error: 'Password must be at least 12 characters.' });
+      if (typeof password !== 'string' || password.length < 12 || Buffer.byteLength(password, 'utf8') > 72) {
+        return res.status(400).json({ success: false, error: 'Password must be 12 to 72 UTF-8 bytes.' });
       }
       updateData.password = await bcrypt.hash(password, 12);
+      updateData.passwordResetTokenHash = null;
+      updateData.passwordResetExpiresAt = null;
     }
 
     const allUsers = await dbAdapter.find('users');

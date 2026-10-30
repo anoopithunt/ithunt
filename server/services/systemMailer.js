@@ -231,3 +231,22 @@ ${message}`;
 
   return { success: true };
 }
+
+export async function sendPasswordResetEmail(email, resetUrl) {
+  const subject = 'Reset your IT HUNT Portal password';
+  const safeResetUrl = resetUrl
+    .replaceAll('&', '&amp;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
+  const text = `We received a request to reset the password for your IT HUNT Portal account.
+
+Use the link below within 30 minutes to choose a new password:
+${resetUrl}
+
+If you did not request a password reset, you can ignore this email.`;
+  const html = `<p>We received a request to reset the password for your IT HUNT Portal account.</p>
+    <p><a href="${safeResetUrl}">Reset your password</a></p>
+    <p>This link expires in 30 minutes. If you did not request a password reset, you can ignore this email.</p>`;
+  return sendMail({ to: email, subject, text, html });
+}

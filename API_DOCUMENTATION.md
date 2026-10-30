@@ -71,15 +71,15 @@ curl -s https://ithunt.vercel.app/api/health
 
 #### `POST /api/auth/login`
 Authenticates SuperAdmin or Student credentials and issues a JWT token.
-* **SuperAdmin default**: `admin@ithunt.com` / `admin@ithunt2026`
+* **SuperAdmin**: Sign in with an account provisioned by the administrator. The API does not provide default SuperAdmin credentials.
 * **Student credentials**: Automatically generated upon admission confirmation (`ITH-2026-STUxxxx`).
 
 ```bash
 curl -s -X POST https://ithunt.vercel.app/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "admin@ithunt.com",
-    "password": "admin@ithunt2026"
+    "email": "YOUR_PROVISIONED_ACCOUNT_EMAIL",
+    "password": "YOUR_PROVISIONED_ACCOUNT_PASSWORD"
   }'
 ```
 **Response (200 OK):**
@@ -105,6 +105,18 @@ Retrieves authenticated user details from the JWT bearer token.
 ```bash
 curl -s https://ithunt.vercel.app/api/auth/me \
   -H "Authorization: Bearer <token>"
+```
+
+#### `POST /api/auth/forgot-password`
+Requests a password reset email. The response is the same whether or not an account exists for the email.
+```json
+{ "email": "user@example.com" }
+```
+
+#### `POST /api/auth/reset-password`
+Sets a new password with a valid, one-time reset token (expires after 30 minutes).
+```json
+{ "token": "<reset-token>", "password": "<new-password-of-12-to-72-utf8-bytes>" }
 ```
 
 #### `GET /api/auth/users` *(SuperAdmin Only)*

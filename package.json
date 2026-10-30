@@ -19,7 +19,7 @@
     "pdf:api": "node server/generate-api-pdf.js",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node -e \"console.log('✓ All tests passed!')\""
+    "test": "node --test server/middleware/*.test.js server/routes/*.test.js"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

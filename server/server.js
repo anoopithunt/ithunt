@@ -54,6 +54,16 @@ app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 
 app.use((req, res, next) => {
+  res.set({
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()'
+  });
+  next();
+});
+
+app.use((req, res, next) => {
   const start = Date.now();
   res.on('finish', () => {
     if (!req.path.includes('/health')) {
@@ -94,7 +104,7 @@ const healthHandler = async (req, res) => {
     authentication: {
       jwtSecretConfigured: hasValidJwtSecret()
     },
-    endpoints: ['/api/admissions', '/api/students', '/api/courses', '/api/events', '/api/nielit-projects', '/api/careers/applications', '/api/internships/applications', '/api/events/rsvps', '/api/reviews', '/api/fees', '/api/certificates', '/api/projects', '/api/contact', '/api/auth/login', '/api/admin/stats', '/api/festival-wish']
+    endpoints: ['/api/admissions', '/api/students', '/api/courses', '/api/events', '/api/nielit-projects', '/api/careers/applications', '/api/internships/applications', '/api/events/rsvps', '/api/reviews', '/api/fees', '/api/certificates', '/api/projects', '/api/contact', '/api/auth/login', '/api/auth/forgot-password', '/api/auth/reset-password', '/api/admin/stats', '/api/festival-wish']
   });
 };
 

@@ -67,6 +67,41 @@ export const dbAdapter = {
     return null;
   },
 
+  async createPasswordResetToken(emailPattern, tokenHash, expiresAt) {
+    await ensureConnection();
+    const user = await User.findOneAndUpdate(
+      { email: emailPattern },
+      { $set: { passwordResetTokenHash: tokenHash, passwordResetExpiresAt: expiresAt } },
+      { new: true }
+    ).select('_id email').lean();
+    return user ? { id: user._id.toString(), email: user.email } : null;
+  },
+
+  async clearPasswordResetToken(tokenHash) {
+    await ensureConnection();
+    const result = await User.updateOne(
+      { passwordResetTokenHash: tokenHash },
+      { $unset: { passwordResetTokenHash: 1, passwordResetExpiresAt: 1 } }
+    );
+    return result.modifiedCount === 1;
+  },
+
+  async resetUserPassword(tokenHash, passwordHash) {
+    await ensureConnection();
+    const user = await User.findOneAndUpdate(
+      {
+        passwordResetTokenHash: tokenHash,
+        passwordResetExpiresAt: { $gt: new Date() }
+      },
+      {
+        $set: { password: passwordHash, updatedAt: new Date().toISOString() },
+        $unset: { passwordResetTokenHash: 1, passwordResetExpiresAt: 1 }
+      },
+      { new: true }
+    ).select('_id').lean();
+    return Boolean(user);
+  },
+
   /**
    * Find record by ID or registration number (100% Direct from MongoDB Atlas)
    */
