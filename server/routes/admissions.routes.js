@@ -44,7 +44,8 @@ router.get('/:id', verifyToken, requireAdmin, async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const body = req.body || {};
-    if (typeof body.password !== 'string' || body.password.length < 12 || body.password.length > 1024) {
+    const password = body.password;
+    if (typeof password !== 'string' || password.length < 12 || password.length > 1024) {
       return res.status(400).json({ success: false, message: 'Create a password of at least 12 characters before submitting.' });
     }
     const regNo = body.registrationNo || body.registrationNumber || `ITH-${Math.floor(100000 + Math.random() * 900000)}`;
@@ -86,12 +87,18 @@ router.post('/', async (req, res) => {
       address: body.address || 'Prayagraj, UP',
       createdAt: new Date().toISOString()
     };
-    await dbAdapter.create('students', studentRecord);
+    const existingStudent = await dbAdapter.findOne('students', { registrationNo: regNo }) ||
+      await dbAdapter.findOne('students', { email });
+    if (existingStudent) {
+      await dbAdapter.update('students', existingStudent.id || existingStudent._id || regNo, studentRecord);
+    } else {
+      await dbAdapter.create('students', studentRecord);
+    }
 
     // Admission submissions stay pending until the authenticated admin confirmation flow.
     if (email) {
-      await dbAdapter.create('users', {
-        id: email,
+      const existingUser = await dbAdapter.findOne('users', { email });
+      const userPayload = {
         name: candidateName,
         email,
         phone,
@@ -101,7 +108,16 @@ router.post('/', async (req, res) => {
         course: admissionRecord.course,
         verified: false,
         status: 'PENDING_REVIEW'
-      });
+      };
+      if (existingUser) {
+        await dbAdapter.update('users', existingUser.id || existingUser._id || email, userPayload);
+      } else {
+        await dbAdapter.create('users', {
+          id: email,
+          userId: regNo,
+          ...userPayload
+        });
+      }
     }
 
     const registrationSlip = {
@@ -158,7 +174,7 @@ router.post('/:id/confirm', verifyToken, requireAdmin, async (req, res) => {
       return res.status(404).json({ success: false, message: 'Admission record not found' });
     }
 
-    const { userId: reqUserId, feeStatus, confirmedBy } = req.body || {};
+    const { userId: reqUserId, feeStatus } = req.body || {};
     const finalUserId = reqUserId || adm.userId || adm.enrollmentNumber || adm.email;
     const email = (adm.email || `${finalUserId.toLowerCase()}@ithunt.com`).toLowerCase();
     const user = await dbAdapter.findOne('users', { email });
@@ -182,7 +198,7 @@ router.post('/:id/confirm', verifyToken, requireAdmin, async (req, res) => {
       admissionConfirmedDate: dateStr,
       admissionConfirmedTime: timeStr,
       confirmedAt: now.toISOString(),
-      confirmedBy: confirmedBy || 'SuperAdmin'
+      confirmedBy: req.user?.name || req.user?.fullName || 'SuperAdmin'
     };
 
     const updatedAdmission = await dbAdapter.update('admissions', adm.id || targetId, updates);
@@ -195,7 +211,7 @@ router.post('/:id/confirm', verifyToken, requireAdmin, async (req, res) => {
       userId: finalUserId,
       name: adm.candidateName || adm.fullName || 'Student',
       fullName: adm.fullName || adm.candidateName || 'Student',
-      email: adm.email || `${finalUserId.toLowerCase()}@ithunt.com`,
+      email,
       phone: adm.phone || adm.mobile || '',
       mobile: adm.mobile || adm.phone || '',
       course: adm.course || 'Software Engineering',
@@ -208,7 +224,14 @@ router.post('/:id/confirm', verifyToken, requireAdmin, async (req, res) => {
       address: adm.address || 'Prayagraj, UP',
       confirmedAt: now.toISOString()
     };
-    await dbAdapter.create('students', studentRecord);
+    const existingStudent = await dbAdapter.findOne('students', {
+      registrationNo: studentRecord.registrationNo
+    }) || await dbAdapter.findOne('students', { email: studentRecord.email.toLowerCase() });
+    if (existingStudent) {
+      await dbAdapter.update('students', existingStudent.id || existingStudent._id || studentRecord.registrationNo, studentRecord);
+    } else {
+      await dbAdapter.create('students', studentRecord);
+    }
 
     await dbAdapter.update('users', user.id || user._id, {
       userId: finalUserId,
