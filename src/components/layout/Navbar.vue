@@ -11,7 +11,7 @@
       </button>
 
       <!-- Desktop Navigation -->
-      <nav>
+      <nav aria-label="Primary navigation">
         <ul class="nav-links">
           <li v-for="item in content.navigation" :key="item.id">
             <button 
@@ -31,6 +31,7 @@
         <button 
           class="theme-toggle-btn" 
           @click="$emit('toggle-theme')" 
+          :aria-label="isDarkMode ? (content.navbar?.lightModeTitle || 'Switch to Light Mode') : (content.navbar?.darkModeTitle || 'Switch to Dark Mode')"
           :title="isDarkMode ? (content.navbar?.lightModeTitle || 'Switch to Light Mode') : (content.navbar?.darkModeTitle || 'Switch to Dark Mode')"
         >
           <span>{{ isDarkMode ? '☀️' : '🌙' }}</span>
@@ -76,8 +77,10 @@
         <button 
           class="mobile-toggle-btn" 
           @click="toggleMobileNav" 
-          :aria-label="content.navbar?.toggleNavAria || 'Toggle Navigation'"
+          :aria-label="isMobileNavOpen ? 'Close navigation' : (content.navbar?.toggleNavAria || 'Open navigation')"
           :aria-expanded="isMobileNavOpen"
+          aria-controls="mobile-navigation-sidebar"
+          ref="mobileToggleButton"
         >
           <span>{{ isMobileNavOpen ? '✕' : '☰' }}</span>
         </button>
@@ -98,11 +101,15 @@
 
     <!-- Mobile Off-Canvas Navigation Sidebar (Side Menu) -->
     <aside 
+      id="mobile-navigation-sidebar"
+      ref="mobileNavSidebar"
       class="mobile-nav-sidebar" 
       :class="{ open: isMobileNavOpen }"
       role="dialog"
       aria-modal="true"
       aria-label="Mobile Navigation Sidebar"
+      :aria-hidden="!isMobileNavOpen"
+      :inert="!isMobileNavOpen"
     >
       <!-- Sidebar Header with Brand & Close Button -->
       <div class="sidebar-header">
@@ -122,7 +129,7 @@
 
         <button 
           class="sidebar-close-btn" 
-          @click="closeMobileNav" 
+          @click="closeMobileNav(true)"
           aria-label="Close Navigation Sidebar"
           title="Close Sidebar Menu"
         >
@@ -381,7 +388,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
 
 const props = defineProps({
   content: {
@@ -458,13 +465,22 @@ defineEmits(['set-tab', 'toggle-theme', 'open-nielit-modal', 'open-cv-modal']);
 
 const isMobileNavOpen = ref(false);
 const isScrolled = ref(false);
+const mobileToggleButton = ref(null);
+const mobileNavSidebar = ref(null);
 
 const toggleMobileNav = () => {
-  isMobileNavOpen.value = !isMobileNavOpen.value;
+  if (isMobileNavOpen.value) {
+    closeMobileNav(true);
+    return;
+  }
+
+  isMobileNavOpen.value = true;
+  nextTick(() => mobileNavSidebar.value?.querySelector('.sidebar-close-btn')?.focus());
 };
 
-const closeMobileNav = () => {
+const closeMobileNav = (restoreFocus = true) => {
   isMobileNavOpen.value = false;
+  if (restoreFocus) nextTick(() => mobileToggleButton.value?.focus());
 };
 
 let savedScrollY = 0;
@@ -583,7 +599,7 @@ const handleOutsideClick = (e) => {
     return;
   }
   // Outside click detected -> close the side menu
-  closeMobileNav();
+  closeMobileNav(false);
 };
 
 watch(isMobileNavOpen, (isOpen) => {
@@ -606,10 +622,28 @@ const handleNavScroll = () => {
 
 const handleKeyDown = (e) => {
   if (e.key === 'Escape' && isMobileNavOpen.value) {
-    closeMobileNav();
+    closeMobileNav(true);
     return;
   }
   if (!isMobileNavOpen.value) return;
+  if (e.key === 'Tab') {
+    const focusable = mobileNavSidebar.value?.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])');
+    if (!focusable?.length) {
+      e.preventDefault();
+      return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && (document.activeElement === first || !mobileNavSidebar.value.contains(document.activeElement))) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && (document.activeElement === last || !mobileNavSidebar.value.contains(document.activeElement))) {
+      e.preventDefault();
+      first.focus();
+    }
+    return;
+  }
   if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(e.key)) {
     const scrollable = e.target && e.target.closest ? e.target.closest('.sidebar-nav-body') : null;
     if (!scrollable) {
