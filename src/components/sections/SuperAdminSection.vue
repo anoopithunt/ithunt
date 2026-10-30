@@ -9172,6 +9172,7 @@ body.light-theme .admin-data-table th {
   --bg-card-hover: #f1f5f9;
   background: #f4f6fb !important;
   color: #0f172a !important;
+  font-style: normal;
 }
 
 .admin-shell.dark-theme {
@@ -12635,31 +12636,118 @@ label {
 }
 
 .admissions-table th:nth-child(1),
-.admissions-table td:nth-child(1) { width: 12%; }
+.admissions-table td:nth-child(1) { width: 10%; }
 .admissions-table th:nth-child(2),
 .admissions-table td:nth-child(2) { width: 10%; }
 .admissions-table th:nth-child(3),
-.admissions-table td:nth-child(3) { width: 9%; }
+.admissions-table td:nth-child(3) { width: 8%; }
 .admissions-table th:nth-child(4),
-.admissions-table td:nth-child(4) { width: 14%; }
+.admissions-table td:nth-child(4) { width: 13%; }
 .admissions-table th:nth-child(5),
-.admissions-table td:nth-child(5) { width: 14%; }
+.admissions-table td:nth-child(5) { width: 13%; }
 .admissions-table th:nth-child(6),
-.admissions-table td:nth-child(6) { width: 11%; }
+.admissions-table td:nth-child(6) { width: 10%; }
 .admissions-table th:nth-child(7),
 .admissions-table td:nth-child(7) { width: 9%; }
 .admissions-table th:nth-child(8),
-.admissions-table td:nth-child(8) { width: 21%; }
+.admissions-table td:nth-child(8) { width: 27%; }
 
 .admissions-table .admin-row-actions {
-  flex-wrap: wrap;
-  justify-content: flex-start;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  justify-content: stretch;
+  align-items: start;
+  gap: 0.45rem;
   max-width: 100%;
 }
 
 .admissions-table .admin-row-actions > * {
-  flex: 0 1 auto;
-  white-space: normal;
+  width: 100%;
+  min-width: 0;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.admin-shell.light-theme .admissions-tab-panel {
+  color: #172033;
+  font-style: normal;
+}
+
+.admin-shell.light-theme .admissions-table-card {
+  background: #ffffff !important;
+  border-color: #d7e0ec !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07) !important;
+}
+
+.admin-shell.light-theme .admissions-table-hint {
+  color: #475569 !important;
+  background: #f1f5f9 !important;
+  border-bottom-color: #dbe3ee !important;
+}
+
+.admin-shell.light-theme .admissions-table th {
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+  border-bottom-color: #cbd5e1 !important;
+}
+
+.admin-shell.light-theme .admissions-table td {
+  color: #1e293b !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+.admin-shell.light-theme .admissions-table tbody tr:nth-child(even) {
+  background: #f8fafc;
+}
+
+.admin-shell.light-theme .admissions-table tbody tr:hover {
+  background: #eff6ff !important;
+}
+
+.admin-shell.light-theme .admissions-table td [style*="color: var(--text-dim)"] {
+  color: #475569 !important;
+}
+
+.admin-shell.light-theme .admissions-table td [style*="color: var(--color-ai-cyan)"] {
+  color: #0369a1 !important;
+}
+
+.admin-shell.light-theme .admissions-table .admin-reg-pill {
+  color: #9a3412 !important;
+  background: #ffedd5 !important;
+}
+
+.admin-shell.light-theme .admissions-table .admin-status-chip.status-confirmed {
+  color: #166534 !important;
+  background: #dcfce7 !important;
+  border-color: #86efac !important;
+}
+
+.admin-shell.light-theme .admissions-table .admin-status-chip.status-verified {
+  color: #075985 !important;
+  background: #e0f2fe !important;
+  border-color: #7dd3fc !important;
+}
+
+.admin-shell.light-theme .admissions-table .admin-status-chip.status-pending {
+  color: #92400e !important;
+  background: #fef3c7 !important;
+  border-color: #fcd34d !important;
+}
+
+.admin-shell.light-theme .admissions-table .admin-icon-btn {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+.admin-shell.light-theme .admissions-table .admin-icon-btn:hover {
+  background: #eff6ff !important;
+  border-color: #60a5fa !important;
+}
+
+.admin-shell.light-theme .admissions-table .btn-primary {
+  color: #ffffff !important;
 }
 
 @media (max-width: 960px) {
