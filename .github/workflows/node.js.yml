@@ -26,6 +26,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm ci --include=optional
-    - run: npm run build --if-present
-    - run: npm test
+    - run: env -u npm_config_cache_dir -u NPM_CONFIG_CACHE_DIR npm ci --include=optional
+    - run: env -u npm_config_cache_dir -u NPM_CONFIG_CACHE_DIR npm run build --if-present
+    - run: env -u npm_config_cache_dir -u NPM_CONFIG_CACHE_DIR npm test
