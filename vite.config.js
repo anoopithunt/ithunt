@@ -34,8 +34,7 @@ export default defineConfig(({ command }) => ({
   plugins: [vue(), tailwindcss(), ...(command === 'serve' ? [autoBackendPlugin()] : [])],
   resolve: { 
     alias: { 
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-      'jspdf': fileURLToPath(new URL('./node_modules/jspdf/dist/jspdf.umd.min.js', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url))
     } 
   },
   server: {
@@ -60,21 +59,6 @@ export default defineConfig(({ command }) => ({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false,
-    chunkSizeWarningLimit: 600,
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('jspdf') || id.includes('pdfkit') || id.includes('html2canvas')) {
-            return 'vendor-pdf';
-          }
-          if (id.includes('qrcode') || id.includes('dompurify')) {
-            return 'vendor-tools';
-          }
-          if (id.includes('node_modules')) {
-            return 'vendor-core';
-          }
-        }
-      }
-    }
+    chunkSizeWarningLimit: 600
   }
 }));
