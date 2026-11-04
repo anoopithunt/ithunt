@@ -101,13 +101,17 @@
           :key="activeTab"
           :service="currentServicePage"
           :services="SERVICE_PAGES"
-          :whatsapp="content.contact?.whatsapp"
         />
 
         <InsightsPage
           v-else-if="currentInsightsRoute"
           :key="activeTab"
           :route="currentInsightsRoute"
+        />
+
+        <ProjectPartnerPage
+          v-else-if="activeTab === 'start-project'"
+          key="start-project"
         />
 
         <!-- 1. Home Flow -->
@@ -252,6 +256,7 @@
           @add-review="handleAddReview"
           @delete-review="handleDeleteReview"
           @delete-contact="handleDeleteContact"
+          @update-contact-status="handleUpdateContactStatus"
           :festivalWish="festivalWish"
           @update-festival-wish="handleUpdateFestivalWish"
           @preview-festival-wish="handlePreviewFestivalWish"
@@ -533,6 +538,7 @@ import ServiceLandingPage from './components/sections/ServiceLandingPage.vue';
 import { getServicePageByPath, SERVICE_PAGES } from './data/servicePages.js';
 import InsightsPage from './components/sections/InsightsPage.vue';
 import { getInsightArticleBySlug, getInsightsRouteByPath } from './data/insights.js';
+import ProjectPartnerPage from './components/sections/ProjectPartnerPage.vue';
 import { 
   saveNielitProjectRecord, 
   saveAdmissionRecord, 
@@ -562,6 +568,7 @@ import {
   updateFeeInBackend,
   deleteFeeFromBackend,
   deleteContactInquiryFromBackend,
+  updateContactInquiryStatusInBackend,
   fetchEventsCatalogFromBackend,
   saveEventToBackend,
   updateEventInBackend,
@@ -1247,8 +1254,10 @@ const setTab = (tab) => {
         ? `/insights/${insightPage.slug}`
         : (tab === 'insights'
           ? '/insights'
-          : ((getServicePageByPath(window.location.pathname) || getInsightsRouteByPath(window.location.pathname)) ? '/' : window.location.pathname)));
-    const targetHash = servicePage || insightPage || tab === 'insights' || tab === 'home' ? '' : '#' + tab;
+          : (tab === 'start-project'
+            ? '/start-project'
+            : ((getServicePageByPath(window.location.pathname) || getInsightsRouteByPath(window.location.pathname) || window.location.pathname === '/start-project') ? '/' : window.location.pathname))));
+    const targetHash = servicePage || insightPage || tab === 'insights' || tab === 'start-project' || tab === 'home' ? '' : '#' + tab;
     const targetUrl = targetPath + window.location.search + targetHash;
     if (window.location.pathname + window.location.hash !== targetUrl) {
       window.history.pushState({ tab }, '', targetUrl);
@@ -1780,9 +1789,25 @@ const handleDeleteFee = async (id) => {
 };
 
 const handleDeleteContact = async (id) => {
-  await deleteContactInquiryFromBackend(id);
+  const result = await deleteContactInquiryFromBackend(id);
+  if (!result.success) {
+    showToast(`Could not delete enquiry: ${result.error}`, 'error');
+    return;
+  }
   liveContactInquiriesList.value = liveContactInquiriesList.value.filter(c => c.id !== id);
   showToast('Contact inquiry removed from database.', 'info');
+};
+
+const handleUpdateContactStatus = async ({ id, status }) => {
+  const result = await updateContactInquiryStatusInBackend(id, status);
+  if (!result.success) {
+    showToast(`Could not update enquiry status: ${result.error}`, 'error');
+    return;
+  }
+  liveContactInquiriesList.value = liveContactInquiriesList.value.map((inquiry) =>
+    inquiry.id === id ? { ...inquiry, status } : inquiry
+  );
+  showToast('Enquiry stage updated.', 'success');
 };
 
 const handleUpdateNielitProject = async (updatedProject) => {
@@ -1859,10 +1884,18 @@ const updateSeoMetadata = (tab) => {
       title: 'Software Development Insights & Guides | IT HUNT',
       description: 'Practical, original guides on software development, startup MVPs, AI automation, mobile apps, SaaS architecture, and technology decisions.'
     } : null);
-  const metaObj = servicePage || insightMeta || content.value?.seoPages?.[tab] || content.value?.seoPages?.home || {};
+  const projectPartnerMeta = tab === 'start-project'
+    ? {
+      title: 'Software Product Development Partner | IT HUNT',
+      description: 'Plan and build your web, mobile, SaaS, or AI product with IT HUNT. Explore engagement options and request a fixed-price proposal.'
+    }
+    : null;
+  const metaObj = servicePage || insightMeta || projectPartnerMeta || content.value?.seoPages?.[tab] || content.value?.seoPages?.home || {};
   const canonicalUrl = servicePage
     ? `https://ithunt.vercel.app/services/${servicePage.slug}`
-    : (insightsRoute ? `https://ithunt.vercel.app${insightsRoute.canonicalPath}` : 'https://ithunt.vercel.app/');
+    : (insightsRoute
+      ? `https://ithunt.vercel.app${insightsRoute.canonicalPath}`
+      : (projectPartnerMeta ? 'https://ithunt.vercel.app/start-project' : 'https://ithunt.vercel.app/'));
 
   // 1. Update Document Title
   if (metaObj.title) {
@@ -2018,6 +2051,10 @@ watch(activeTab, (newTab) => {
 // Synchronize tab view when browser back/forward history is triggered
 const handlePopState = () => {
   if (typeof window === 'undefined') return;
+  if (window.location.pathname === '/start-project') {
+    activeTab.value = 'start-project';
+    return;
+  }
   const servicePage = getServicePageByPath(window.location.pathname);
   if (servicePage) {
     activeTab.value = `service:${servicePage.slug}`;
@@ -2106,6 +2143,8 @@ onMounted(() => {
   const servicePage = getServicePageByPath(window.location.pathname);
   if (servicePage) {
     activeTab.value = `service:${servicePage.slug}`;
+  } else if (window.location.pathname === '/start-project') {
+    activeTab.value = 'start-project';
   } else if (getInsightsRouteByPath(window.location.pathname)) {
     const insightsRoute = getInsightsRouteByPath(window.location.pathname);
     activeTab.value = insightsRoute.type === 'article' ? `insight:${insightsRoute.article.slug}` : 'insights';

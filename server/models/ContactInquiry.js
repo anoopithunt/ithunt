@@ -8,7 +8,8 @@ const ContactInquirySchema = new mongoose.Schema({
   mobile: { type: String },
   subject: { type: String, default: 'Course Enquiry' },
   message: { type: String, required: true },
-  status: { type: String, default: 'New' },
+  status: { type: String, enum: ['New', 'Contacted', 'Qualified', 'Proposal', 'Won', 'Lost'], default: 'New' },
+  source: { type: String, default: 'website' },
   createdAt: { type: Date, default: Date.now },
 });
 

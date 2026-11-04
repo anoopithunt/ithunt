@@ -10,7 +10,7 @@
     />
 
     <!-- =====================================================================
-         1. PAGE 1: HERO OVERVIEW & KEY METRICS (IT Hunt Signature Style)
+         1. PAGE 1: HERO OVERVIEW & DELIVERY APPROACH
          ===================================================================== -->
     <section class="ithunt-home-section ithunt-hero ithunt-section-odd" id="page-hero">
       <div class="ithunt-hero-glow ithunt-hero-glow-1"></div>
@@ -36,14 +36,9 @@
         </p>
 
         <div class="ithunt-hero-cta-group anim-fade-in-up-delay">
-          <a
-            class="ithunt-btn-primary ithunt-hero-main-cta"
-            :href="'https://wa.me/' + (content.contact?.whatsapp || '919795771806') + '?text=' + encodeURIComponent('Hi IT HUNT, I would like to book a free consultation about a software project for my business.')"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <button class="ithunt-btn-primary ithunt-hero-main-cta" @click="$emit('set-tab', 'start-project')">
             <span>Book a Free Consultation</span>
-          </a>
+          </button>
           <button class="ithunt-btn-secondary ithunt-hero-main-cta" @click="scrollToSection('page-projects')">
             <span>View Our Work</span>
           </button>
@@ -71,16 +66,15 @@
           </div>
         </div>
 
-        <!-- Key Metrics Counter Band right inside Page 1 -->
-        <div class="ithunt-stats-band-hero" ref="statsSectionRef">
+        <div class="ithunt-stats-band-hero">
           <div class="stats-card-grid">
-            <div class="stat-pill-card" v-for="(stat, idx) in content.stats" :key="idx">
+            <div class="stat-pill-card" v-for="step in deliveryApproach" :key="step.number">
               <div class="stat-number-box">
-                <span class="stat-num text-brand">{{ animatedStats[idx] || stat.number }}</span>
+                <span class="stat-num text-brand">{{ step.number }}</span>
               </div>
               <div class="stat-desc-box">
-                <div class="stat-label-title">{{ stat.label }}</div>
-                <div class="stat-micro-note">Program snapshot</div>
+                <div class="stat-label-title">{{ step.title }}</div>
+                <div class="stat-micro-note">{{ step.description }}</div>
               </div>
             </div>
           </div>
@@ -102,7 +96,7 @@
         <div class="section-title-wrap text-center">
           <div class="ithunt-pill-badge small">
             <span class="ithunt-badge-dot"></span>
-            <span>PRODUCTION ARCHITECTURE</span>
+            <span>ILLUSTRATIVE ARCHITECTURE</span>
           </div>
           <h2 class="ithunt-section-heading">
             Project Code &amp; Architecture Showcase
@@ -136,7 +130,7 @@
               </div>
               <div class="showcase-badge-status">
                 <span class="pulse-dot"></span>
-                <span>PRODUCTION LIVE</span>
+                <span>ILLUSTRATIVE EXAMPLE</span>
               </div>
             </div>
 
@@ -164,38 +158,26 @@
                 </div>
               </div>
 
-              <!-- Right Pane: Real-Time Metrics & Highlights -->
+              <!-- Right Pane: Example architecture highlights -->
               <div class="showcase-right-pane">
                 <div class="metrics-panel-card">
                   <div class="metrics-panel-header">
-                    <h4>Production Deployment Metrics</h4>
-                    <span class="branch-tag">branch: production</span>
+                    <h4>Example architecture</h4>
+                    <span class="branch-tag">concept only</span>
                   </div>
 
                   <div class="metrics-grid">
-                    <div class="metric-item">
-                      <span class="metric-val text-brand">{{ currentProject.metrics.coverage }}</span>
-                      <span class="metric-lbl">Test Coverage</span>
-                    </div>
-                    <div class="metric-item">
-                      <span class="metric-val text-green">{{ currentProject.metrics.uptime }}</span>
-                      <span class="metric-lbl">Production Uptime</span>
-                    </div>
-                    <div class="metric-item">
-                      <span class="metric-val">{{ currentProject.metrics.prs }}</span>
-                      <span class="metric-lbl">Merged Client PRs</span>
-                    </div>
-                    <div class="metric-item">
-                      <span class="metric-val text-brand">{{ currentProject.metrics.interns }}</span>
-                      <span class="metric-lbl">Engineers on Team</span>
+                    <div class="metric-item" v-for="technology in currentProject.stack.slice(0, 4)" :key="technology">
+                      <span class="metric-val text-brand">✓</span>
+                      <span class="metric-lbl">{{ technology }}</span>
                     </div>
                   </div>
 
                   <div class="review-status-card">
                     <div class="reviewer-avatar">👨‍💻</div>
                     <div class="reviewer-info">
-                      <div class="reviewer-name">Architect Review: Approved</div>
-                      <div class="reviewer-comment">"Clean modular service architecture, production ready."</div>
+                      <div class="reviewer-name">A starting-point concept</div>
+                      <div class="reviewer-comment">Scope, architecture, and outcomes are defined for each real engagement.</div>
                     </div>
                   </div>
 
@@ -417,10 +399,10 @@
             <span>EXAMPLES</span>
           </div>
           <h2 class="ithunt-section-heading">
-            See IT HUNT <span class="text-brand">in Action</span>
+            See IT HUNT <span class="text-brand">Product Thinking</span>
           </h2>
           <p class="ithunt-section-desc">
-            Explore representative software project briefs with their problem, proposed solution, technologies, and evidence status. Client-approved media, delivery dates, and measured outcomes can be added as they become available.
+            These are illustrative solution concepts, not published client case studies. We’ll share client work only when attribution, media, timelines, and outcome evidence are approved.
           </p>
         </div>
 
@@ -447,7 +429,7 @@
                 <span class="example-avatar">{{ item.logo }}</span>
                 <div>
                   <h4 class="example-client-name">{{ item.name }}</h4>
-                  <span class="example-meta-text">{{ item.category }} • Portfolio project</span>
+                  <span class="example-meta-text">{{ item.category }} • Illustrative concept</span>
                 </div>
               </div>
               <span class="example-platform-pill">{{ item.platform }}</span>
@@ -468,14 +450,14 @@
 
             <div class="example-card-footer">
               <details class="case-study-details">
-                <summary class="example-view-btn">View full case study <span aria-hidden="true">⌄</span></summary>
+                <summary class="example-view-btn">View solution concept <span aria-hidden="true">⌄</span></summary>
                 <div class="case-study-content">
                   <div class="case-study-section">
-                    <h5>Client problem</h5>
+                    <h5>Example problem</h5>
                     <p>{{ item.problem }}</p>
                   </div>
                   <div class="case-study-section">
-                    <h5>Proposed solution</h5>
+                    <h5>Illustrative approach</h5>
                     <p>{{ item.solution }}</p>
                   </div>
                   <div class="case-study-section">
@@ -485,7 +467,7 @@
                     </div>
                   </div>
                   <div class="case-study-section">
-                    <h5>Screenshots &amp; product video</h5>
+                    <h5>Concept media</h5>
                     <div v-if="item.screenshots.length || item.videoUrl" class="case-study-media">
                       <figure v-for="image in item.screenshots" :key="image.src">
                         <img :src="image.src" :alt="image.alt" loading="lazy">
@@ -497,21 +479,21 @@
                       </video>
                     </div>
                     <p v-else class="case-study-evidence-note">
-                      Client-approved screenshots and product video have not been added yet.
+                      No client-approved project media is available for this concept.
                     </p>
                   </div>
                   <div class="case-study-meta-grid">
                     <div class="case-study-section">
-                      <h5>Development timeline</h5>
-                      <p>{{ item.timeline || 'Not published — confirm the project dates before sharing.' }}</p>
+                      <h5>Delivery timeline</h5>
+                      <p>{{ item.timeline || 'A real delivery timeline depends on discovery and an agreed scope.' }}</p>
                     </div>
                     <div class="case-study-section">
-                      <h5>Measurable results</h5>
+                      <h5>Client outcome evidence</h5>
                       <ul v-if="item.results.length">
                         <li v-for="result in item.results" :key="result">{{ result }}</li>
                       </ul>
                       <p v-else class="case-study-evidence-note">
-                        No verified client metrics are available to publish yet.
+                        This is an illustrative concept, not a client case study. No client results are claimed.
                       </p>
                     </div>
                   </div>
@@ -932,7 +914,6 @@ const showcaseProjects = [
     desc: 'Engineered by IT HUNT iOS interns: declarative SwiftUI payment sheet, UIKit view controller bridge, Apple Pay PassKit, Face ID biometrics, and Swift 6 concurrency.',
     file: 'PaymentEngineView.swift',
     stack: ['Swift 6', 'SwiftUI', 'UIKit Interop', 'PassKit (Apple Pay)', 'LocalAuthentication', 'Swift Concurrency'],
-    metrics: { coverage: '99.4%', uptime: '99.99%', prs: '54 Merged', interns: '6 iOS Engineers' },
     codeSnippet: [
       "import SwiftUI",
       "import UIKit // PassKit Bridge",
@@ -955,7 +936,6 @@ const showcaseProjects = [
     desc: 'Reads brand websites, generates viral multi-slide carousels, drafts copy, and publishes directly to social channels.',
     file: 'contentGenerator.py',
     stack: ['Python 3.12', 'FastAPI', 'Gemini 2.0 API', 'LangChain', 'Vue 3', 'Canvas API'],
-    metrics: { coverage: '98.8%', uptime: '100%', prs: '36 Merged', interns: '5 Engineers' },
     codeSnippet: [
       "from fastapi import FastAPI, BackgroundTasks",
       "from ai_engine.models import GeminiProGenerator",
@@ -977,7 +957,6 @@ const showcaseProjects = [
     desc: 'Cross-platform mobile application for doctor consultations with end-to-end encrypted video calling and instant prescriptions.',
     file: 'consultationController.dart',
     stack: ['Flutter 3.24', 'Dart', 'WebRTC', 'Firebase Auth', 'Node.js', 'Socket.io'],
-    metrics: { coverage: '97.6%', uptime: '99.9%', prs: '52 Merged', interns: '7 Engineers' },
     codeSnippet: [
       "import 'package:flutter/material.dart';",
       "import 'package:healthpulse/webrtc_service.dart';",
@@ -1001,7 +980,6 @@ const showcaseProjects = [
     desc: 'Engineered by IT HUNT interns for enterprise SaaS billing: webhooks, auto-invoicing, idempotency keys, and sub-50ms latency.',
     file: 'paymentEngine.service.ts',
     stack: ['React 19', 'Node.js', 'Express', 'Redis', 'PostgreSQL', 'Docker'],
-    metrics: { coverage: '99.4%', uptime: '99.98%', prs: '48 Merged', interns: '6 Engineers' },
     codeSnippet: [
       "import { PaymentGateway, WebhookDispatcher } from '@cloudpay/core';",
       "import { RedisCache } from '@cloudpay/cache';",
@@ -1021,52 +999,12 @@ const showcaseProjects = [
 const activeShowcaseIdx = ref(0);
 const currentProject = computed(() => showcaseProjects[activeShowcaseIdx.value] || showcaseProjects[0]);
 
-// Animated Stats Counter
-const statsSectionRef = ref(null);
-const animatedStats = ref([]);
-let observer = null;
-
-const startStatsAnimation = () => {
-  const statsList = props.content?.stats || [];
-  if (!statsList.length) return;
-
-  const duration = 1500;
-  const startTime = performance.now();
-
-  const parsedStats = statsList.map(s => {
-    const raw = String(s.number || '');
-    if (raw.includes('4.9')) return { target: 4.9, isFloat: true, suffix: ' ★' };
-    if (raw.includes('5,000') || raw.includes('5000')) return { target: 5000, isFloat: false, formatComma: true, suffix: '+' };
-    if (raw.includes('100')) return { target: 100, isFloat: false, suffix: '%' };
-    if (raw.includes('4')) return { target: 4, isFloat: false, suffix: '+ Yrs' };
-    const match = raw.match(/([0-9.]+)/);
-    if (match) {
-      const val = parseFloat(match[1]);
-      const suffix = raw.replace(match[1], '');
-      return { target: val, isFloat: raw.includes('.'), suffix };
-    }
-    return { target: null, fallback: raw };
-  });
-
-  const step = (now) => {
-    const elapsed = now - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-
-    animatedStats.value = parsedStats.map(item => {
-      if (item.target === null) return item.fallback;
-      const current = item.target * ease;
-      if (item.isFloat) return current.toFixed(1) + item.suffix;
-      const intVal = Math.round(current);
-      const formatted = item.formatComma ? intVal.toLocaleString('en-US') : String(intVal);
-      return formatted + item.suffix;
-    });
-
-    if (progress < 1) requestAnimationFrame(step);
-  };
-
-  requestAnimationFrame(step);
-};
+const deliveryApproach = [
+  { number: '01', title: 'Discover', description: 'Align on goals and requirements' },
+  { number: '02', title: 'Design', description: 'Shape the right product solution' },
+  { number: '03', title: 'Build', description: 'Develop with clear feedback loops' },
+  { number: '04', title: 'Support', description: 'Improve as your business grows' }
+];
 
 // Section 4 Live Projects Data & Filter Categories (IT Hunt Style)
 const projectCategories = [
@@ -1391,22 +1329,6 @@ onMounted(() => {
   window.addEventListener('scroll', handleScrollBounds, { passive: true });
 
   setTimeout(initSectionObserver, 200);
-
-  const statsList = props.content?.stats || [];
-  animatedStats.value = statsList.map(s => s.number);
-
-  if (typeof window !== 'undefined' && 'IntersectionObserver' in window && statsSectionRef.value) {
-    let triggered = false;
-    observer = new IntersectionObserver((entries) => {
-      if (entries[0] && entries[0].isIntersecting && !triggered) {
-        triggered = true;
-        startStatsAnimation();
-      }
-    }, { threshold: 0.15 });
-    observer.observe(statsSectionRef.value);
-  } else {
-    startStatsAnimation();
-  }
 });
 
 onUnmounted(() => {
@@ -1415,7 +1337,6 @@ onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown);
   window.removeEventListener('scroll', handleScrollBounds);
   if (sectionObserver) sectionObserver.disconnect();
-  if (observer) observer.disconnect();
 });
 </script>
 

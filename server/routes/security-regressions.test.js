@@ -5,9 +5,10 @@ import { dbAdapter } from '../services/dbAdapter.js';
 
 process.env.JWT_SECRET ||= 'test-only-jwt-secret-with-at-least-32-bytes';
 
-const [admissionsModule, festivalModule] = await Promise.all([
+const [admissionsModule, festivalModule, contactModule] = await Promise.all([
   import('./admissions.routes.js'),
-  import('./festival.routes.js')
+  import('./festival.routes.js'),
+  import('./contact.routes.js')
 ]);
 
 function findRoute(router, path, method) {
@@ -73,6 +74,55 @@ test('festival read routes remain public', () => {
     const middleware = findRoute(festivalModule.default, path, 'get');
     assert.equal(middleware.includes('verifyToken'), false);
     assert.equal(middleware.includes('requireAdmin'), false);
+  }
+});
+
+test('contact inquiry reads, updates, and deletes require an administrator', () => {
+  for (const [path, method] of [
+    ['/', 'get'],
+    ['/:id/status', 'patch'],
+    ['/:id', 'delete']
+  ]) {
+    const middleware = findRoute(contactModule.default, path, method);
+    assert.ok(middleware.includes('verifyToken'), `${method.toUpperCase()} ${path} must verify authentication`);
+    assert.ok(middleware.includes('requireAdmin'), `${method.toUpperCase()} ${path} must require admin`);
+  }
+  assert.equal(findRoute(contactModule.default, '/', 'post').includes('requireAdmin'), false);
+});
+
+test('contact lead stage only accepts known pipeline values', async () => {
+  const layer = contactModule.default.stack.find(item =>
+    item.route?.path === '/:id/status' && item.route.methods.patch
+  );
+  const handler = layer.route.stack.at(-1).handle;
+  const originalUpdate = dbAdapter.update;
+  const updates = [];
+  dbAdapter.update = async (...args) => {
+    updates.push(args);
+    return { id: args[1], ...args[2] };
+  };
+  const response = {
+    statusCode: 200,
+    body: null,
+    status(code) {
+      this.statusCode = code;
+      return this;
+    },
+    json(body) {
+      this.body = body;
+      return this;
+    }
+  };
+  try {
+    await handler({ params: { id: 'INQ-1' }, body: { status: 'Qualified' } }, response);
+    assert.equal(response.statusCode, 200);
+    assert.equal(updates[0][2].status, 'Qualified');
+
+    await handler({ params: { id: 'INQ-1' }, body: { status: 'admin' } }, response);
+    assert.equal(response.statusCode, 400);
+    assert.equal(updates.length, 1);
+  } finally {
+    dbAdapter.update = originalUpdate;
   }
 });
 

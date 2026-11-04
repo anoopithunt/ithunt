@@ -2486,9 +2486,12 @@
     <div v-else-if="currentTab === 'contact'" class="admin-tab-panel anim-stagger-3">
       <div class="panel-header-controls">
         <div>
-          <h3 class="panel-title">📬 Inbound Student & Corporate Enquiries</h3>
-          <p class="panel-subtitle">Direct messages and queries submitted through the website contact channels.</p>
+          <h3 class="panel-title">📬 Product Leads & Enquiries</h3>
+          <p class="panel-subtitle">Track each enquiry through the internal lead stages and follow up by email or WhatsApp.</p>
         </div>
+        <button type="button" class="btn-secondary" :disabled="contactInquiriesList.length === 0" @click="exportContactLeads">
+          Export leads (CSV)
+        </button>
       </div>
 
       <div class="admin-table-card">
@@ -2500,8 +2503,10 @@
                 <th>Contact Phone</th>
                 <th>Email Address</th>
                 <th>Subject</th>
+                <th>Lead stage</th>
                 <th>Message Content</th>
                 <th>Received Date</th>
+                <th>Follow up</th>
                 <th style="text-align: right;">Action</th>
               </tr>
             </thead>
@@ -2511,8 +2516,22 @@
                 <td>📞 {{ inq.phone || inq.mobile }}</td>
                 <td style="color: var(--color-ai-cyan);">{{ inq.email }}</td>
                 <td style="font-weight: 700; color: var(--color-ai-yellow);">{{ inq.subject }}</td>
+                <td>
+                  <select
+                    class="form-control"
+                    :value="inq.status || 'New'"
+                    aria-label="Enquiry lead stage"
+                    @change="emit('update-contact-status', { id: inq.id || inq._id, status: $event.target.value })"
+                  >
+                    <option v-for="status in contactLeadStatuses" :key="status" :value="status">{{ status }}</option>
+                  </select>
+                </td>
                 <td style="max-width: 320px; font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">{{ inq.message }}</td>
                 <td style="font-family: var(--font-mono); font-size: 0.8rem;">{{ inq.createdAt }}</td>
+                <td>
+                  <a v-if="inq.email" :href="`mailto:${inq.email}?subject=${encodeURIComponent(`Re: ${inq.subject || 'Your IT HUNT enquiry'}`)}`">Email</a>
+                  <a v-if="inq.phone" :href="`https://wa.me/${String(inq.phone).replace(/\D/g, '')}`" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                </td>
                 <td style="text-align: right;">
                   <button class="admin-icon-btn" @click="handleDeleteContact(inq)" title="Delete Contact Inquiry" style="color: #ef4444;">
                     🗑️
@@ -2520,7 +2539,7 @@
                 </td>
               </tr>
               <tr v-if="contactInquiriesList.length === 0">
-                <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-dim);">No inbound enquiries recorded yet.</td>
+                <td colspan="9" style="text-align: center; padding: 2rem; color: var(--text-dim);">No inbound enquiries recorded yet.</td>
               </tr>
             </tbody>
           </table>
@@ -5072,7 +5091,6 @@ import {
   saveFeeToBackend,
   updateFeeInBackend,
   deleteFeeFromBackend,
-  deleteContactInquiryFromBackend,
   saveNielitProjectRecord,
   fetchInternshipsFromBackend,
   fetchEventsCatalogFromBackend,
@@ -5212,6 +5230,7 @@ const emit = defineEmits([
   'add-review',
   'delete-review',
   'delete-contact',
+  'update-contact-status',
   'refresh-data',
   'set-tab',
   'update-festival-wish',
@@ -6554,6 +6573,7 @@ const feesList = ref(props.allFees && props.allFees.length ? [...props.allFees] 
 const certificatesList = ref(props.allCertificates && props.allCertificates.length ? [...props.allCertificates] : []);
 const projectsList = ref(props.allProjects && props.allProjects.length ? [...props.allProjects] : []);
 const contactInquiriesList = ref(props.allContactInquiries && props.allContactInquiries.length ? [...props.allContactInquiries] : []);
+const contactLeadStatuses = ['New', 'Contacted', 'Qualified', 'Proposal', 'Won', 'Lost'];
 const reviewsList = ref(props.allReviews && props.allReviews.length ? [...props.allReviews] : []);
 const usersList = ref(props.allUsers && props.allUsers.length ? [...props.allUsers] : []);
 const coursesList = ref(props.allCourses && props.allCourses.length ? [...props.allCourses] : (props.content?.coursesSection?.coursesList || []));
@@ -7689,13 +7709,25 @@ const handleDeleteFee = async (fee) => {
 const handleDeleteContact = async (inq) => {
   const id = inq.id || inq._id;
   if (!confirm(`Delete contact inquiry from ${inq.name || inq.fullName}?`)) return;
-  contactInquiriesList.value = contactInquiriesList.value.filter(c => c.id !== id && c._id !== id);
   emit('delete-contact', id);
-  try {
-    await deleteContactInquiryFromBackend(id);
-    emailActionMsg.value = `✓ Contact inquiry deleted.`;
-  } catch (e) {}
-  setTimeout(() => { emailActionMsg.value = ''; }, 4000);
+};
+
+const exportContactLeads = () => {
+  const columns = ['name', 'email', 'phone', 'subject', 'status', 'source', 'createdAt', 'message'];
+  const escapeCsv = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
+  const csv = [
+    columns.join(','),
+    ...contactInquiriesList.value.map((inquiry) =>
+      columns.map((column) => escapeCsv(inquiry[column])).join(',')
+    )
+  ].join('\r\n');
+  const file = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(file);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `ithunt-leads-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
 };
 
 // Add NIELIT Modal State

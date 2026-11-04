@@ -248,6 +248,8 @@ export const normalizeContactInquiry = (c) => ({
   mobile: c.phone || c.mobile || '',
   subject: c.subject || 'Course Enquiry',
   message: c.message || '',
+  status: c.status || 'New',
+  source: c.source || 'website',
   createdAt: c.createdAt ? (String(c.createdAt).includes('/') ? c.createdAt : new Date(c.createdAt).toLocaleDateString('en-GB')) : new Date().toLocaleDateString('en-GB')
 });
 
@@ -450,6 +452,7 @@ export const API = {
   // Contact Inquiries
   getContactInquiries: () => apiRequest('/contact'),
   submitContactInquiry: (data) => apiRequest('/contact', { method: 'POST', body: JSON.stringify(data) }),
+  updateContactInquiryStatus: (id, status) => apiRequest(`/contact/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
   deleteContactInquiry: (id) => apiRequest(`/contact/${id}`, { method: 'DELETE' }),
 
   // Auth & Admin Users
@@ -1556,6 +1559,16 @@ export async function deleteContactInquiryFromBackend(id) {
     return { success: true };
   } catch (e) {
     console.warn('Notice deleting contact inquiry from MongoDB:', e.message);
+    return { success: false, error: e.message };
+  }
+}
+
+export async function updateContactInquiryStatusInBackend(id, status) {
+  try {
+    const response = await API.updateContactInquiryStatus(id, status);
+    return { success: true, data: response?.data || response };
+  } catch (e) {
+    console.warn('Notice updating contact inquiry status:', e.message);
     return { success: false, error: e.message };
   }
 }

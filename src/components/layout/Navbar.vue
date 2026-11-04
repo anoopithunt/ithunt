@@ -62,10 +62,10 @@
 
         <button 
           class="cta-btn-header nav-action-desktop" 
-          @click="$emit('set-tab', 'admission')"
-          title="Start your application"
+          @click="$emit('set-tab', 'start-project')"
+          title="Plan a software project"
         >
-          <span>Apply now ➜</span>
+          <span>Plan a project ➜</span>
         </button>
 
         <!-- Mobile Drawer Toggle -->
@@ -134,6 +134,11 @@
       <!-- Compact navigation links -->
       <div class="sidebar-nav-body">
         <ul class="sidebar-nav-list">
+          <li>
+            <button class="sidebar-nav-item" :class="{ active: activeTab === 'start-project' }" @click="$emit('set-tab', 'start-project'); closeMobileNav();">
+              <span class="sidebar-item-icon">🚀</span><span class="sidebar-item-label">Plan a project</span>
+            </button>
+          </li>
           <li>
             <a class="sidebar-nav-item insights-mobile-nav-link" :class="{ active: activeTab === 'insights' || activeTab.startsWith('insight:') }" href="/insights">
               <span class="sidebar-item-icon">✍️</span><span class="sidebar-item-label">Insights</span>
