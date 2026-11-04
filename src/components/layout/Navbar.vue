@@ -22,6 +22,11 @@
               <span class="nav-item-icon" aria-hidden="true">{{ item.icon }}</span><span>{{ item.label }}</span>
             </button>
           </li>
+          <li>
+            <a class="nav-item-btn insights-nav-link" :class="{ active: activeTab === 'insights' || activeTab.startsWith('insight:') }" href="/insights">
+              <span class="nav-item-icon" aria-hidden="true">✍️</span><span>Insights</span>
+            </a>
+          </li>
         </ul>
       </nav>
 
@@ -129,6 +134,11 @@
       <!-- Compact navigation links -->
       <div class="sidebar-nav-body">
         <ul class="sidebar-nav-list">
+          <li>
+            <a class="sidebar-nav-item insights-mobile-nav-link" :class="{ active: activeTab === 'insights' || activeTab.startsWith('insight:') }" href="/insights">
+              <span class="sidebar-item-icon">✍️</span><span class="sidebar-item-label">Insights</span>
+            </a>
+          </li>
           <li>
             <button class="sidebar-nav-item" :class="{ active: activeTab === 'home' }" @click="$emit('set-tab', 'home'); closeMobileNav();">
               <span class="sidebar-item-icon">🏠</span><span class="sidebar-item-label">Home</span>
@@ -498,3 +508,10 @@ const onImgError = (event) => {
   event.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60"><rect width="60" height="60" rx="12" fill="%23f97316"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="900" fill="white">IT HUNT</text></svg>';
 };
 </script>
+
+<style scoped>
+.insights-nav-link,
+.insights-mobile-nav-link {
+  text-decoration: none;
+}
+</style>

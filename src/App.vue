@@ -104,6 +104,12 @@
           :whatsapp="content.contact?.whatsapp"
         />
 
+        <InsightsPage
+          v-else-if="currentInsightsRoute"
+          :key="activeTab"
+          :route="currentInsightsRoute"
+        />
+
         <!-- 1. Home Flow -->
         <HeroSection 
           v-if="activeTab === 'home'" 
@@ -525,6 +531,8 @@ import { generateAdmissionPdf, generatePrivacyPolicyPdf, generateTermsConditions
 import { generateNielitProjectPdf } from './utils/nielitPdfGenerator.js';
 import ServiceLandingPage from './components/sections/ServiceLandingPage.vue';
 import { getServicePageByPath, SERVICE_PAGES } from './data/servicePages.js';
+import InsightsPage from './components/sections/InsightsPage.vue';
+import { getInsightArticleBySlug, getInsightsRouteByPath } from './data/insights.js';
 import { 
   saveNielitProjectRecord, 
   saveAdmissionRecord, 
@@ -800,6 +808,14 @@ const activeTab = ref(computeInitialTab());
 const currentServicePage = computed(() => {
   const slug = activeTab.value.startsWith('service:') ? activeTab.value.slice('service:'.length) : '';
   return SERVICE_PAGES.find((service) => service.slug === slug) || null;
+});
+const currentInsightsRoute = computed(() => {
+  if (activeTab.value === 'insights') return getInsightsRouteByPath('/insights');
+  if (activeTab.value.startsWith('insight:')) {
+    const article = getInsightArticleBySlug(activeTab.value.slice('insight:'.length));
+    return article ? { type: 'article', article, canonicalPath: `/insights/${article.slug}` } : null;
+  }
+  return null;
 });
 
 const handleStudentLogin = async ({ email, password }, callback) => {
@@ -1216,13 +1232,23 @@ const setTab = (tab) => {
   const servicePage = tab.startsWith('service:')
     ? SERVICE_PAGES.find((service) => `service:${service.slug}` === tab)
     : null;
-  activeTab.value = servicePage ? `service:${servicePage.slug}` : tab;
+  const insightPage = tab.startsWith('insight:')
+    ? getInsightArticleBySlug(tab.slice('insight:'.length))
+    : null;
+  const normalizedTab = servicePage
+    ? `service:${servicePage.slug}`
+    : (insightPage ? `insight:${insightPage.slug}` : tab);
+  activeTab.value = normalizedTab;
   // Seamless browser history & deep link synchronization for search engines and user bookmarks
   if (typeof window !== 'undefined' && window.history && window.history.pushState) {
-    const targetHash = servicePage || tab === 'home' ? '' : '#' + tab;
     const targetPath = servicePage
       ? `/services/${servicePage.slug}`
-      : (getServicePageByPath(window.location.pathname) ? '/' : window.location.pathname);
+      : (insightPage
+        ? `/insights/${insightPage.slug}`
+        : (tab === 'insights'
+          ? '/insights'
+          : ((getServicePageByPath(window.location.pathname) || getInsightsRouteByPath(window.location.pathname)) ? '/' : window.location.pathname)));
+    const targetHash = servicePage || insightPage || tab === 'insights' || tab === 'home' ? '' : '#' + tab;
     const targetUrl = targetPath + window.location.search + targetHash;
     if (window.location.pathname + window.location.hash !== targetUrl) {
       window.history.pushState({ tab }, '', targetUrl);
@@ -1816,10 +1842,27 @@ const updateSeoMetadata = (tab) => {
   const servicePage = tab.startsWith('service:')
     ? SERVICE_PAGES.find((service) => `service:${service.slug}` === tab)
     : null;
-  const metaObj = servicePage || content.value?.seoPages?.[tab] || content.value?.seoPages?.home || {};
+  const insightsRoute = tab === 'insights'
+    ? getInsightsRouteByPath('/insights')
+    : (tab.startsWith('insight:')
+      ? (() => {
+        const article = getInsightArticleBySlug(tab.slice('insight:'.length));
+        return article ? { type: 'article', article, canonicalPath: `/insights/${article.slug}` } : null;
+      })()
+      : null);
+  const insightMeta = insightsRoute?.type === 'article'
+    ? {
+      title: `${insightsRoute.article.title} | IT HUNT Insights`,
+      description: insightsRoute.article.description
+    }
+    : (insightsRoute ? {
+      title: 'Software Development Insights & Guides | IT HUNT',
+      description: 'Practical, original guides on software development, startup MVPs, AI automation, mobile apps, SaaS architecture, and technology decisions.'
+    } : null);
+  const metaObj = servicePage || insightMeta || content.value?.seoPages?.[tab] || content.value?.seoPages?.home || {};
   const canonicalUrl = servicePage
     ? `https://ithunt.vercel.app/services/${servicePage.slug}`
-    : 'https://ithunt.vercel.app/';
+    : (insightsRoute ? `https://ithunt.vercel.app${insightsRoute.canonicalPath}` : 'https://ithunt.vercel.app/');
 
   // 1. Update Document Title
   if (metaObj.title) {
@@ -1859,7 +1902,7 @@ const updateSeoMetadata = (tab) => {
   if (metaObj.ogDescription || metaObj.description) {
     setMetaTag('meta[property="og:description"]', 'property', 'og:description', metaObj.ogDescription || metaObj.description);
   }
-  setMetaTag('meta[property="og:type"]', 'property', 'og:type', 'website');
+  setMetaTag('meta[property="og:type"]', 'property', 'og:type', insightsRoute?.type === 'article' ? 'article' : 'website');
   setMetaTag('meta[property="og:site_name"]', 'property', 'og:site_name', 'IT HUNT');
   setMetaTag('meta[property="og:image"]', 'property', 'og:image', 'https://ithunt.vercel.app/img/ithunt.jpg');
   setMetaTag('meta[property="og:image:secure_url"]', 'property', 'og:image:secure_url', 'https://ithunt.vercel.app/img/ithunt.jpg');
@@ -1922,6 +1965,40 @@ const updateSeoMetadata = (tab) => {
     serviceStructuredData?.remove();
   }
 
+  let insightStructuredData = document.getElementById('insight-page-jsonld');
+  if (insightsRoute) {
+    if (!insightStructuredData) {
+      insightStructuredData = document.createElement('script');
+      insightStructuredData.id = 'insight-page-jsonld';
+      insightStructuredData.type = 'application/ld+json';
+      document.head.appendChild(insightStructuredData);
+    }
+    const insightJsonLd = insightsRoute.type === 'article'
+      ? {
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        headline: insightsRoute.article.title,
+        description: insightsRoute.article.description,
+        datePublished: insightsRoute.article.publishedAt,
+        dateModified: insightsRoute.article.publishedAt,
+        author: { '@type': 'Organization', name: 'IT HUNT Editorial', url: 'https://ithunt.vercel.app/' },
+        publisher: { '@type': 'Organization', name: 'IT HUNT', url: 'https://ithunt.vercel.app/' },
+        mainEntityOfPage: canonicalUrl,
+        articleSection: insightsRoute.article.category
+      }
+      : {
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        name: metaObj.title,
+        description: metaObj.description,
+        url: canonicalUrl,
+        isPartOf: { '@type': 'WebSite', name: 'IT HUNT', url: 'https://ithunt.vercel.app/' }
+      };
+    insightStructuredData.textContent = JSON.stringify(insightJsonLd);
+  } else {
+    insightStructuredData?.remove();
+  }
+
   // 5. Twitter Card Meta Tags
   setMetaTag('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
   setMetaTag('meta[name="twitter:site"]', 'name', 'twitter:site', '@ithunt');
@@ -1944,6 +2021,11 @@ const handlePopState = () => {
   const servicePage = getServicePageByPath(window.location.pathname);
   if (servicePage) {
     activeTab.value = `service:${servicePage.slug}`;
+    return;
+  }
+  const insightsRoute = getInsightsRouteByPath(window.location.pathname);
+  if (insightsRoute) {
+    activeTab.value = insightsRoute.type === 'article' ? `insight:${insightsRoute.article.slug}` : 'insights';
     return;
   }
   const rawHash = (window.location.hash || '').replace('#', '').toLowerCase().trim();
@@ -2024,6 +2106,9 @@ onMounted(() => {
   const servicePage = getServicePageByPath(window.location.pathname);
   if (servicePage) {
     activeTab.value = `service:${servicePage.slug}`;
+  } else if (getInsightsRouteByPath(window.location.pathname)) {
+    const insightsRoute = getInsightsRouteByPath(window.location.pathname);
+    activeTab.value = insightsRoute.type === 'article' ? `insight:${insightsRoute.article.slug}` : 'insights';
   } else if (window.location.hash) {
     const rawHash = window.location.hash.replace('#', '').toLowerCase().trim();
     if (rawHash === 'admission' || rawHash === 'admisson') {

@@ -171,7 +171,9 @@ export const normalizeReview = (r) => ({
   category: r.category || '💻 Labs & Workstations',
   avatar: r.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=60',
   date: r.date || (r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')),
-  verified: r.verified !== undefined ? r.verified : true
+  verified: r.verified === true,
+  approved: r.approved === true,
+  consentToPublish: r.consentToPublish === true
 });
 
 export const normalizeInternship = (i) => ({

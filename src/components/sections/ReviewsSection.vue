@@ -21,7 +21,7 @@
           <span>✍️ Leave a Review & Rating ⭐</span>
         </button>
         <button class="btn-secondary" @click="selectedCategory = 'all'; selectedRatingFilter = 0;">
-          <span>Browse All {{ reviewsList.length }} Reviews 📖</span>
+          <span>Browse All {{ publicReviews.length }} Reviews 📖</span>
         </button>
       </div>
     </div>
@@ -29,9 +29,13 @@
     <!-- 2. RATING SUMMARY & METRIC BREAKDOWN CARD -->
     <div class="rating-summary-card anim-stagger-2">
       <div class="rating-score-column">
-        <div class="big-rating-score text-gradient-gold">{{ content.reviewsSection?.overallScore || '4.9' }}</div>
-        <div class="star-rating-display" style="font-size: 1.5rem; margin: 0.35rem 0;">{{ content.reviewsSection?.overallStars || '★★★★★' }}</div>
-        <div class="rating-count-sub">{{ content.reviewsSection?.totalCountLabel || 'Based on 250+ Verified Reviews' }}</div>
+        <div class="big-rating-score text-gradient-gold">{{ averageRating ? averageRating.toFixed(1) : '—' }}</div>
+        <div class="star-rating-display" style="font-size: 1.5rem; margin: 0.35rem 0;">
+          {{ '★'.repeat(Math.round(averageRating)) }}{{ '☆'.repeat(5 - Math.round(averageRating)) }}
+        </div>
+        <div class="rating-count-sub">
+          {{ publicReviews.length ? `Based on ${publicReviews.length} approved reviews with publication consent` : 'No verified reviews published yet' }}
+        </div>
         
         <button class="btn-primary quick-write-btn" @click="scrollToReviewForm" style="margin-top: 1.25rem; font-size: 0.88rem; padding: 0.6rem 1.15rem; width: 100%; justify-content: center;">
           <span>⭐ Write a Review Now</span>
@@ -40,18 +44,11 @@
 
       <div class="rating-metrics-column">
         <h4 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 800; margin-bottom: 1.15rem; color: var(--text-main);">
-          {{ content.reviewsSectionUI?.metricsHeading || 'Facility & Development Evaluation Metrics' }}
+          How published reviews are selected
         </h4>
-        
-        <div class="metric-bar-wrapper" v-for="metric in (content.reviewsSection?.facilityMetrics || defaultFacilityMetrics)" :key="metric.name">
-          <div class="metric-bar-header">
-            <span style="font-weight: 600; color: var(--text-main); font-size: 0.9rem;">{{ metric.name }}</span>
-            <span style="font-weight: 800; color: var(--color-ai-cyan); font-family: var(--font-mono); font-size: 0.85rem;">{{ metric.score }} / 5.0</span>
-          </div>
-          <div class="metric-bar-track">
-            <div class="metric-bar-fill" :style="{ width: (metric.score / 5 * 100) + '%' }"></div>
-          </div>
-        </div>
+        <p style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.65;">
+          Reviews are shown only after verification, approval, and explicit permission to publish. New submissions are not treated as verified ratings.
+        </p>
       </div>
     </div>
 
@@ -115,8 +112,8 @@
 
       <div v-if="filteredReviews.length === 0" style="grid-column: 1 / -1; text-align: center; padding: 3.5rem 1.5rem; background: var(--bg-card-glass); border-radius: var(--radius-lg); border: 1px solid var(--border-cyber);">
         <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">⭐</div>
-        <h3 style="font-family: var(--font-heading); color: var(--text-main); font-size: 1.25rem; margin-bottom: 0.4rem;">No reviews found for this filter</h3>
-        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">Be the first student to leave a review in this category!</p>
+        <h3 style="font-family: var(--font-heading); color: var(--text-main); font-size: 1.25rem; margin-bottom: 0.4rem;">No published reviews found for this filter</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">Submitted reviews appear here only after they have been verified and approved for publication.</p>
         <button class="btn-primary" @click="scrollToReviewForm"><span>Leave Review Now ✍️</span></button>
       </div>
     </div>
@@ -239,6 +236,10 @@
                 :placeholder="content.reviewsSectionUI?.fields?.reviewPlaceholder || 'Share your experience regarding facility quality, faculty guidance, live coding projects, and ease of development...'"
               ></textarea>
             </div>
+            <label class="review-consent full-width">
+              <input v-model="newReview.consentToPublish" type="checkbox" required>
+              <span>I give IT HUNT permission to publish my review and name after it has been verified. I understand this is optional and can contact IT HUNT to withdraw permission.</span>
+            </label>
           </div>
 
           <!-- Live Preview Box if user starts typing -->
@@ -261,7 +262,7 @@
           <!-- Submit Button -->
           <div style="margin-top: 2rem;">
             <button type="submit" class="btn-primary review-submit-mega-btn">
-              <span>{{ content.reviewsSectionUI?.fields?.submitBtn || 'Submit & Publish Verified Review ⭐ ➔' }}</span>
+              <span>{{ content.reviewsSectionUI?.fields?.submitBtn || 'Submit Review for Verification ⭐ ➔' }}</span>
             </button>
           </div>
         </form>
@@ -293,13 +294,6 @@ const selectedCategory = ref('all');
 const selectedRatingFilter = ref(0);
 const hoverRating = ref(0);
 
-const defaultFacilityMetrics = [
-  { name: 'Computer Labs & Workstations', score: 4.9 },
-  { name: 'Faculty Expertise & Mentorship', score: 5.0 },
-  { name: 'Internship LOR & Placement Support', score: 4.9 },
-  { name: 'Curriculum & Ease of Development', score: 4.8 }
-];
-
 const categoryList = [
   '💻 Labs & Workstations',
   '🎓 Teaching & Mentorship',
@@ -329,11 +323,22 @@ const newReview = ref({
   role: '',
   rating: 5,
   category: '💻 Labs & Workstations',
-  comment: ''
+  comment: '',
+  consentToPublish: false
 });
 
+const publicReviews = computed(() => reviewsList.value.filter(review =>
+  review.verified === true
+  && review.approved === true
+  && review.consentToPublish === true
+));
+
+const averageRating = computed(() => publicReviews.value.length
+  ? publicReviews.value.reduce((sum, review) => sum + review.rating, 0) / publicReviews.value.length
+  : 0);
+
 const filteredReviews = computed(() => {
-  return reviewsList.value.filter(rev => {
+  return publicReviews.value.filter(rev => {
     const matchCategory = selectedCategory.value === 'all' || (rev.category && rev.category.toLowerCase().includes(selectedCategory.value.toLowerCase()));
     const matchRating = selectedRatingFilter.value === 0 || (rev.rating && rev.rating >= selectedRatingFilter.value);
     return matchCategory && matchRating;
@@ -378,6 +383,10 @@ const handleSubmitReview = async () => {
     alert('Please share your brief review feedback (at least 5 characters).');
     return;
   }
+  if (!newReview.value.consentToPublish) {
+    alert('Please confirm whether IT HUNT may publish your review after verification.');
+    return;
+  }
 
   const reviewObj = {
     id: 'rev-' + Date.now(),
@@ -388,6 +397,7 @@ const handleSubmitReview = async () => {
     rating: Number(newReview.value.rating) || 5,
     category: sanitizeInput(newReview.value.category.replace(/^[^\w]+/, '')),
     comment: cleanComment,
+    consentToPublish: true,
     createdAt: new Date().toISOString()
   };
 
@@ -404,7 +414,8 @@ const handleSubmitReview = async () => {
     role: '',
     rating: 5,
     category: '💻 Labs & Workstations',
-    comment: ''
+    comment: '',
+    consentToPublish: false
   };
 
   // Scroll smoothly back to top so user sees their new review
@@ -479,6 +490,21 @@ const onImgError = (event) => {
   font-size: 0.85rem;
   color: var(--text-muted);
   font-weight: 600;
+}
+
+.review-consent {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  color: var(--text-muted);
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.review-consent input {
+  flex: 0 0 auto;
+  margin-top: 0.2rem;
+  accent-color: var(--color-ai-cyan);
 }
 
 .reviews-filter-bar {
