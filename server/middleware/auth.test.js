@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import jwt from 'jsonwebtoken';
-import { generatePasswordResetToken, generateToken, hashPasswordResetToken, verifyToken } from './auth.js';
+import { generatePasswordResetToken, generateToken, hasValidJwtSecret, hashPasswordResetToken, verifyToken } from './auth.js';
 import authRoutes from '../routes/auth.routes.js';
 
 function createResponse() {
@@ -21,11 +21,34 @@ function createResponse() {
 
 test('JWT generation fails closed when the secret is missing or too short', () => {
   const originalSecret = process.env.JWT_SECRET;
+  const originalVercel = process.env.VERCEL;
+  const originalVercelEnv = process.env.VERCEL_ENV;
   try {
+    process.env.VERCEL = '1';
+    process.env.VERCEL_ENV = 'production';
     process.env.JWT_SECRET = '';
     assert.throws(() => generateToken({ sub: 'test' }), { code: 'JWT_SECRET_CONFIGURATION' });
     process.env.JWT_SECRET = 'short';
     assert.throws(() => generateToken({ sub: 'test' }), { code: 'JWT_SECRET_CONFIGURATION' });
+  } finally {
+    if (originalSecret === undefined) delete process.env.JWT_SECRET;
+    else process.env.JWT_SECRET = originalSecret;
+    if (originalVercel === undefined) delete process.env.VERCEL;
+    else process.env.VERCEL = originalVercel;
+    if (originalVercelEnv === undefined) delete process.env.VERCEL_ENV;
+    else process.env.VERCEL_ENV = originalVercelEnv;
+  }
+});
+
+test('JWT configuration health check only accepts a configured secret of at least 32 bytes', () => {
+  const originalSecret = process.env.JWT_SECRET;
+  try {
+    delete process.env.JWT_SECRET;
+    assert.equal(hasValidJwtSecret(), false);
+    process.env.JWT_SECRET = 'short';
+    assert.equal(hasValidJwtSecret(), false);
+    process.env.JWT_SECRET = 'test-only-secret-with-at-least-32-cryptographic-bytes';
+    assert.equal(hasValidJwtSecret(), true);
   } finally {
     if (originalSecret === undefined) delete process.env.JWT_SECRET;
     else process.env.JWT_SECRET = originalSecret;

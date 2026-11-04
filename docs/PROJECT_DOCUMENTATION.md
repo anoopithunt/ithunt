@@ -119,7 +119,7 @@ All paths below are mounted below `/api` (for example, `/api/auth/login`). Some 
 - Protected route handlers use the authentication middleware and, where required, administrator checks. Role-section permission checks are mounted for API requests and consult the `SystemSetting` record.
 - Login and password-recovery requests are rate limited. Password-reset tokens are one-time, hashed before storage, and time limited.
 - The SuperAdmin bootstrap command is an interactive administrative tool; do not seed production accounts with sample credentials.
-- Configure a unique, randomly generated `JWT_SECRET` (at least 32 bytes) in every environment. The current checked-in authentication middleware includes a built-in fallback when the environment variable is absent; that fallback is not appropriate for production. Remove/replace it before relying on JWT signing in a production deployment, and rotate the key if it may have been used.
+- Configure a unique, cryptographically random `JWT_SECRET` of at least 32 bytes in every environment. Authentication and token signing fail closed if it is missing or too short; generate one with `openssl rand -hex 32`, and rotate it if it may have been exposed.
 - Do not put bearer tokens, mail credentials, database credentials, or API keys in documentation, source control, or support requests.
 
 ### Existing API reference
@@ -250,7 +250,7 @@ Recommended release checks:
 ## 12. Security and maintenance guidance
 
 - Keep secrets only in local ignored environment files or hosting-provider secret stores.
-- Use a unique `JWT_SECRET` with at least 32 random bytes; remove the checked-in fallback in `server/middleware/auth.js` before production use.
+- Use a unique `JWT_SECRET` with at least 32 random bytes. The server does not provide a fallback; authentication is unavailable until a valid secret is configured.
 - Use HTTPS for live traffic and rotate tokens/secrets after exposure.
 - Protect administrative routes with the appropriate authentication and role checks; audit route-level middleware when adding endpoints.
 - Preserve password hashing, reset-token hashing, rate-limit behavior, and generic recovery responses.
