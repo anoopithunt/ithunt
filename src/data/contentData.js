@@ -515,7 +515,7 @@ const CONTENT_DATA = {
     name: "Mr. Lakshman Singh Chauhan",
     title: "Director & Founder, IT HUNT | MCA (Computer Science)",
     image: "img/ithunt.webp",
-    message: "Our mission is to empower every candidate with market-ready IT skills. With our new IT Solutions Internship Center and experienced senior faculty (min 14+ years experience), we deliver unparalleled quality and hands-on production experience.",
+    message: "Our mission is to build deep, practical IT knowledge that helps every learner stand out. We go beyond surface-level teaching with guided projects, experienced senior faculty (14+ years of experience), and hands-on production practice—so our learners gain skills that set them apart.",
     skills: ["Public Speaking Expert", "Motivational Speaker", "Life Coach", "Spoken English Mentor"]
   },
   coFounder: {
@@ -2134,7 +2134,7 @@ const CONTENT_DATA = {
 
   // Footer Text
   footer: {
-    aboutText: "World-class IT Solutions Internship Center & accredited computer education institute. Training students in MERN Stack, iOS, Android, and Digital Marketing.",
+    aboutText: "Our mission is to build deep, practical IT knowledge that helps learners stand out. Through guided projects and training in MERN Stack, iOS, Android, and Digital Marketing, we help students develop skills that set them apart.",
     copyrightText: "© 2026 IT HUNT Institute of Computer Technology & IT Solutions. All rights reserved."
   },
 
