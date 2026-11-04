@@ -165,14 +165,6 @@ const CONTENT_DATA = {
     ]
   },
 
-  // Key Statistics & Metrics
-  stats: [
-    { number: "5,000+", label: "Engineers & Interns Trained", isGradientPrimary: true },
-    { number: "4.9 ★", label: "Facility & Quality Review", isGradientSecondary: true },
-    { number: "100%", label: "Live Client Projects", isGradientPrimary: true },
-    { number: "4+ Yrs", label: "Senior Tech Instructors", isGradientSecondary: true }
-  ],
-
   // Software Company Services & Internship Venture
   internshipVenture: {
     tagline: "SOFTWARE INTERNSHIPS • WEB, MOBILE & DIGITAL SKILLS",

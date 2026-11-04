@@ -38,6 +38,7 @@
         <h4>Quick Links</h4>
         <ul class="footer-links">
           <li><a href="#" @click.prevent="$emit('set-tab', 'home')">Home</a></li>
+          <li><a href="/start-project">Plan a software project</a></li>
           <li><a href="/insights">Insights &amp; Guides</a></li>
           <li><a href="#" @click.prevent="$emit('set-tab', 'internships')">Internships</a></li>
           <li><a href="#" @click.prevent="$emit('set-tab', 'courses')">Courses</a></li>

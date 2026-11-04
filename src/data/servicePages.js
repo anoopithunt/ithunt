@@ -30,6 +30,25 @@ export const SERVICE_PAGES = [
     ]
   },
   {
+    slug: 'mobile-app-development',
+    name: 'Mobile App Development',
+    title: 'iOS & Android Mobile App Development | IT HUNT',
+    description: 'Mobile app development for iOS and Android, including product discovery, interface design, backend integration, device testing, and release support.',
+    headline: 'Mobile products made for everyday use',
+    intro: 'We help businesses plan, build, and improve iOS and Android apps around real customer and team workflows.',
+    audience: 'Startups and businesses launching a mobile product, extending a service to phones, or modernizing an existing application.',
+    challenge: 'A dependable mobile product must do more than look good: it needs clear user journeys, reliable integrations, device-aware testing, and a plan for ongoing releases.',
+    approach: 'We start with user needs and product scope, choose native or cross-platform implementation based on the requirements, then build, test, and prepare the product for release.',
+    deliverables: ['Product discovery and prioritized mobile roadmap', 'iOS and Android user experience and implementation', 'Secure APIs and business-system integrations', 'Device testing, release preparation, and handover'],
+    technologies: ['Swift', 'SwiftUI', 'Kotlin', 'Jetpack Compose', 'Flutter', 'REST APIs'],
+    outcomes: ['A focused app experience for your users', 'Mobile workflows connected to your business systems', 'A maintainable base for future releases'],
+    faqs: [
+      { question: 'Do you build for both iOS and Android?', answer: 'Yes. We can scope for both platforms and recommend native or cross-platform implementation based on user needs, device capabilities, and maintenance considerations.' },
+      commonFaqs.timeline,
+      commonFaqs.process
+    ]
+  },
+  {
     slug: 'ios-app-development',
     name: 'iOS App Development',
     title: 'iOS App Development Services | IT HUNT',

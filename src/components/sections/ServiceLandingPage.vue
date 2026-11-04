@@ -14,7 +14,7 @@
         <h1>{{ service.headline }}</h1>
         <p class="service-intro">{{ service.intro }}</p>
         <div class="service-hero-actions">
-          <a class="service-button service-button-primary" :href="consultationUrl" target="_blank" rel="noopener noreferrer">
+          <a class="service-button service-button-primary" href="/start-project">
             Book a Free Consultation
           </a>
           <a class="service-button service-button-secondary" href="/#page-projects">View Our Work</a>
@@ -85,7 +85,7 @@
         <p class="service-eyebrow">LET'S TALK</p>
         <h2 id="service-cta-heading">Have a project in mind?</h2>
         <p>Tell us what you are trying to achieve. We’ll discuss your requirements and possible next steps in a free consultation.</p>
-        <a class="service-button service-button-primary" :href="consultationUrl" target="_blank" rel="noopener noreferrer">
+        <a class="service-button service-button-primary" href="/start-project">
           Book a Free Consultation
         </a>
       </section>
@@ -103,17 +103,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-
-const props = defineProps({
+defineProps({
   service: { type: Object, required: true },
-  services: { type: Array, required: true },
-  whatsapp: { type: String, default: '919795771806' }
-});
-
-const consultationUrl = computed(() => {
-  const message = `Hi IT HUNT, I would like a free consultation about ${props.service.name}.`;
-  return `https://wa.me/${props.whatsapp}?text=${encodeURIComponent(message)}`;
+  services: { type: Array, required: true }
 });
 </script>
 
