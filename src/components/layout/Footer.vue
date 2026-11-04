@@ -47,6 +47,15 @@
         </ul>
       </div>
 
+      <div id="service-links" class="footer-col footer-services-col">
+        <h4>Software Services</h4>
+        <ul class="footer-links">
+          <li v-for="service in servicePages" :key="service.slug">
+            <a :href="`/services/${service.slug}`">{{ service.name }}</a>
+          </li>
+        </ul>
+      </div>
+
       <!-- Contact -->
       <div class="footer-col footer-contact-col">
         <h4>Contact & Location</h4>
@@ -87,11 +96,14 @@
 </template>
 
 <script setup>
+import { SERVICE_PAGES } from '../../data/servicePages.js';
+
 defineProps({
   content: { type: Object, required: true },
   activeTab: { type: String, default: 'home' }
 });
 defineEmits(['set-tab', 'open-privacy-policy', 'open-terms-conditions', 'open-cv-modal']);
+const servicePages = SERVICE_PAGES;
 
 const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -122,8 +134,8 @@ const onImgError = (event) => {
 
 .footer-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1.4fr;
-  gap: 2.5rem;
+  grid-template-columns: minmax(0, 1.5fr) minmax(130px, 0.75fr) minmax(0, 1.25fr) minmax(0, 1.25fr);
+  gap: 2rem;
   padding-bottom: 2.5rem;
 }
 

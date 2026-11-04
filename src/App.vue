@@ -96,6 +96,14 @@
     <!-- Main Dynamic Views with Animated Morph Transition -->
     <main id="main-content" :class="{ 'superadmin-main-active': activeTab === 'superadmin' }">
       <Transition name="view-morph" mode="out-in">
+        <ServiceLandingPage
+          v-if="currentServicePage"
+          :key="activeTab"
+          :service="currentServicePage"
+          :services="SERVICE_PAGES"
+          :whatsapp="content.contact?.whatsapp"
+        />
+
         <!-- 1. Home Flow -->
         <HeroSection 
           v-if="activeTab === 'home'" 
@@ -510,11 +518,13 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onUnmounted, nextTick, defineAsyncComponent } from 'vue';
+import { ref, watch, onMounted, onUnmounted, nextTick, defineAsyncComponent, computed } from 'vue';
 import CONTENT_DATA from './data/contentData.js';
 import { DEFAULT_DEMO_STUDENT } from './data/studentAcademicData.js';
 import { generateAdmissionPdf, generatePrivacyPolicyPdf, generateTermsConditionsPdf } from './utils/pdfGenerator.js';
 import { generateNielitProjectPdf } from './utils/nielitPdfGenerator.js';
+import ServiceLandingPage from './components/sections/ServiceLandingPage.vue';
+import { getServicePageByPath, SERVICE_PAGES } from './data/servicePages.js';
 import { 
   saveNielitProjectRecord, 
   saveAdmissionRecord, 
@@ -766,6 +776,10 @@ const studentUser = ref(storedStudent);
 
 // Compute default initial tab based on logged in user session (persists across hard refresh)
 const computeInitialTab = () => {
+  if (typeof window !== 'undefined') {
+    const servicePage = getServicePageByPath(window.location.pathname);
+    if (servicePage) return `service:${servicePage.slug}`;
+  }
   if (typeof window !== 'undefined' && window.location.hash) {
     const rawHash = window.location.hash.replace('#', '').toLowerCase().trim();
     if (rawHash === 'admission' || rawHash === 'admisson') return 'admission';
@@ -783,6 +797,10 @@ const computeInitialTab = () => {
 };
 
 const activeTab = ref(computeInitialTab());
+const currentServicePage = computed(() => {
+  const slug = activeTab.value.startsWith('service:') ? activeTab.value.slice('service:'.length) : '';
+  return SERVICE_PAGES.find((service) => service.slug === slug) || null;
+});
 
 const handleStudentLogin = async ({ email, password }, callback) => {
   try {
@@ -1195,17 +1213,22 @@ const setTab = (tab) => {
       return;
     }
   }
-  activeTab.value = tab;
+  const servicePage = tab.startsWith('service:')
+    ? SERVICE_PAGES.find((service) => `service:${service.slug}` === tab)
+    : null;
+  activeTab.value = servicePage ? `service:${servicePage.slug}` : tab;
   // Seamless browser history & deep link synchronization for search engines and user bookmarks
   if (typeof window !== 'undefined' && window.history && window.history.pushState) {
-    const targetHash = (tab === 'home') ? '' : '#' + tab;
-    const currentHash = window.location.hash || '';
-    if (currentHash !== targetHash) {
-      const targetUrl = window.location.pathname + window.location.search + targetHash;
+    const targetHash = servicePage || tab === 'home' ? '' : '#' + tab;
+    const targetPath = servicePage
+      ? `/services/${servicePage.slug}`
+      : (getServicePageByPath(window.location.pathname) ? '/' : window.location.pathname);
+    const targetUrl = targetPath + window.location.search + targetHash;
+    if (window.location.pathname + window.location.hash !== targetUrl) {
       window.history.pushState({ tab }, '', targetUrl);
     }
   }
-  updateSeoMetadata(tab);
+  updateSeoMetadata(activeTab.value);
   if (tab === 'home') {
     checkAndShowFestivalModal(true);
   }
@@ -1790,7 +1813,13 @@ const printAdmissionSlip = () => {
 // Dynamic SEO Metadata Updater for SPA Views
 const updateSeoMetadata = (tab) => {
   if (typeof document === 'undefined') return;
-  const metaObj = content.value?.seoPages?.[tab] || content.value?.seoPages?.home || {};
+  const servicePage = tab.startsWith('service:')
+    ? SERVICE_PAGES.find((service) => `service:${service.slug}` === tab)
+    : null;
+  const metaObj = servicePage || content.value?.seoPages?.[tab] || content.value?.seoPages?.home || {};
+  const canonicalUrl = servicePage
+    ? `https://ithunt.vercel.app/services/${servicePage.slug}`
+    : 'https://ithunt.vercel.app/';
 
   // 1. Update Document Title
   if (metaObj.title) {
@@ -1838,15 +1867,60 @@ const updateSeoMetadata = (tab) => {
   setMetaTag('meta[property="og:image:width"]', 'property', 'og:image:width', '1200');
   setMetaTag('meta[property="og:image:height"]', 'property', 'og:image:height', '630');
   setMetaTag('meta[property="og:image:alt"]', 'property', 'og:image:alt', 'IT HUNT Software Solutions & Tech Academy Prayagraj Campus');
-  const canonicalBase = 'https://ithunt.vercel.app/';
-  setMetaTag('meta[property="og:url"]', 'property', 'og:url', canonicalBase);
+  setMetaTag('meta[property="og:url"]', 'property', 'og:url', canonicalUrl);
   let canonical = document.querySelector('link[rel="canonical"]');
   if (!canonical) {
     canonical = document.createElement('link');
     canonical.setAttribute('rel', 'canonical');
     document.head.appendChild(canonical);
   }
-  canonical.setAttribute('href', canonicalBase);
+  canonical.setAttribute('href', canonicalUrl);
+
+  let serviceStructuredData = document.getElementById('service-page-jsonld');
+  if (servicePage) {
+    if (!serviceStructuredData) {
+      serviceStructuredData = document.createElement('script');
+      serviceStructuredData.id = 'service-page-jsonld';
+      serviceStructuredData.type = 'application/ld+json';
+      document.head.appendChild(serviceStructuredData);
+    }
+    serviceStructuredData.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'Service',
+          '@id': `${canonicalUrl}#service`,
+          name: servicePage.name,
+          serviceType: servicePage.name,
+          description: servicePage.description,
+          url: canonicalUrl,
+          provider: { '@id': 'https://ithunt.vercel.app/#organization' },
+          areaServed: [
+            { '@type': 'City', name: 'Prayagraj' },
+            { '@type': 'Country', name: 'India' }
+          ]
+        },
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ithunt.vercel.app/' },
+            { '@type': 'ListItem', position: 2, name: 'Services', item: 'https://ithunt.vercel.app/#service-links' },
+            { '@type': 'ListItem', position: 3, name: servicePage.name, item: canonicalUrl }
+          ]
+        },
+        {
+          '@type': 'FAQPage',
+          mainEntity: servicePage.faqs.map((faq) => ({
+            '@type': 'Question',
+            name: faq.question,
+            acceptedAnswer: { '@type': 'Answer', text: faq.answer }
+          }))
+        }
+      ]
+    });
+  } else {
+    serviceStructuredData?.remove();
+  }
 
   // 5. Twitter Card Meta Tags
   setMetaTag('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
@@ -1867,6 +1941,11 @@ watch(activeTab, (newTab) => {
 // Synchronize tab view when browser back/forward history is triggered
 const handlePopState = () => {
   if (typeof window === 'undefined') return;
+  const servicePage = getServicePageByPath(window.location.pathname);
+  if (servicePage) {
+    activeTab.value = `service:${servicePage.slug}`;
+    return;
+  }
   const rawHash = (window.location.hash || '').replace('#', '').toLowerCase().trim();
   if (!rawHash || rawHash === 'home') {
     activeTab.value = 'home';
@@ -1942,7 +2021,10 @@ onMounted(() => {
   } catch (e) {}
 
   // If user arrived with a hash (e.g. #admission, #courses, #internships, #nielit-project), open corresponding view
-  if (window.location.hash) {
+  const servicePage = getServicePageByPath(window.location.pathname);
+  if (servicePage) {
+    activeTab.value = `service:${servicePage.slug}`;
+  } else if (window.location.hash) {
     const rawHash = window.location.hash.replace('#', '').toLowerCase().trim();
     if (rawHash === 'admission' || rawHash === 'admisson') {
       activeTab.value = 'admission';
