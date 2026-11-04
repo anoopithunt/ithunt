@@ -420,7 +420,7 @@
             See IT HUNT <span class="text-brand">in Action</span>
           </h2>
           <p class="ithunt-section-desc">
-            A quick preview of real software products designed, engineered, and shipped by our students and leads. Each live project below runs in active production.
+            Explore representative software project briefs with their problem, proposed solution, technologies, and evidence status. Client-approved media, delivery dates, and measured outcomes can be added as they become available.
           </p>
         </div>
 
@@ -447,7 +447,7 @@
                 <span class="example-avatar">{{ item.logo }}</span>
                 <div>
                   <h4 class="example-client-name">{{ item.name }}</h4>
-                  <span class="example-meta-text">{{ item.category }} • 🌐 Production Live</span>
+                  <span class="example-meta-text">{{ item.category }} • Portfolio project</span>
                 </div>
               </div>
               <span class="example-platform-pill">{{ item.platform }}</span>
@@ -457,7 +457,7 @@
               <p class="example-desc-text">
                 {{ item.description }}
               </p>
-              
+
               <div class="example-features-box">
                 <div class="feature-bullet" v-for="f in item.features" :key="f">
                   <span class="bullet-dot"></span>
@@ -467,14 +467,56 @@
             </div>
 
             <div class="example-card-footer">
-              <div class="example-engagement-stats">
-                <span>⚡ {{ item.stats.speed }}</span>
-                <span>👥 {{ item.stats.users }}</span>
-                <span>⭐ {{ item.stats.rating }}</span>
-              </div>
-              <button class="example-view-btn" @click="$emit('apply-course', item.name)">
-                <span>Inspect Architecture ↗</span>
-              </button>
+              <details class="case-study-details">
+                <summary class="example-view-btn">View full case study <span aria-hidden="true">⌄</span></summary>
+                <div class="case-study-content">
+                  <div class="case-study-section">
+                    <h5>Client problem</h5>
+                    <p>{{ item.problem }}</p>
+                  </div>
+                  <div class="case-study-section">
+                    <h5>Proposed solution</h5>
+                    <p>{{ item.solution }}</p>
+                  </div>
+                  <div class="case-study-section">
+                    <h5>Technologies used</h5>
+                    <div class="case-study-tech-list">
+                      <span class="stack-badge" v-for="technology in item.technologies" :key="technology">{{ technology }}</span>
+                    </div>
+                  </div>
+                  <div class="case-study-section">
+                    <h5>Screenshots &amp; product video</h5>
+                    <div v-if="item.screenshots.length || item.videoUrl" class="case-study-media">
+                      <figure v-for="image in item.screenshots" :key="image.src">
+                        <img :src="image.src" :alt="image.alt" loading="lazy">
+                        <figcaption>{{ image.caption }}</figcaption>
+                      </figure>
+                      <video v-if="item.videoUrl" controls preload="metadata" :poster="item.videoPoster || undefined">
+                        <source :src="item.videoUrl">
+                        Your browser does not support embedded videos.
+                      </video>
+                    </div>
+                    <p v-else class="case-study-evidence-note">
+                      Client-approved screenshots and product video have not been added yet.
+                    </p>
+                  </div>
+                  <div class="case-study-meta-grid">
+                    <div class="case-study-section">
+                      <h5>Development timeline</h5>
+                      <p>{{ item.timeline || 'Not published — confirm the project dates before sharing.' }}</p>
+                    </div>
+                    <div class="case-study-section">
+                      <h5>Measurable results</h5>
+                      <ul v-if="item.results.length">
+                        <li v-for="result in item.results" :key="result">{{ result }}</li>
+                      </ul>
+                      <p v-else class="case-study-evidence-note">
+                        No verified client metrics are available to publish yet.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </details>
             </div>
           </div>
         </div>
@@ -1039,8 +1081,15 @@ const liveProjectsList = [
     categoryKey: 'mern',
     platform: 'MERN Stack',
     description: 'Enterprise multi-tenant payment gateway processing recurring client subscriptions, webhooks, and automated PDF tax invoices.',
-    features: ['High-throughput Redis cache', 'Stripe & Razorpay integrations', 'Sub-45ms average response time'],
-    stats: { speed: '<45ms', users: '10k+ MAU', rating: '4.9 ★' }
+    features: ['Redis caching layer', 'Stripe & Razorpay integrations', 'Recurring billing and invoice workflows'],
+    problem: 'Example brief: A subscription business needs one dependable way to manage recurring billing, payment events, and customer invoices across multiple organizations.',
+    solution: 'Design a multi-tenant billing service with payment-provider integrations, idempotent webhook handling, automated invoice generation, and a cache layer for frequently accessed data.',
+    technologies: ['React', 'Node.js', 'Express', 'Redis', 'PostgreSQL', 'Stripe', 'Razorpay'],
+    screenshots: [],
+    videoUrl: '',
+    videoPoster: '',
+    timeline: '',
+    results: []
   },
   {
     id: 2,
@@ -1050,8 +1099,15 @@ const liveProjectsList = [
     categoryKey: 'ai',
     platform: 'Python & Vue 3',
     description: 'Intelligent social media autopilot that reads website URLs, analyzes tone, and generates multi-slide carousels automatically.',
-    features: ['Gemini 2.0 Pro Multimodal API', 'Dynamic Canvas visual engine', 'Automated social scheduling'],
-    stats: { speed: '1.2s Gen', users: '5k+ Posts', rating: '5.0 ★' }
+    features: ['Gemini AI integration', 'Canvas-based visual editor', 'Social content scheduling'],
+    problem: 'Example brief: A marketing team spends significant time researching brand material and producing consistent social posts and carousel content.',
+    solution: 'Create a workflow that extracts brand context from a website, drafts social copy and carousel content with an AI model, and provides a visual editor and scheduling tools.',
+    technologies: ['Python', 'FastAPI', 'Gemini API', 'Vue 3', 'Canvas API'],
+    screenshots: [],
+    videoUrl: '',
+    videoPoster: '',
+    timeline: '',
+    results: []
   },
   {
     id: 3,
@@ -1061,8 +1117,15 @@ const liveProjectsList = [
     categoryKey: 'cloud',
     platform: 'Full-Stack Node.js',
     description: 'Live GPS vehicle telemetry dashboard with geospatial geofencing alerts, route analytics, and driver dispatch coordination.',
-    features: ['WebSockets realtime stream', 'PostGIS spatial queries', 'Driver mobile companion app'],
-    stats: { speed: 'Realtime', users: '250+ Trucks', rating: '4.8 ★' }
+    features: ['Live telemetry stream', 'Geospatial route and geofence tools', 'Driver companion app'],
+    problem: 'Example brief: A fleet operations team needs a shared view of vehicle locations, route activity, and dispatch events as they happen.',
+    solution: 'Build a live tracking portal that streams vehicle telemetry, evaluates geofence events, and brings route insights and driver coordination into one interface.',
+    technologies: ['Node.js', 'WebSockets', 'PostgreSQL', 'PostGIS', 'Mobile app'],
+    screenshots: [],
+    videoUrl: '',
+    videoPoster: '',
+    timeline: '',
+    results: []
   },
   {
     id: 4,
@@ -1072,8 +1135,15 @@ const liveProjectsList = [
     categoryKey: 'mobile',
     platform: 'Flutter & Dart',
     description: 'Cross-platform mobile application with WebRTC end-to-end encrypted video appointments, instant digital prescriptions, and EHR sync.',
-    features: ['Peer-to-peer WebRTC video', 'Secure HIPAA-ready storage', 'Realtime socket messaging'],
-    stats: { speed: '<80ms Video', users: '12k+ Pts', rating: '4.9 ★' }
+    features: ['WebRTC video appointments', 'Secure patient record access', 'Realtime messaging'],
+    problem: 'Example brief: Patients and clinicians need a convenient way to arrange remote consultations and access visit information from a mobile device.',
+    solution: 'Develop a cross-platform app with video consultations, secure access to patient records, real-time messaging, and digital prescription workflows.',
+    technologies: ['Flutter', 'Dart', 'WebRTC', 'Firebase', 'Node.js', 'Socket.IO'],
+    screenshots: [],
+    videoUrl: '',
+    videoPoster: '',
+    timeline: '',
+    results: []
   },
   {
     id: 5,
@@ -1082,9 +1152,16 @@ const liveProjectsList = [
     category: 'Modern Web Platform',
     categoryKey: 'mern',
     platform: 'Next.js 15 & TS',
-    description: 'Blazing fast headless e-commerce store with incremental static regeneration, server actions, faceted search filters, and checkout flow.',
-    features: ['Next.js 15 React Server Components', 'Tailored Algolia search', 'Sub-second page loads'],
-    stats: { speed: '99/100 LCP', users: '35k+ Orders', rating: '5.0 ★' }
+    description: 'Headless e-commerce store with incremental static regeneration, server actions, faceted search filters, and checkout flow.',
+    features: ['Next.js 15 React Server Components', 'Tailored Algolia search', 'Optimized catalog and checkout flows'],
+    problem: 'Example brief: An online retailer needs a flexible storefront that makes a large catalog easier to browse and supports a smooth purchase journey.',
+    solution: 'Build a headless commerce experience with server-rendered pages, catalog filters and search, and an integrated checkout flow.',
+    technologies: ['Next.js 15', 'TypeScript', 'React', 'Algolia', 'Server Actions'],
+    screenshots: [],
+    videoUrl: '',
+    videoPoster: '',
+    timeline: '',
+    results: []
   },
   {
     id: 6,
@@ -1094,8 +1171,15 @@ const liveProjectsList = [
     categoryKey: 'cloud',
     platform: 'Python & Cloud',
     description: 'Centralized public verification gateway with cryptographic QR verification for diplomas, marksheets, and internship letters.',
-    features: ['SHA-256 tamper-proof seals', 'Sub-30ms verification API', 'Automated PDF generator engine'],
-    stats: { speed: 'Instant', users: '50k+ Verify', rating: '5.0 ★' }
+    features: ['SHA-256 document integrity checks', 'QR-based public verification', 'Automated PDF generation'],
+    problem: 'Example brief: Organizations and document holders need a simple way to check whether a digital credential was issued and has not been altered.',
+    solution: 'Create a public verification portal that links QR codes to issued records and checks document identifiers and integrity hashes.',
+    technologies: ['Python', 'Cloud services', 'SHA-256', 'QR codes', 'PDF generation'],
+    screenshots: [],
+    videoUrl: '',
+    videoPoster: '',
+    timeline: '',
+    results: []
   }
 ];
 
@@ -2434,11 +2518,6 @@ onUnmounted(() => {
   border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
 }
 
-.ithunt-section-even .example-engagement-stats,
-.ithunt-section-alt .example-engagement-stats {
-  color: #94a3b8 !important;
-}
-
 .ithunt-section-even .example-view-btn,
 .ithunt-section-alt .example-view-btn {
   background: rgba(99, 102, 241, 0.12) !important;
@@ -3146,19 +3225,12 @@ onUnmounted(() => {
 
 .example-card-footer {
   margin-top: auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   padding-top: 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.example-engagement-stats {
-  display: flex;
-  gap: 0.75rem;
-  font-size: 0.78rem;
-  color: var(--text-muted, #94a3b8);
-  font-weight: 600;
+.case-study-details {
+  width: 100%;
 }
 
 .example-view-btn {
@@ -3169,6 +3241,101 @@ onUnmounted(() => {
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
+  list-style: none;
+}
+
+.example-view-btn::-webkit-details-marker {
+  display: none;
+}
+
+.case-study-details[open] > .example-view-btn {
+  margin-bottom: 1rem;
+}
+
+.case-study-content {
+  display: grid;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+.case-study-section {
+  min-width: 0;
+}
+
+.case-study-section h5 {
+  margin-bottom: 0.35rem;
+  color: var(--text-main, #fff);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.case-study-section p,
+.case-study-section li,
+.case-study-evidence-note {
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.case-study-section ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.case-study-tech-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.case-study-media {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.case-study-media figure {
+  margin: 0;
+}
+
+.case-study-media img,
+.case-study-media video {
+  display: block;
+  width: 100%;
+  max-height: 240px;
+  object-fit: cover;
+  border: 1px solid var(--border-cyber, rgba(255, 255, 255, 0.12));
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.65);
+}
+
+.case-study-media figcaption {
+  margin-top: 0.35rem;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.72rem;
+}
+
+.case-study-evidence-note {
+  padding: 0.7rem 0.8rem;
+  border: 1px dashed var(--border-cyber, rgba(255, 255, 255, 0.16));
+  border-radius: 8px;
+}
+
+.case-study-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+:global(body.light-theme) .case-study-section h5 {
+  color: #111827;
+}
+
+:global(body.light-theme) .case-study-section p,
+:global(body.light-theme) .case-study-section li,
+:global(body.light-theme) .case-study-evidence-note,
+:global(body.light-theme) .case-study-media figcaption {
+  color: #4b5563;
 }
 
 .example-view-btn:hover {
@@ -3807,7 +3974,6 @@ onUnmounted(() => {
 
 :global(body.light-theme) .stat-micro-note,
 :global(body.light-theme) .example-meta-text,
-:global(body.light-theme) .example-engagement-stats,
 :global(body.light-theme) .feature-bullet,
 :global(body.light-theme) .guarantee-item,
 :global(body.light-theme) .founder-role,
@@ -4685,14 +4851,13 @@ onUnmounted(() => {
     padding-top: 0.85rem;
   }
 
-  .example-engagement-stats {
-    font-size: 0.74rem;
-    gap: 0.5rem;
-  }
-
   .example-view-btn {
     align-self: flex-start;
     font-size: 0.82rem;
+  }
+
+  .case-study-meta-grid {
+    grid-template-columns: 1fr;
   }
 
   /* Section 6: Bento Grid */
