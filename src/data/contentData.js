@@ -571,48 +571,10 @@ const CONTENT_DATA = {
 
   // Student & Client Reviews Section
   reviewsSection: {
-    tagline: "QUALITY & FACILITY EVALUATION",
-    titlePrefix: "Student & Client ",
+    tagline: "CUSTOMER FEEDBACK",
+    titlePrefix: "Verified ",
     titleGradient: "Reviews & Feedback",
-    description: "We continuously evaluate our institute facilities and curriculum to drive software development quality.",
-    overallScore: "4.9",
-    overallStars: "★★★★★",
-    totalCountLabel: "Based on 250+ Verified Reviews",
-    facilityMetrics: [
-      { name: "Computer Labs & Workstations", score: 4.9 },
-      { name: "Faculty Expertise & Mentorship", score: 5.0 },
-      { name: "Internship LOR & Placement Support", score: 4.9 },
-      { name: "Curriculum & Ease of Development", score: 4.8 }
-    ],
-    reviewsList: [
-      {
-        id: 1,
-        name: "Anup Mishra (Co-Founder)",
-        role: "Co-Founder & Senior Software Architect",
-        rating: 5,
-        date: "Aug 2026",
-        avatar: "img/anoop.webp",
-        comment: "The 6-month MERN Stack internship transformed my practical coding skills! The mentors have 4+ years of real industry experience and guided us on live client projects."
-      },
-      {
-        id: 2,
-        name: "Priya Mishra",
-        role: "NIELIT O Level Student",
-        rating: 5,
-        date: "Jul 2026",
-        avatar: "img/vikash.webp",
-        comment: "Exceptional facilities and lab infrastructure in Holagarh Prayagraj! Teachers make complex Python and Web topics very easy to learn."
-      },
-      {
-        id: 3,
-        name: "Amit Kumar Srivastav",
-        role: "iOS App Development Intern",
-        rating: 5,
-        date: "Jun 2026",
-        avatar: "img/vikash.webp",
-        comment: "Great experience learning Swift & SwiftUI! The lab workstations and ease of development support helped me build 2 production apps on App Store."
-      }
-    ]
+    description: "Reviews appear only after verification, approval, and explicit permission to publish."
   },
 
   // Careers & Hiring Section

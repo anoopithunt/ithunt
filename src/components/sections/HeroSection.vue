@@ -764,11 +764,16 @@
       </div>
 
       <!-- Jump Down Pill to Next Page -->
-      <button class="section-scroll-pill" @click="scrollToSection('page-faq')" aria-label="Next: Frequently Asked Questions">
-        <span>Next: Frequently Asked Questions</span>
+      <button class="section-scroll-pill" @click="scrollToSection('page-trust')" aria-label="Next: Trust and Company Information">
+        <span>Next: Trust &amp; Company Information</span>
         <span class="scroll-arrow-anim">↓</span>
       </button>
     </section>
+
+    <TrustProofSection
+      :content="content"
+      @navigate="scrollToSection"
+    />
 
     <!-- =====================================================================
          9. PAGE 9: FREQUENTLY ASKED QUESTIONS (Accordion)
@@ -867,6 +872,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import VerticalPaginationNav from '../layout/VerticalPaginationNav.vue';
+import TrustProofSection from './TrustProofSection.vue';
 
 const props = defineProps({
   content: {
@@ -877,7 +883,7 @@ const props = defineProps({
 
 const emit = defineEmits(['set-tab', 'apply-course', 'open-job-modal', 'open-cv-modal']);
 
-// Vertical Section-Wise Pagination Config (11 Distinct Full-Viewport Pages)
+// Vertical Section-Wise Pagination Config
 const homeSections = [
   { id: 'page-hero', label: 'Overview', icon: '🏠', subtitle: 'Hero & Verified Stats' },
   { id: 'page-showcase', label: 'Code Showcase', icon: '💻', subtitle: 'Interactive Mac Terminal' },
@@ -887,6 +893,7 @@ const homeSections = [
   { id: 'page-roadmap', label: 'Roadmap', icon: '🗺️', subtitle: 'From Day 1 to Placement' },
   { id: 'page-benefits', label: 'Why IT HUNT', icon: '💎', subtitle: 'Bento Grid of Advantages' },
   { id: 'page-leadership', label: 'Leadership', icon: '👥', subtitle: 'Founders & Senior Architects' },
+  { id: 'page-trust', label: 'Trust & Proof', icon: '🤝', subtitle: 'Reviews, Credentials & Contact' },
   { id: 'page-faq', label: 'FAQs', icon: '❓', subtitle: 'Common Inquiries Answered' },
   { id: 'page-cta', label: 'Apply Now', icon: '🔥', subtitle: 'Start your application' },
   { id: 'page-footer', label: 'Contact & Info', icon: '📍', subtitle: 'Location, Socials & Legal' },
