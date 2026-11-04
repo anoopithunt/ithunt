@@ -21,52 +21,53 @@
         <div class="ithunt-badge-wrapper anim-fade-in">
           <div class="ithunt-pill-badge">
             <span class="ithunt-badge-dot"></span>
-            <span class="ithunt-badge-text">{{ content.hero?.badgeText || '🚀 SOFTWARE STUDIO & TECH ACADEMY 2026' }}</span>
+            <span class="ithunt-badge-text">SOFTWARE PARTNER FOR GROWING BUSINESSES</span>
           </div>
         </div>
 
         <!-- Main Headline (IT Hunt Dual-Tone Style) -->
         <h1 class="ithunt-hero-headline anim-fade-in-up">
-          Learn by building.<br />
-          <span class="ithunt-gradient-text">Grow into your next opportunity.</span>
+          Software built to move<br />
+          <span class="ithunt-gradient-text">your business forward.</span>
         </h1>
 
-        <!-- Subtitle with Signature Hand-Drawn Brush Stroke Underline -->
         <p class="ithunt-hero-subtitle anim-fade-in-up-delay">
-          Explore software internships and IT diplomas in Prayagraj. Build practical skills through guided projects, strengthen your portfolio, and get support as you prepare for your next step.
+          We help startups, growing businesses, and organizations turn ideas into reliable web and mobile apps, custom software, and AI-powered tools. Our senior-led team combines deep technical knowledge with practical delivery to streamline operations, improve customer experiences, and help your business scale.
         </p>
 
-        <!-- Dual CTA Buttons (IT Hunt Style) -->
         <div class="ithunt-hero-cta-group anim-fade-in-up-delay">
-          <button class="ithunt-btn-primary ithunt-hero-main-cta" @click="$emit('set-tab', 'admission')">
-            <span>Start your application</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-          </button>
-          <button class="ithunt-btn-secondary ithunt-hero-main-cta" @click="$emit('set-tab', 'internships')">
-            <span>Explore internship tracks</span>
+          <a
+            class="ithunt-btn-primary ithunt-hero-main-cta"
+            :href="'https://wa.me/' + (content.contact?.whatsapp || '919795771806') + '?text=' + encodeURIComponent('Hi IT HUNT, I would like to book a free consultation about a software project for my business.')"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span>Book a Free Consultation</span>
+          </a>
+          <button class="ithunt-btn-secondary ithunt-hero-main-cta" @click="scrollToSection('page-projects')">
+            <span>View Our Work</span>
           </button>
         </div>
 
-        <!-- Trust Badges & Guarantee Row (IT Hunt Style) -->
         <div class="ithunt-guarantee-row anim-fade-in-up-delay">
           <div class="guarantee-item">
             <span class="guarantee-icon">✓</span>
-            <span>ISO 9001:2015 Certified</span>
+            <span>For startups, growing businesses &amp; organizations</span>
           </div>
           <span class="guarantee-sep">·</span>
           <div class="guarantee-item">
             <span class="guarantee-icon">✓</span>
-            <span>Hands-on project sprints</span>
+            <span>Web, mobile, custom software &amp; AI solutions</span>
           </div>
           <span class="guarantee-sep">·</span>
           <div class="guarantee-item">
             <span class="guarantee-icon">✓</span>
-            <span>1-on-1 Senior Tech Mentorship</span>
+            <span>Deep expertise with senior-led delivery</span>
           </div>
           <span class="guarantee-sep">·</span>
           <div class="guarantee-item">
             <span class="guarantee-icon">✓</span>
-            <span>Career guidance &amp; placement support</span>
+            <span>Streamlined operations, better experiences &amp; scalable growth</span>
           </div>
         </div>
 
