@@ -112,7 +112,7 @@
 
         <!-- 1. Home Flow -->
         <HeroSection 
-          v-if="activeTab === 'home'" 
+          v-else-if="activeTab === 'home'"
           key="home"
           :content="content" 
           @set-tab="setTab" 
