@@ -5,6 +5,9 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
+  "env": {
+    "JWT_SECRET": "ithunt_super_secure_jwt_secret_2026"
+  },
   "routes": [
     {
       "src": "/api/(.*)",

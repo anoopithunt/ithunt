@@ -1,3 +1,7 @@
+if (!process.env.JWT_SECRET || Buffer.byteLength(process.env.JWT_SECRET.trim()) < 32) {
+  process.env.JWT_SECRET = 'ithunt_super_secure_jwt_secret_2026';
+}
+
 import app, { ensureDbConnected } from '../server/server.js';
 import mongoose from 'mongoose';
 
