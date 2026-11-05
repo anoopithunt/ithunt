@@ -19,17 +19,12 @@ import contactRoutes from './routes/contact.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import coursesRoutes from './routes/courses.routes.js';
 import festivalRoutes from './routes/festival.routes.js';
-import { optionalAuth } from './middleware/auth.js';
+import { hasValidJwtSecret, optionalAuth } from './middleware/auth.js';
 import { enforceRoleSectionPermission } from './middleware/rolePermissions.js';
 
 const app = express();
 const PORT = process.env.BACKEND_PORT || process.env.PORT || 3000;
 app.set('trust proxy', process.env.VERCEL ? 1 : false);
-const hasValidJwtSecret = () => {
-  const secret = (process.env.JWT_SECRET || 'undefined').trim();
-  return Boolean(secret && Buffer.byteLength(secret) >= 32);
-};
-
 const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5500,http://localhost:5501,http://localhost:5173,https://ithunt.vercel.app')
   .split(',').map(origin => origin.trim()).filter(Boolean);
 

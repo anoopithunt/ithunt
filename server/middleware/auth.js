@@ -3,28 +3,21 @@ import { createHash, randomBytes } from 'node:crypto';
 
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
-const DEFAULT_JWT_SECRET = null;
+function getConfiguredJwtSecret() {
+  const secret = process.env.JWT_SECRET?.trim();
+  return secret && Buffer.byteLength(secret) >= 32 ? secret : null;
+}
 
 function getJwtSecret() {
-  const configuredSecret = process.env.JWT_SECRET;
-  if (configuredSecret) {
-    const secret = configuredSecret.trim();
-    if (Buffer.byteLength(secret) < 32) {
-      const error = new Error('JWT_SECRET must be configured with at least 32 bytes of cryptographically random data.');
-      error.code = 'JWT_SECRET_CONFIGURATION';
-      throw error;
-    }
-    return secret;
-  }
-
-  // If running on Vercel deployment and JWT_SECRET is not yet set in dashboard, use resilient production secret
-  if (process.env.VERCEL || process.env.VERCEL_ENV) {
-    throw new Error('JWT_SECRET must be configured with at least 32 bytes of cryptographically random data.');
-  }
-
+  const secret = getConfiguredJwtSecret();
+  if (secret) return secret;
   const error = new Error('JWT_SECRET must be configured with at least 32 bytes of cryptographically random data.');
   error.code = 'JWT_SECRET_CONFIGURATION';
   throw error;
+}
+
+export function hasValidJwtSecret() {
+  return getConfiguredJwtSecret() !== null;
 }
 
 /**
