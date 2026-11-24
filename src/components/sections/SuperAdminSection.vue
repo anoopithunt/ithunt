@@ -6563,8 +6563,38 @@ const guardPermissionSubmit = (event) => {
 
 onMounted(loadRolePermissionSettings);
 
-// Reactive dataset states (initialized from live props if available)
-const admissionsList = ref(props.allAdmissions && props.allAdmissions.length ? [...props.allAdmissions] : []);
+// Helper to deduplicate admissions in SuperAdmin UI
+const deduplicateAdmissions = (list) => {
+  if (!Array.isArray(list)) return [];
+  const map = new Map();
+  list.forEach(a => {
+    const reg = String(a.registrationNo || a.registrationNumber || a.id || '').trim();
+    const email = String(a.email || '').trim().toLowerCase();
+    const key = reg || email;
+    if (key && !map.has(key)) {
+      map.set(key, a);
+    }
+  });
+  return Array.from(map.values());
+};
+
+// Helper to deduplicate reviews in SuperAdmin UI
+const deduplicateReviews = (list) => {
+  if (!Array.isArray(list)) return [];
+  const map = new Map();
+  list.forEach(r => {
+    const normName = String(r.name || r.fullName || '').trim().toLowerCase();
+    const normComment = String(r.comment || r.reviewText || r.review || '').trim().toLowerCase();
+    const key = (normName && normComment) ? `${normName}::${normComment}` : (r.id || r._id);
+    if (key && !map.has(key)) {
+      map.set(key, r);
+    }
+  });
+  return Array.from(map.values());
+};
+
+// Reactive dataset states (initialized from live props if available, deduplicated)
+const admissionsList = ref(deduplicateAdmissions(props.allAdmissions));
 const jobApplicationsList = ref(props.allJobApplications && props.allJobApplications.length ? [...props.allJobApplications] : []);
 const rsvpsList = ref(props.allRsvps && props.allRsvps.length ? [...props.allRsvps] : []);
 const nielitProjectsList = ref(props.allNielitProjects && props.allNielitProjects.length ? [...props.allNielitProjects] : []);
@@ -6574,7 +6604,7 @@ const certificatesList = ref(props.allCertificates && props.allCertificates.leng
 const projectsList = ref(props.allProjects && props.allProjects.length ? [...props.allProjects] : []);
 const contactInquiriesList = ref(props.allContactInquiries && props.allContactInquiries.length ? [...props.allContactInquiries] : []);
 const contactLeadStatuses = ['New', 'Contacted', 'Qualified', 'Proposal', 'Won', 'Lost'];
-const reviewsList = ref(props.allReviews && props.allReviews.length ? [...props.allReviews] : []);
+const reviewsList = ref(deduplicateReviews(props.allReviews));
 const usersList = ref(props.allUsers && props.allUsers.length ? [...props.allUsers] : []);
 const coursesList = ref(props.allCourses && props.allCourses.length ? [...props.allCourses] : (props.content?.coursesSection?.coursesList || []));
 const eventsCatalogList = ref(props.allEventsCatalog && props.allEventsCatalog.length ? [...props.allEventsCatalog] : []);
@@ -6616,7 +6646,8 @@ const availableInternshipTracks = computed(() => {
 // --- ENTERPRISE EXECUTIVE OVERVIEW COMPUTED PROPERTIES ---
 const overviewAdmissionFilter = ref('all');
 const recentAdmissions = computed(() => {
-  const list = (admissionsList.value && admissionsList.value.length) ? admissionsList.value : (props.allAdmissions && props.allAdmissions.length ? props.allAdmissions : []);
+  const rawList = (admissionsList.value && admissionsList.value.length) ? admissionsList.value : (props.allAdmissions && props.allAdmissions.length ? props.allAdmissions : []);
+  const list = deduplicateAdmissions(rawList);
   if (overviewAdmissionFilter.value === 'pending') {
     const pending = list.filter(a => a.status === 'Pending Verification' || a.status === 'Pending Confirmation' || (!a.status && !a.admissionConfirmed));
     if (pending.length > 0) return pending.slice(0, 15);
@@ -6885,7 +6916,7 @@ const filteredStudents = computed(() => {
 });
 
 watch(() => props.allAdmissions, (val) => {
-  if (val && val.length > 0) admissionsList.value = val;
+  if (val && val.length > 0) admissionsList.value = deduplicateAdmissions(val);
 }, { immediate: true, deep: true });
 
 watch(() => props.allJobApplications, (val) => {
@@ -6921,7 +6952,7 @@ watch(() => props.allContactInquiries, (val) => {
 }, { immediate: true, deep: true });
 
 watch(() => props.allReviews, (val) => {
-  if (val && val.length > 0) reviewsList.value = val;
+  if (val && val.length > 0) reviewsList.value = deduplicateReviews(val);
 }, { immediate: true, deep: true });
 
 watch(() => props.allUsers, (val) => {
@@ -6929,7 +6960,8 @@ watch(() => props.allUsers, (val) => {
 }, { immediate: true, deep: true });
 
 const filteredAdmissions = computed(() => {
-  const list = (admissionsList.value && admissionsList.value.length) ? admissionsList.value : (props.allAdmissions && props.allAdmissions.length ? props.allAdmissions : []);
+  const rawList = (admissionsList.value && admissionsList.value.length) ? admissionsList.value : (props.allAdmissions && props.allAdmissions.length ? props.allAdmissions : []);
+  const list = deduplicateAdmissions(rawList);
   return list.filter(adm => {
     let matchStatus = true;
     if (admissionStatusFilter.value === 'Confirmed') {
@@ -7416,11 +7448,24 @@ const handleCreateDirectAdmission = async () => {
   }
   const { password: _password, ...safeAdmission } = newAdm;
   quickForm.value.password = '';
-  admissionsList.value.unshift(safeAdmission);
+  const admIdx = admissionsList.value.findIndex(a => 
+    (a.registrationNo && safeAdmission.registrationNo && a.registrationNo.toString().toUpperCase() === safeAdmission.registrationNo.toString().toUpperCase()) ||
+    (a.id && safeAdmission.id && a.id.toString() === safeAdmission.id.toString()) ||
+    (a.email && safeAdmission.email && a.email.trim().toLowerCase() === safeAdmission.email.trim().toLowerCase())
+  );
+  if (admIdx !== -1) {
+    admissionsList.value[admIdx] = { ...admissionsList.value[admIdx], ...safeAdmission };
+  } else {
+    admissionsList.value.unshift(safeAdmission);
+  }
   emit('add-admission', safeAdmission);
 
   // Sync into studentsList
-  studentsList.value.unshift({
+  const studIdx = studentsList.value.findIndex(s => 
+    (s.registrationNo && regId && s.registrationNo.toString().toUpperCase() === regId.toString().toUpperCase()) ||
+    (s.email && studentEmail && s.email.trim().toLowerCase() === studentEmail.trim().toLowerCase())
+  );
+  const studentEntry = {
     id: generatedUserId,
     userId: generatedUserId,
     enrollmentNumber: generatedUserId,
@@ -7434,10 +7479,18 @@ const handleCreateDirectAdmission = async () => {
     academicStatus: 'ACTIVE',
     admissionConfirmed: true,
     batch: '2026'
-  });
+  };
+  if (studIdx !== -1) {
+    studentsList.value[studIdx] = { ...studentsList.value[studIdx], ...studentEntry };
+  } else {
+    studentsList.value.unshift(studentEntry);
+  }
 
   // Sync into usersList
-  usersList.value.unshift({
+  const userIdx = usersList.value.findIndex(u => 
+    (u.email && studentEmail && u.email.trim().toLowerCase() === studentEmail.trim().toLowerCase())
+  );
+  const userEntry = {
     id: generatedUserId,
     userId: generatedUserId,
     email: studentEmail,
@@ -7445,7 +7498,12 @@ const handleCreateDirectAdmission = async () => {
     role: 'student',
     verified: true,
     status: 'ACTIVE'
-  });
+  };
+  if (userIdx !== -1) {
+    usersList.value[userIdx] = { ...usersList.value[userIdx], ...userEntry };
+  } else {
+    usersList.value.unshift(userEntry);
+  }
 
   showQuickAdmissionModal.value = false;
 
@@ -7822,12 +7880,12 @@ const loadTabData = async (tabName = currentTab.value, force = false) => {
           fetchAdmissionsFromBackend(),
           refreshDatabaseStatus()
         ]);
-        if (adms && adms.length > 0) admissionsList.value = adms;
+        if (adms && adms.length > 0) admissionsList.value = deduplicateAdmissions(adms);
         break;
       }
       case 'admissions': {
         const adms = await fetchAdmissionsFromBackend();
-        if (adms && adms.length > 0) admissionsList.value = adms;
+        if (adms && adms.length > 0) admissionsList.value = deduplicateAdmissions(adms);
         break;
       }
       case 'students': {
@@ -7871,7 +7929,7 @@ const loadTabData = async (tabName = currentTab.value, force = false) => {
       }
       case 'reviews': {
         const revs = await fetchReviewsFromBackend();
-        if (revs && revs.length > 0) reviewsList.value = revs;
+        if (revs && revs.length > 0) reviewsList.value = deduplicateReviews(revs);
         break;
       }
       case 'fees': {
@@ -8251,13 +8309,20 @@ const handleSaveReview = async () => {
     id: `REV-${Math.floor(1000 + Math.random() * 9000)}`,
     ...reviewForm.value
   };
-  reviewsList.value.unshift(item);
-  emit('add-review', item);
+  const existingIdx = reviewsList.value.findIndex(r => 
+    (r.name && String(r.name).toLowerCase() === String(item.name).toLowerCase() && (r.comment === item.comment || r.reviewText === item.comment))
+  );
+  if (existingIdx === -1) {
+    reviewsList.value.unshift(item);
+  }
   try {
-    await saveReviewToBackend(item);
+    const res = await saveReviewToBackend(item);
     emailActionMsg.value = `✓ Student review saved to MongoDB Atlas!`;
+    const saved = res?.data?.data || res?.data || item;
+    emit('add-review', saved);
   } catch (e) {
     console.warn('Save review error:', e.message);
+    emit('add-review', item);
   }
   showAddReviewModal.value = false;
   setTimeout(() => { emailActionMsg.value = ''; }, 4000);

@@ -401,12 +401,14 @@ const handleSubmitReview = async () => {
     createdAt: new Date().toISOString()
   };
 
-  reviewsList.value.unshift(reviewObj);
+  const existingIdx = reviewsList.value.findIndex(r => 
+    (r.id && r.id === reviewObj.id) ||
+    (r.name && String(r.name).toLowerCase() === String(reviewObj.name).toLowerCase() && (r.comment === reviewObj.comment || r.reviewText === reviewObj.comment))
+  );
+  if (existingIdx === -1) {
+    reviewsList.value.unshift(reviewObj);
+  }
   emit('review-submitted', reviewObj);
-
-  try {
-    await saveReviewRecord(reviewObj);
-  } catch (e) {}
 
   // Reset form
   newReview.value = {

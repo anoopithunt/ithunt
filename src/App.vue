@@ -1060,12 +1060,15 @@ const handleDeleteProject = async (item) => {
 };
 
 const handleAddReview = async (data) => {
+  const existingIdx = liveReviewsList.value.findIndex(r => 
+    (r.id && r.id === data.id) ||
+    (r.name && String(r.name).toLowerCase() === String(data.name).toLowerCase() && (r.comment === data.comment || r.reviewText === data.comment))
+  );
+  if (existingIdx !== -1) return;
   const res = await saveReviewToBackend(data);
-  if (res.success) {
-    const saved = res.data?.data || res.data || data;
-    liveReviewsList.value.unshift(saved);
-    showToast('Student review recorded in database!', 'success');
-  }
+  const saved = res?.data?.data || res?.data || data;
+  liveReviewsList.value.unshift(saved);
+  showToast('Student review recorded in database!', 'success');
 };
 
 const handleDeleteReview = async (item) => {
@@ -1397,13 +1400,16 @@ const downloadNielitProjectPdfDoc = (projectData) => {
 
 const handleReviewSubmitted = async (review) => {
   submittedRegistrationNo.value = '';
-  const existingIdx = liveReviewsList.value.findIndex(r => r.id === review.id);
+  const existingIdx = liveReviewsList.value.findIndex(r => 
+    (r.id && r.id === review.id) ||
+    (r.name && String(r.name).toLowerCase() === String(review.name).toLowerCase() && (r.comment === review.comment || r.reviewText === review.comment))
+  );
   if (existingIdx === -1) {
     liveReviewsList.value.unshift(review);
+    try {
+      await submitReviewToBackend(review);
+    } catch (e) {}
   }
-  try {
-    await submitReviewToBackend(review);
-  } catch (e) {}
 
   modalTitle.value = content.value?.ui?.reviewSubmitSuccessTitle || 'Review Published Successfully! ⭐';
   modalBody.value = `Thank you ${review.name} for rating IT HUNT ${review.rating} Stars! Your review is now live on our student ratings scorecard.`;
@@ -1480,9 +1486,14 @@ const submitAdmission = async (formData) => {
     submittedRegistrationNo.value = finalRegNo;
     lastSubmittedAdmission.value = newAdmissionRecord;
 
-    const existingIdx = liveAdmissionsList.value.findIndex(a => a.registrationNo === finalRegNo);
+    const existingIdx = liveAdmissionsList.value.findIndex(a => 
+      (a.registrationNo && a.registrationNo === finalRegNo) ||
+      (a.email && a.email.toLowerCase() === newAdmissionRecord.email.toLowerCase())
+    );
     if (existingIdx === -1) {
       liveAdmissionsList.value.unshift(newAdmissionRecord);
+    } else {
+      liveAdmissionsList.value[existingIdx] = { ...liveAdmissionsList.value[existingIdx], ...newAdmissionRecord };
     }
 
     modalTitle.value = '🎉 Admission Application Submitted Successfully!';
@@ -1588,10 +1599,13 @@ const handleDirectAdmission = async (newAdm) => {
   delete safeAdmission.password;
   lastSubmittedAdmission.value = safeAdmission;
   const existingIdx = liveAdmissionsList.value.findIndex(a =>
-    (a.registrationNo && a.registrationNo === safeAdmission.registrationNo) ||
-    (a.id && a.id === safeAdmission.id)
+    (a.registrationNo && safeAdmission.registrationNo && a.registrationNo.toString().toUpperCase() === safeAdmission.registrationNo.toString().toUpperCase()) ||
+    (a.id && safeAdmission.id && a.id.toString() === safeAdmission.id.toString()) ||
+    (a.email && safeAdmission.email && a.email.trim().toLowerCase() === safeAdmission.email.trim().toLowerCase())
   );
-  if (existingIdx === -1) {
+  if (existingIdx !== -1) {
+    liveAdmissionsList.value[existingIdx] = { ...liveAdmissionsList.value[existingIdx], ...safeAdmission };
+  } else {
     liveAdmissionsList.value.unshift(safeAdmission);
   }
 

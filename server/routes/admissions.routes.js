@@ -14,12 +14,22 @@ const sanitizeRecord = (record) => {
 };
 
 /**
- * GET /api/admissions
+ * GET /api/admissions (Admin: all admissions, deduplicated)
  */
 router.get('/', verifyToken, requireAdmin, async (req, res) => {
   try {
     const list = (await dbAdapter.find('admissions')).map(sanitizeRecord);
-    res.json({ success: true, admissions: list, data: list });
+    const uniqueMap = new Map();
+    list.forEach(adm => {
+      const reg = String(adm.registrationNo || adm.registrationNumber || adm.id || '').trim();
+      const email = String(adm.email || '').trim().toLowerCase();
+      const key = reg || email;
+      if (key && !uniqueMap.has(key)) {
+        uniqueMap.set(key, adm);
+      }
+    });
+    const deduped = Array.from(uniqueMap.values());
+    res.json({ success: true, admissions: deduped, data: deduped });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -65,7 +75,23 @@ router.post('/', async (req, res) => {
       createdAt: now.toISOString()
     });
 
-    const saved = await dbAdapter.create('admissions', admissionRecord);
+    // Check if an admission with this registrationNo or email already exists
+    let existingAdm = null;
+    if (body.registrationNo || body.registrationNumber) {
+      existingAdm = await dbAdapter.findOne('admissions', { 
+        registrationNo: body.registrationNo || body.registrationNumber 
+      });
+    }
+    if (!existingAdm && body.email) {
+      existingAdm = await dbAdapter.findOne('admissions', { email });
+    }
+
+    let saved;
+    if (existingAdm) {
+      saved = await dbAdapter.update('admissions', existingAdm.id || existingAdm._id || existingAdm.registrationNo, admissionRecord);
+    } else {
+      saved = await dbAdapter.create('admissions', admissionRecord);
+    }
 
     // Auto-create student record
     const studentRecord = {

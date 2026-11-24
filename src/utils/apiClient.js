@@ -820,7 +820,19 @@ export async function fetchReviewsFromBackend() {
     console.warn('Backend API connection warning (Fetch Reviews):', error.message);
   }
 
-  return list.map(normalizeReview);
+  const normalized = list.map(normalizeReview);
+  // Deduplicate reviews by author name and review comment
+  const uniqueMap = new Map();
+  normalized.forEach(r => {
+    const normName = String(r.name || r.fullName || '').trim().toLowerCase();
+    const normComment = String(r.comment || r.reviewText || r.review || '').trim().toLowerCase();
+    const key = (normName && normComment) ? `${normName}::${normComment}` : (r.id || r._id);
+    if (key && !uniqueMap.has(key)) {
+      uniqueMap.set(key, r);
+    }
+  });
+
+  return Array.from(uniqueMap.values());
 }
 
 /**
