@@ -96,27 +96,9 @@
     <!-- Main Dynamic Views with Animated Morph Transition -->
     <main id="main-content" :class="{ 'superadmin-main-active': activeTab === 'superadmin' }">
       <Transition name="view-morph" mode="out-in">
-        <ServiceLandingPage
-          v-if="currentServicePage"
-          :key="activeTab"
-          :service="currentServicePage"
-          :services="SERVICE_PAGES"
-        />
-
-        <InsightsPage
-          v-else-if="currentInsightsRoute"
-          :key="activeTab"
-          :route="currentInsightsRoute"
-        />
-
-        <ProjectPartnerPage
-          v-else-if="activeTab === 'start-project'"
-          key="start-project"
-        />
-
         <!-- 1. Home Flow -->
         <HeroSection 
-          v-else-if="activeTab === 'home'"
+          v-if="activeTab === 'home'"
           key="home"
           :content="content" 
           @set-tab="setTab" 
@@ -155,17 +137,9 @@
           @apply-course="applyForCourse" 
         />
 
-        <!-- 5. Dedicated Testimonials View -->
-        <TestimonialsSection 
-          v-else-if="activeTab === 'testimonials'" 
-          key="testimonials"
-          :content="content" 
-          @set-tab="setTab" 
-        />
-
-        <!-- 6. Dedicated Reviews View -->
+        <!-- 5. Dedicated Reviews View -->
         <ReviewsSection 
-          v-else-if="activeTab === 'reviews'" 
+          v-else-if="activeTab === 'reviews' || activeTab === 'testimonials'" 
           key="reviews"
           :content="content" 
           :allReviews="liveReviewsList"
@@ -534,11 +508,6 @@ import CONTENT_DATA from './data/contentData.js';
 import { DEFAULT_DEMO_STUDENT } from './data/studentAcademicData.js';
 import { generateAdmissionPdf, generatePrivacyPolicyPdf, generateTermsConditionsPdf } from './utils/pdfGenerator.js';
 import { generateNielitProjectPdf } from './utils/nielitPdfGenerator.js';
-import ServiceLandingPage from './components/sections/ServiceLandingPage.vue';
-import { getServicePageByPath, SERVICE_PAGES } from './data/servicePages.js';
-import InsightsPage from './components/sections/InsightsPage.vue';
-import { getInsightArticleBySlug, getInsightsRouteByPath } from './data/insights.js';
-import ProjectPartnerPage from './components/sections/ProjectPartnerPage.vue';
 import { 
   saveNielitProjectRecord, 
   saveAdmissionRecord, 
@@ -600,7 +569,6 @@ import { initSessionInactivityMonitor, sanitizeInput, isValidEmail, isValidPhone
 const InternshipsSection = defineAsyncComponent(() => import('./components/sections/InternshipsSection.vue'));
 const EventsSection = defineAsyncComponent(() => import('./components/sections/EventsSection.vue'));
 const CoursesSection = defineAsyncComponent(() => import('./components/sections/CoursesSection.vue'));
-const TestimonialsSection = defineAsyncComponent(() => import('./components/sections/TestimonialsSection.vue'));
 const ReviewsSection = defineAsyncComponent(() => import('./components/sections/ReviewsSection.vue'));
 const CareersSection = defineAsyncComponent(() => import('./components/sections/CareersSection.vue'));
 const AdmissionSection = defineAsyncComponent(() => import('./components/sections/AdmissionSection.vue'));
@@ -791,17 +759,13 @@ const studentUser = ref(storedStudent);
 
 // Compute default initial tab based on logged in user session (persists across hard refresh)
 const computeInitialTab = () => {
-  if (typeof window !== 'undefined') {
-    const servicePage = getServicePageByPath(window.location.pathname);
-    if (servicePage) return `service:${servicePage.slug}`;
-  }
   if (typeof window !== 'undefined' && window.location.hash) {
     const rawHash = window.location.hash.replace('#', '').toLowerCase().trim();
     if (rawHash === 'admission' || rawHash === 'admisson') return 'admission';
     if (rawHash === 'login') return 'login';
     if (rawHash === 'superadmin' || rawHash === 'admin') return storedAdmin ? 'superadmin' : 'login';
     if (rawHash === 'student-portal' || rawHash === 'student') return storedStudent ? 'student-portal' : 'login';
-    if (['home', 'internships', 'courses', 'careers', 'reviews', 'testimonials', 'events'].includes(rawHash)) {
+    if (['home', 'internships', 'courses', 'careers', 'reviews', 'testimonials', 'events', 'nielit-project'].includes(rawHash)) {
       return rawHash;
     }
   }
@@ -812,18 +776,6 @@ const computeInitialTab = () => {
 };
 
 const activeTab = ref(computeInitialTab());
-const currentServicePage = computed(() => {
-  const slug = activeTab.value.startsWith('service:') ? activeTab.value.slice('service:'.length) : '';
-  return SERVICE_PAGES.find((service) => service.slug === slug) || null;
-});
-const currentInsightsRoute = computed(() => {
-  if (activeTab.value === 'insights') return getInsightsRouteByPath('/insights');
-  if (activeTab.value.startsWith('insight:')) {
-    const article = getInsightArticleBySlug(activeTab.value.slice('insight:'.length));
-    return article ? { type: 'article', article, canonicalPath: `/insights/${article.slug}` } : null;
-  }
-  return null;
-});
 
 const handleStudentLogin = async ({ email, password }, callback) => {
   try {
@@ -1236,29 +1188,11 @@ const setTab = (tab) => {
       return;
     }
   }
-  const servicePage = tab.startsWith('service:')
-    ? SERVICE_PAGES.find((service) => `service:${service.slug}` === tab)
-    : null;
-  const insightPage = tab.startsWith('insight:')
-    ? getInsightArticleBySlug(tab.slice('insight:'.length))
-    : null;
-  const normalizedTab = servicePage
-    ? `service:${servicePage.slug}`
-    : (insightPage ? `insight:${insightPage.slug}` : tab);
-  activeTab.value = normalizedTab;
+  activeTab.value = tab;
   // Seamless browser history & deep link synchronization for search engines and user bookmarks
   if (typeof window !== 'undefined' && window.history && window.history.pushState) {
-    const targetPath = servicePage
-      ? `/services/${servicePage.slug}`
-      : (insightPage
-        ? `/insights/${insightPage.slug}`
-        : (tab === 'insights'
-          ? '/insights'
-          : (tab === 'start-project'
-            ? '/start-project'
-            : ((getServicePageByPath(window.location.pathname) || getInsightsRouteByPath(window.location.pathname) || window.location.pathname === '/start-project') ? '/' : window.location.pathname))));
-    const targetHash = servicePage || insightPage || tab === 'insights' || tab === 'start-project' || tab === 'home' ? '' : '#' + tab;
-    const targetUrl = targetPath + window.location.search + targetHash;
+    const targetHash = tab === 'home' ? '' : '#' + tab;
+    const targetUrl = '/' + window.location.search + targetHash;
     if (window.location.pathname + window.location.hash !== targetUrl) {
       window.history.pushState({ tab }, '', targetUrl);
     }
@@ -1870,38 +1804,8 @@ const printAdmissionSlip = () => {
 // Dynamic SEO Metadata Updater for SPA Views
 const updateSeoMetadata = (tab) => {
   if (typeof document === 'undefined') return;
-  const servicePage = tab.startsWith('service:')
-    ? SERVICE_PAGES.find((service) => `service:${service.slug}` === tab)
-    : null;
-  const insightsRoute = tab === 'insights'
-    ? getInsightsRouteByPath('/insights')
-    : (tab.startsWith('insight:')
-      ? (() => {
-        const article = getInsightArticleBySlug(tab.slice('insight:'.length));
-        return article ? { type: 'article', article, canonicalPath: `/insights/${article.slug}` } : null;
-      })()
-      : null);
-  const insightMeta = insightsRoute?.type === 'article'
-    ? {
-      title: `${insightsRoute.article.title} | IT HUNT Insights`,
-      description: insightsRoute.article.description
-    }
-    : (insightsRoute ? {
-      title: 'Software Development Insights & Guides | IT HUNT',
-      description: 'Practical, original guides on software development, startup MVPs, AI automation, mobile apps, SaaS architecture, and technology decisions.'
-    } : null);
-  const projectPartnerMeta = tab === 'start-project'
-    ? {
-      title: 'Software Product Development Partner | IT HUNT',
-      description: 'Plan and build your web, mobile, SaaS, or AI product with IT HUNT. Explore engagement options and request a fixed-price proposal.'
-    }
-    : null;
-  const metaObj = servicePage || insightMeta || projectPartnerMeta || content.value?.seoPages?.[tab] || content.value?.seoPages?.home || {};
-  const canonicalUrl = servicePage
-    ? `https://ithunt.vercel.app/services/${servicePage.slug}`
-    : (insightsRoute
-      ? `https://ithunt.vercel.app${insightsRoute.canonicalPath}`
-      : (projectPartnerMeta ? 'https://ithunt.vercel.app/start-project' : 'https://ithunt.vercel.app/'));
+  const metaObj = content.value?.seoPages?.[tab] || content.value?.seoPages?.home || {};
+  const canonicalUrl = 'https://ithunt.vercel.app/';
 
   // 1. Update Document Title
   if (metaObj.title) {
@@ -1941,7 +1845,7 @@ const updateSeoMetadata = (tab) => {
   if (metaObj.ogDescription || metaObj.description) {
     setMetaTag('meta[property="og:description"]', 'property', 'og:description', metaObj.ogDescription || metaObj.description);
   }
-  setMetaTag('meta[property="og:type"]', 'property', 'og:type', insightsRoute?.type === 'article' ? 'article' : 'website');
+  setMetaTag('meta[property="og:type"]', 'property', 'og:type', 'website');
   setMetaTag('meta[property="og:site_name"]', 'property', 'og:site_name', 'IT HUNT');
   setMetaTag('meta[property="og:image"]', 'property', 'og:image', 'https://ithunt.vercel.app/img/ithunt.jpg');
   setMetaTag('meta[property="og:image:secure_url"]', 'property', 'og:image:secure_url', 'https://ithunt.vercel.app/img/ithunt.jpg');
@@ -1958,85 +1862,10 @@ const updateSeoMetadata = (tab) => {
   }
   canonical.setAttribute('href', canonicalUrl);
 
-  let serviceStructuredData = document.getElementById('service-page-jsonld');
-  if (servicePage) {
-    if (!serviceStructuredData) {
-      serviceStructuredData = document.createElement('script');
-      serviceStructuredData.id = 'service-page-jsonld';
-      serviceStructuredData.type = 'application/ld+json';
-      document.head.appendChild(serviceStructuredData);
-    }
-    serviceStructuredData.textContent = JSON.stringify({
-      '@context': 'https://schema.org',
-      '@graph': [
-        {
-          '@type': 'Service',
-          '@id': `${canonicalUrl}#service`,
-          name: servicePage.name,
-          serviceType: servicePage.name,
-          description: servicePage.description,
-          url: canonicalUrl,
-          provider: { '@id': 'https://ithunt.vercel.app/#organization' },
-          areaServed: [
-            { '@type': 'City', name: 'Prayagraj' },
-            { '@type': 'Country', name: 'India' }
-          ]
-        },
-        {
-          '@type': 'BreadcrumbList',
-          itemListElement: [
-            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ithunt.vercel.app/' },
-            { '@type': 'ListItem', position: 2, name: 'Services', item: 'https://ithunt.vercel.app/#service-links' },
-            { '@type': 'ListItem', position: 3, name: servicePage.name, item: canonicalUrl }
-          ]
-        },
-        {
-          '@type': 'FAQPage',
-          mainEntity: servicePage.faqs.map((faq) => ({
-            '@type': 'Question',
-            name: faq.question,
-            acceptedAnswer: { '@type': 'Answer', text: faq.answer }
-          }))
-        }
-      ]
-    });
-  } else {
-    serviceStructuredData?.remove();
-  }
-
-  let insightStructuredData = document.getElementById('insight-page-jsonld');
-  if (insightsRoute) {
-    if (!insightStructuredData) {
-      insightStructuredData = document.createElement('script');
-      insightStructuredData.id = 'insight-page-jsonld';
-      insightStructuredData.type = 'application/ld+json';
-      document.head.appendChild(insightStructuredData);
-    }
-    const insightJsonLd = insightsRoute.type === 'article'
-      ? {
-        '@context': 'https://schema.org',
-        '@type': 'BlogPosting',
-        headline: insightsRoute.article.title,
-        description: insightsRoute.article.description,
-        datePublished: insightsRoute.article.publishedAt,
-        dateModified: insightsRoute.article.publishedAt,
-        author: { '@type': 'Organization', name: 'IT HUNT Editorial', url: 'https://ithunt.vercel.app/' },
-        publisher: { '@type': 'Organization', name: 'IT HUNT', url: 'https://ithunt.vercel.app/' },
-        mainEntityOfPage: canonicalUrl,
-        articleSection: insightsRoute.article.category
-      }
-      : {
-        '@context': 'https://schema.org',
-        '@type': 'CollectionPage',
-        name: metaObj.title,
-        description: metaObj.description,
-        url: canonicalUrl,
-        isPartOf: { '@type': 'WebSite', name: 'IT HUNT', url: 'https://ithunt.vercel.app/' }
-      };
-    insightStructuredData.textContent = JSON.stringify(insightJsonLd);
-  } else {
-    insightStructuredData?.remove();
-  }
+  const serviceStructuredData = document.getElementById('service-page-jsonld');
+  serviceStructuredData?.remove();
+  const insightStructuredData = document.getElementById('insight-page-jsonld');
+  insightStructuredData?.remove();
 
   // 5. Twitter Card Meta Tags
   setMetaTag('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
@@ -2046,7 +1875,6 @@ const updateSeoMetadata = (tab) => {
   setMetaTag('meta[name="twitter:description"]', 'name', 'twitter:description', metaObj.ogDescription || metaObj.description);
   setMetaTag('meta[name="twitter:image"]', 'name', 'twitter:image', 'https://ithunt.vercel.app/img/ithunt.jpg');
   setMetaTag('meta[name="twitter:image:alt"]', 'name', 'twitter:image:alt', 'IT HUNT Computer Institute & Software Solutions Prayagraj');
-
 };
 
 // Synchronize SEO metadata whenever active tab changes
@@ -2057,20 +1885,6 @@ watch(activeTab, (newTab) => {
 // Synchronize tab view when browser back/forward history is triggered
 const handlePopState = () => {
   if (typeof window === 'undefined') return;
-  if (window.location.pathname === '/start-project') {
-    activeTab.value = 'start-project';
-    return;
-  }
-  const servicePage = getServicePageByPath(window.location.pathname);
-  if (servicePage) {
-    activeTab.value = `service:${servicePage.slug}`;
-    return;
-  }
-  const insightsRoute = getInsightsRouteByPath(window.location.pathname);
-  if (insightsRoute) {
-    activeTab.value = insightsRoute.type === 'article' ? `insight:${insightsRoute.article.slug}` : 'insights';
-    return;
-  }
   const rawHash = (window.location.hash || '').replace('#', '').toLowerCase().trim();
   if (!rawHash || rawHash === 'home') {
     activeTab.value = 'home';
@@ -2146,15 +1960,7 @@ onMounted(() => {
   } catch (e) {}
 
   // If user arrived with a hash (e.g. #admission, #courses, #internships, #nielit-project), open corresponding view
-  const servicePage = getServicePageByPath(window.location.pathname);
-  if (servicePage) {
-    activeTab.value = `service:${servicePage.slug}`;
-  } else if (window.location.pathname === '/start-project') {
-    activeTab.value = 'start-project';
-  } else if (getInsightsRouteByPath(window.location.pathname)) {
-    const insightsRoute = getInsightsRouteByPath(window.location.pathname);
-    activeTab.value = insightsRoute.type === 'article' ? `insight:${insightsRoute.article.slug}` : 'insights';
-  } else if (window.location.hash) {
+  if (window.location.hash) {
     const rawHash = window.location.hash.replace('#', '').toLowerCase().trim();
     if (rawHash === 'admission' || rawHash === 'admisson') {
       activeTab.value = 'admission';

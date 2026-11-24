@@ -442,6 +442,12 @@
           </button>
         </div>
       </form>
+
+      <!-- Bottom Hindi Trust Watermark -->
+      <div class="nielit-hindi-watermark text-center">
+        <h2 class="hindi-trust-heading">IT करियर का सबसे भरोसेमंद संस्थान</h2>
+        <p class="hindi-trust-sub">Prayagraj Campus • NIELIT Accredited • ISO 9001:2015 Certified • 100% Practical Training</p>
+      </div>
     </div>
   </section>
 </template>
@@ -856,12 +862,16 @@ const handleFormSubmit = () => {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Form Section Panels */
+/* Form Section Panels (Theme-Oriented with Orange Accent Bar) */
 .form-section-group {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 2rem;
-  border-radius: 20px;
+  background: rgba(13, 21, 39, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-left: 8px solid #f97316;
+  padding: 2.2rem;
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   transition: all 0.3s ease;
 }
 
@@ -870,7 +880,7 @@ const handleFormSubmit = () => {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   padding-bottom: 1.25rem;
   flex-wrap: wrap;
   gap: 1rem;
@@ -890,14 +900,14 @@ const handleFormSubmit = () => {
 .form-section-heading {
   font-family: var(--font-heading);
   color: #fff;
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   font-weight: 800;
   margin: 0;
   letter-spacing: -0.25px;
 }
 
 .form-section-sub {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   color: #94a3b8;
   display: block;
   margin-top: 0.25rem;
@@ -906,50 +916,69 @@ const handleFormSubmit = () => {
 .section-badge-req {
   font-size: 0.75rem;
   font-weight: 800;
-  color: #f59e0b;
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  color: #f97316;
+  background: rgba(249, 115, 22, 0.12);
+  border: 1px solid rgba(249, 115, 22, 0.3);
   padding: 0.35rem 0.85rem;
   border-radius: 9999px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-/* Input Overrides for Premium Feel */
+/* Input Overrides for Premium Cyber Theme */
 .form-label {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.88rem;
+  font-weight: 700;
   color: #cbd5e1;
   margin-bottom: 0.5rem;
 }
 
 .form-control {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #f8fafc;
-  border-radius: 12px;
-  padding: 0.85rem 1.15rem;
+  background: rgba(15, 23, 42, 0.82) !important;
+  border: 1.5px solid rgba(56, 189, 248, 0.35) !important;
+  color: #ffffff !important;
+  border-radius: 999px !important;
+  padding: 0.85rem 1.25rem !important;
   font-size: 0.95rem;
+  font-weight: 500;
   transition: all 0.3s ease;
   width: 100%;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.35) !important;
+  backdrop-filter: blur(8px);
 }
 
 .form-control::placeholder {
-  color: rgba(255, 255, 255, 0.25);
+  color: rgba(148, 163, 184, 0.65) !important;
 }
 
 .form-control:focus, .form-control:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(15, 23, 42, 0.95) !important;
+  border-color: rgba(56, 189, 248, 0.6) !important;
 }
 
 .form-control:focus {
-  border-color: #f97316;
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+  border-color: #f97316 !important;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.25), 0 0 15px rgba(249, 115, 22, 0.35) !important;
   outline: none;
+}
+
+select.form-control {
+  appearance: none;
+  background: linear-gradient(135deg, #0f766e 0%, #0e7490 100%) !important;
+  border: 1.5px solid #14b8a6 !important;
+  color: #ffffff !important;
+  border-radius: 999px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 15px rgba(15, 118, 110, 0.35) !important;
+  cursor: pointer;
+}
+
+select.form-control option {
+  background: #0f172a;
+  color: #ffffff;
 }
 
 .form-field.has-error .form-control {
@@ -1127,5 +1156,25 @@ const handleFormSubmit = () => {
     margin-left: 0;
     justify-content: center;
   }
+}
+
+/* Bottom Hindi Trust Watermark */
+.nielit-hindi-watermark {
+  margin-top: 4rem;
+}
+
+.nielit-hindi-watermark .hindi-trust-heading {
+  font-size: clamp(2.2rem, 4.4vw, 3.6rem);
+  font-weight: 900;
+  color: #0284c7;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 12px rgba(2, 132, 199, 0.3);
+}
+
+.nielit-hindi-watermark .hindi-trust-sub {
+  font-size: 1.05rem;
+  color: #94a3b8;
+  font-weight: 600;
 }
 </style>

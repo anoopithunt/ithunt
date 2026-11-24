@@ -42,11 +42,6 @@
               <span class="nav-item-icon" aria-hidden="true">{{ item.icon }}</span><span>{{ item.label }}</span>
             </button>
           </li>
-          <li>
-            <a class="nav-item-btn insights-nav-link" :class="{ active: activeTab === 'insights' || activeTab.startsWith('insight:') }" href="/insights">
-              <span class="nav-item-icon" aria-hidden="true">✍️</span><span>Insights</span>
-            </a>
-          </li>
         </ul>
       </nav>
 

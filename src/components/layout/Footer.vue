@@ -35,28 +35,29 @@
 
       <!-- Quick Links -->
       <div class="footer-col footer-links-col">
-        <h4>Quick Links</h4>
+        <h4>Quick Navigation</h4>
         <ul class="footer-links">
           <li><a href="#" @click.prevent="$emit('set-tab', 'home')">Home</a></li>
-          <li><a href="/start-project">Plan a software project</a></li>
-          <li><a href="/insights">Insights &amp; Guides</a></li>
-          <li><a href="#" @click.prevent="$emit('set-tab', 'internships')">Internships</a></li>
-          <li><a href="#" @click.prevent="$emit('set-tab', 'courses')">Courses</a></li>
-          <li><a href="#" @click.prevent="$emit('set-tab', 'events')">Events</a></li>
-          <li><a href="#" @click.prevent="$emit('set-tab', 'testimonials')">Alumni</a></li>
-          <li><a href="#" @click.prevent="$emit('set-tab', 'reviews')">Reviews</a></li>
-          <li><a href="#" @click.prevent="$emit('set-tab', 'careers')">Careers</a></li>
-          <li><a href="#" @click.prevent="$emit('set-tab', 'admission')">Admission</a></li>
+          <li><a href="#" @click.prevent="$emit('set-tab', 'admission')">Admission 2026</a></li>
+          <li><a href="#" @click.prevent="$emit('set-tab', 'courses')">Courses & Diplomas</a></li>
+          <li><a href="#" @click.prevent="$emit('set-tab', 'internships')">Development Tracks</a></li>
+          <li><a href="#" @click.prevent="$emit('set-tab', 'nielit-project')">NIELIT Project Portal</a></li>
+          <li><a href="#" @click.prevent="$emit('set-tab', 'reviews')">Student Reviews</a></li>
+          <li><a href="#" @click.prevent="$emit('set-tab', 'careers')">Careers & Placement</a></li>
+          <li><a href="#" @click.prevent="$emit('set-tab', 'events')">Events & Hackathons</a></li>
           <li><a href="#" @click.prevent="$emit('open-cv-modal')" class="footer-link-cta">Build a CV</a></li>
         </ul>
       </div>
 
       <div id="service-links" class="footer-col footer-services-col">
-        <h4>Software Services</h4>
+        <h4>Academy Programs</h4>
         <ul class="footer-links">
-          <li v-for="service in servicePages" :key="service.slug">
-            <a :href="`/services/${service.slug}`">{{ service.name }}</a>
-          </li>
+          <li><a href="#" @click.prevent="$emit('set-tab', 'courses')">NIELIT 'O' Level Diploma</a></li>
+          <li><a href="#" @click.prevent="$emit('set-tab', 'courses')">NIELIT 'A' Level Diploma</a></li>
+          <li><a href="#" @click.prevent="$emit('set-tab', 'internships')">Full-Stack MERN Stack</a></li>
+          <li><a href="#" @click.prevent="$emit('set-tab', 'internships')">Python AI & Data Science</a></li>
+          <li><a href="#" @click.prevent="$emit('set-tab', 'courses')">ADCA Computer Applications</a></li>
+          <li><a href="#" @click.prevent="$emit('set-tab', 'nielit-project')">NIELIT Project Submission</a></li>
         </ul>
       </div>
 
@@ -100,7 +101,6 @@
 </template>
 
 <script setup>
-import { SERVICE_PAGES } from '../../data/servicePages.js';
 import { TRUST_PROOF } from '../../data/trustProof.js';
 
 defineProps({
@@ -108,7 +108,6 @@ defineProps({
   activeTab: { type: String, default: 'home' }
 });
 defineEmits(['set-tab', 'open-privacy-policy', 'open-terms-conditions', 'open-cv-modal']);
-const servicePages = SERVICE_PAGES;
 const socialLinks = TRUST_PROOF.socialLinks.filter((social) => {
   try {
     const url = new URL(social.url);
