@@ -602,14 +602,16 @@ const onImgError = (event) => {
   align-items: start;
 }
 
-/* Form Card (Styled like Image 1 with Orange Accent Bar & Soft Blue Inputs) */
+/* Form Card (Theme-Oriented with Orange Accent Bar & High-Contrast Cyber Inputs) */
 .form-card {
-  background: #ffffff;
-  border: 1px solid rgba(226, 232, 240, 0.9);
+  background: rgba(13, 21, 39, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-left: 8px solid #f97316;
   border-radius: 24px;
   padding: 2.2rem;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .form-card-header {
@@ -619,7 +621,7 @@ const onImgError = (event) => {
 .form-title {
   font-size: 1.45rem;
   font-weight: 800;
-  color: #0f172a;
+  color: #ffffff;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -627,7 +629,7 @@ const onImgError = (event) => {
 }
 
 .form-subtitle {
-  color: #64748b;
+  color: #94a3b8;
   font-size: 0.92rem;
   margin: 0;
   line-height: 1.45;
@@ -653,7 +655,7 @@ const onImgError = (event) => {
 .form-label {
   font-weight: 700;
   font-size: 0.88rem;
-  color: #334155;
+  color: #cbd5e1;
   display: flex;
   align-items: center;
   gap: 0.35rem;
@@ -677,34 +679,35 @@ const onImgError = (event) => {
 .form-control {
   width: 100%;
   box-sizing: border-box;
-  background: #e0f2fe;
-  border: 1.5px solid #bae6fd;
-  color: #0f172a;
+  background: rgba(15, 23, 42, 0.8) !important;
+  border: 1.5px solid rgba(56, 189, 248, 0.35) !important;
+  color: #ffffff !important;
   padding: 0.8rem 1.15rem;
   border-radius: 999px;
   font-size: 0.95rem;
   font-family: inherit;
   transition: all 0.25s ease;
   outline: none;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.35) !important;
 }
 
 .form-control::placeholder {
-  color: #64748b;
+  color: rgba(148, 163, 184, 0.65) !important;
 }
 
 .form-control:focus {
-  border-color: var(--color-ai-orange, #f97316);
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+  border-color: var(--color-ai-orange, #f97316) !important;
+  background: rgba(15, 23, 42, 0.95) !important;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.25), 0 0 15px rgba(249, 115, 22, 0.35) !important;
 }
 
-/* Fix browser autofill white background */
+/* Fix browser autofill */
 .form-control:-webkit-autofill,
 .form-control:-webkit-autofill:hover, 
 .form-control:-webkit-autofill:focus,
 .form-control:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 1000px #e0f2fe inset !important;
-  -webkit-text-fill-color: #0f172a !important;
+  -webkit-box-shadow: 0 0 0 1000px #0f172a inset !important;
+  -webkit-text-fill-color: #ffffff !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 
@@ -719,11 +722,17 @@ const onImgError = (event) => {
   -moz-appearance: none;
   padding-right: 2.5rem;
   cursor: pointer;
-  background: #0e7490 !important;
+  background: linear-gradient(135deg, #0f766e 0%, #0e7490 100%) !important;
   color: #ffffff !important;
-  border: 1.5px solid #0891b2 !important;
+  border: 1.5px solid #14b8a6 !important;
   border-radius: 999px !important;
-  font-weight: 600;
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(15, 118, 110, 0.35) !important;
+}
+
+.select-control option {
+  background: #0f172a;
+  color: #ffffff;
 }
 
 .select-chevron {
@@ -733,7 +742,34 @@ const onImgError = (event) => {
   transform: translateY(-50%);
   pointer-events: none;
   font-size: 0.75rem;
-  color: #ffffff;
+  color: #38bdf8;
+}
+
+/* Light Theme overrides for Admission Form */
+body.light-theme .form-card {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-left: 8px solid #f97316;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+}
+body.light-theme .form-card .form-title {
+  color: #0f172a;
+}
+body.light-theme .form-card .form-subtitle {
+  color: #64748b;
+}
+body.light-theme .form-card .form-label {
+  color: #334155;
+}
+body.light-theme .form-card .form-control {
+  background: #e0f2fe !important;
+  border: 1.5px solid #bae6fd !important;
+  color: #0f172a !important;
+  box-shadow: none !important;
+}
+body.light-theme .form-card .form-control::placeholder {
+  color: #64748b !important;
 }
 
 /* Bottom Hindi Trust Watermark */

@@ -5579,22 +5579,25 @@ onUnmounted(() => {
 }
 
 .highlight-card {
-  background: #ffffff;
-  color: #0f172a;
+  background: rgba(15, 23, 42, 0.85);
+  color: #ffffff;
   border-radius: 22px;
   padding: 2.2rem 1.8rem;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08), 0 5px 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
   position: relative;
-  border: 1px solid rgba(226, 232, 240, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .highlight-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.16);
+  border-color: rgba(249, 115, 22, 0.45);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 25px rgba(249, 115, 22, 0.18);
 }
 
 .card-icon-circle {
@@ -5605,22 +5608,25 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   font-size: 1.85rem;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 .card-theme-cyan .card-icon-circle {
-  background: #e0f2fe;
-  color: #0284c7;
+  background: rgba(14, 165, 233, 0.2);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
 }
 
 .card-theme-orange .card-icon-circle {
-  background: #ffedd5;
-  color: #ea580c;
+  background: rgba(249, 115, 22, 0.2);
+  color: #fb923c;
+  border: 1px solid rgba(249, 115, 22, 0.3);
 }
 
 .card-theme-teal .card-icon-circle {
-  background: #ccfbf1;
-  color: #0f766e;
+  background: rgba(20, 184, 166, 0.2);
+  color: #2dd4bf;
+  border: 1px solid rgba(45, 212, 191, 0.3);
 }
 
 .card-badge-chip {
@@ -5628,40 +5634,40 @@ onUnmounted(() => {
   font-size: 0.72rem;
   font-weight: 800;
   text-transform: uppercase;
-  padding: 0.2rem 0.55rem;
+  padding: 0.25rem 0.6rem;
   border-radius: 6px;
   letter-spacing: 0.05em;
   margin-bottom: 0.5rem;
 }
 
 .card-theme-cyan .card-badge-chip {
-  background: #f0f9ff;
-  color: #0369a1;
-  border: 1px solid #bae6fd;
+  background: rgba(14, 165, 233, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
 }
 
 .card-theme-orange .card-badge-chip {
-  background: #fff7ed;
-  color: #c2410c;
-  border: 1px solid #fed7aa;
+  background: rgba(249, 115, 22, 0.15);
+  color: #fb923c;
+  border: 1px solid rgba(249, 115, 22, 0.35);
 }
 
 .card-theme-teal .card-badge-chip {
-  background: #f0fdfa;
-  color: #0f766e;
-  border: 1px solid #99f6e4;
+  background: rgba(20, 184, 166, 0.15);
+  color: #2dd4bf;
+  border: 1px solid rgba(45, 212, 191, 0.35);
 }
 
 .card-title {
   font-size: 1.4rem;
   font-weight: 800;
-  color: #0f172a;
+  color: #ffffff;
   margin-bottom: 0.45rem;
 }
 
 .card-desc {
   font-size: 0.95rem;
-  color: #64748b;
+  color: #94a3b8;
   line-height: 1.55;
   margin-bottom: 1.25rem;
   flex-grow: 1;
@@ -5681,7 +5687,7 @@ onUnmounted(() => {
 }
 
 .card-theme-cyan .card-cta-btn {
-  color: #0284c7;
+  color: #38bdf8;
 }
 
 .card-theme-orange .card-cta-btn {
@@ -5689,15 +5695,29 @@ onUnmounted(() => {
 }
 
 .card-theme-teal .card-cta-btn {
-  color: #0f766e;
+  color: #2dd4bf;
 }
 
 .card-cta-btn:hover {
   gap: 0.65rem;
 }
 
+/* Light Theme overrides for Highlight Cards */
+body.light-theme .highlight-card {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+}
+body.light-theme .highlight-card .card-title {
+  color: #0f172a;
+}
+body.light-theme .highlight-card .card-desc {
+  color: #64748b;
+}
+
 /* ==========================================================================
-   3D LAPTOP APPLICATION FORM (Image 1)
+   3D LAPTOP APPLICATION FORM (Image 1 - THEME-ORIENTED)
    ========================================================================== */
 .laptop-section-wrapper {
   margin-top: 5rem;
@@ -5732,11 +5752,11 @@ onUnmounted(() => {
 }
 
 .laptop-screen {
-  background: #0f172a;
+  background: #0a0f1d;
   border-radius: 18px 18px 0 0;
   padding: 12px 14px 0 14px;
-  box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.15);
-  border: 2px solid #334155;
+  box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  border: 2px solid #1e293b;
   border-bottom: none;
   position: relative;
 }
@@ -5754,7 +5774,8 @@ onUnmounted(() => {
   height: 7px;
   border-radius: 50%;
   background: #020617;
-  border: 1px solid #475569;
+  border: 1px solid #334155;
+  box-shadow: inset 0 0 2px #38bdf8;
 }
 
 .webcam-mic {
@@ -5764,19 +5785,22 @@ onUnmounted(() => {
   background: #475569;
 }
 
+/* Inside Screen: Cyber Dark Theme Oriented */
 .laptop-screen-content {
-  background: #ffffff;
+  background: radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.15) 0%, transparent 60%), linear-gradient(145deg, #070d1e 0%, #0c1833 55%, #050a18 100%);
   border-radius: 10px 10px 0 0;
   display: flex;
   position: relative;
   overflow: hidden;
   min-height: 400px;
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  box-shadow: inset 0 2px 25px rgba(0, 0, 0, 0.75);
 }
 
 .laptop-left-accent {
   width: 10px;
-  background: linear-gradient(180deg, #f97316 0%, #ea580c 100%);
+  background: linear-gradient(180deg, #f97316 0%, #ea580c 50%, #f59e0b 100%);
+  box-shadow: 0 0 18px rgba(249, 115, 22, 0.65);
   flex-shrink: 0;
 }
 
@@ -5803,17 +5827,20 @@ onUnmounted(() => {
 .laptop-logo-it {
   color: #f97316;
   margin-right: 4px;
+  text-shadow: 0 0 15px rgba(249, 115, 22, 0.6);
 }
 
 .laptop-logo-hunt {
-  color: #0f172a;
+  color: #ffffff;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.35);
 }
 
 .laptop-form-heading {
   font-size: 1.7rem;
   font-weight: 800;
-  color: #0f172a;
+  color: #ffffff;
   letter-spacing: -0.01em;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
 }
 
 .laptop-form-grid {
@@ -5825,32 +5852,42 @@ onUnmounted(() => {
 }
 
 .laptop-label {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
   font-size: 0.88rem;
-  font-weight: 600;
-  color: #475569;
+  font-weight: 700;
+  color: #cbd5e1;
   margin-bottom: 0.45rem;
   text-align: left;
 }
 
 .laptop-input-field {
   width: 100%;
-  background: #e0f2fe;
-  border: 1.5px solid #bae6fd;
-  border-radius: 999px;
-  padding: 0.75rem 1.25rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #0f172a;
-  outline: none;
-  transition: all 0.2s ease;
-  box-sizing: border-box;
+  background: rgba(15, 23, 42, 0.82) !important;
+  border: 1.5px solid rgba(56, 189, 248, 0.35) !important;
+  border-radius: 999px !important;
+  padding: 0.75rem 1.25rem !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  color: #ffffff !important;
+  outline: none !important;
+  transition: all 0.25s ease !important;
+  box-sizing: border-box !important;
+  backdrop-filter: blur(10px) !important;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.45) !important;
+}
+
+.laptop-input-field::placeholder {
+  color: rgba(148, 163, 184, 0.65) !important;
+  font-weight: 400 !important;
 }
 
 .laptop-input-field:focus {
-  background: #ffffff;
-  border-color: #f97316;
-  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.15);
+  background: rgba(15, 23, 42, 0.98) !important;
+  border-color: #f97316 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.25), 0 0 20px rgba(249, 115, 22, 0.45) !important;
 }
 
 .laptop-select-wrapper {
@@ -5861,21 +5898,28 @@ onUnmounted(() => {
 .laptop-select-field {
   width: 100%;
   appearance: none;
-  background: #0e7490;
-  color: #ffffff;
-  border: 1.5px solid #0891b2;
-  border-radius: 999px;
-  padding: 0.75rem 2.5rem 0.75rem 1.25rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  outline: none;
-  transition: all 0.2s ease;
-  box-sizing: border-box;
+  background: linear-gradient(135deg, #0f766e 0%, #0e7490 100%) !important;
+  color: #ffffff !important;
+  border: 1.5px solid #14b8a6 !important;
+  border-radius: 999px !important;
+  padding: 0.75rem 2.5rem 0.75rem 1.25rem !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  outline: none !important;
+  transition: all 0.25s ease !important;
+  box-sizing: border-box !important;
+  box-shadow: 0 4px 18px rgba(15, 118, 110, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.25) !important;
 }
 
 .laptop-select-field:focus {
-  box-shadow: 0 0 0 4px rgba(14, 116, 144, 0.25);
+  border-color: #2dd4bf !important;
+  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.35), 0 0 25px rgba(20, 184, 166, 0.45) !important;
+}
+
+.laptop-select-field option {
+  background: #0f172a;
+  color: #ffffff;
 }
 
 .laptop-select-wrapper .select-chevron {
@@ -5883,7 +5927,7 @@ onUnmounted(() => {
   right: 1.25rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #ffffff;
+  color: #38bdf8;
   font-size: 0.75rem;
   pointer-events: none;
 }
@@ -5901,61 +5945,86 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   gap: 0.65rem;
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-  color: #ffffff;
-  border: none;
-  border-radius: 999px;
-  padding: 0.85rem 2.85rem;
-  font-size: 1.1rem;
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.45);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid #fb923c !important;
+  border-radius: 999px !important;
+  padding: 0.9rem 3rem !important;
+  font-size: 1.15rem !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.55), 0 0 35px rgba(249, 115, 22, 0.35) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .laptop-apply-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(249, 115, 22, 0.6);
+  box-shadow: 0 12px 35px rgba(249, 115, 22, 0.75), 0 0 45px rgba(249, 115, 22, 0.5) !important;
 }
 
 .cursor-pointer-icon {
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
 }
 
 .laptop-bottom-bar {
   width: 100%;
-  height: 6px;
-  background: linear-gradient(90deg, #f97316, #0e7490);
+  height: 5px;
+  background: linear-gradient(90deg, #f97316 0%, #06b6d4 50%, #0f766e 100%);
   margin-top: 1rem;
   border-radius: 999px;
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.5);
 }
 
 .laptop-base {
   width: 106%;
   margin-left: -3%;
   height: 20px;
-  background: linear-gradient(180deg, #cbd5e1 0%, #94a3b8 40%, #64748b 100%);
+  background: linear-gradient(180deg, #334155 0%, #1e293b 50%, #0f172a 100%);
   border-radius: 0 0 18px 18px;
   position: relative;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
   display: flex;
   justify-content: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .laptop-base-notch {
   width: 140px;
   height: 7px;
-  background: #475569;
+  background: #0f172a;
   border-radius: 0 0 8px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: none;
 }
 
 .laptop-drop-shadow {
   width: 90%;
   height: 25px;
   margin: 0 auto;
-  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 70%);
-  filter: blur(6px);
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0) 70%);
+  filter: blur(8px);
   margin-top: 4px;
+}
+
+/* Light theme overrides for Laptop Mockup */
+body.light-theme .laptop-screen-content {
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+body.light-theme .laptop-logo-hunt,
+body.light-theme .laptop-form-heading {
+  color: #0f172a;
+  text-shadow: none;
+}
+body.light-theme .laptop-label {
+  color: #475569;
+}
+body.light-theme .laptop-input-field {
+  background: #e0f2fe !important;
+  border: 1.5px solid #bae6fd !important;
+  color: #0f172a !important;
+  box-shadow: none !important;
 }
 
 /* Bottom Hindi Trust Watermark (Image 1) */
