@@ -1357,209 +1357,321 @@
         </div>
       </div>
 
+      <!-- Admissions KPI Quick Stats Cards Strip -->
+      <div class="adm-kpi-strip anim-stagger-1">
+        <div class="adm-kpi-card" :class="{ active: admissionStatusFilter === 'all' }" @click="admissionStatusFilter = 'all'" title="View All Registrations">
+          <div class="adm-kpi-icon total">📋</div>
+          <div class="adm-kpi-data">
+            <span class="adm-kpi-num">{{ admissionsList.length }}</span>
+            <span class="adm-kpi-title">Total Registrations</span>
+          </div>
+        </div>
+
+        <div class="adm-kpi-card" :class="{ active: admissionStatusFilter === 'Confirmed' }" @click="admissionStatusFilter = 'Confirmed'" title="Filter Confirmed Students">
+          <div class="adm-kpi-icon confirmed">✅</div>
+          <div class="adm-kpi-data">
+            <span class="adm-kpi-num text-emerald">{{ confirmedAdmissionsCount }}</span>
+            <span class="adm-kpi-title">Confirmed & Logins Active</span>
+          </div>
+        </div>
+
+        <div class="adm-kpi-card" :class="{ active: admissionStatusFilter === 'Pending Verification' }" @click="admissionStatusFilter = 'Pending Verification'" title="Filter Pending Review">
+          <div class="adm-kpi-icon pending">⏳</div>
+          <div class="adm-kpi-data">
+            <span class="adm-kpi-num" :class="pendingAdmissionsCount > 0 ? 'text-amber' : 'text-dim'">{{ pendingAdmissionsCount }}</span>
+            <span class="adm-kpi-title">Pending Review</span>
+          </div>
+        </div>
+
+        <div class="adm-kpi-card fee-card" title="Verified Fee Records">
+          <div class="adm-kpi-icon fee">💳</div>
+          <div class="adm-kpi-data">
+            <span class="adm-kpi-num text-cyan">{{ paidAdmissionsCount }}</span>
+            <span class="adm-kpi-title">Fee Slips Verified</span>
+          </div>
+        </div>
+      </div>
+
       <!-- Quick Filter Pills Strip -->
-      <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap;">
-        <button 
-          type="button"
-          class="admin-tab-btn" 
-          :class="{ active: admissionStatusFilter === 'all' }"
-          @click="admissionStatusFilter = 'all'"
-          style="padding: 0.35rem 0.85rem; font-size: 0.8rem; border-radius: 999px;"
-        >
-          📋 All Registrations ({{ admissionsList.length }})
-        </button>
-        <button 
-          type="button"
-          class="admin-tab-btn" 
-          :class="{ active: admissionStatusFilter === 'Pending Verification' || admissionStatusFilter === 'Pending Confirmation' }"
-          @click="admissionStatusFilter = 'Pending Verification'"
-          style="padding: 0.35rem 0.85rem; font-size: 0.8rem; border-radius: 999px; border-color: rgba(245, 158, 11, 0.5);"
-          :style="pendingAdmissionsCount > 0 ? { color: '#f59e0b', fontWeight: '800', background: 'rgba(245, 158, 11, 0.12)' } : {}"
-        >
-          ⏳ Pending Review ({{ pendingAdmissionsCount }})
-          <span v-if="pendingAdmissionsCount > 0" style="margin-left: 6px; padding: 2px 7px; border-radius: 999px; background: #f59e0b; color: #000; font-size: 0.68rem; font-weight: 900;">
-            Action Needed
-          </span>
-        </button>
-        <button 
-          type="button"
-          class="admin-tab-btn" 
-          :class="{ active: admissionStatusFilter === 'Confirmed' }"
-          @click="admissionStatusFilter = 'Confirmed'"
-          style="padding: 0.35rem 0.85rem; font-size: 0.8rem; border-radius: 999px; border-color: rgba(16, 185, 129, 0.5);"
-          :style="{ color: '#10b981' }"
-        >
-          ✅ Confirmed Students & Active Logins ({{ confirmedAdmissionsCount }})
-        </button>
+      <div class="adm-filter-dock">
+        <div class="adm-filter-pills">
+          <button 
+            type="button"
+            class="adm-filter-btn" 
+            :class="{ active: admissionStatusFilter === 'all' }"
+            @click="admissionStatusFilter = 'all'"
+          >
+            📋 All Registrations <span class="pill-count">{{ admissionsList.length }}</span>
+          </button>
+          <button 
+            type="button"
+            class="adm-filter-btn pending" 
+            :class="{ active: admissionStatusFilter === 'Pending Verification' || admissionStatusFilter === 'Pending Confirmation' }"
+            @click="admissionStatusFilter = 'Pending Verification'"
+          >
+            ⏳ Pending Review <span class="pill-count" :class="{ alert: pendingAdmissionsCount > 0 }">{{ pendingAdmissionsCount }}</span>
+            <span v-if="pendingAdmissionsCount > 0" class="action-alert-badge">Action Needed</span>
+          </button>
+          <button 
+            type="button"
+            class="adm-filter-btn confirmed" 
+            :class="{ active: admissionStatusFilter === 'Confirmed' }"
+            @click="admissionStatusFilter = 'Confirmed'"
+          >
+            ✅ Confirmed & Active <span class="pill-count">{{ confirmedAdmissionsCount }}</span>
+          </button>
+        </div>
+        <div class="adm-table-meta-counter">
+          Showing <strong>{{ filteredAdmissions.length }}</strong> of <strong>{{ admissionsList.length }}</strong> candidate records
+        </div>
       </div>
 
       <!-- Action Feedback Banner -->
-      <div v-if="emailActionMsg" style="margin-bottom: 1.25rem; padding: 0.85rem 1.25rem; background: rgba(249, 115, 22, 0.15); border: 1px solid rgba(249, 115, 22, 0.4); border-radius: var(--radius-md); color: var(--color-ai-orange); font-weight: 700; font-size: 0.9rem;">
+      <div v-if="emailActionMsg" class="adm-action-toast">
         {{ emailActionMsg }}
       </div>
 
       <!-- Admissions Data Table -->
       <div class="admin-table-card admissions-table-card">
-        <div class="admissions-table-hint" aria-hidden="true">↔ Swipe or scroll horizontally when needed to view all columns and actions</div>
-        <div class="table-responsive admissions-table-scroll" tabindex="0" role="region" aria-label="Admissions registry table; scroll horizontally to view all columns">
+        <div class="table-responsive admissions-table-scroll" tabindex="0" role="region" aria-label="Admissions registry table">
           <table class="admin-data-table admissions-table">
             <thead>
               <tr>
-                <th>Reg. / Student ID</th>
-                <th>Candidate Name</th>
-                <th>Father's Name</th>
-                <th>Mobile & Email</th>
-                <th>Enrolled Program / Track</th>
+                <th>Registration & ID</th>
+                <th>Candidate Profile</th>
+                <th>Contact Channels</th>
+                <th>Course & Center</th>
                 <th>Date & Time</th>
-                <th>Admission Status</th>
+                <th>Status & Portal</th>
                 <th style="text-align: right;">Official Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="adm in filteredAdmissions" :key="adm.registrationNo || adm.id">
+              <tr v-for="adm in filteredAdmissions" :key="adm.registrationNo || adm.id" class="adm-table-row">
+                <!-- 1. Reg & Student ID -->
                 <td>
-                  <span class="admin-reg-pill">{{ adm.registrationNo || adm.id }}</span>
-                  <div v-if="adm.userId || adm.enrollmentNumber" style="font-size: 0.72rem; font-family: var(--font-mono); color: #38bdf8; margin-top: 4px; font-weight: 700;">
-                    🆔 {{ adm.userId || adm.enrollmentNumber }}
+                  <div class="adm-id-cell">
+                    <div class="adm-reg-code" :title="'Registration ID: ' + (adm.registrationNo || adm.id)">
+                      <span class="adm-reg-icon">🏷️</span>
+                      <span class="adm-reg-text">{{ adm.registrationNo || adm.id }}</span>
+                    </div>
+                    <div v-if="adm.userId || adm.enrollmentNumber" class="adm-uid-badge" title="Student User ID for Portal Login">
+                      <span class="adm-uid-dot"></span>
+                      <span>{{ adm.userId || adm.enrollmentNumber }}</span>
+                    </div>
+                    <div v-else class="adm-uid-pending">
+                      <span>No User ID</span>
+                    </div>
                   </div>
                 </td>
-                <td>
-                  <div style="font-weight: 800; color: var(--text-main);">{{ adm.candidateName || adm.fullName }}</div>
-                  <div style="font-size: 0.75rem; color: var(--text-dim);">{{ adm.gender || '—' }} | DOB: {{ adm.dob || '—' }}</div>
-                </td>
-                <td>{{ adm.fatherName || '—' }}</td>
-                <td>
-                  <div>📞 {{ adm.mobile || adm.phone || '—' }}</div>
-                  <div style="font-size: 0.75rem; color: var(--color-ai-cyan);">{{ adm.email || '—' }}</div>
-                </td>
-                <td>
-                  <span class="admin-track-pill">{{ adm.course }}</span>
-                  <div style="font-size: 0.725rem; color: var(--text-dim); margin-top: 2px;">📍 {{ adm.district || 'Prayagraj' }}, UP</div>
-                </td>
-                <td style="font-size: 0.8rem; font-family: var(--font-mono); white-space: nowrap;">
-                  <div>📅 {{ adm.date }}</div>
-                  <div style="color: var(--text-dim);">⏱️ {{ adm.time }}</div>
-                </td>
-                <td>
-                  <span 
-                    class="admin-status-chip"
-                    :class="{
-                      'status-confirmed': adm.status === 'Confirmed' || adm.admissionConfirmed,
-                      'status-verified': adm.status === 'Verified',
-                      'status-pending': adm.status === 'Pending Verification' || (!adm.status && !adm.admissionConfirmed)
-                    }"
-                    @click="cycleAdmissionStatus(adm)"
-                    :title="'Click to toggle status'"
-                  >
-                    {{ adm.status || (adm.admissionConfirmed ? 'Confirmed' : 'Pending Verification') }}
-                  </span>
-                  <div v-if="adm.status === 'Confirmed' || adm.admissionConfirmed" style="font-size: 0.7rem; color: #10b981; font-weight: 700; margin-top: 3px;">
-                    ● Login Active
-                  </div>
-                  <div v-else style="font-size: 0.7rem; color: #f59e0b; font-weight: 700; margin-top: 3px;">
-                    ● Pending Review
-                  </div>
-                  <div style="font-size: 0.7rem; font-weight: 700; margin-top: 3px;" :style="{ color: (adm.feeStatus && adm.feeStatus.includes('Paid')) ? '#10b981' : '#f59e0b' }">
-                    💳 {{ adm.feeStatus || 'Fee Pending' }}
-                  </div>
-                </td>
-                <td style="text-align: right;">
-                  <div class="admin-row-actions">
-                    <!-- ✏️ Edit Admission Record Button -->
-                    <button 
-                      class="admin-icon-btn" 
-                      @click="openEditAdmissionModal(adm)" 
-                      title="Edit Candidate Admission Details"
-                      style="color: var(--color-ai-cyan); border-color: rgba(56, 189, 248, 0.4);"
-                    >
-                      ✏️ Edit
-                    </button>
-                    <!-- 1-Click Confirm & Auto-Generate Credentials for Pending Registrations -->
-                    <button 
-                      v-if="adm.status !== 'Confirmed' && !adm.admissionConfirmed"
-                      class="btn-primary" 
-                      @click="handleConfirmAdmissionAndGenerateCredentials(adm)" 
-                      title="Confirm candidate admission, generate User ID & Password, and activate student login"
-                      style="padding: 0.35rem 0.75rem; font-size: 0.78rem; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-color: #10b981; color: #fff; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);"
-                    >
-                      ⚡ Confirm & Generate
-                    </button>
 
-                    <!-- Confirmed Candidate Actions: Credentials, WhatsApp, Reset Password -->
+                <!-- 2. Candidate Profile (Avatar, Full Name, Parent, Gender, DOB) -->
+                <td>
+                  <div class="adm-candidate-cell">
+                    <div class="adm-avatar-circle" :style="{ background: getAvatarGradient(adm.candidateName || adm.fullName) }">
+                      {{ getInitials(adm.candidateName || adm.fullName) }}
+                    </div>
+                    <div class="adm-candidate-info">
+                      <div class="adm-candidate-name">{{ adm.candidateName || adm.fullName }}</div>
+                      <div class="adm-candidate-sub">
+                        <span v-if="adm.fatherName && adm.fatherName !== 'Not Specified'" class="adm-father-tag">
+                          S/D/W: {{ adm.fatherName }}
+                        </span>
+                        <span class="adm-meta-dot" v-if="adm.fatherName && adm.fatherName !== 'Not Specified'">•</span>
+                        <span>{{ adm.gender || 'Student' }}</span>
+                        <span v-if="adm.dob" class="adm-dob-tag"> (DOB: {{ adm.dob }})</span>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- 3. Contact Channels (Phone & Email) -->
+                <td>
+                  <div class="adm-contact-cell">
+                    <a v-if="adm.mobile || adm.phone" :href="'tel:' + (adm.mobile || adm.phone)" class="adm-contact-line phone" title="Click to call candidate">
+                      <span class="adm-contact-icon">📞</span>
+                      <span class="adm-contact-val">{{ adm.mobile || adm.phone }}</span>
+                    </a>
+                    <span v-else class="adm-contact-line phone muted">📞 —</span>
+
+                    <a v-if="adm.email" :href="'mailto:' + adm.email" class="adm-contact-line email" :title="'Email: ' + adm.email">
+                      <span class="adm-contact-icon">✉️</span>
+                      <span class="adm-contact-val">{{ adm.email }}</span>
+                    </a>
+                    <span v-else class="adm-contact-line email muted">✉️ —</span>
+                  </div>
+                </td>
+
+                <!-- 4. Course & Location -->
+                <td>
+                  <div class="adm-program-cell">
+                    <span class="adm-course-chip" :title="adm.course">{{ adm.course }}</span>
+                    <div class="adm-location-line">
+                      <span class="adm-loc-icon">📍</span>
+                      <span>{{ adm.district || 'Prayagraj' }}, UP</span>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- 5. Date & Time -->
+                <td>
+                  <div class="adm-time-cell">
+                    <div class="adm-date-badge">📅 {{ adm.date }}</div>
+                    <div class="adm-time-tag">⏱️ {{ adm.time }}</div>
+                  </div>
+                </td>
+
+                <!-- 6. Status & Portal Access -->
+                <td>
+                  <div class="adm-status-cell">
                     <button 
-                      v-if="adm.status === 'Confirmed' || adm.admissionConfirmed"
-                      class="admin-icon-btn" 
-                      @click="openCredentialsModal(adm)" 
-                      title="View Generated Student User ID & Password"
-                      style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);"
-                    >
-                      🔐 Credentials
-                    </button>
-                    <button 
-                      v-if="(adm.status === 'Confirmed' || adm.admissionConfirmed) && (adm.mobile || adm.phone)"
-                      class="admin-icon-btn" 
-                      @click="shareCredentialsOnWhatsApp(adm)" 
-                      title="Send Credentials to Student WhatsApp"
-                      style="color: #22c55e; border-color: rgba(34, 197, 94, 0.4);"
-                    >
-                      📲 WhatsApp
-                    </button>
-                    <button 
-                      v-if="adm.status === 'Confirmed' || adm.admissionConfirmed"
-                      class="admin-icon-btn" 
-                      @click="openResetPasswordModal(adm)" 
-                      title="Reset Student Login Password"
-                      style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.4);"
-                    >
-                      🔑 Reset Pass
-                    </button>
-                    <button 
-                      v-if="adm.status === 'Confirmed' || adm.admissionConfirmed"
                       type="button"
-                      class="admin-icon-btn" 
-                      @click="openDashboardControlModal(adm)" 
-                      title="Control Student Dashboard Features, Modules, Announcements & Access"
-                      style="color: #c084fc; border-color: rgba(192, 132, 252, 0.4); background: rgba(192, 132, 252, 0.1); font-weight: 700;"
+                      class="adm-status-badge"
+                      :class="{
+                        'confirmed': adm.status === 'Confirmed' || adm.admissionConfirmed,
+                        'verified': adm.status === 'Verified',
+                        'pending': adm.status === 'Pending Verification' || (!adm.status && !adm.admissionConfirmed)
+                      }"
+                      @click="cycleAdmissionStatus(adm)"
+                      title="Click to toggle admission status"
                     >
-                      🎛️ Controls
+                      <span class="status-pulse-dot"></span>
+                      <span>{{ adm.status || (adm.admissionConfirmed ? 'Confirmed' : 'Pending Verification') }}</span>
                     </button>
 
-                    <button 
-                      class="admin-icon-btn" 
-                      @click="openAdmissionEmailModal(adm)" 
-                      title="Open Official Admission Confirmation Letter Dispatch Modal"
-                      style="color: var(--color-ai-orange); border-color: rgba(249, 115, 22, 0.4);"
-                    >
-                      📩 Email
-                    </button>
-                    <button 
-                      class="admin-icon-btn" 
-                      @click="confirmFeeAndSendJpgReceipt(adm)" 
-                      title="Confirm Fee Payment and Email Official JPG Image Receipt to Student"
-                      style="color: #34d399; border-color: rgba(52, 211, 153, 0.4);"
-                    >
-                      💳 JPG Receipt
-                    </button>
-                    <button 
-                      class="admin-icon-btn" 
-                      @click="$emit('download-slip', adm)" 
-                      title="Download Official Verified PDF Slip"
-                    >
-                      📄 PDF
-                    </button>
-                    <button 
-                      class="admin-icon-btn" 
-                      @click="deleteAdmission(adm)" 
-                      title="Delete Candidate Record"
-                      style="color: #ef4444;"
-                    >
-                      🗑️
-                    </button>
+                    <div class="adm-portal-status" :class="(adm.status === 'Confirmed' || adm.admissionConfirmed) ? 'active' : 'inactive'">
+                      <span class="portal-dot"></span>
+                      <span>{{ (adm.status === 'Confirmed' || adm.admissionConfirmed) ? 'Portal Active' : 'Review Needed' }}</span>
+                    </div>
+
+                    <div class="adm-fee-status-tag" :class="(adm.feeStatus && adm.feeStatus.includes('Paid')) ? 'paid' : 'unpaid'">
+                      <span>💳 {{ adm.feeStatus || 'Fee Pending' }}</span>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- 7. Executive 2-Tier Actions Dock -->
+                <td style="text-align: right;">
+                  <div class="adm-actions-cell">
+                    <!-- Tier 1: Primary Action & Quick Edit -->
+                    <div class="adm-primary-actions-row">
+                      <!-- If pending: Confirm & Generate button -->
+                      <button 
+                        v-if="adm.status !== 'Confirmed' && !adm.admissionConfirmed"
+                        type="button"
+                        class="adm-btn adm-btn-confirm" 
+                        @click="handleConfirmAdmissionAndGenerateCredentials(adm)" 
+                        title="Confirm candidate admission, generate User ID & Password, and activate student login"
+                      >
+                        <span class="adm-btn-icon">⚡</span>
+                        <span>Confirm & Generate</span>
+                      </button>
+
+                      <!-- If confirmed: View Credentials button -->
+                      <button 
+                        v-if="adm.status === 'Confirmed' || adm.admissionConfirmed"
+                        type="button"
+                        class="adm-btn adm-btn-credentials" 
+                        @click="openCredentialsModal(adm)" 
+                        title="View Generated Student User ID & Password"
+                      >
+                        <span class="adm-btn-icon">🔐</span>
+                        <span>Credentials</span>
+                      </button>
+
+                      <!-- Edit Button -->
+                      <button 
+                        type="button"
+                        class="adm-btn adm-btn-edit" 
+                        @click="openEditAdmissionModal(adm)" 
+                        title="Edit Candidate Details"
+                      >
+                        <span class="adm-btn-icon">✏️</span>
+                        <span>Edit</span>
+                      </button>
+                    </div>
+
+                    <!-- Tier 2: Sleek Icon Toolbar with Rich Tooltips -->
+                    <div class="adm-tools-toolbar">
+                      <button 
+                        v-if="(adm.status === 'Confirmed' || adm.admissionConfirmed) && (adm.mobile || adm.phone)"
+                        type="button"
+                        class="adm-tool-btn tool-wa" 
+                        @click="shareCredentialsOnWhatsApp(adm)" 
+                        title="Send Credentials via WhatsApp"
+                      >
+                        <span>📲</span>
+                        <span class="tool-tip">WhatsApp</span>
+                      </button>
+
+                      <button 
+                        type="button"
+                        class="adm-tool-btn tool-email" 
+                        @click="openAdmissionEmailModal(adm)" 
+                        title="Email Official Confirmation Letter"
+                      >
+                        <span>📩</span>
+                        <span class="tool-tip">Letter</span>
+                      </button>
+
+                      <button 
+                        type="button"
+                        class="adm-tool-btn tool-pdf" 
+                        @click="$emit('download-slip', adm)" 
+                        title="Download Verified PDF Registration Slip"
+                      >
+                        <span>📄</span>
+                        <span class="tool-tip">PDF Slip</span>
+                      </button>
+
+                      <button 
+                        type="button"
+                        class="adm-tool-btn tool-receipt" 
+                        @click="confirmFeeAndSendJpgReceipt(adm)" 
+                        title="Confirm Fee Payment and Send JPG Receipt"
+                      >
+                        <span>💳</span>
+                        <span class="tool-tip">JPG Fee</span>
+                      </button>
+
+                      <button 
+                        v-if="adm.status === 'Confirmed' || adm.admissionConfirmed"
+                        type="button"
+                        class="adm-tool-btn tool-controls" 
+                        @click="openDashboardControlModal(adm)" 
+                        title="Student Portal Dashboard Feature Controls"
+                      >
+                        <span>🎛️</span>
+                        <span class="tool-tip">Controls</span>
+                      </button>
+
+                      <button 
+                        v-if="adm.status === 'Confirmed' || adm.admissionConfirmed"
+                        type="button"
+                        class="adm-tool-btn tool-pass" 
+                        @click="openResetPasswordModal(adm)" 
+                        title="Reset Student Password"
+                      >
+                        <span>🔑</span>
+                        <span class="tool-tip">Reset</span>
+                      </button>
+
+                      <button 
+                        type="button"
+                        class="adm-tool-btn tool-delete" 
+                        @click="deleteAdmission(adm)" 
+                        title="Delete Candidate Record"
+                      >
+                        <span>🗑️</span>
+                        <span class="tool-tip">Delete</span>
+                      </button>
+                    </div>
                   </div>
                 </td>
               </tr>
+
               <tr v-if="filteredAdmissions.length === 0">
-                <td colspan="8" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                <td colspan="7" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
                   <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔍</div>
                   <div style="font-weight: 700; font-size: 1rem; color: var(--text-main); margin-bottom: 0.5rem;">
                     {{ admissionsList.length > 0 ? 'No candidates match filter "' + admissionStatusFilter + '".' : 'No candidate admissions found.' }}
@@ -5590,6 +5702,35 @@ const pendingAdmissionsCount = computed(() => {
 const confirmedAdmissionsCount = computed(() => {
   return admissionsList.value.filter(a => a.status === 'Confirmed' || a.status === 'Active Registered Student' || a.status === 'Verified' || a.admissionConfirmed).length;
 });
+
+const paidAdmissionsCount = computed(() => {
+  return admissionsList.value.filter(a => a.feeStatus && (a.feeStatus.includes('Paid') || a.feeStatus.includes('Verified'))).length;
+});
+
+const getInitials = (name) => {
+  if (!name) return 'ST';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+};
+
+const getAvatarGradient = (name) => {
+  const gradients = [
+    'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+    'linear-gradient(135deg, #10b981 0%, #047857 100%)',
+    'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
+    'linear-gradient(135deg, #f59e0b 0%, #b45309 100%)',
+    'linear-gradient(135deg, #ec4899 0%, #be185d 100%)',
+    'linear-gradient(135deg, #06b6d4 0%, #0e7490 100%)'
+  ];
+  if (!name) return gradients[0];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  const index = Math.abs(hash) % gradients.length;
+  return gradients[index];
+};
 
 const openAdmissionEmailModal = (adm) => {
   if (!adm || !adm.email) {
@@ -12704,134 +12845,734 @@ label {
   border-radius: 999px;
 }
 
-.admissions-table {
-  min-width: 1260px;
-  table-layout: fixed;
+/* === ADMISSIONS REGISTRY REDESIGN STYLES === */
+.adm-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.25rem;
 }
 
-.admissions-table th,
-.admissions-table td {
-  overflow-wrap: anywhere;
+@media (max-width: 900px) {
+  .adm-kpi-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 540px) {
+  .adm-kpi-strip {
+    grid-template-columns: 1fr;
+  }
+}
+
+.adm-kpi-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  background: rgba(13, 19, 35, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(12px);
+}
+
+.adm-kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(56, 189, 248, 0.35);
+  background: rgba(18, 27, 49, 0.85);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.adm-kpi-card.active {
+  border-color: rgba(56, 189, 248, 0.7);
+  background: rgba(14, 30, 58, 0.9);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+}
+
+.adm-kpi-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.adm-kpi-icon.total { background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); }
+.adm-kpi-icon.confirmed { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); }
+.adm-kpi-icon.pending { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); }
+.adm-kpi-icon.fee { background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.3); }
+
+.adm-kpi-data {
+  display: flex;
+  flex-direction: column;
+}
+
+.adm-kpi-num {
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: #f8fafc;
+  line-height: 1.1;
+  font-family: var(--font-heading, sans-serif);
+}
+
+.adm-kpi-num.text-emerald { color: #10b981; }
+.adm-kpi-num.text-amber { color: #f59e0b; }
+.adm-kpi-num.text-cyan { color: #38bdf8; }
+.adm-kpi-num.text-dim { color: #64748b; }
+
+.adm-kpi-title {
+  font-size: 0.74rem;
+  color: #94a3b8;
+  font-weight: 700;
+  margin-top: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Quick Filter Dock */
+.adm-filter-dock {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.adm-filter-pills {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.adm-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0.45rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.adm-filter-btn:hover {
+  background: rgba(30, 41, 59, 0.8);
+  color: #f8fafc;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.adm-filter-btn.active {
+  background: rgba(56, 189, 248, 0.16);
+  border-color: rgba(56, 189, 248, 0.6);
+  color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
+}
+
+.adm-filter-btn.pending.active {
+  background: rgba(245, 158, 11, 0.16);
+  border-color: rgba(245, 158, 11, 0.6);
+  color: #f59e0b;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+}
+
+.adm-filter-btn.confirmed.active {
+  background: rgba(16, 185, 129, 0.16);
+  border-color: rgba(16, 185, 129, 0.6);
+  color: #10b981;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+}
+
+.adm-filter-btn .pill-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.adm-filter-btn .pill-count.alert {
+  background: #f59e0b;
+  color: #0f172a;
+}
+
+.action-alert-badge {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #f59e0b;
+  color: #000;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.adm-table-meta-counter {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.adm-table-meta-counter strong {
+  color: #f8fafc;
+}
+
+.adm-action-toast {
+  margin-bottom: 1.25rem;
+  padding: 0.85rem 1.25rem;
+  background: rgba(249, 115, 22, 0.15);
+  border: 1px solid rgba(249, 115, 22, 0.4);
+  border-radius: var(--radius-md);
+  color: var(--color-ai-orange);
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+/* Admissions Table Card & Scroll */
+.admissions-table-card {
+  min-width: 0;
+  background: rgba(11, 17, 33, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(14px);
+}
+
+.admissions-table {
+  min-width: 1240px;
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .admissions-table th {
-  white-space: normal;
-  line-height: 1.35;
+  background: #0f172a;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
 }
 
 .admissions-table th:nth-child(1),
-.admissions-table td:nth-child(1) { width: 10%; }
+.admissions-table td:nth-child(1) { width: 14%; }
 .admissions-table th:nth-child(2),
-.admissions-table td:nth-child(2) { width: 10%; }
+.admissions-table td:nth-child(2) { width: 22%; }
 .admissions-table th:nth-child(3),
-.admissions-table td:nth-child(3) { width: 8%; }
+.admissions-table td:nth-child(3) { width: 15%; }
 .admissions-table th:nth-child(4),
-.admissions-table td:nth-child(4) { width: 13%; }
+.admissions-table td:nth-child(4) { width: 15%; }
 .admissions-table th:nth-child(5),
-.admissions-table td:nth-child(5) { width: 13%; }
+.admissions-table td:nth-child(5) { width: 10%; }
 .admissions-table th:nth-child(6),
-.admissions-table td:nth-child(6) { width: 10%; }
+.admissions-table td:nth-child(6) { width: 11%; }
 .admissions-table th:nth-child(7),
-.admissions-table td:nth-child(7) { width: 9%; }
-.admissions-table th:nth-child(8),
-.admissions-table td:nth-child(8) { width: 27%; }
+.admissions-table td:nth-child(7) { width: 25%; }
 
-.admissions-table .admin-row-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  justify-content: stretch;
-  align-items: start;
-  gap: 0.45rem;
-  max-width: 100%;
+.adm-table-row {
+  transition: all 0.18s ease;
 }
 
-.admissions-table .admin-row-actions > * {
-  width: 100%;
+.admissions-table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.admissions-table tbody tr:hover {
+  background: rgba(30, 41, 59, 0.45) !important;
+}
+
+.admissions-table td {
+  padding: 0.85rem 1.1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* 1. Reg & Student ID */
+.adm-id-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.adm-reg-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.8rem;
+  width: fit-content;
+}
+
+.adm-reg-icon {
+  font-size: 0.75rem;
+}
+
+.adm-uid-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: #7dd3fc;
+  font-weight: 700;
+}
+
+.adm-uid-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 6px #38bdf8;
+}
+
+.adm-uid-pending {
+  font-size: 0.68rem;
+  color: #64748b;
+  font-style: italic;
+}
+
+/* 2. Candidate Profile */
+.adm-candidate-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.adm-avatar-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 0.95rem;
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+}
+
+.adm-candidate-info {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
-  white-space: nowrap;
-  text-align: center;
 }
 
-.admin-shell.light-theme .admissions-tab-panel {
-  color: #172033;
-  font-style: normal;
+.adm-candidate-name {
+  font-weight: 800;
+  font-size: 0.92rem;
+  color: #f8fafc;
+  line-height: 1.25;
+}
+
+.adm-candidate-sub {
+  font-size: 0.73rem;
+  color: #94a3b8;
+  margin-top: 3px;
+  line-height: 1.3;
+}
+
+.adm-father-tag {
+  color: #cbd5e1;
+}
+
+.adm-meta-dot {
+  margin: 0 4px;
+  color: #64748b;
+}
+
+.adm-dob-tag {
+  color: #64748b;
+}
+
+/* 3. Contact Channels */
+.adm-contact-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.adm-contact-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.adm-contact-line.phone {
+  color: #e2e8f0;
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+.adm-contact-line.phone:hover {
+  color: #38bdf8;
+  text-decoration: underline;
+}
+
+.adm-contact-line.email {
+  color: #38bdf8;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 175px;
+}
+
+.adm-contact-line.email:hover {
+  color: #7dd3fc;
+  text-decoration: underline;
+}
+
+.adm-contact-line.muted {
+  color: #64748b;
+}
+
+/* 4. Course & Location */
+.adm-program-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.adm-course-chip {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #c7d2fe;
+  font-weight: 700;
+  font-size: 0.76rem;
+  line-height: 1.35;
+  width: fit-content;
+}
+
+.adm-location-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+/* 5. Date & Time */
+.adm-time-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.adm-date-badge {
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  color: #e2e8f0;
+  font-weight: 700;
+}
+
+.adm-time-tag {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: #64748b;
+}
+
+/* 6. Status & Portal */
+.adm-status-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.adm-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  width: fit-content;
+  border: 1px solid transparent;
+}
+
+.adm-status-badge.confirmed {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.adm-status-badge.verified {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.adm-status-badge.pending {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.status-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.adm-portal-status {
+  font-size: 0.69rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.adm-portal-status.active {
+  color: #10b981;
+}
+
+.adm-portal-status.inactive {
+  color: #f59e0b;
+}
+
+.portal-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.adm-fee-status-tag {
+  font-size: 0.69rem;
+  font-weight: 700;
+}
+
+.adm-fee-status-tag.paid {
+  color: #10b981;
+}
+
+.adm-fee-status-tag.unpaid {
+  color: #f59e0b;
+}
+
+/* 7. Executive 2-Tier Actions Dock */
+.adm-actions-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.adm-primary-actions-row {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.adm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 11px;
+  border-radius: 7px;
+  font-size: 0.775rem;
+  font-weight: 800;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.adm-btn-confirm {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border-color: #10b981;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.adm-btn-confirm:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45);
+}
+
+.adm-btn-credentials {
+  background: rgba(56, 189, 248, 0.14);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.45);
+}
+
+.adm-btn-credentials:hover {
+  background: #38bdf8;
+  color: #0f172a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.35);
+}
+
+.adm-btn-edit {
+  background: rgba(255, 255, 255, 0.06);
+  color: #e2e8f0;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.adm-btn-edit:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.adm-tools-toolbar {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.adm-tool-btn {
+  width: 29px;
+  height: 29px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.18s ease;
+}
+
+.adm-tool-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.adm-tool-btn .tool-tip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: #0f172a;
+  color: #f8fafc;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.16s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  z-index: 20;
+}
+
+.adm-tool-btn:hover .tool-tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.adm-tool-btn.tool-wa:hover { background: rgba(34, 197, 94, 0.2); border-color: #22c55e; }
+.adm-tool-btn.tool-email:hover { background: rgba(249, 115, 22, 0.2); border-color: #f97316; }
+.adm-tool-btn.tool-pdf:hover { background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; }
+.adm-tool-btn.tool-receipt:hover { background: rgba(52, 211, 153, 0.2); border-color: #34d399; }
+.adm-tool-btn.tool-controls:hover { background: rgba(192, 132, 252, 0.2); border-color: #c084fc; }
+.adm-tool-btn.tool-pass:hover { background: rgba(245, 158, 11, 0.2); border-color: #f59e0b; }
+.adm-tool-btn.tool-delete:hover { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #ef4444; }
+
+/* === Light Theme Overrides === */
+.admin-shell.light-theme .adm-kpi-card {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05) !important;
+}
+
+.admin-shell.light-theme .adm-kpi-num {
+  color: #0f172a !important;
+}
+
+.admin-shell.light-theme .adm-kpi-title {
+  color: #64748b !important;
+}
+
+.admin-shell.light-theme .adm-filter-btn {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.admin-shell.light-theme .adm-filter-btn.active {
+  background: #e0f2fe;
+  border-color: #38bdf8;
+  color: #0284c7;
 }
 
 .admin-shell.light-theme .admissions-table-card {
   background: #ffffff !important;
-  border-color: #d7e0ec !important;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07) !important;
-}
-
-.admin-shell.light-theme .admissions-table-hint {
-  color: #475569 !important;
-  background: #f1f5f9 !important;
-  border-bottom-color: #dbe3ee !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06) !important;
 }
 
 .admin-shell.light-theme .admissions-table th {
-  background: #f1f5f9 !important;
+  background: #f8fafc !important;
   color: #334155 !important;
-  border-bottom-color: #cbd5e1 !important;
+  border-bottom-color: #e2e8f0 !important;
 }
 
 .admin-shell.light-theme .admissions-table td {
   color: #1e293b !important;
-  border-bottom-color: #e2e8f0 !important;
-}
-
-.admin-shell.light-theme .admissions-table tbody tr:nth-child(even) {
-  background: #f8fafc;
+  border-bottom-color: #f1f5f9 !important;
 }
 
 .admin-shell.light-theme .admissions-table tbody tr:hover {
-  background: #eff6ff !important;
+  background: #f8fafc !important;
 }
 
-.admin-shell.light-theme .admissions-table td [style*="color: var(--text-dim)"] {
-  color: #475569 !important;
+.admin-shell.light-theme .adm-candidate-name {
+  color: #0f172a !important;
 }
 
-.admin-shell.light-theme .admissions-table td [style*="color: var(--color-ai-cyan)"] {
-  color: #0369a1 !important;
+.admin-shell.light-theme .adm-btn-edit {
+  background: #f8fafc;
+  color: #334155;
+  border-color: #cbd5e1;
 }
 
-.admin-shell.light-theme .admissions-table .admin-reg-pill {
-  color: #9a3412 !important;
-  background: #ffedd5 !important;
-}
-
-.admin-shell.light-theme .admissions-table .admin-status-chip.status-confirmed {
-  color: #166534 !important;
-  background: #dcfce7 !important;
-  border-color: #86efac !important;
-}
-
-.admin-shell.light-theme .admissions-table .admin-status-chip.status-verified {
-  color: #075985 !important;
-  background: #e0f2fe !important;
-  border-color: #7dd3fc !important;
-}
-
-.admin-shell.light-theme .admissions-table .admin-status-chip.status-pending {
-  color: #92400e !important;
-  background: #fef3c7 !important;
-  border-color: #fcd34d !important;
-}
-
-.admin-shell.light-theme .admissions-table .admin-icon-btn {
-  background: #ffffff !important;
-  border-color: #cbd5e1 !important;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
-}
-
-.admin-shell.light-theme .admissions-table .admin-icon-btn:hover {
-  background: #eff6ff !important;
-  border-color: #60a5fa !important;
-}
-
-.admin-shell.light-theme .admissions-table .btn-primary {
-  color: #ffffff !important;
+.admin-shell.light-theme .adm-tool-btn {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #334155;
 }
 
 @media (max-width: 960px) {
