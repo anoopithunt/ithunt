@@ -1270,8 +1270,14 @@ const setTab = (tab) => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-const applyForCourse = (courseName) => {
-  form.value.course = courseName;
+const applyForCourse = (courseOrData) => {
+  if (typeof courseOrData === 'object' && courseOrData !== null) {
+    if (courseOrData.candidateName) form.value.candidateName = courseOrData.candidateName;
+    if (courseOrData.mobile) form.value.mobile = courseOrData.mobile;
+    if (courseOrData.course) form.value.course = courseOrData.course;
+  } else if (typeof courseOrData === 'string') {
+    form.value.course = courseOrData;
+  }
   setTab('admission');
 };
 

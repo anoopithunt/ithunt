@@ -131,9 +131,11 @@ const CONTENT_DATA = {
   // Header Navigation Items
   navigation: [
     { id: "home", label: "Home", icon: "🏠" },
-    { id: "internships", label: "Internships", icon: "💼" },
     { id: "courses", label: "Courses", icon: "📚" },
-    { id: "events", label: "Events", icon: "🎪" }
+    { id: "internships", label: "NIELIT & Internships", icon: "🎓" },
+    { id: "admission", label: "Admission", icon: "📝" },
+    { id: "reviews", label: "Reviews", icon: "⭐" },
+    { id: "careers", label: "Careers", icon: "💼" }
   ],
 
   // Hero Section Copy

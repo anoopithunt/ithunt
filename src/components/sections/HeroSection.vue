@@ -10,80 +10,277 @@
     />
 
     <!-- =====================================================================
-         1. PAGE 1: HERO OVERVIEW & DELIVERY APPROACH
+         1. PAGE 1: EDUCATIONAL ACADEMY HERO & 3 HIGHLIGHT CARDS & LAPTOP FORM
          ===================================================================== -->
-    <section class="ithunt-home-section ithunt-hero ithunt-section-odd" id="page-hero">
+    <section class="ithunt-home-section ithunt-hero ithunt-edu-hero ithunt-section-odd" id="page-hero">
       <div class="ithunt-hero-glow ithunt-hero-glow-1"></div>
       <div class="ithunt-hero-glow ithunt-hero-glow-2"></div>
 
       <div class="container ithunt-hero-container">
-        <!-- Top Announcement Badge -->
-        <div class="ithunt-badge-wrapper anim-fade-in">
-          <div class="ithunt-pill-badge">
-            <span class="ithunt-badge-dot"></span>
-            <span class="ithunt-badge-text">SOFTWARE PARTNER FOR GROWING BUSINESSES</span>
-          </div>
-        </div>
-
-        <!-- Main Headline (IT Hunt Dual-Tone Style) -->
-        <h1 class="ithunt-hero-headline anim-fade-in-up">
-          Software built to move<br />
-          <span class="ithunt-gradient-text">your business forward.</span>
-        </h1>
-
-        <p class="ithunt-hero-subtitle anim-fade-in-up-delay">
-          We help startups, growing businesses, and organizations turn ideas into reliable web and mobile apps, custom software, and AI-powered tools. Our senior-led team combines deep technical knowledge with practical delivery to streamline operations, improve customer experiences, and help your business scale.
-        </p>
-
-        <div class="ithunt-hero-cta-group anim-fade-in-up-delay">
-          <button class="ithunt-btn-primary ithunt-hero-main-cta" @click="$emit('set-tab', 'start-project')">
-            <span>Book a Free Consultation</span>
+        <!-- Interactive Carousel Container (Image 2) -->
+        <div class="hero-carousel-wrapper">
+          <!-- Left/Right Slide Controls -->
+          <button class="carousel-control-btn btn-prev" @click="prevHeroSlide" aria-label="Previous slide" title="Previous Slide">
+            <span>‹</span>
           </button>
-          <button class="ithunt-btn-secondary ithunt-hero-main-cta" @click="scrollToSection('page-projects')">
-            <span>View Our Work</span>
+          <button class="carousel-control-btn btn-next" @click="nextHeroSlide" aria-label="Next slide" title="Next Slide">
+            <span>›</span>
           </button>
-        </div>
 
-        <div class="ithunt-guarantee-row anim-fade-in-up-delay">
-          <div class="guarantee-item">
-            <span class="guarantee-icon">✓</span>
-            <span>For startups, growing businesses &amp; organizations</span>
-          </div>
-          <span class="guarantee-sep">·</span>
-          <div class="guarantee-item">
-            <span class="guarantee-icon">✓</span>
-            <span>Web, mobile, custom software &amp; AI solutions</span>
-          </div>
-          <span class="guarantee-sep">·</span>
-          <div class="guarantee-item">
-            <span class="guarantee-icon">✓</span>
-            <span>Deep expertise with senior-led delivery</span>
-          </div>
-          <span class="guarantee-sep">·</span>
-          <div class="guarantee-item">
-            <span class="guarantee-icon">✓</span>
-            <span>Streamlined operations, better experiences &amp; scalable growth</span>
-          </div>
-        </div>
-
-        <div class="ithunt-stats-band-hero">
-          <div class="stats-card-grid">
-            <div class="stat-pill-card" v-for="step in deliveryApproach" :key="step.number">
-              <div class="stat-number-box">
-                <span class="stat-num text-brand">{{ step.number }}</span>
+          <div class="hero-carousel-grid">
+            <!-- Left Hero Content Column -->
+            <div class="hero-text-column">
+              <!-- Top Category Badge -->
+              <div class="hero-badge-pill anim-fade-in">
+                <span class="badge-dot"></span>
+                <span>{{ currentHeroSlide.badge }}</span>
               </div>
-              <div class="stat-desc-box">
-                <div class="stat-label-title">{{ step.title }}</div>
-                <div class="stat-micro-note">{{ step.description }}</div>
+
+              <!-- Main Hero Headline -->
+              <h1 class="hero-main-title anim-fade-in-up">
+                {{ currentHeroSlide.titlePrefix }}<br />
+                <span class="hero-highlight-text">{{ currentHeroSlide.titleHighlight }}</span>
+              </h1>
+
+              <!-- Subtitle / Location -->
+              <p class="hero-subheading anim-fade-in-up-delay">
+                {{ currentHeroSlide.subtitle }}
+              </p>
+
+              <!-- Benefit Checklist Pills -->
+              <div class="hero-pills-row anim-fade-in-up-delay">
+                <div class="hero-pill-item" v-for="(pill, idx) in currentHeroSlide.pills" :key="idx">
+                  <span class="check-icon">✓</span>
+                  <span>{{ pill }}</span>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="hero-actions-row anim-fade-in-up-delay">
+                <button class="btn-hero-primary" @click="currentHeroSlide.ctaPrimaryAction">
+                  <span>{{ currentHeroSlide.ctaPrimary }}</span>
+                </button>
+                <button class="btn-hero-secondary" @click="currentHeroSlide.ctaSecondaryAction">
+                  <span>{{ currentHeroSlide.ctaSecondary }}</span>
+                </button>
+              </div>
+
+              <!-- Carousel Indicators -->
+              <div class="hero-dots-row">
+                <button 
+                  v-for="(slide, idx) in heroSlides" 
+                  :key="idx" 
+                  class="hero-dot" 
+                  :class="{ active: heroSlideIdx === idx }"
+                  @click="heroSlideIdx = idx"
+                  :aria-label="'Go to slide ' + (idx + 1)"
+                ></button>
               </div>
             </div>
+
+            <!-- Right Hero Image Column with Angular Geometric Panels (Image 2) -->
+            <div class="hero-visual-column">
+              <div class="hero-image-stage">
+                <!-- Geometric Angular Panels matching Image 2 -->
+                <div class="geo-panel geo-panel-orange"></div>
+                <div class="geo-panel geo-panel-teal"></div>
+
+                <!-- Students Main Photo -->
+                <img 
+                  src="/img/hero-students.jpg" 
+                  alt="IT HUNT Students with Laptop and Books" 
+                  class="hero-students-photo"
+                  loading="eager"
+                  fetchpriority="high"
+                />
+
+                <!-- Floating Stat Badges (Image 2) -->
+                <div class="floating-badge badge-rating">
+                  <span class="badge-icon">⭐</span>
+                  <div>
+                    <div class="badge-bold">4.9 / 5 Rating</div>
+                    <div class="badge-sub">1,200+ Alumni Placed</div>
+                  </div>
+                </div>
+
+                <div class="floating-badge badge-placement">
+                  <span class="badge-icon">🎯</span>
+                  <div>
+                    <div class="badge-bold">100% Placement</div>
+                    <div class="badge-sub">Prayagraj Campus</div>
+                  </div>
+                </div>
+
+                <div class="floating-badge badge-certified">
+                  <span class="badge-icon">🏅</span>
+                  <div>
+                    <div class="badge-bold">NIELIT Accredited</div>
+                    <div class="badge-sub">ISO 9001:2015 Certified</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =================================================================
+             THREE CATEGORY HIGHLIGHT CARDS (Image 2)
+             ================================================================= -->
+        <div class="highlight-cards-band">
+          <div class="highlight-cards-grid">
+            <div 
+              v-for="card in highlightCards" 
+              :key="card.id"
+              class="highlight-card"
+              :class="'card-theme-' + card.theme"
+            >
+              <div class="card-icon-circle">
+                <span>{{ card.icon }}</span>
+              </div>
+              <div class="card-body">
+                <div class="card-badge-chip">{{ card.badge }}</div>
+                <h3 class="card-title">{{ card.title }}</h3>
+                <p class="card-desc">{{ card.desc }}</p>
+                <button class="card-cta-btn" @click="card.action">
+                  <span>{{ card.actionText }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =================================================================
+             INTERACTIVE 3D LAPTOP APPLICATION FORM (Image 1)
+             ================================================================= -->
+        <div class="laptop-section-wrapper" id="home-application-form">
+          <div class="laptop-section-header text-center">
+            <div class="ithunt-pill-badge small">
+              <span class="ithunt-badge-dot"></span>
+              <span>DIRECT ADMISSION 2026</span>
+            </div>
+            <h2 class="laptop-section-title">
+              IT HUNT Fast-Track <span class="ithunt-gradient-text">Application Form</span>
+            </h2>
+            <p class="laptop-section-sub">
+              Secure your seat for 2026 batches at Prayagraj Campus. Apply directly below in under 30 seconds.
+            </p>
+          </div>
+
+          <!-- 3D Laptop Mockup Body (Image 1) -->
+          <div class="laptop-mockup-frame">
+            <!-- Laptop Top Lid / Screen -->
+            <div class="laptop-screen">
+              <div class="laptop-webcam">
+                <span class="webcam-lens"></span>
+                <span class="webcam-mic"></span>
+              </div>
+
+              <!-- Inside Screen: Application Form -->
+              <div class="laptop-screen-content">
+                <!-- Left Orange Accent Stripe -->
+                <div class="laptop-left-accent"></div>
+
+                <div class="laptop-form-inner">
+                  <!-- Form Header -->
+                  <div class="laptop-brand-header">
+                    <div class="laptop-logo-wrap">
+                      <span class="laptop-logo-it">IT</span>
+                      <span class="laptop-logo-hunt">HUNT</span>
+                    </div>
+                    <h3 class="laptop-form-heading">Application Form</h3>
+                  </div>
+
+                  <!-- Form Inputs (2 Columns) -->
+                  <form @submit.prevent="submitLaptopForm" class="laptop-form-grid">
+                    <div class="laptop-col">
+                      <div class="laptop-form-group">
+                        <label class="laptop-label">Name</label>
+                        <input 
+                          type="text" 
+                          v-model="laptopForm.candidateName" 
+                          class="laptop-input-field" 
+                          placeholder="Candidate full name" 
+                          required
+                        />
+                      </div>
+
+                      <div class="laptop-form-group">
+                        <label class="laptop-label">Password / Qualification</label>
+                        <input 
+                          type="text" 
+                          v-model="laptopForm.qualification" 
+                          class="laptop-input-field" 
+                          placeholder="10th / 12th / Grad / B.Tech"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="laptop-col">
+                      <div class="laptop-form-group">
+                        <label class="laptop-label">Username / Mobile</label>
+                        <input 
+                          type="tel" 
+                          v-model="laptopForm.mobile" 
+                          class="laptop-input-field" 
+                          placeholder="10-digit mobile number" 
+                          required
+                        />
+                      </div>
+
+                      <div class="laptop-form-group">
+                        <label class="laptop-label">Course</label>
+                        <div class="laptop-select-wrapper">
+                          <select v-model="laptopForm.course" class="laptop-select-field">
+                            <option value="NIELIT 'O' Level Diploma">NIELIT 'O' Level Diploma</option>
+                            <option value="NIELIT 'A' Level Advanced">NIELIT 'A' Level Advanced</option>
+                            <option value="Full-Stack MERN Development">Full-Stack MERN Development</option>
+                            <option value="Python AI & Data Science">Python AI & Data Science</option>
+                            <option value="ADCA (Advance Diploma in Computer Apps)">ADCA Diploma</option>
+                            <option value="CCC (Course on Computer Concepts)">CCC Certification</option>
+                            <option value="Tally Prime + GST Accounting">Tally Prime + GST Accounting</option>
+                            <option value="Web Designing & Frontend">Web Designing & Frontend</option>
+                          </select>
+                          <span class="select-chevron">▼</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Submit Button Row -->
+                    <div class="laptop-submit-row">
+                      <button type="submit" class="laptop-apply-btn" title="Submit Admission Application">
+                        <span>Apply Now</span>
+                        <svg class="cursor-pointer-icon" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                          <path d="M7 2l12 11.2-5.8.5 3.3 7.3-2.2 1-3.2-7.4L7 18V2z"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </form>
+
+                  <!-- Bottom Accent Bar -->
+                  <div class="laptop-bottom-bar"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Laptop Base & Keyboard Contour -->
+            <div class="laptop-base">
+              <div class="laptop-base-notch"></div>
+            </div>
+            <!-- Laptop Shadow -->
+            <div class="laptop-drop-shadow"></div>
+          </div>
+
+          <!-- Bottom Hindi Trust Watermark (Image 1) -->
+          <div class="laptop-hindi-watermark text-center">
+            <h2 class="hindi-trust-heading">IT करियर का सबसे भरोसेमंद संस्थान</h2>
+            <p class="hindi-trust-sub">Prayagraj Campus • NIELIT Accredited • ISO 9001:2015 Certified • 100% Practical Training</p>
           </div>
         </div>
       </div>
 
       <!-- Jump Down Pill to Next Page -->
       <button class="section-scroll-pill" @click="scrollToSection('page-showcase')" aria-label="Inspect Production Code Showcase">
-        <span>Inspect Production Code Showcase</span>
+        <span>Explore Programs & Architecture Showcase</span>
         <span class="scroll-arrow-anim">↓</span>
       </button>
     </section>
@@ -901,6 +1098,119 @@ const toggleSnapMode = () => {
     document.documentElement.classList.remove('ithunt-home-snapping');
     document.body.classList.remove('ithunt-home-snapping');
   }
+};
+
+// Educational Hero Carousel Configuration (Image 2)
+const heroSlideIdx = ref(0);
+const heroSlides = [
+  {
+    badge: "🎓 NIELIT ACCREDITED & ISO 9001:2015 CERTIFIED",
+    titlePrefix: "NIELIT Diploma Courses:",
+    titleHighlight: "'O' Level, 'A' Level, 'B' Level",
+    subtitle: "Admission Open for 2026 at Prayagraj Campus",
+    pills: ["Classroom Batches", "100% Placement Support", "Practical Labs"],
+    ctaPrimary: "Admission Open ➜",
+    ctaPrimaryAction: () => emit('set-tab', 'admission'),
+    ctaSecondary: "Explore Courses 📚",
+    ctaSecondaryAction: () => emit('set-tab', 'courses')
+  },
+  {
+    badge: "🚀 INDUSTRY SOFTWARE PRODUCTION TRACKS",
+    titlePrefix: "Software Engineering & AI:",
+    titleHighlight: "Full-Stack MERN, Python AI & Cloud",
+    subtitle: "Live Client Deployments & Guaranteed 3-6 Months Internships",
+    pills: ["Live Codebase", "Senior Architect Mentors", "Verified Certificate"],
+    ctaPrimary: "Apply for Track ➜",
+    ctaPrimaryAction: () => emit('set-tab', 'internships'),
+    ctaSecondary: "View Syllabus 📚",
+    ctaSecondaryAction: () => emit('set-tab', 'courses')
+  },
+  {
+    badge: "💻 HIGH-DEMAND COMPUTER DIPLOMAS",
+    titlePrefix: "Government Verified Diplomas:",
+    titleHighlight: "ADCA, DCA & Tally Prime + GST",
+    subtitle: "Complete Practical Computer Literacy & Office Management",
+    pills: ["Govt. Recognized", "Daily Lab Practicals", "Job Placement"],
+    ctaPrimary: "Enroll Today ➜",
+    ctaPrimaryAction: () => emit('set-tab', 'admission'),
+    ctaSecondary: "View Courses 📚",
+    ctaSecondaryAction: () => emit('set-tab', 'courses')
+  }
+];
+
+const currentHeroSlide = computed(() => heroSlides[heroSlideIdx.value]);
+
+const nextHeroSlide = () => {
+  heroSlideIdx.value = (heroSlideIdx.value + 1) % heroSlides.length;
+};
+
+const prevHeroSlide = () => {
+  heroSlideIdx.value = (heroSlideIdx.value - 1 + heroSlides.length) % heroSlides.length;
+};
+
+let heroTimer = null;
+onMounted(() => {
+  heroTimer = setInterval(() => {
+    nextHeroSlide();
+  }, 7000);
+});
+
+onUnmounted(() => {
+  if (heroTimer) clearInterval(heroTimer);
+});
+
+// Three Highlight Feature Cards (Image 2)
+const highlightCards = [
+  {
+    id: 'nielit',
+    icon: '🎓',
+    theme: 'cyan',
+    title: 'NIELIT Courses',
+    desc: "Government-recognized 'O' Level, 'A' Level, 'B' Level & CCC certification with official syllabus & lab practicals.",
+    badge: 'Govt. Accredited',
+    actionText: 'Learn More ➜',
+    action: () => emit('set-tab', 'courses')
+  },
+  {
+    id: 'dev-tracks',
+    icon: '🚀',
+    theme: 'orange',
+    title: 'Development Tracks',
+    desc: 'Full-Stack MERN, Python AI, React, Flutter & Cloud DevOps with production client software and internships.',
+    badge: 'High Placement',
+    actionText: 'Learn More ➜',
+    action: () => emit('set-tab', 'internships')
+  },
+  {
+    id: 'courses-portfolio',
+    icon: '💻',
+    theme: 'teal',
+    title: 'Courses Portfolio',
+    desc: 'ADCA, DCA, Tally Prime + GST, Graphic Design & Web Designing diploma programs for fast career entry.',
+    badge: 'Job Ready',
+    actionText: 'Learn More ➜',
+    action: () => emit('set-tab', 'courses')
+  }
+];
+
+// Interactive 3D Laptop Application Form (Image 1)
+const laptopForm = ref({
+  candidateName: '',
+  mobile: '',
+  qualification: '',
+  course: "NIELIT 'O' Level Diploma"
+});
+
+const submitLaptopForm = () => {
+  if (!laptopForm.value.candidateName.trim() || !laptopForm.value.mobile.trim()) {
+    alert('Please enter your Name and Mobile Number.');
+    return;
+  }
+  emit('apply-course', {
+    candidateName: laptopForm.value.candidateName,
+    mobile: laptopForm.value.mobile,
+    course: laptopForm.value.course
+  });
 };
 
 // Interactive Showcase Card Data (Mac-style App & Terminal view)
@@ -4940,6 +5250,790 @@ onUnmounted(() => {
     grid-template-columns: 1fr;
     text-align: center;
     justify-items: center;
+  }
+}
+
+/* ==========================================================================
+   ACADEMY HERO CAROUSEL, HIGHLIGHT CARDS & 3D LAPTOP FORM (Images 1 & 2)
+   ========================================================================== */
+.ithunt-edu-hero {
+  padding-top: 1.5rem !important;
+  padding-bottom: 4rem !important;
+  justify-content: flex-start !important;
+}
+
+.hero-carousel-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: 28px;
+  padding: 3rem 2.5rem;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(14, 116, 144, 0.2) 60%, rgba(249, 115, 22, 0.1) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+  overflow: visible;
+}
+
+.carousel-control-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-size: 1.9rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.carousel-control-btn.btn-prev {
+  left: -20px;
+}
+
+.carousel-control-btn.btn-next {
+  right: -20px;
+}
+
+.carousel-control-btn:hover {
+  background: #f97316;
+  border-color: #fb923c;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 0 25px rgba(249, 115, 22, 0.6);
+}
+
+.hero-carousel-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 2.5rem;
+  align-items: center;
+  min-height: 430px;
+}
+
+/* Left Hero Text Column */
+.hero-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(249, 115, 22, 0.15);
+  border: 1px solid rgba(249, 115, 22, 0.4);
+  color: #fb923c;
+  padding: 0.35rem 0.95rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 10px rgba(249, 115, 22, 0.2);
+}
+
+.hero-badge-pill .badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #f97316;
+  box-shadow: 0 0 8px #f97316;
+}
+
+.hero-main-title {
+  font-size: clamp(2.2rem, 3.6vw, 3.4rem);
+  font-weight: 900;
+  line-height: 1.15;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.hero-highlight-text {
+  background: linear-gradient(135deg, #f97316 0%, #fb923c 45%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.hero-subheading {
+  font-size: 1.2rem;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  line-height: 1.45;
+}
+
+.hero-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-bottom: 1.85rem;
+}
+
+.hero-pill-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: #f1f5f9;
+  font-weight: 600;
+}
+
+.hero-pill-item .check-icon {
+  color: #22c55e;
+  font-weight: 900;
+}
+
+.hero-actions-row {
+  display: flex;
+  gap: 1.1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.75rem;
+}
+
+.btn-hero-primary {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  color: #ffffff;
+  border: 1px solid #fb923c;
+  border-radius: 999px;
+  padding: 0.9rem 2rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 24px rgba(249, 115, 22, 0.45);
+}
+
+.btn-hero-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(249, 115, 22, 0.65);
+}
+
+.btn-hero-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  padding: 0.9rem 1.85rem;
+  font-size: 1.02rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-hero-secondary:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.hero-dots-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.hero-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.25);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.3s ease;
+}
+
+.hero-dot.active {
+  width: 32px;
+  background: #f97316;
+}
+
+/* Right Hero Visual Stage with Geometric Angled Panels (Image 2) */
+.hero-visual-column {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-image-stage {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  height: 420px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.geo-panel {
+  position: absolute;
+  border-radius: 24px;
+}
+
+.geo-panel-orange {
+  top: 10px;
+  right: -10px;
+  width: 280px;
+  height: 380px;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  transform: skewX(-8deg) rotate(5deg);
+  z-index: 1;
+  opacity: 0.95;
+  box-shadow: 0 15px 40px rgba(249, 115, 22, 0.35);
+}
+
+.geo-panel-teal {
+  top: 30px;
+  left: 5px;
+  width: 260px;
+  height: 370px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #0f766e 100%);
+  transform: skewX(6deg) rotate(-4deg);
+  z-index: 1;
+  opacity: 0.85;
+  box-shadow: 0 15px 40px rgba(15, 118, 110, 0.35);
+}
+
+.hero-students-photo {
+  position: relative;
+  z-index: 2;
+  width: 94%;
+  height: 94%;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.45);
+}
+
+/* Floating Badges */
+.floating-badge {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  padding: 0.55rem 0.95rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+}
+
+.badge-rating {
+  top: 10px;
+  left: -20px;
+}
+
+.badge-placement {
+  bottom: 20px;
+  left: -20px;
+}
+
+.badge-certified {
+  top: 25px;
+  right: -25px;
+}
+
+.floating-badge .badge-icon {
+  font-size: 1.35rem;
+}
+
+.floating-badge .badge-bold {
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #ffffff;
+}
+
+.floating-badge .badge-sub {
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+/* ==========================================================================
+   THREE CATEGORY HIGHLIGHT CARDS (Image 2)
+   ========================================================================== */
+.highlight-cards-band {
+  margin-top: 3.5rem;
+  width: 100%;
+}
+
+.highlight-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.75rem;
+}
+
+.highlight-card {
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 22px;
+  padding: 2.2rem 1.8rem;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08), 0 5px 15px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  position: relative;
+  border: 1px solid rgba(226, 232, 240, 0.85);
+}
+
+.highlight-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.16);
+}
+
+.card-icon-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.85rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.card-theme-cyan .card-icon-circle {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.card-theme-orange .card-icon-circle {
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+.card-theme-teal .card-icon-circle {
+  background: #ccfbf1;
+  color: #0f766e;
+}
+
+.card-badge-chip {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.card-theme-cyan .card-badge-chip {
+  background: #f0f9ff;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.card-theme-orange .card-badge-chip {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
+.card-theme-teal .card-badge-chip {
+  background: #f0fdfa;
+  color: #0f766e;
+  border: 1px solid #99f6e4;
+}
+
+.card-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0.45rem;
+}
+
+.card-desc {
+  font-size: 0.95rem;
+  color: #64748b;
+  line-height: 1.55;
+  margin-bottom: 1.25rem;
+  flex-grow: 1;
+}
+
+.card-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 0;
+  transition: gap 0.2s ease;
+}
+
+.card-theme-cyan .card-cta-btn {
+  color: #0284c7;
+}
+
+.card-theme-orange .card-cta-btn {
+  color: #f97316;
+}
+
+.card-theme-teal .card-cta-btn {
+  color: #0f766e;
+}
+
+.card-cta-btn:hover {
+  gap: 0.65rem;
+}
+
+/* ==========================================================================
+   3D LAPTOP APPLICATION FORM (Image 1)
+   ========================================================================== */
+.laptop-section-wrapper {
+  margin-top: 5rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.laptop-section-title {
+  font-size: clamp(1.8rem, 3.2vw, 2.7rem);
+  font-weight: 900;
+  color: #ffffff;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.laptop-section-sub {
+  font-size: 1.05rem;
+  color: #94a3b8;
+  max-width: 620px;
+  margin-bottom: 2.5rem;
+}
+
+.laptop-mockup-frame {
+  position: relative;
+  width: 100%;
+  max-width: 840px;
+  perspective: 1200px;
+  margin: 0 auto;
+}
+
+.laptop-screen {
+  background: #0f172a;
+  border-radius: 18px 18px 0 0;
+  padding: 12px 14px 0 14px;
+  box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  border: 2px solid #334155;
+  border-bottom: none;
+  position: relative;
+}
+
+.laptop-webcam {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.webcam-lens {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #020617;
+  border: 1px solid #475569;
+}
+
+.webcam-mic {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #475569;
+}
+
+.laptop-screen-content {
+  background: #ffffff;
+  border-radius: 10px 10px 0 0;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+  min-height: 400px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.laptop-left-accent {
+  width: 10px;
+  background: linear-gradient(180deg, #f97316 0%, #ea580c 100%);
+  flex-shrink: 0;
+}
+
+.laptop-form-inner {
+  padding: 2.2rem 2.5rem 1.8rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.laptop-brand-header {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.laptop-logo-wrap {
+  font-size: 1.45rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.2rem;
+}
+
+.laptop-logo-it {
+  color: #f97316;
+  margin-right: 4px;
+}
+
+.laptop-logo-hunt {
+  color: #0f172a;
+}
+
+.laptop-form-heading {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.laptop-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem 2rem;
+  width: 100%;
+  align-items: start;
+}
+
+.laptop-label {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.45rem;
+  text-align: left;
+}
+
+.laptop-input-field {
+  width: 100%;
+  background: #e0f2fe;
+  border: 1.5px solid #bae6fd;
+  border-radius: 999px;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #0f172a;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.laptop-input-field:focus {
+  background: #ffffff;
+  border-color: #f97316;
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.15);
+}
+
+.laptop-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.laptop-select-field {
+  width: 100%;
+  appearance: none;
+  background: #0e7490;
+  color: #ffffff;
+  border: 1.5px solid #0891b2;
+  border-radius: 999px;
+  padding: 0.75rem 2.5rem 0.75rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.laptop-select-field:focus {
+  box-shadow: 0 0 0 4px rgba(14, 116, 144, 0.25);
+}
+
+.laptop-select-wrapper .select-chevron {
+  position: absolute;
+  right: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ffffff;
+  font-size: 0.75rem;
+  pointer-events: none;
+}
+
+.laptop-submit-row {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.laptop-apply-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  padding: 0.85rem 2.85rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.45);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.laptop-apply-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(249, 115, 22, 0.6);
+}
+
+.cursor-pointer-icon {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+
+.laptop-bottom-bar {
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(90deg, #f97316, #0e7490);
+  margin-top: 1rem;
+  border-radius: 999px;
+}
+
+.laptop-base {
+  width: 106%;
+  margin-left: -3%;
+  height: 20px;
+  background: linear-gradient(180deg, #cbd5e1 0%, #94a3b8 40%, #64748b 100%);
+  border-radius: 0 0 18px 18px;
+  position: relative;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+}
+
+.laptop-base-notch {
+  width: 140px;
+  height: 7px;
+  background: #475569;
+  border-radius: 0 0 8px 8px;
+}
+
+.laptop-drop-shadow {
+  width: 90%;
+  height: 25px;
+  margin: 0 auto;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 70%);
+  filter: blur(6px);
+  margin-top: 4px;
+}
+
+/* Bottom Hindi Trust Watermark (Image 1) */
+.laptop-hindi-watermark {
+  margin-top: 2.75rem;
+}
+
+.hindi-trust-heading {
+  font-size: clamp(2.2rem, 4.4vw, 3.6rem);
+  font-weight: 900;
+  color: #0284c7;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 12px rgba(2, 132, 199, 0.3);
+}
+
+.hindi-trust-sub {
+  font-size: 1.05rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* Responsive Overrides */
+@media (max-width: 992px) {
+  .hero-carousel-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 2rem;
+  }
+
+  .hero-pills-row,
+  .hero-actions-row,
+  .hero-dots-row {
+    justify-content: center;
+  }
+
+  .highlight-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .carousel-control-btn.btn-prev {
+    left: 5px;
+  }
+
+  .carousel-control-btn.btn-next {
+    right: 5px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-carousel-wrapper {
+    padding: 2rem 1.25rem;
+  }
+
+  .hero-image-stage {
+    max-width: 320px;
+    height: 300px;
+  }
+
+  .geo-panel-orange,
+  .geo-panel-teal {
+    width: 200px;
+    height: 260px;
+  }
+
+  .laptop-form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .laptop-form-inner {
+    padding: 1.5rem 1rem;
+  }
+
+  .badge-rating,
+  .badge-placement,
+  .badge-certified {
+    transform: scale(0.85);
   }
 }
 </style>

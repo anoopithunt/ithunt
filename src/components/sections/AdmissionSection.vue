@@ -362,6 +362,12 @@
           </div>
         </div>
       </div>
+
+      <!-- Bottom Hindi Trust Watermark (Image 1) -->
+      <div class="admission-hindi-watermark text-center">
+        <h2 class="hindi-trust-heading">IT करियर का सबसे भरोसेमंद संस्थान</h2>
+        <p class="hindi-trust-sub">Prayagraj Campus • NIELIT Accredited • ISO 9001:2015 Certified • 100% Practical Training</p>
+      </div>
     </div>
   </section>
 </template>
@@ -596,15 +602,14 @@ const onImgError = (event) => {
   align-items: start;
 }
 
-/* Form Card */
+/* Form Card (Styled like Image 1 with Orange Accent Bar & Soft Blue Inputs) */
 .form-card {
-  background: var(--bg-card-cyber, rgba(13, 21, 39, 0.85));
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-left: 8px solid #f97316;
+  border-radius: 24px;
+  padding: 2.2rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
 }
 
 .form-card-header {
@@ -612,9 +617,9 @@ const onImgError = (event) => {
 }
 
 .form-title {
-  font-size: 1.35rem;
+  font-size: 1.45rem;
   font-weight: 800;
-  color: var(--text-main, #ffffff);
+  color: #0f172a;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -622,10 +627,10 @@ const onImgError = (event) => {
 }
 
 .form-subtitle {
-  color: var(--text-muted, #94a3b8);
-  font-size: 0.88rem;
+  color: #64748b;
+  font-size: 0.92rem;
   margin: 0;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 /* Form Grid */
@@ -647,8 +652,8 @@ const onImgError = (event) => {
 
 .form-label {
   font-weight: 700;
-  font-size: 0.85rem;
-  color: var(--text-main, #e2e8f0);
+  font-size: 0.88rem;
+  color: #334155;
   display: flex;
   align-items: center;
   gap: 0.35rem;
@@ -672,24 +677,24 @@ const onImgError = (event) => {
 .form-control {
   width: 100%;
   box-sizing: border-box;
-  background: rgba(15, 23, 42, 0.75);
-  border: 1.5px solid rgba(255, 255, 255, 0.14);
-  color: var(--text-main, #ffffff);
-  padding: 0.8rem 1rem;
-  border-radius: 12px;
-  font-size: 0.92rem;
+  background: #e0f2fe;
+  border: 1.5px solid #bae6fd;
+  color: #0f172a;
+  padding: 0.8rem 1.15rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
   font-family: inherit;
   transition: all 0.25s ease;
   outline: none;
 }
 
 .form-control::placeholder {
-  color: rgba(148, 163, 184, 0.6);
+  color: #64748b;
 }
 
 .form-control:focus {
   border-color: var(--color-ai-orange, #f97316);
-  background: rgba(15, 23, 42, 0.95);
+  background: #ffffff;
   box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
 }
 
@@ -698,12 +703,12 @@ const onImgError = (event) => {
 .form-control:-webkit-autofill:hover, 
 .form-control:-webkit-autofill:focus,
 .form-control:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 1000px #0f172a inset !important;
-  -webkit-text-fill-color: #ffffff !important;
+  -webkit-box-shadow: 0 0 0 1000px #e0f2fe inset !important;
+  -webkit-text-fill-color: #0f172a !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 
-/* Custom Select Control */
+/* Custom Select Control (Dark Teal matching Image 1) */
 .select-wrap {
   position: relative;
 }
@@ -714,16 +719,41 @@ const onImgError = (event) => {
   -moz-appearance: none;
   padding-right: 2.5rem;
   cursor: pointer;
+  background: #0e7490 !important;
+  color: #ffffff !important;
+  border: 1.5px solid #0891b2 !important;
+  border-radius: 999px !important;
+  font-weight: 600;
 }
 
 .select-chevron {
   position: absolute;
-  right: 1rem;
+  right: 1.15rem;
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
   font-size: 0.75rem;
-  color: var(--color-ai-orange, #f97316);
+  color: #ffffff;
+}
+
+/* Bottom Hindi Trust Watermark */
+.admission-hindi-watermark {
+  margin-top: 3.5rem;
+}
+
+.admission-hindi-watermark .hindi-trust-heading {
+  font-size: clamp(2.2rem, 4.4vw, 3.6rem);
+  font-weight: 900;
+  color: #0284c7;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 12px rgba(2, 132, 199, 0.3);
+}
+
+.admission-hindi-watermark .hindi-trust-sub {
+  font-size: 1.05rem;
+  color: #94a3b8;
+  font-weight: 600;
 }
 
 /* Radio Option Pills */

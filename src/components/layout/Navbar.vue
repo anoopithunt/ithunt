@@ -1,5 +1,25 @@
 <template>
   <header class="navbar-header" :class="{ scrolled: isScrolled }">
+    <!-- Top Announcement Strip (Image 2) -->
+    <div class="top-announcement-bar" v-if="!isScrolled">
+      <div class="container top-announcement-container">
+        <div class="top-announcement-left">
+          <span class="announcement-pill">ADMISSION 2026</span>
+          <span class="announcement-text">Admission Open for 2026 Batch at Prayagraj Campus</span>
+        </div>
+        <div class="top-announcement-right">
+          <a href="tel:+919795771806" class="announcement-link" title="Call IT HUNT Admission Office">
+            <span class="announcement-icon">📞</span>
+            <span>Call: +91 9795771806</span>
+          </a>
+          <span class="announcement-sep">|</span>
+          <button class="announcement-btn" type="button" @click="$emit('set-tab', 'admission')" title="Apply for 2026 Batches">
+            <span>Apply Online ➜</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="container navbar-container">
       <!-- Brand Logo -->
       <button class="brand-logo brand-logo-button" type="button" @click="$emit('set-tab', 'home')" aria-label="Go to IT HUNT home page">
@@ -61,11 +81,11 @@
         </button>
 
         <button 
-          class="cta-btn-header nav-action-desktop" 
-          @click="$emit('set-tab', 'start-project')"
-          title="Plan a software project"
+          class="cta-btn-header nav-action-desktop nav-btn-admission" 
+          @click="$emit('set-tab', 'admission')"
+          title="Apply for Admission 2026"
         >
-          <span>Plan a project ➜</span>
+          <span>Admission Open ➜</span>
         </button>
 
         <!-- Mobile Drawer Toggle -->
@@ -135,28 +155,18 @@
       <div class="sidebar-nav-body">
         <ul class="sidebar-nav-list">
           <li>
-            <button class="sidebar-nav-item" :class="{ active: activeTab === 'start-project' }" @click="$emit('set-tab', 'start-project'); closeMobileNav();">
-              <span class="sidebar-item-icon">🚀</span><span class="sidebar-item-label">Plan a project</span>
-            </button>
-          </li>
-          <li>
-            <a class="sidebar-nav-item insights-mobile-nav-link" :class="{ active: activeTab === 'insights' || activeTab.startsWith('insight:') }" href="/insights">
-              <span class="sidebar-item-icon">✍️</span><span class="sidebar-item-label">Insights</span>
-            </a>
-          </li>
-          <li>
-            <button class="sidebar-nav-item" :class="{ active: activeTab === 'home' }" @click="$emit('set-tab', 'home'); closeMobileNav();">
-              <span class="sidebar-item-icon">🏠</span><span class="sidebar-item-label">Home</span>
+            <button class="sidebar-nav-item admission-mobile-highlight" :class="{ active: activeTab === 'admission' }" @click="$emit('set-tab', 'admission'); closeMobileNav();">
+              <span class="sidebar-item-icon">📝</span><span class="sidebar-item-label">Admission 2026 (Open)</span>
             </button>
           </li>
           <li>
             <button class="sidebar-nav-item" :class="{ active: activeTab === 'courses' }" @click="$emit('set-tab', 'courses'); closeMobileNav();">
-              <span class="sidebar-item-icon">📚</span><span class="sidebar-item-label">Courses</span>
+              <span class="sidebar-item-icon">📚</span><span class="sidebar-item-label">Courses & NIELIT</span>
             </button>
           </li>
           <li>
             <button class="sidebar-nav-item" :class="{ active: activeTab === 'internships' }" @click="$emit('set-tab', 'internships'); closeMobileNav();">
-              <span class="sidebar-item-icon">🚀</span><span class="sidebar-item-label">Internships</span>
+              <span class="sidebar-item-icon">🚀</span><span class="sidebar-item-label">Development Tracks</span>
             </button>
           </li>
           <li>
@@ -518,5 +528,121 @@ const onImgError = (event) => {
 .insights-nav-link,
 .insights-mobile-nav-link {
   text-decoration: none;
+}
+
+/* Top Announcement Strip (Image 2) */
+.top-announcement-bar {
+  background: linear-gradient(90deg, #0f766e 0%, #0369a1 50%, #0f766e 100%);
+  color: #ffffff;
+  font-size: 0.82rem;
+  padding: 0.45rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  position: relative;
+  z-index: 1001;
+}
+
+.top-announcement-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.top-announcement-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.announcement-pill {
+  background: #f97316;
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 6px rgba(249, 115, 22, 0.35);
+}
+
+.announcement-text {
+  color: #f0fdfa;
+}
+
+.top-announcement-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+}
+
+.announcement-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: opacity 0.2s ease;
+}
+
+.announcement-link:hover {
+  opacity: 0.85;
+}
+
+.announcement-sep {
+  opacity: 0.4;
+}
+
+.announcement-btn {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  padding: 0.22rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.announcement-btn:hover {
+  background: #ffffff;
+  color: #0f766e;
+}
+
+/* Admission Button in Navbar (Image 2) */
+.nav-btn-admission {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid #fb923c !important;
+  border-radius: 999px !important;
+  padding: 0.55rem 1.25rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.38) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.nav-btn-admission:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.55) !important;
+}
+
+.admission-mobile-highlight {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.18), rgba(234, 88, 12, 0.12)) !important;
+  border: 1px solid rgba(249, 115, 22, 0.35) !important;
+  color: #f97316 !important;
+  font-weight: 700 !important;
+}
+
+@media (max-width: 768px) {
+  .top-announcement-bar {
+    display: none;
+  }
 }
 </style>
