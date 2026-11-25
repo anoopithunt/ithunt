@@ -4671,6 +4671,7 @@ onUnmounted(() => {
 .hero-highlight-text {
   background: linear-gradient(135deg, #f97316 0%, #fb923c 45%, #38bdf8 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
 }
