@@ -981,7 +981,7 @@
                 </td>
 
                 <!-- Actions -->
-                <td class="action-cell" style="text-align: right; position: relative;">
+                <td class="action-cell" style="text-align: right;">
                   <div class="row-action-cluster">
                     <!-- Quick Action -->
                     <button 
@@ -1005,151 +1005,21 @@
                       <span>Profile</span>
                     </button>
 
-                    <!-- Dropdown Trigger & Popover -->
-                    <div class="action-dropdown-wrap">
-                      <button 
-                        type="button"
-                        class="dropdown-trigger-btn"
-                        :class="{ 'active': activeStudentDropdown === (stu.id || stu.enrollmentNumber || stu.userId) }"
-                        @click.stop="toggleStudentDropdown(stu, $event)"
-                        title="More Actions"
-                        aria-haspopup="true"
-                        :aria-expanded="activeStudentDropdown === (stu.id || stu.enrollmentNumber || stu.userId)"
-                      >
-                        <span>Actions</span>
-                        <svg class="dropdown-caret-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                          <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                      </button>
-
-                      <transition name="dropdown-pop">
-                        <div 
-                          v-if="activeStudentDropdown === (stu.id || stu.enrollmentNumber || stu.userId)"
-                          class="action-popover-menu"
-                          :class="{ 'is-dropup': idx >= Math.max(1, filteredStudents.length - 2) }"
-                          @click.stop
-                        >
-                          <div class="popover-badge-row">
-                            <span class="popover-id-tag">{{ stu.enrollmentNumber || stu.userId || stu.id }}</span>
-                            <span class="popover-status-tag status-confirmed-tag">● Enrolled</span>
-                          </div>
-
-                          <!-- Profile & Academic -->
-                          <div class="popover-group">
-                            <div class="popover-group-label">Profile & Academic</div>
-                            <button 
-                              type="button" 
-                              class="popover-menu-item" 
-                              @click="closeAllActionDropdowns(); selectedStudentDetail = stu; showStudentDetailModal = true;"
-                            >
-                              <span class="menu-item-icon">👁️</span>
-                              <div class="menu-item-text">
-                                <div class="menu-item-title">Full Profile</div>
-                                <div class="menu-item-desc">Admission & academic summary</div>
-                              </div>
-                            </button>
-                            <button 
-                              type="button" 
-                              class="popover-menu-item highlight-cyan" 
-                              @click="closeAllActionDropdowns(); openEditStudentModal(stu)"
-                            >
-                              <span class="menu-item-icon">✏️</span>
-                              <div class="menu-item-text">
-                                <div class="menu-item-title">Edit Record</div>
-                                <div class="menu-item-desc">Personal & course particulars</div>
-                              </div>
-                            </button>
-                            <button 
-                              type="button" 
-                              class="popover-menu-item highlight-yellow" 
-                              @click="closeAllActionDropdowns(); openIssueCourseCertModalForStudent(stu)"
-                            >
-                              <span class="menu-item-icon">🏅</span>
-                              <div class="menu-item-text">
-                                <div class="menu-item-title">Issue Certificate</div>
-                                <div class="menu-item-desc">Official completion credential</div>
-                              </div>
-                            </button>
-                            <button 
-                              type="button" 
-                              class="popover-menu-item highlight-purple" 
-                              @click="closeAllActionDropdowns(); openDashboardControlModal(stu)"
-                            >
-                              <span class="menu-item-icon">🎛️</span>
-                              <div class="menu-item-text">
-                                <div class="menu-item-title">Dashboard Controls</div>
-                                <div class="menu-item-desc">Manage features & portal modules</div>
-                              </div>
-                            </button>
-                            <button 
-                              type="button" 
-                              class="popover-menu-item highlight-cyan" 
-                              @click="closeAllActionDropdowns(); goToStudentExams(stu)"
-                            >
-                              <span class="menu-item-icon">📝</span>
-                              <div class="menu-item-text">
-                                <div class="menu-item-title">Student Exams</div>
-                                <div class="menu-item-desc">View test submissions & answers</div>
-                              </div>
-                            </button>
-                          </div>
-
-                          <!-- Credentials & Access -->
-                          <div class="popover-group" v-if="stu.admissionConfirmed || stu.status === 'Confirmed'">
-                            <div class="popover-group-label">Credentials & Access</div>
-                            <button 
-                              type="button" 
-                              class="popover-menu-item highlight-cyan" 
-                              @click="closeAllActionDropdowns(); openCredentialsModal(stu)"
-                            >
-                              <span class="menu-item-icon">🔐</span>
-                              <div class="menu-item-text">
-                                <div class="menu-item-title">View Credentials</div>
-                                <div class="menu-item-desc">Display User ID & password card</div>
-                              </div>
-                            </button>
-                            <button 
-                              v-if="stu.phone || stu.mobile"
-                              type="button" 
-                              class="popover-menu-item highlight-green" 
-                              @click="closeAllActionDropdowns(); shareCredentialsOnWhatsApp(stu)"
-                            >
-                              <span class="menu-item-icon">📲</span>
-                              <div class="menu-item-text">
-                                <div class="menu-item-title">Send WhatsApp</div>
-                                <div class="menu-item-desc">Direct login pass to student mobile</div>
-                              </div>
-                            </button>
-                            <button 
-                              type="button" 
-                              class="popover-menu-item highlight-amber" 
-                              @click="closeAllActionDropdowns(); openResetPasswordModal(stu)"
-                            >
-                              <span class="menu-item-icon">🔑</span>
-                              <div class="menu-item-text">
-                                <div class="menu-item-title">Reset Password</div>
-                                <div class="menu-item-desc">Issue new student portal secret</div>
-                              </div>
-                            </button>
-                          </div>
-
-                          <!-- Danger Zone -->
-                          <div class="popover-group popover-group-danger">
-                            <button 
-                              type="button" 
-                              class="popover-menu-item item-danger" 
-                              @click="closeAllActionDropdowns(); $emit('delete-student', stu)"
-                            >
-                              <span class="menu-item-icon">🗑️</span>
-                              <div class="menu-item-text">
-                                <div class="menu-item-title">Delete Student</div>
-                                <div class="menu-item-desc">Remove from active directory</div>
-                              </div>
-                            </button>
-                          </div>
-                        </div>
-                      </transition>
-                    </div>
+                    <!-- Dropdown Trigger Button -->
+                    <button 
+                      type="button"
+                      class="dropdown-trigger-btn"
+                      :class="{ 'active': activeStudentDropdown === (stu.id || stu.enrollmentNumber || stu.userId) }"
+                      @click.stop="toggleStudentDropdown(stu, $event)"
+                      title="More Actions"
+                      aria-haspopup="true"
+                      :aria-expanded="activeStudentDropdown === (stu.id || stu.enrollmentNumber || stu.userId)"
+                    >
+                      <span>Actions</span>
+                      <svg class="dropdown-caret-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -1543,7 +1413,7 @@
                     💳 {{ adm.feeStatus || 'Fee Pending' }}
                   </div>
                 </td>
-                <td class="action-cell" style="text-align: right; position: relative;">
+                <td class="action-cell" style="text-align: right;">
                   <div class="row-action-cluster">
                     <!-- Primary Quick Action -->
                     <button 
@@ -1567,174 +1437,21 @@
                       <span>Edit</span>
                     </button>
 
-                    <!-- Dropdown Trigger & Popover -->
-                    <div class="action-dropdown-wrap">
-                      <button 
-                        type="button"
-                        class="dropdown-trigger-btn"
-                        :class="{ 'active': activeAdmissionDropdown === (adm.registrationNo || adm.id) }"
-                        @click.stop="toggleAdmissionDropdown(adm, $event)"
-                        title="More Actions"
-                        aria-haspopup="true"
-                        :aria-expanded="activeAdmissionDropdown === (adm.registrationNo || adm.id)"
-                      >
-                        <span>Actions</span>
-                        <svg class="dropdown-caret-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                          <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                      </button>
-
-                      <transition name="dropdown-pop">
-                        <div 
-                          v-if="activeAdmissionDropdown === (adm.registrationNo || adm.id)"
-                          class="action-popover-menu"
-                          :class="{ 'is-dropup': idx >= Math.max(1, filteredAdmissions.length - 2) }"
-                          @click.stop
-                        >
-                          <div class="popover-badge-row">
-                            <span class="popover-id-tag">{{ adm.registrationNo || adm.id }}</span>
-                            <span 
-                              class="popover-status-tag"
-                              :class="adm.status === 'Confirmed' || adm.admissionConfirmed ? 'status-confirmed-tag' : 'status-pending-tag'"
-                            >
-                              {{ adm.status === 'Confirmed' || adm.admissionConfirmed ? '● Confirmed' : '● Pending' }}
-                            </span>
-                          </div>
-
-                          <!-- Management & Record -->
-                          <div class="popover-group">
-                            <div class="popover-group-label">Record & Settings</div>
-                            <button 
-                              type="button" 
-                              class="popover-menu-item" 
-                              @click="closeAllActionDropdowns(); openEditAdmissionModal(adm)"
-                            >
-                              <span class="menu-item-icon">✏️</span>
-                              <div class="menu-item-text">
-                                <div class="menu-item-title">Edit Details</div>
-                                <div class="menu-item-desc">Candidate personal & course info</div>
-                              </div>
-                            </button>
-                            <button 
-                              v-if="adm.status !== 'Confirmed' && !adm.admissionConfirmed"
-                              type="button" 
-                              class="popover-menu-item highlight-emerald" 
-                              @click="closeAllActionDropdowns(); handleConfirmAdmissionAndGenerateCredentials(adm)"
-                            >
-                              <span class="menu-item-icon">⚡</span>
-                              <div class="menu-item-text">
-                                <div class="menu-item-title">Confirm & Generate</div>
-                                <div class="menu-item-desc">Activate student ID & send credentials</div>
-                              </div>
-                            </button>
-                            <button 
-                              v-if="adm.status === 'Confirmed' || adm.admissionConfirmed"
-                              type="button" 
-                              class="popover-menu-item highlight-purple" 
-                              @click="closeAllActionDropdowns(); openDashboardControlModal(adm)"
-                            >
-                              <span class="menu-item-icon">🎛️</span>
-                              <div class="menu-item-text">
-                                <div class="menu-item-title">Dashboard Controls</div>
-                                <div class="menu-item-desc">Manage exams, notices & portal modules</div>
-                              </div>
-                            </button>
-                          </div>
-
-                          <!-- Credentials & Notice -->
-                          <div class="popover-group" v-if="adm.status === 'Confirmed' || adm.admissionConfirmed">
-                            <div class="popover-group-label">Credentials & Access</div>
-                            <button 
-                              type="button" 
-                              class="popover-menu-item highlight-cyan" 
-                              @click="closeAllActionDropdowns(); openCredentialsModal(adm)"
-                            >
-                              <span class="menu-item-icon">🔐</span>
-                              <div class="menu-item-text">
-                                <div class="menu-item-title">View Credentials</div>
-                                <div class="menu-item-desc">Display User ID & password card</div>
-                              </div>
-                            </button>
-                            <button 
-                              v-if="adm.mobile || adm.phone"
-                              type="button" 
-                              class="popover-menu-item highlight-green" 
-                              @click="closeAllActionDropdowns(); shareCredentialsOnWhatsApp(adm)"
-                            >
-                              <span class="menu-item-icon">📲</span>
-                              <div class="menu-item-text">
-                                <div class="menu-item-title">WhatsApp Notice</div>
-                                <div class="menu-item-desc">Send credentials message to phone</div>
-                              </div>
-                            </button>
-                            <button 
-                              type="button" 
-                              class="popover-menu-item highlight-amber" 
-                              @click="closeAllActionDropdowns(); openResetPasswordModal(adm)"
-                            >
-                              <span class="menu-item-icon">🔑</span>
-                              <div class="menu-item-text">
-                                <div class="menu-item-title">Reset Password</div>
-                                <div class="menu-item-desc">Generate new student portal secret</div>
-                              </div>
-                            </button>
-                          </div>
-
-                          <!-- Documents & Dispatch -->
-                          <div class="popover-group">
-                            <div class="popover-group-label">Documents & Receipts</div>
-                            <button 
-                              type="button" 
-                              class="popover-menu-item highlight-orange" 
-                              @click="closeAllActionDropdowns(); openAdmissionEmailModal(adm)"
-                            >
-                              <span class="menu-item-icon">📩</span>
-                              <div class="menu-item-text">
-                                <div class="menu-item-title">Email Letter</div>
-                                <div class="menu-item-desc">Send admission confirmation letter</div>
-                              </div>
-                            </button>
-                            <button 
-                              type="button" 
-                              class="popover-menu-item highlight-emerald" 
-                              @click="closeAllActionDropdowns(); confirmFeeAndSendJpgReceipt(adm)"
-                            >
-                              <span class="menu-item-icon">💳</span>
-                              <div class="menu-item-text">
-                                <div class="menu-item-title">JPG Fee Receipt</div>
-                                <div class="menu-item-desc">Confirm fee & send image receipt</div>
-                              </div>
-                            </button>
-                            <button 
-                              type="button" 
-                              class="popover-menu-item" 
-                              @click="closeAllActionDropdowns(); $emit('download-slip', adm)"
-                            >
-                              <span class="menu-item-icon">📄</span>
-                              <div class="menu-item-text">
-                                <div class="menu-item-title">Download PDF Slip</div>
-                                <div class="menu-item-desc">Print verified admission receipt</div>
-                              </div>
-                            </button>
-                          </div>
-
-                          <!-- Danger Zone -->
-                          <div class="popover-group popover-group-danger">
-                            <button 
-                              type="button" 
-                              class="popover-menu-item item-danger" 
-                              @click="closeAllActionDropdowns(); deleteAdmission(adm)"
-                            >
-                              <span class="menu-item-icon">🗑️</span>
-                              <div class="menu-item-text">
-                                <div class="menu-item-title">Delete Admission</div>
-                                <div class="menu-item-desc">Remove candidate from database</div>
-                              </div>
-                            </button>
-                          </div>
-                        </div>
-                      </transition>
-                    </div>
+                    <!-- Dropdown Trigger Button -->
+                    <button 
+                      type="button"
+                      class="dropdown-trigger-btn"
+                      :class="{ 'active': activeAdmissionDropdown === (adm.registrationNo || adm.id) }"
+                      @click.stop="toggleAdmissionDropdown(adm, $event)"
+                      title="More Actions"
+                      aria-haspopup="true"
+                      :aria-expanded="activeAdmissionDropdown === (adm.registrationNo || adm.id)"
+                    >
+                      <span>Actions</span>
+                      <svg class="dropdown-caret-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -5228,6 +4945,305 @@
       </div> <!-- /.admin-canvas-content -->
     </main>
   </div>
+
+  <!-- GLOBAL TELEPORTED ACTION DROPDOWNS (MOUNTED TO BODY TO PREVENT OVERFLOW CLIPPING) -->
+  <teleport to="body">
+    <!-- Backdrop to close dropdown on outside click -->
+    <div 
+      v-if="activeAdmissionDropdown || activeStudentDropdown" 
+      class="action-dropdown-backdrop" 
+      @click="closeAllActionDropdowns"
+    ></div>
+
+    <!-- Admissions Floating Action Dropdown Menu -->
+    <transition name="dropdown-pop">
+      <div 
+        v-if="activeAdmissionDropdown && selectedDropdownAdm"
+        class="action-popover-menu is-teleported"
+        :class="{ 'is-dropup': dropdownMenuPos.isDropup }"
+        :style="{
+          top: dropdownMenuPos.top + 'px',
+          right: dropdownMenuPos.right + 'px'
+        }"
+        @click.stop
+      >
+        <div class="popover-badge-row">
+          <span class="popover-id-tag">{{ selectedDropdownAdm.registrationNo || selectedDropdownAdm.id }}</span>
+          <span 
+            class="popover-status-tag"
+            :class="selectedDropdownAdm.status === 'Confirmed' || selectedDropdownAdm.admissionConfirmed ? 'status-confirmed-tag' : 'status-pending-tag'"
+          >
+            {{ selectedDropdownAdm.status === 'Confirmed' || selectedDropdownAdm.admissionConfirmed ? '● Confirmed' : '● Pending' }}
+          </span>
+        </div>
+
+        <!-- Management & Record -->
+        <div class="popover-group">
+          <div class="popover-group-label">Record & Settings</div>
+          <button 
+            type="button" 
+            class="popover-menu-item" 
+            @click="closeAllActionDropdowns(); openEditAdmissionModal(selectedDropdownAdm)"
+          >
+            <span class="menu-item-icon">✏️</span>
+            <div class="menu-item-text">
+              <div class="menu-item-title">Edit Details</div>
+              <div class="menu-item-desc">Candidate personal & course info</div>
+            </div>
+          </button>
+          <button 
+            v-if="selectedDropdownAdm.status !== 'Confirmed' && !selectedDropdownAdm.admissionConfirmed"
+            type="button" 
+            class="popover-menu-item highlight-emerald" 
+            @click="closeAllActionDropdowns(); handleConfirmAdmissionAndGenerateCredentials(selectedDropdownAdm)"
+          >
+            <span class="menu-item-icon">⚡</span>
+            <div class="menu-item-text">
+              <div class="menu-item-title">Confirm & Generate</div>
+              <div class="menu-item-desc">Activate student ID & send credentials</div>
+            </div>
+          </button>
+          <button 
+            v-if="selectedDropdownAdm.status === 'Confirmed' || selectedDropdownAdm.admissionConfirmed"
+            type="button" 
+            class="popover-menu-item highlight-purple" 
+            @click="closeAllActionDropdowns(); openDashboardControlModal(selectedDropdownAdm)"
+          >
+            <span class="menu-item-icon">🎛️</span>
+            <div class="menu-item-text">
+              <div class="menu-item-title">Dashboard Controls</div>
+              <div class="menu-item-desc">Manage exams, notices & portal modules</div>
+            </div>
+          </button>
+        </div>
+
+        <!-- Credentials & Notice -->
+        <div class="popover-group" v-if="selectedDropdownAdm.status === 'Confirmed' || selectedDropdownAdm.admissionConfirmed">
+          <div class="popover-group-label">Credentials & Access</div>
+          <button 
+            type="button" 
+            class="popover-menu-item highlight-cyan" 
+            @click="closeAllActionDropdowns(); openCredentialsModal(selectedDropdownAdm)"
+          >
+            <span class="menu-item-icon">🔐</span>
+            <div class="menu-item-text">
+              <div class="menu-item-title">View Credentials</div>
+              <div class="menu-item-desc">Display User ID & password card</div>
+            </div>
+          </button>
+          <button 
+            v-if="selectedDropdownAdm.mobile || selectedDropdownAdm.phone"
+            type="button" 
+            class="popover-menu-item highlight-green" 
+            @click="closeAllActionDropdowns(); shareCredentialsOnWhatsApp(selectedDropdownAdm)"
+          >
+            <span class="menu-item-icon">📲</span>
+            <div class="menu-item-text">
+              <div class="menu-item-title">WhatsApp Notice</div>
+              <div class="menu-item-desc">Send credentials message to phone</div>
+            </div>
+          </button>
+          <button 
+            type="button" 
+            class="popover-menu-item highlight-amber" 
+            @click="closeAllActionDropdowns(); openResetPasswordModal(selectedDropdownAdm)"
+          >
+            <span class="menu-item-icon">🔑</span>
+            <div class="menu-item-text">
+              <div class="menu-item-title">Reset Password</div>
+              <div class="menu-item-desc">Generate new student portal secret</div>
+            </div>
+          </button>
+        </div>
+
+        <!-- Documents & Receipts -->
+        <div class="popover-group">
+          <div class="popover-group-label">Documents & Receipts</div>
+          <button 
+            type="button" 
+            class="popover-menu-item highlight-orange" 
+            @click="closeAllActionDropdowns(); openAdmissionEmailModal(selectedDropdownAdm)"
+          >
+            <span class="menu-item-icon">📩</span>
+            <div class="menu-item-text">
+              <div class="menu-item-title">Email Letter</div>
+              <div class="menu-item-desc">Send admission confirmation letter</div>
+            </div>
+          </button>
+          <button 
+            type="button" 
+            class="popover-menu-item highlight-emerald" 
+            @click="closeAllActionDropdowns(); confirmFeeAndSendJpgReceipt(selectedDropdownAdm)"
+          >
+            <span class="menu-item-icon">💳</span>
+            <div class="menu-item-text">
+              <div class="menu-item-title">JPG Fee Receipt</div>
+              <div class="menu-item-desc">Confirm fee & send image receipt</div>
+            </div>
+          </button>
+          <button 
+            type="button" 
+            class="popover-menu-item" 
+            @click="closeAllActionDropdowns(); $emit('download-slip', selectedDropdownAdm)"
+          >
+            <span class="menu-item-icon">📄</span>
+            <div class="menu-item-text">
+              <div class="menu-item-title">Download PDF Slip</div>
+              <div class="menu-item-desc">Print verified admission receipt</div>
+            </div>
+          </button>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="popover-group popover-group-danger">
+          <button 
+            type="button" 
+            class="popover-menu-item item-danger" 
+            @click="closeAllActionDropdowns(); deleteAdmission(selectedDropdownAdm)"
+          >
+            <span class="menu-item-icon">🗑️</span>
+            <div class="menu-item-text">
+              <div class="menu-item-title">Delete Admission</div>
+              <div class="menu-item-desc">Remove candidate from database</div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Students Directory Floating Action Dropdown Menu -->
+    <transition name="dropdown-pop">
+      <div 
+        v-if="activeStudentDropdown && selectedDropdownStu"
+        class="action-popover-menu is-teleported"
+        :class="{ 'is-dropup': dropdownMenuPos.isDropup }"
+        :style="{
+          top: dropdownMenuPos.top + 'px',
+          right: dropdownMenuPos.right + 'px'
+        }"
+        @click.stop
+      >
+        <div class="popover-badge-row">
+          <span class="popover-id-tag">{{ selectedDropdownStu.enrollmentNumber || selectedDropdownStu.userId || selectedDropdownStu.id }}</span>
+          <span class="popover-status-tag status-confirmed-tag">● Enrolled</span>
+        </div>
+
+        <!-- Profile & Academic -->
+        <div class="popover-group">
+          <div class="popover-group-label">Profile & Academic</div>
+          <button 
+            type="button" 
+            class="popover-menu-item" 
+            @click="closeAllActionDropdowns(); selectedStudentDetail = selectedDropdownStu; showStudentDetailModal = true;"
+          >
+            <span class="menu-item-icon">👁️</span>
+            <div class="menu-item-text">
+              <div class="menu-item-title">Full Profile</div>
+              <div class="menu-item-desc">Admission & academic summary</div>
+            </div>
+          </button>
+          <button 
+            type="button" 
+            class="popover-menu-item highlight-cyan" 
+            @click="closeAllActionDropdowns(); openEditStudentModal(selectedDropdownStu)"
+          >
+            <span class="menu-item-icon">✏️</span>
+            <div class="menu-item-text">
+              <div class="menu-item-title">Edit Record</div>
+              <div class="menu-item-desc">Personal & course particulars</div>
+            </div>
+          </button>
+          <button 
+            type="button" 
+            class="popover-menu-item highlight-yellow" 
+            @click="closeAllActionDropdowns(); openIssueCourseCertModalForStudent(selectedDropdownStu)"
+          >
+            <span class="menu-item-icon">🏅</span>
+            <div class="menu-item-text">
+              <div class="menu-item-title">Issue Certificate</div>
+              <div class="menu-item-desc">Official completion credential</div>
+            </div>
+          </button>
+          <button 
+            type="button" 
+            class="popover-menu-item highlight-purple" 
+            @click="closeAllActionDropdowns(); openDashboardControlModal(selectedDropdownStu)"
+          >
+            <span class="menu-item-icon">🎛️</span>
+            <div class="menu-item-text">
+              <div class="menu-item-title">Dashboard Controls</div>
+              <div class="menu-item-desc">Manage features & portal modules</div>
+            </div>
+          </button>
+          <button 
+            type="button" 
+            class="popover-menu-item highlight-cyan" 
+            @click="closeAllActionDropdowns(); goToStudentExams(selectedDropdownStu)"
+          >
+            <span class="menu-item-icon">📝</span>
+            <div class="menu-item-text">
+              <div class="menu-item-title">Student Exams</div>
+              <div class="menu-item-desc">View test submissions & answers</div>
+            </div>
+          </button>
+        </div>
+
+        <!-- Credentials & Access -->
+        <div class="popover-group" v-if="selectedDropdownStu.admissionConfirmed || selectedDropdownStu.status === 'Confirmed'">
+          <div class="popover-group-label">Credentials & Access</div>
+          <button 
+            type="button" 
+            class="popover-menu-item highlight-cyan" 
+            @click="closeAllActionDropdowns(); openCredentialsModal(selectedDropdownStu)"
+          >
+            <span class="menu-item-icon">🔐</span>
+            <div class="menu-item-text">
+              <div class="menu-item-title">View Credentials</div>
+              <div class="menu-item-desc">Display User ID & password card</div>
+            </div>
+          </button>
+          <button 
+            v-if="selectedDropdownStu.phone || selectedDropdownStu.mobile"
+            type="button" 
+            class="popover-menu-item highlight-green" 
+            @click="closeAllActionDropdowns(); shareCredentialsOnWhatsApp(selectedDropdownStu)"
+          >
+            <span class="menu-item-icon">📲</span>
+            <div class="menu-item-text">
+              <div class="menu-item-title">Send WhatsApp</div>
+              <div class="menu-item-desc">Direct login pass to student mobile</div>
+            </div>
+          </button>
+          <button 
+            type="button" 
+            class="popover-menu-item highlight-amber" 
+            @click="closeAllActionDropdowns(); openResetPasswordModal(selectedDropdownStu)"
+          >
+            <span class="menu-item-icon">🔑</span>
+            <div class="menu-item-text">
+              <div class="menu-item-title">Reset Password</div>
+              <div class="menu-item-desc">Issue new student portal secret</div>
+            </div>
+          </button>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="popover-group popover-group-danger">
+          <button 
+            type="button" 
+            class="popover-menu-item item-danger" 
+            @click="closeAllActionDropdowns(); $emit('delete-student', selectedDropdownStu)"
+          >
+            <span class="menu-item-icon">🗑️</span>
+            <div class="menu-item-text">
+              <div class="menu-item-title">Delete Student</div>
+              <div class="menu-item-desc">Remove from active directory</div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </transition>
+  </teleport>
 </template>
 
 <script setup>
@@ -8705,9 +8721,33 @@ const handleDeleteCertificate = async (cert) => {
   setTimeout(() => { emailActionMsg.value = ''; }, 4000);
 };
 
-// --- ROW ACTION DROPDOWN POPUP STATE ---
+// --- ROW ACTION DROPDOWN POPUP STATE (TELEPORTED TO PREVENT OVERFLOW CLIPPING) ---
 const activeAdmissionDropdown = ref(null);
 const activeStudentDropdown = ref(null);
+const selectedDropdownAdm = ref(null);
+const selectedDropdownStu = ref(null);
+const dropdownMenuPos = ref({ top: 0, right: 0, isDropup: false });
+
+const updateDropdownPosition = (targetEl) => {
+  if (!targetEl || typeof window === 'undefined') return;
+  const rect = targetEl.getBoundingClientRect();
+  const menuHeight = 360;
+  const spaceBelow = window.innerHeight - rect.bottom;
+  const spaceAbove = rect.top;
+  const isDropup = spaceBelow < menuHeight && spaceAbove > spaceBelow;
+  
+  const top = isDropup 
+    ? Math.max(10, rect.top - menuHeight - 6) 
+    : Math.min(window.innerHeight - menuHeight - 10, rect.bottom + 6);
+  
+  const right = Math.max(10, window.innerWidth - rect.right);
+
+  dropdownMenuPos.value = {
+    top: Math.round(top),
+    right: Math.round(right),
+    isDropup
+  };
+};
 
 const toggleAdmissionDropdown = (adm, e) => {
   if (e) {
@@ -8717,9 +8757,14 @@ const toggleAdmissionDropdown = (adm, e) => {
   const id = adm.registrationNo || adm.id || adm._id;
   if (activeAdmissionDropdown.value === id) {
     activeAdmissionDropdown.value = null;
+    selectedDropdownAdm.value = null;
   } else {
     activeAdmissionDropdown.value = id;
     activeStudentDropdown.value = null;
+    selectedDropdownAdm.value = adm;
+    selectedDropdownStu.value = null;
+    const btn = e ? (e.currentTarget || (e.target && e.target.closest('button'))) : null;
+    updateDropdownPosition(btn);
   }
 };
 
@@ -8731,15 +8776,22 @@ const toggleStudentDropdown = (stu, e) => {
   const id = stu.id || stu.enrollmentNumber || stu.userId || stu._id;
   if (activeStudentDropdown.value === id) {
     activeStudentDropdown.value = null;
+    selectedDropdownStu.value = null;
   } else {
     activeStudentDropdown.value = id;
     activeAdmissionDropdown.value = null;
+    selectedDropdownStu.value = stu;
+    selectedDropdownAdm.value = null;
+    const btn = e ? (e.currentTarget || (e.target && e.target.closest('button'))) : null;
+    updateDropdownPosition(btn);
   }
 };
 
 const closeAllActionDropdowns = () => {
   activeAdmissionDropdown.value = null;
   activeStudentDropdown.value = null;
+  selectedDropdownAdm.value = null;
+  selectedDropdownStu.value = null;
 };
 
 const onGlobalKeydown = (e) => {
@@ -8772,6 +8824,7 @@ onMounted(() => {
     window.addEventListener('resize', updateAdminHeaderHeight, { passive: true });
     window.addEventListener('ithunt_exam_submitted', onExamSubmittedHandler);
     window.addEventListener('click', closeAllActionDropdowns);
+    window.addEventListener('scroll', closeAllActionDropdowns, true);
     window.addEventListener('keydown', onGlobalKeydown);
   }
 });
@@ -8785,6 +8838,7 @@ onUnmounted(() => {
     window.removeEventListener('resize', updateAdminHeaderHeight);
     window.removeEventListener('ithunt_exam_submitted', onExamSubmittedHandler);
     window.removeEventListener('click', closeAllActionDropdowns);
+    window.removeEventListener('scroll', closeAllActionDropdowns, true);
     window.removeEventListener('keydown', onGlobalKeydown);
     document.removeEventListener('click', handleAdminOutsideClick, true);
     document.removeEventListener('touchstart', handleAdminOutsideClick, { capture: true });
@@ -12936,7 +12990,7 @@ label {
 }
 
 .admissions-table {
-  min-width: 1040px;
+  min-width: 980px;
   table-layout: fixed;
 }
 
@@ -12952,25 +13006,26 @@ label {
 }
 
 .admissions-table th:nth-child(1),
-.admissions-table td:nth-child(1) { width: 12%; }
+.admissions-table td:nth-child(1) { width: 11%; }
 .admissions-table th:nth-child(2),
-.admissions-table td:nth-child(2) { width: 14%; }
+.admissions-table td:nth-child(2) { width: 13%; }
 .admissions-table th:nth-child(3),
-.admissions-table td:nth-child(3) { width: 9%; }
+.admissions-table td:nth-child(3) { width: 8%; }
 .admissions-table th:nth-child(4),
-.admissions-table td:nth-child(4) { width: 17%; }
+.admissions-table td:nth-child(4) { width: 16%; }
 .admissions-table th:nth-child(5),
-.admissions-table td:nth-child(5) { width: 18%; }
+.admissions-table td:nth-child(5) { width: 17%; }
 .admissions-table th:nth-child(6),
-.admissions-table td:nth-child(6) { width: 10%; }
+.admissions-table td:nth-child(6) { width: 9%; }
 .admissions-table th:nth-child(7),
 .admissions-table td:nth-child(7) { width: 9%; }
 .admissions-table th:nth-child(8),
-.admissions-table td:nth-child(8) { width: 11%; min-width: 135px; }
+.admissions-table td:nth-child(8) { width: 17%; min-width: 185px; }
 
 .action-cell {
   position: relative;
   overflow: visible !important;
+  white-space: nowrap;
 }
 
 .row-action-cluster {
@@ -12979,6 +13034,8 @@ label {
   justify-content: flex-end;
   gap: 0.45rem;
   position: relative;
+  white-space: nowrap;
+  flex-wrap: nowrap;
 }
 
 /* Quick Action Button */
@@ -12994,6 +13051,7 @@ label {
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
+  flex-shrink: 0;
   line-height: 1.2;
 }
 
@@ -13055,6 +13113,7 @@ label {
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .dropdown-trigger-btn:hover,
@@ -13070,6 +13129,18 @@ label {
 }
 .dropdown-trigger-btn.active .dropdown-caret-svg {
   transform: rotate(180deg);
+}
+
+/* Backdrop */
+.action-dropdown-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999998;
+  background: transparent;
+  cursor: default;
 }
 
 /* Popover Menu */
@@ -13095,6 +13166,16 @@ label {
   top: auto;
   bottom: calc(100% + 6px);
   transform-origin: bottom right;
+}
+
+.action-popover-menu.is-teleported {
+  position: fixed !important;
+  z-index: 999999 !important;
+  min-width: 260px;
+  max-width: 290px;
+  max-height: calc(100vh - 30px);
+  overflow-y: auto;
+  box-shadow: 0 20px 45px -4px rgba(0, 0, 0, 0.75), 0 0 1px 1px rgba(255, 255, 255, 0.15) !important;
 }
 
 .popover-badge-row {
@@ -13552,7 +13633,7 @@ label {
 }
 
 .student-directory-table .action-cell {
-  min-width: 135px;
+  min-width: 185px;
   overflow: visible !important;
 }
 
