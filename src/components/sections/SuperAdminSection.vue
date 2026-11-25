@@ -913,7 +913,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="stu in filteredStudents" :key="stu.id || stu.enrollmentNumber" class="student-directory-row">
+              <tr v-for="(stu, idx) in filteredStudents" :key="stu.id || stu.enrollmentNumber" class="student-directory-row">
                 <!-- Enrollment No -->
                 <td>
                   <span 
@@ -981,95 +981,175 @@
                 </td>
 
                 <!-- Actions -->
-                <td style="text-align: right;">
-                  <div class="student-directory-actions" style="display: flex; justify-content: flex-end; gap: 0.4rem; flex-wrap: wrap;">
-                    <!-- If pending candidate: prominent 1-click Confirm & Generate Login -->
+                <td class="action-cell" style="text-align: right; position: relative;">
+                  <div class="row-action-cluster">
+                    <!-- Quick Action -->
                     <button 
                       v-if="!stu.admissionConfirmed && stu.status !== 'Confirmed'"
-                      class="btn-primary" 
+                      type="button"
+                      class="quick-action-btn quick-confirm-btn" 
                       @click="handleConfirmAdmissionAndGenerateCredentials(stu.originalAdmission || stu)"
                       title="Confirm candidate admission and automatically generate Student User ID & Password"
-                      style="padding: 0.35rem 0.75rem; font-size: 0.78rem; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-color: #10b981; color: #fff; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);"
                     >
-                      ⚡ Confirm & Generate
+                      <span class="btn-icon">⚡</span>
+                      <span>Confirm</span>
+                    </button>
+                    <button 
+                      v-else
+                      type="button"
+                      class="quick-action-btn quick-profile-btn" 
+                      @click="selectedStudentDetail = stu; showStudentDetailModal = true;"
+                      title="View Student Profile"
+                    >
+                      <span class="btn-icon">👁️</span>
+                      <span>Profile</span>
                     </button>
 
-                    <button 
-                      class="admin-icon-btn" 
-                      title="View Student Profile"
-                      @click="selectedStudentDetail = stu; showStudentDetailModal = true;"
-                    >
-                      👁️ Profile
-                    </button>
-                    <button 
-                      class="admin-icon-btn" 
-                      title="Edit Student Record"
-                      style="color: var(--color-ai-cyan); border-color: rgba(56, 189, 248, 0.4);"
-                      @click="openEditStudentModal(stu)"
-                    >
-                      ✏️ Edit
-                    </button>
-                    <button 
-                      type="button"
-                      class="admin-icon-btn" 
-                      title="Issue Official Course Completion Certificate"
-                      style="color: var(--color-ai-yellow); border-color: rgba(250, 204, 21, 0.4);"
-                      @click="openIssueCourseCertModalForStudent(stu)"
-                    >
-                      🏅 Issue Cert
-                    </button>
-                    <button 
-                      type="button"
-                      class="admin-icon-btn" 
-                      title="Control Student Dashboard Features, Modules, Announcements & Access"
-                      style="color: #c084fc; border-color: rgba(192, 132, 252, 0.4); background: rgba(192, 132, 252, 0.1); font-weight: 700;"
-                      @click="openDashboardControlModal(stu)"
-                    >
-                      🎛️ Controls
-                    </button>
-                    <button 
-                      v-if="stu.admissionConfirmed || stu.status === 'Confirmed'"
-                      class="admin-icon-btn" 
-                      title="View Student Portal Login Credentials"
-                      style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);"
-                      @click="openCredentialsModal(stu)"
-                    >
-                      🔐 Credentials
-                    </button>
-                    <button 
-                      v-if="(stu.admissionConfirmed || stu.status === 'Confirmed') && (stu.phone || stu.mobile)"
-                      class="admin-icon-btn" 
-                      title="Share Login Credentials via WhatsApp"
-                      style="color: #22c55e; border-color: rgba(34, 197, 94, 0.4);"
-                      @click="shareCredentialsOnWhatsApp(stu)"
-                    >
-                      📲 WhatsApp
-                    </button>
-                    <button 
-                      v-if="stu.admissionConfirmed || stu.status === 'Confirmed'"
-                      class="admin-icon-btn" 
-                      title="Reset Student Login Password"
-                      style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.4);"
-                      @click="openResetPasswordModal(stu)"
-                    >
-                      🔑 Reset Pass
-                    </button>
-                    <button 
-                      class="admin-icon-btn" 
-                      title="Inspect Student Online Exams & Selected Options"
-                      style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);"
-                      @click="goToStudentExams(stu)"
-                    >
-                      📝 Exams
-                    </button>
-                    <button 
-                      class="admin-icon-btn" 
-                      style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3);"
-                      title="Delete Student"
-                      @click="$emit('delete-student', stu)"
-                    >
-                      🗑️
-                    </button>
+                    <!-- Dropdown Trigger & Popover -->
+                    <div class="action-dropdown-wrap">
+                      <button 
+                        type="button"
+                        class="dropdown-trigger-btn"
+                        :class="{ 'active': activeStudentDropdown === (stu.id || stu.enrollmentNumber || stu.userId) }"
+                        @click.stop="toggleStudentDropdown(stu, $event)"
+                        title="More Actions"
+                        aria-haspopup="true"
+                        :aria-expanded="activeStudentDropdown === (stu.id || stu.enrollmentNumber || stu.userId)"
+                      >
+                        <span>Actions</span>
+                        <svg class="dropdown-caret-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                      </button>
+
+                      <transition name="dropdown-pop">
+                        <div 
+                          v-if="activeStudentDropdown === (stu.id || stu.enrollmentNumber || stu.userId)"
+                          class="action-popover-menu"
+                          :class="{ 'is-dropup': idx >= Math.max(1, filteredStudents.length - 2) }"
+                          @click.stop
+                        >
+                          <div class="popover-badge-row">
+                            <span class="popover-id-tag">{{ stu.enrollmentNumber || stu.userId || stu.id }}</span>
+                            <span class="popover-status-tag status-confirmed-tag">● Enrolled</span>
+                          </div>
+
+                          <!-- Profile & Academic -->
+                          <div class="popover-group">
+                            <div class="popover-group-label">Profile & Academic</div>
+                            <button 
+                              type="button" 
+                              class="popover-menu-item" 
+                              @click="closeAllActionDropdowns(); selectedStudentDetail = stu; showStudentDetailModal = true;"
+                            >
+                              <span class="menu-item-icon">👁️</span>
+                              <div class="menu-item-text">
+                                <div class="menu-item-title">Full Profile</div>
+                                <div class="menu-item-desc">Admission & academic summary</div>
+                              </div>
+                            </button>
+                            <button 
+                              type="button" 
+                              class="popover-menu-item highlight-cyan" 
+                              @click="closeAllActionDropdowns(); openEditStudentModal(stu)"
+                            >
+                              <span class="menu-item-icon">✏️</span>
+                              <div class="menu-item-text">
+                                <div class="menu-item-title">Edit Record</div>
+                                <div class="menu-item-desc">Personal & course particulars</div>
+                              </div>
+                            </button>
+                            <button 
+                              type="button" 
+                              class="popover-menu-item highlight-yellow" 
+                              @click="closeAllActionDropdowns(); openIssueCourseCertModalForStudent(stu)"
+                            >
+                              <span class="menu-item-icon">🏅</span>
+                              <div class="menu-item-text">
+                                <div class="menu-item-title">Issue Certificate</div>
+                                <div class="menu-item-desc">Official completion credential</div>
+                              </div>
+                            </button>
+                            <button 
+                              type="button" 
+                              class="popover-menu-item highlight-purple" 
+                              @click="closeAllActionDropdowns(); openDashboardControlModal(stu)"
+                            >
+                              <span class="menu-item-icon">🎛️</span>
+                              <div class="menu-item-text">
+                                <div class="menu-item-title">Dashboard Controls</div>
+                                <div class="menu-item-desc">Manage features & portal modules</div>
+                              </div>
+                            </button>
+                            <button 
+                              type="button" 
+                              class="popover-menu-item highlight-cyan" 
+                              @click="closeAllActionDropdowns(); goToStudentExams(stu)"
+                            >
+                              <span class="menu-item-icon">📝</span>
+                              <div class="menu-item-text">
+                                <div class="menu-item-title">Student Exams</div>
+                                <div class="menu-item-desc">View test submissions & answers</div>
+                              </div>
+                            </button>
+                          </div>
+
+                          <!-- Credentials & Access -->
+                          <div class="popover-group" v-if="stu.admissionConfirmed || stu.status === 'Confirmed'">
+                            <div class="popover-group-label">Credentials & Access</div>
+                            <button 
+                              type="button" 
+                              class="popover-menu-item highlight-cyan" 
+                              @click="closeAllActionDropdowns(); openCredentialsModal(stu)"
+                            >
+                              <span class="menu-item-icon">🔐</span>
+                              <div class="menu-item-text">
+                                <div class="menu-item-title">View Credentials</div>
+                                <div class="menu-item-desc">Display User ID & password card</div>
+                              </div>
+                            </button>
+                            <button 
+                              v-if="stu.phone || stu.mobile"
+                              type="button" 
+                              class="popover-menu-item highlight-green" 
+                              @click="closeAllActionDropdowns(); shareCredentialsOnWhatsApp(stu)"
+                            >
+                              <span class="menu-item-icon">📲</span>
+                              <div class="menu-item-text">
+                                <div class="menu-item-title">Send WhatsApp</div>
+                                <div class="menu-item-desc">Direct login pass to student mobile</div>
+                              </div>
+                            </button>
+                            <button 
+                              type="button" 
+                              class="popover-menu-item highlight-amber" 
+                              @click="closeAllActionDropdowns(); openResetPasswordModal(stu)"
+                            >
+                              <span class="menu-item-icon">🔑</span>
+                              <div class="menu-item-text">
+                                <div class="menu-item-title">Reset Password</div>
+                                <div class="menu-item-desc">Issue new student portal secret</div>
+                              </div>
+                            </button>
+                          </div>
+
+                          <!-- Danger Zone -->
+                          <div class="popover-group popover-group-danger">
+                            <button 
+                              type="button" 
+                              class="popover-menu-item item-danger" 
+                              @click="closeAllActionDropdowns(); $emit('delete-student', stu)"
+                            >
+                              <span class="menu-item-icon">🗑️</span>
+                              <div class="menu-item-text">
+                                <div class="menu-item-title">Delete Student</div>
+                                <div class="menu-item-desc">Remove from active directory</div>
+                              </div>
+                            </button>
+                          </div>
+                        </div>
+                      </transition>
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -1357,321 +1437,309 @@
         </div>
       </div>
 
-      <!-- Admissions KPI Quick Stats Cards Strip -->
-      <div class="adm-kpi-strip anim-stagger-1">
-        <div class="adm-kpi-card" :class="{ active: admissionStatusFilter === 'all' }" @click="admissionStatusFilter = 'all'" title="View All Registrations">
-          <div class="adm-kpi-icon total">📋</div>
-          <div class="adm-kpi-data">
-            <span class="adm-kpi-num">{{ admissionsList.length }}</span>
-            <span class="adm-kpi-title">Total Registrations</span>
-          </div>
-        </div>
-
-        <div class="adm-kpi-card" :class="{ active: admissionStatusFilter === 'Confirmed' }" @click="admissionStatusFilter = 'Confirmed'" title="Filter Confirmed Students">
-          <div class="adm-kpi-icon confirmed">✅</div>
-          <div class="adm-kpi-data">
-            <span class="adm-kpi-num text-emerald">{{ confirmedAdmissionsCount }}</span>
-            <span class="adm-kpi-title">Confirmed & Logins Active</span>
-          </div>
-        </div>
-
-        <div class="adm-kpi-card" :class="{ active: admissionStatusFilter === 'Pending Verification' }" @click="admissionStatusFilter = 'Pending Verification'" title="Filter Pending Review">
-          <div class="adm-kpi-icon pending">⏳</div>
-          <div class="adm-kpi-data">
-            <span class="adm-kpi-num" :class="pendingAdmissionsCount > 0 ? 'text-amber' : 'text-dim'">{{ pendingAdmissionsCount }}</span>
-            <span class="adm-kpi-title">Pending Review</span>
-          </div>
-        </div>
-
-        <div class="adm-kpi-card fee-card" title="Verified Fee Records">
-          <div class="adm-kpi-icon fee">💳</div>
-          <div class="adm-kpi-data">
-            <span class="adm-kpi-num text-cyan">{{ paidAdmissionsCount }}</span>
-            <span class="adm-kpi-title">Fee Slips Verified</span>
-          </div>
-        </div>
-      </div>
-
       <!-- Quick Filter Pills Strip -->
-      <div class="adm-filter-dock">
-        <div class="adm-filter-pills">
-          <button 
-            type="button"
-            class="adm-filter-btn" 
-            :class="{ active: admissionStatusFilter === 'all' }"
-            @click="admissionStatusFilter = 'all'"
-          >
-            📋 All Registrations <span class="pill-count">{{ admissionsList.length }}</span>
-          </button>
-          <button 
-            type="button"
-            class="adm-filter-btn pending" 
-            :class="{ active: admissionStatusFilter === 'Pending Verification' || admissionStatusFilter === 'Pending Confirmation' }"
-            @click="admissionStatusFilter = 'Pending Verification'"
-          >
-            ⏳ Pending Review <span class="pill-count" :class="{ alert: pendingAdmissionsCount > 0 }">{{ pendingAdmissionsCount }}</span>
-            <span v-if="pendingAdmissionsCount > 0" class="action-alert-badge">Action Needed</span>
-          </button>
-          <button 
-            type="button"
-            class="adm-filter-btn confirmed" 
-            :class="{ active: admissionStatusFilter === 'Confirmed' }"
-            @click="admissionStatusFilter = 'Confirmed'"
-          >
-            ✅ Confirmed & Active <span class="pill-count">{{ confirmedAdmissionsCount }}</span>
-          </button>
-        </div>
-        <div class="adm-table-meta-counter">
-          Showing <strong>{{ filteredAdmissions.length }}</strong> of <strong>{{ admissionsList.length }}</strong> candidate records
-        </div>
+      <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap;">
+        <button 
+          type="button"
+          class="admin-tab-btn" 
+          :class="{ active: admissionStatusFilter === 'all' }"
+          @click="admissionStatusFilter = 'all'"
+          style="padding: 0.35rem 0.85rem; font-size: 0.8rem; border-radius: 999px;"
+        >
+          📋 All Registrations ({{ admissionsList.length }})
+        </button>
+        <button 
+          type="button"
+          class="admin-tab-btn" 
+          :class="{ active: admissionStatusFilter === 'Pending Verification' || admissionStatusFilter === 'Pending Confirmation' }"
+          @click="admissionStatusFilter = 'Pending Verification'"
+          style="padding: 0.35rem 0.85rem; font-size: 0.8rem; border-radius: 999px; border-color: rgba(245, 158, 11, 0.5);"
+          :style="pendingAdmissionsCount > 0 ? { color: '#f59e0b', fontWeight: '800', background: 'rgba(245, 158, 11, 0.12)' } : {}"
+        >
+          ⏳ Pending Review ({{ pendingAdmissionsCount }})
+          <span v-if="pendingAdmissionsCount > 0" style="margin-left: 6px; padding: 2px 7px; border-radius: 999px; background: #f59e0b; color: #000; font-size: 0.68rem; font-weight: 900;">
+            Action Needed
+          </span>
+        </button>
+        <button 
+          type="button"
+          class="admin-tab-btn" 
+          :class="{ active: admissionStatusFilter === 'Confirmed' }"
+          @click="admissionStatusFilter = 'Confirmed'"
+          style="padding: 0.35rem 0.85rem; font-size: 0.8rem; border-radius: 999px; border-color: rgba(16, 185, 129, 0.5);"
+          :style="{ color: '#10b981' }"
+        >
+          ✅ Confirmed Students & Active Logins ({{ confirmedAdmissionsCount }})
+        </button>
       </div>
 
       <!-- Action Feedback Banner -->
-      <div v-if="emailActionMsg" class="adm-action-toast">
+      <div v-if="emailActionMsg" style="margin-bottom: 1.25rem; padding: 0.85rem 1.25rem; background: rgba(249, 115, 22, 0.15); border: 1px solid rgba(249, 115, 22, 0.4); border-radius: var(--radius-md); color: var(--color-ai-orange); font-weight: 700; font-size: 0.9rem;">
         {{ emailActionMsg }}
       </div>
 
       <!-- Admissions Data Table -->
       <div class="admin-table-card admissions-table-card">
-        <div class="table-responsive admissions-table-scroll" tabindex="0" role="region" aria-label="Admissions registry table">
+        <div class="admissions-table-hint" aria-hidden="true">↔ Swipe or scroll horizontally when needed to view all columns and actions</div>
+        <div class="table-responsive admissions-table-scroll" tabindex="0" role="region" aria-label="Admissions registry table; scroll horizontally to view all columns">
           <table class="admin-data-table admissions-table">
             <thead>
               <tr>
-                <th>Registration & ID</th>
-                <th>Candidate Profile</th>
-                <th>Contact Channels</th>
-                <th>Course & Center</th>
+                <th>Reg. / Student ID</th>
+                <th>Candidate Name</th>
+                <th>Father's Name</th>
+                <th>Mobile & Email</th>
+                <th>Enrolled Program / Track</th>
                 <th>Date & Time</th>
-                <th>Status & Portal</th>
+                <th>Admission Status</th>
                 <th style="text-align: right;">Official Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="adm in filteredAdmissions" :key="adm.registrationNo || adm.id" class="adm-table-row">
-                <!-- 1. Reg & Student ID -->
+              <tr v-for="(adm, idx) in filteredAdmissions" :key="adm.registrationNo || adm.id">
                 <td>
-                  <div class="adm-id-cell">
-                    <div class="adm-reg-code" :title="'Registration ID: ' + (adm.registrationNo || adm.id)">
-                      <span class="adm-reg-icon">🏷️</span>
-                      <span class="adm-reg-text">{{ adm.registrationNo || adm.id }}</span>
-                    </div>
-                    <div v-if="adm.userId || adm.enrollmentNumber" class="adm-uid-badge" title="Student User ID for Portal Login">
-                      <span class="adm-uid-dot"></span>
-                      <span>{{ adm.userId || adm.enrollmentNumber }}</span>
-                    </div>
-                    <div v-else class="adm-uid-pending">
-                      <span>No User ID</span>
-                    </div>
+                  <span class="admin-reg-pill">{{ adm.registrationNo || adm.id }}</span>
+                  <div v-if="adm.userId || adm.enrollmentNumber" style="font-size: 0.72rem; font-family: var(--font-mono); color: #38bdf8; margin-top: 4px; font-weight: 700;">
+                    🆔 {{ adm.userId || adm.enrollmentNumber }}
                   </div>
                 </td>
-
-                <!-- 2. Candidate Profile (Avatar, Full Name, Parent, Gender, DOB) -->
                 <td>
-                  <div class="adm-candidate-cell">
-                    <div class="adm-avatar-circle" :style="{ background: getAvatarGradient(adm.candidateName || adm.fullName) }">
-                      {{ getInitials(adm.candidateName || adm.fullName) }}
-                    </div>
-                    <div class="adm-candidate-info">
-                      <div class="adm-candidate-name">{{ adm.candidateName || adm.fullName }}</div>
-                      <div class="adm-candidate-sub">
-                        <span v-if="adm.fatherName && adm.fatherName !== 'Not Specified'" class="adm-father-tag">
-                          S/D/W: {{ adm.fatherName }}
-                        </span>
-                        <span class="adm-meta-dot" v-if="adm.fatherName && adm.fatherName !== 'Not Specified'">•</span>
-                        <span>{{ adm.gender || 'Student' }}</span>
-                        <span v-if="adm.dob" class="adm-dob-tag"> (DOB: {{ adm.dob }})</span>
-                      </div>
-                    </div>
+                  <div style="font-weight: 800; color: var(--text-main);">{{ adm.candidateName || adm.fullName }}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-dim);">{{ adm.gender || '—' }} | DOB: {{ adm.dob || '—' }}</div>
+                </td>
+                <td>{{ adm.fatherName || '—' }}</td>
+                <td>
+                  <div>📞 {{ adm.mobile || adm.phone || '—' }}</div>
+                  <div style="font-size: 0.75rem; color: var(--color-ai-cyan);">{{ adm.email || '—' }}</div>
+                </td>
+                <td>
+                  <span class="admin-track-pill">{{ adm.course }}</span>
+                  <div style="font-size: 0.725rem; color: var(--text-dim); margin-top: 2px;">📍 {{ adm.district || 'Prayagraj' }}, UP</div>
+                </td>
+                <td style="font-size: 0.8rem; font-family: var(--font-mono); white-space: nowrap;">
+                  <div>📅 {{ adm.date }}</div>
+                  <div style="color: var(--text-dim);">⏱️ {{ adm.time }}</div>
+                </td>
+                <td>
+                  <span 
+                    class="admin-status-chip"
+                    :class="{
+                      'status-confirmed': adm.status === 'Confirmed' || adm.admissionConfirmed,
+                      'status-verified': adm.status === 'Verified',
+                      'status-pending': adm.status === 'Pending Verification' || (!adm.status && !adm.admissionConfirmed)
+                    }"
+                    @click="cycleAdmissionStatus(adm)"
+                    :title="'Click to toggle status'"
+                  >
+                    {{ adm.status || (adm.admissionConfirmed ? 'Confirmed' : 'Pending Verification') }}
+                  </span>
+                  <div v-if="adm.status === 'Confirmed' || adm.admissionConfirmed" style="font-size: 0.7rem; color: #10b981; font-weight: 700; margin-top: 3px;">
+                    ● Login Active
+                  </div>
+                  <div v-else style="font-size: 0.7rem; color: #f59e0b; font-weight: 700; margin-top: 3px;">
+                    ● Pending Review
+                  </div>
+                  <div style="font-size: 0.7rem; font-weight: 700; margin-top: 3px;" :style="{ color: (adm.feeStatus && adm.feeStatus.includes('Paid')) ? '#10b981' : '#f59e0b' }">
+                    💳 {{ adm.feeStatus || 'Fee Pending' }}
                   </div>
                 </td>
-
-                <!-- 3. Contact Channels (Phone & Email) -->
-                <td>
-                  <div class="adm-contact-cell">
-                    <a v-if="adm.mobile || adm.phone" :href="'tel:' + (adm.mobile || adm.phone)" class="adm-contact-line phone" title="Click to call candidate">
-                      <span class="adm-contact-icon">📞</span>
-                      <span class="adm-contact-val">{{ adm.mobile || adm.phone }}</span>
-                    </a>
-                    <span v-else class="adm-contact-line phone muted">📞 —</span>
-
-                    <a v-if="adm.email" :href="'mailto:' + adm.email" class="adm-contact-line email" :title="'Email: ' + adm.email">
-                      <span class="adm-contact-icon">✉️</span>
-                      <span class="adm-contact-val">{{ adm.email }}</span>
-                    </a>
-                    <span v-else class="adm-contact-line email muted">✉️ —</span>
-                  </div>
-                </td>
-
-                <!-- 4. Course & Location -->
-                <td>
-                  <div class="adm-program-cell">
-                    <span class="adm-course-chip" :title="adm.course">{{ adm.course }}</span>
-                    <div class="adm-location-line">
-                      <span class="adm-loc-icon">📍</span>
-                      <span>{{ adm.district || 'Prayagraj' }}, UP</span>
-                    </div>
-                  </div>
-                </td>
-
-                <!-- 5. Date & Time -->
-                <td>
-                  <div class="adm-time-cell">
-                    <div class="adm-date-badge">📅 {{ adm.date }}</div>
-                    <div class="adm-time-tag">⏱️ {{ adm.time }}</div>
-                  </div>
-                </td>
-
-                <!-- 6. Status & Portal Access -->
-                <td>
-                  <div class="adm-status-cell">
+                <td class="action-cell" style="text-align: right; position: relative;">
+                  <div class="row-action-cluster">
+                    <!-- Primary Quick Action -->
                     <button 
+                      v-if="adm.status !== 'Confirmed' && !adm.admissionConfirmed"
                       type="button"
-                      class="adm-status-badge"
-                      :class="{
-                        'confirmed': adm.status === 'Confirmed' || adm.admissionConfirmed,
-                        'verified': adm.status === 'Verified',
-                        'pending': adm.status === 'Pending Verification' || (!adm.status && !adm.admissionConfirmed)
-                      }"
-                      @click="cycleAdmissionStatus(adm)"
-                      title="Click to toggle admission status"
+                      class="quick-action-btn quick-confirm-btn" 
+                      @click="handleConfirmAdmissionAndGenerateCredentials(adm)" 
+                      title="Confirm candidate admission and automatically generate credentials"
                     >
-                      <span class="status-pulse-dot"></span>
-                      <span>{{ adm.status || (adm.admissionConfirmed ? 'Confirmed' : 'Pending Verification') }}</span>
+                      <span class="btn-icon">⚡</span>
+                      <span>Confirm</span>
+                    </button>
+                    <button 
+                      v-else
+                      type="button"
+                      class="quick-action-btn quick-edit-btn" 
+                      @click="openEditAdmissionModal(adm)" 
+                      title="Edit Candidate Details"
+                    >
+                      <span class="btn-icon">✏️</span>
+                      <span>Edit</span>
                     </button>
 
-                    <div class="adm-portal-status" :class="(adm.status === 'Confirmed' || adm.admissionConfirmed) ? 'active' : 'inactive'">
-                      <span class="portal-dot"></span>
-                      <span>{{ (adm.status === 'Confirmed' || adm.admissionConfirmed) ? 'Portal Active' : 'Review Needed' }}</span>
-                    </div>
-
-                    <div class="adm-fee-status-tag" :class="(adm.feeStatus && adm.feeStatus.includes('Paid')) ? 'paid' : 'unpaid'">
-                      <span>💳 {{ adm.feeStatus || 'Fee Pending' }}</span>
-                    </div>
-                  </div>
-                </td>
-
-                <!-- 7. Executive 2-Tier Actions Dock -->
-                <td style="text-align: right;">
-                  <div class="adm-actions-cell">
-                    <!-- Tier 1: Primary Action & Quick Edit -->
-                    <div class="adm-primary-actions-row">
-                      <!-- If pending: Confirm & Generate button -->
-                      <button 
-                        v-if="adm.status !== 'Confirmed' && !adm.admissionConfirmed"
-                        type="button"
-                        class="adm-btn adm-btn-confirm" 
-                        @click="handleConfirmAdmissionAndGenerateCredentials(adm)" 
-                        title="Confirm candidate admission, generate User ID & Password, and activate student login"
-                      >
-                        <span class="adm-btn-icon">⚡</span>
-                        <span>Confirm & Generate</span>
-                      </button>
-
-                      <!-- If confirmed: View Credentials button -->
-                      <button 
-                        v-if="adm.status === 'Confirmed' || adm.admissionConfirmed"
-                        type="button"
-                        class="adm-btn adm-btn-credentials" 
-                        @click="openCredentialsModal(adm)" 
-                        title="View Generated Student User ID & Password"
-                      >
-                        <span class="adm-btn-icon">🔐</span>
-                        <span>Credentials</span>
-                      </button>
-
-                      <!-- Edit Button -->
+                    <!-- Dropdown Trigger & Popover -->
+                    <div class="action-dropdown-wrap">
                       <button 
                         type="button"
-                        class="adm-btn adm-btn-edit" 
-                        @click="openEditAdmissionModal(adm)" 
-                        title="Edit Candidate Details"
+                        class="dropdown-trigger-btn"
+                        :class="{ 'active': activeAdmissionDropdown === (adm.registrationNo || adm.id) }"
+                        @click.stop="toggleAdmissionDropdown(adm, $event)"
+                        title="More Actions"
+                        aria-haspopup="true"
+                        :aria-expanded="activeAdmissionDropdown === (adm.registrationNo || adm.id)"
                       >
-                        <span class="adm-btn-icon">✏️</span>
-                        <span>Edit</span>
-                      </button>
-                    </div>
-
-                    <!-- Tier 2: Sleek Icon Toolbar with Rich Tooltips -->
-                    <div class="adm-tools-toolbar">
-                      <button 
-                        v-if="(adm.status === 'Confirmed' || adm.admissionConfirmed) && (adm.mobile || adm.phone)"
-                        type="button"
-                        class="adm-tool-btn tool-wa" 
-                        @click="shareCredentialsOnWhatsApp(adm)" 
-                        title="Send Credentials via WhatsApp"
-                      >
-                        <span>📲</span>
-                        <span class="tool-tip">WhatsApp</span>
+                        <span>Actions</span>
+                        <svg class="dropdown-caret-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
                       </button>
 
-                      <button 
-                        type="button"
-                        class="adm-tool-btn tool-email" 
-                        @click="openAdmissionEmailModal(adm)" 
-                        title="Email Official Confirmation Letter"
-                      >
-                        <span>📩</span>
-                        <span class="tool-tip">Letter</span>
-                      </button>
+                      <transition name="dropdown-pop">
+                        <div 
+                          v-if="activeAdmissionDropdown === (adm.registrationNo || adm.id)"
+                          class="action-popover-menu"
+                          :class="{ 'is-dropup': idx >= Math.max(1, filteredAdmissions.length - 2) }"
+                          @click.stop
+                        >
+                          <div class="popover-badge-row">
+                            <span class="popover-id-tag">{{ adm.registrationNo || adm.id }}</span>
+                            <span 
+                              class="popover-status-tag"
+                              :class="adm.status === 'Confirmed' || adm.admissionConfirmed ? 'status-confirmed-tag' : 'status-pending-tag'"
+                            >
+                              {{ adm.status === 'Confirmed' || adm.admissionConfirmed ? '● Confirmed' : '● Pending' }}
+                            </span>
+                          </div>
 
-                      <button 
-                        type="button"
-                        class="adm-tool-btn tool-pdf" 
-                        @click="$emit('download-slip', adm)" 
-                        title="Download Verified PDF Registration Slip"
-                      >
-                        <span>📄</span>
-                        <span class="tool-tip">PDF Slip</span>
-                      </button>
+                          <!-- Management & Record -->
+                          <div class="popover-group">
+                            <div class="popover-group-label">Record & Settings</div>
+                            <button 
+                              type="button" 
+                              class="popover-menu-item" 
+                              @click="closeAllActionDropdowns(); openEditAdmissionModal(adm)"
+                            >
+                              <span class="menu-item-icon">✏️</span>
+                              <div class="menu-item-text">
+                                <div class="menu-item-title">Edit Details</div>
+                                <div class="menu-item-desc">Candidate personal & course info</div>
+                              </div>
+                            </button>
+                            <button 
+                              v-if="adm.status !== 'Confirmed' && !adm.admissionConfirmed"
+                              type="button" 
+                              class="popover-menu-item highlight-emerald" 
+                              @click="closeAllActionDropdowns(); handleConfirmAdmissionAndGenerateCredentials(adm)"
+                            >
+                              <span class="menu-item-icon">⚡</span>
+                              <div class="menu-item-text">
+                                <div class="menu-item-title">Confirm & Generate</div>
+                                <div class="menu-item-desc">Activate student ID & send credentials</div>
+                              </div>
+                            </button>
+                            <button 
+                              v-if="adm.status === 'Confirmed' || adm.admissionConfirmed"
+                              type="button" 
+                              class="popover-menu-item highlight-purple" 
+                              @click="closeAllActionDropdowns(); openDashboardControlModal(adm)"
+                            >
+                              <span class="menu-item-icon">🎛️</span>
+                              <div class="menu-item-text">
+                                <div class="menu-item-title">Dashboard Controls</div>
+                                <div class="menu-item-desc">Manage exams, notices & portal modules</div>
+                              </div>
+                            </button>
+                          </div>
 
-                      <button 
-                        type="button"
-                        class="adm-tool-btn tool-receipt" 
-                        @click="confirmFeeAndSendJpgReceipt(adm)" 
-                        title="Confirm Fee Payment and Send JPG Receipt"
-                      >
-                        <span>💳</span>
-                        <span class="tool-tip">JPG Fee</span>
-                      </button>
+                          <!-- Credentials & Notice -->
+                          <div class="popover-group" v-if="adm.status === 'Confirmed' || adm.admissionConfirmed">
+                            <div class="popover-group-label">Credentials & Access</div>
+                            <button 
+                              type="button" 
+                              class="popover-menu-item highlight-cyan" 
+                              @click="closeAllActionDropdowns(); openCredentialsModal(adm)"
+                            >
+                              <span class="menu-item-icon">🔐</span>
+                              <div class="menu-item-text">
+                                <div class="menu-item-title">View Credentials</div>
+                                <div class="menu-item-desc">Display User ID & password card</div>
+                              </div>
+                            </button>
+                            <button 
+                              v-if="adm.mobile || adm.phone"
+                              type="button" 
+                              class="popover-menu-item highlight-green" 
+                              @click="closeAllActionDropdowns(); shareCredentialsOnWhatsApp(adm)"
+                            >
+                              <span class="menu-item-icon">📲</span>
+                              <div class="menu-item-text">
+                                <div class="menu-item-title">WhatsApp Notice</div>
+                                <div class="menu-item-desc">Send credentials message to phone</div>
+                              </div>
+                            </button>
+                            <button 
+                              type="button" 
+                              class="popover-menu-item highlight-amber" 
+                              @click="closeAllActionDropdowns(); openResetPasswordModal(adm)"
+                            >
+                              <span class="menu-item-icon">🔑</span>
+                              <div class="menu-item-text">
+                                <div class="menu-item-title">Reset Password</div>
+                                <div class="menu-item-desc">Generate new student portal secret</div>
+                              </div>
+                            </button>
+                          </div>
 
-                      <button 
-                        v-if="adm.status === 'Confirmed' || adm.admissionConfirmed"
-                        type="button"
-                        class="adm-tool-btn tool-controls" 
-                        @click="openDashboardControlModal(adm)" 
-                        title="Student Portal Dashboard Feature Controls"
-                      >
-                        <span>🎛️</span>
-                        <span class="tool-tip">Controls</span>
-                      </button>
+                          <!-- Documents & Dispatch -->
+                          <div class="popover-group">
+                            <div class="popover-group-label">Documents & Receipts</div>
+                            <button 
+                              type="button" 
+                              class="popover-menu-item highlight-orange" 
+                              @click="closeAllActionDropdowns(); openAdmissionEmailModal(adm)"
+                            >
+                              <span class="menu-item-icon">📩</span>
+                              <div class="menu-item-text">
+                                <div class="menu-item-title">Email Letter</div>
+                                <div class="menu-item-desc">Send admission confirmation letter</div>
+                              </div>
+                            </button>
+                            <button 
+                              type="button" 
+                              class="popover-menu-item highlight-emerald" 
+                              @click="closeAllActionDropdowns(); confirmFeeAndSendJpgReceipt(adm)"
+                            >
+                              <span class="menu-item-icon">💳</span>
+                              <div class="menu-item-text">
+                                <div class="menu-item-title">JPG Fee Receipt</div>
+                                <div class="menu-item-desc">Confirm fee & send image receipt</div>
+                              </div>
+                            </button>
+                            <button 
+                              type="button" 
+                              class="popover-menu-item" 
+                              @click="closeAllActionDropdowns(); $emit('download-slip', adm)"
+                            >
+                              <span class="menu-item-icon">📄</span>
+                              <div class="menu-item-text">
+                                <div class="menu-item-title">Download PDF Slip</div>
+                                <div class="menu-item-desc">Print verified admission receipt</div>
+                              </div>
+                            </button>
+                          </div>
 
-                      <button 
-                        v-if="adm.status === 'Confirmed' || adm.admissionConfirmed"
-                        type="button"
-                        class="adm-tool-btn tool-pass" 
-                        @click="openResetPasswordModal(adm)" 
-                        title="Reset Student Password"
-                      >
-                        <span>🔑</span>
-                        <span class="tool-tip">Reset</span>
-                      </button>
-
-                      <button 
-                        type="button"
-                        class="adm-tool-btn tool-delete" 
-                        @click="deleteAdmission(adm)" 
-                        title="Delete Candidate Record"
-                      >
-                        <span>🗑️</span>
-                        <span class="tool-tip">Delete</span>
-                      </button>
+                          <!-- Danger Zone -->
+                          <div class="popover-group popover-group-danger">
+                            <button 
+                              type="button" 
+                              class="popover-menu-item item-danger" 
+                              @click="closeAllActionDropdowns(); deleteAdmission(adm)"
+                            >
+                              <span class="menu-item-icon">🗑️</span>
+                              <div class="menu-item-text">
+                                <div class="menu-item-title">Delete Admission</div>
+                                <div class="menu-item-desc">Remove candidate from database</div>
+                              </div>
+                            </button>
+                          </div>
+                        </div>
+                      </transition>
                     </div>
                   </div>
                 </td>
               </tr>
-
               <tr v-if="filteredAdmissions.length === 0">
-                <td colspan="7" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                <td colspan="8" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
                   <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔍</div>
                   <div style="font-weight: 700; font-size: 1rem; color: var(--text-main); margin-bottom: 0.5rem;">
                     {{ admissionsList.length > 0 ? 'No candidates match filter "' + admissionStatusFilter + '".' : 'No candidate admissions found.' }}
@@ -5703,35 +5771,6 @@ const confirmedAdmissionsCount = computed(() => {
   return admissionsList.value.filter(a => a.status === 'Confirmed' || a.status === 'Active Registered Student' || a.status === 'Verified' || a.admissionConfirmed).length;
 });
 
-const paidAdmissionsCount = computed(() => {
-  return admissionsList.value.filter(a => a.feeStatus && (a.feeStatus.includes('Paid') || a.feeStatus.includes('Verified'))).length;
-});
-
-const getInitials = (name) => {
-  if (!name) return 'ST';
-  const parts = name.trim().split(/\s+/);
-  if (parts.length >= 2) {
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  }
-  return name.slice(0, 2).toUpperCase();
-};
-
-const getAvatarGradient = (name) => {
-  const gradients = [
-    'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-    'linear-gradient(135deg, #10b981 0%, #047857 100%)',
-    'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
-    'linear-gradient(135deg, #f59e0b 0%, #b45309 100%)',
-    'linear-gradient(135deg, #ec4899 0%, #be185d 100%)',
-    'linear-gradient(135deg, #06b6d4 0%, #0e7490 100%)'
-  ];
-  if (!name) return gradients[0];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  const index = Math.abs(hash) % gradients.length;
-  return gradients[index];
-};
-
 const openAdmissionEmailModal = (adm) => {
   if (!adm || !adm.email) {
     alert('Candidate record has no valid email address.');
@@ -8666,6 +8705,53 @@ const handleDeleteCertificate = async (cert) => {
   setTimeout(() => { emailActionMsg.value = ''; }, 4000);
 };
 
+// --- ROW ACTION DROPDOWN POPUP STATE ---
+const activeAdmissionDropdown = ref(null);
+const activeStudentDropdown = ref(null);
+
+const toggleAdmissionDropdown = (adm, e) => {
+  if (e) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  const id = adm.registrationNo || adm.id || adm._id;
+  if (activeAdmissionDropdown.value === id) {
+    activeAdmissionDropdown.value = null;
+  } else {
+    activeAdmissionDropdown.value = id;
+    activeStudentDropdown.value = null;
+  }
+};
+
+const toggleStudentDropdown = (stu, e) => {
+  if (e) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  const id = stu.id || stu.enrollmentNumber || stu.userId || stu._id;
+  if (activeStudentDropdown.value === id) {
+    activeStudentDropdown.value = null;
+  } else {
+    activeStudentDropdown.value = id;
+    activeAdmissionDropdown.value = null;
+  }
+};
+
+const closeAllActionDropdowns = () => {
+  activeAdmissionDropdown.value = null;
+  activeStudentDropdown.value = null;
+};
+
+const onGlobalKeydown = (e) => {
+  if (e && e.key === 'Escape') {
+    closeAllActionDropdowns();
+  }
+};
+
+watch([currentTab, admissionSearch, admissionStatusFilter, studentSearch, studentCourseFilter, studentStatusFilter], () => {
+  closeAllActionDropdowns();
+});
+
 let headerResizeObserver = null;
 
 onMounted(() => {
@@ -8685,6 +8771,8 @@ onMounted(() => {
   if (typeof window !== 'undefined') {
     window.addEventListener('resize', updateAdminHeaderHeight, { passive: true });
     window.addEventListener('ithunt_exam_submitted', onExamSubmittedHandler);
+    window.addEventListener('click', closeAllActionDropdowns);
+    window.addEventListener('keydown', onGlobalKeydown);
   }
 });
 
@@ -8696,6 +8784,8 @@ onUnmounted(() => {
   if (typeof window !== 'undefined') {
     window.removeEventListener('resize', updateAdminHeaderHeight);
     window.removeEventListener('ithunt_exam_submitted', onExamSubmittedHandler);
+    window.removeEventListener('click', closeAllActionDropdowns);
+    window.removeEventListener('keydown', onGlobalKeydown);
     document.removeEventListener('click', handleAdminOutsideClick, true);
     document.removeEventListener('touchstart', handleAdminOutsideClick, { capture: true });
   }
@@ -12845,734 +12935,461 @@ label {
   border-radius: 999px;
 }
 
-/* === ADMISSIONS REGISTRY REDESIGN STYLES === */
-.adm-kpi-strip {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-}
-
-@media (max-width: 900px) {
-  .adm-kpi-strip {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 540px) {
-  .adm-kpi-strip {
-    grid-template-columns: 1fr;
-  }
-}
-
-.adm-kpi-card {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem 1.2rem;
-  background: rgba(13, 19, 35, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 14px;
-  cursor: pointer;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(12px);
-}
-
-.adm-kpi-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(56, 189, 248, 0.35);
-  background: rgba(18, 27, 49, 0.85);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-}
-
-.adm-kpi-card.active {
-  border-color: rgba(56, 189, 248, 0.7);
-  background: rgba(14, 30, 58, 0.9);
-  box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
-}
-
-.adm-kpi-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.35rem;
-  flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-}
-
-.adm-kpi-icon.total { background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); }
-.adm-kpi-icon.confirmed { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); }
-.adm-kpi-icon.pending { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); }
-.adm-kpi-icon.fee { background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.3); }
-
-.adm-kpi-data {
-  display: flex;
-  flex-direction: column;
-}
-
-.adm-kpi-num {
-  font-size: 1.45rem;
-  font-weight: 900;
-  color: #f8fafc;
-  line-height: 1.1;
-  font-family: var(--font-heading, sans-serif);
-}
-
-.adm-kpi-num.text-emerald { color: #10b981; }
-.adm-kpi-num.text-amber { color: #f59e0b; }
-.adm-kpi-num.text-cyan { color: #38bdf8; }
-.adm-kpi-num.text-dim { color: #64748b; }
-
-.adm-kpi-title {
-  font-size: 0.74rem;
-  color: #94a3b8;
-  font-weight: 700;
-  margin-top: 3px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-/* Quick Filter Dock */
-.adm-filter-dock {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  flex-wrap: wrap;
-}
-
-.adm-filter-pills {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.adm-filter-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 0.45rem 1rem;
-  font-size: 0.8rem;
-  font-weight: 700;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #94a3b8;
-  cursor: pointer;
-  transition: all 0.18s ease;
-}
-
-.adm-filter-btn:hover {
-  background: rgba(30, 41, 59, 0.8);
-  color: #f8fafc;
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.adm-filter-btn.active {
-  background: rgba(56, 189, 248, 0.16);
-  border-color: rgba(56, 189, 248, 0.6);
-  color: #38bdf8;
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
-}
-
-.adm-filter-btn.pending.active {
-  background: rgba(245, 158, 11, 0.16);
-  border-color: rgba(245, 158, 11, 0.6);
-  color: #f59e0b;
-  box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
-}
-
-.adm-filter-btn.confirmed.active {
-  background: rgba(16, 185, 129, 0.16);
-  border-color: rgba(16, 185, 129, 0.6);
-  color: #10b981;
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
-}
-
-.adm-filter-btn .pill-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1px 7px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.1);
-  font-size: 0.72rem;
-  font-weight: 800;
-}
-
-.adm-filter-btn .pill-count.alert {
-  background: #f59e0b;
-  color: #0f172a;
-}
-
-.action-alert-badge {
-  padding: 2px 7px;
-  border-radius: 999px;
-  background: #f59e0b;
-  color: #000;
-  font-size: 0.68rem;
-  font-weight: 900;
-  letter-spacing: 0.02em;
-}
-
-.adm-table-meta-counter {
-  font-size: 0.8rem;
-  color: #94a3b8;
-}
-
-.adm-table-meta-counter strong {
-  color: #f8fafc;
-}
-
-.adm-action-toast {
-  margin-bottom: 1.25rem;
-  padding: 0.85rem 1.25rem;
-  background: rgba(249, 115, 22, 0.15);
-  border: 1px solid rgba(249, 115, 22, 0.4);
-  border-radius: var(--radius-md);
-  color: var(--color-ai-orange);
-  font-weight: 700;
-  font-size: 0.88rem;
-}
-
-/* Admissions Table Card & Scroll */
-.admissions-table-card {
-  min-width: 0;
-  background: rgba(11, 17, 33, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(14px);
-}
-
 .admissions-table {
-  min-width: 1240px;
-  width: 100%;
+  min-width: 1040px;
   table-layout: fixed;
-  border-collapse: separate;
-  border-spacing: 0;
+}
+
+.admissions-table th,
+.admissions-table td {
+  overflow-wrap: anywhere;
+  vertical-align: middle;
 }
 
 .admissions-table th {
-  background: #0f172a;
-  color: #94a3b8;
-  font-size: 0.75rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 0.9rem 1.1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  white-space: nowrap;
+  white-space: normal;
+  line-height: 1.35;
 }
 
 .admissions-table th:nth-child(1),
-.admissions-table td:nth-child(1) { width: 14%; }
+.admissions-table td:nth-child(1) { width: 12%; }
 .admissions-table th:nth-child(2),
-.admissions-table td:nth-child(2) { width: 22%; }
+.admissions-table td:nth-child(2) { width: 14%; }
 .admissions-table th:nth-child(3),
-.admissions-table td:nth-child(3) { width: 15%; }
+.admissions-table td:nth-child(3) { width: 9%; }
 .admissions-table th:nth-child(4),
-.admissions-table td:nth-child(4) { width: 15%; }
+.admissions-table td:nth-child(4) { width: 17%; }
 .admissions-table th:nth-child(5),
-.admissions-table td:nth-child(5) { width: 10%; }
+.admissions-table td:nth-child(5) { width: 18%; }
 .admissions-table th:nth-child(6),
-.admissions-table td:nth-child(6) { width: 11%; }
+.admissions-table td:nth-child(6) { width: 10%; }
 .admissions-table th:nth-child(7),
-.admissions-table td:nth-child(7) { width: 25%; }
+.admissions-table td:nth-child(7) { width: 9%; }
+.admissions-table th:nth-child(8),
+.admissions-table td:nth-child(8) { width: 11%; min-width: 135px; }
 
-.adm-table-row {
-  transition: all 0.18s ease;
+.action-cell {
+  position: relative;
+  overflow: visible !important;
 }
 
-.admissions-table tbody tr {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.admissions-table tbody tr:hover {
-  background: rgba(30, 41, 59, 0.45) !important;
-}
-
-.admissions-table td {
-  padding: 0.85rem 1.1rem;
-  vertical-align: middle;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-/* 1. Reg & Student ID */
-.adm-id-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.adm-reg-code {
+.row-action-cluster {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px 8px;
-  border-radius: 6px;
-  background: rgba(56, 189, 248, 0.1);
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  color: #38bdf8;
-  font-family: var(--font-mono);
-  font-weight: 800;
-  font-size: 0.8rem;
-  width: fit-content;
-}
-
-.adm-reg-icon {
-  font-size: 0.75rem;
-}
-
-.adm-uid-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: #7dd3fc;
-  font-weight: 700;
-}
-
-.adm-uid-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #38bdf8;
-  box-shadow: 0 0 6px #38bdf8;
-}
-
-.adm-uid-pending {
-  font-size: 0.68rem;
-  color: #64748b;
-  font-style: italic;
-}
-
-/* 2. Candidate Profile */
-.adm-candidate-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.adm-avatar-circle {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  font-size: 0.95rem;
-  color: #ffffff;
-  flex-shrink: 0;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-  border: 1.5px solid rgba(255, 255, 255, 0.2);
-}
-
-.adm-candidate-info {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.adm-candidate-name {
-  font-weight: 800;
-  font-size: 0.92rem;
-  color: #f8fafc;
-  line-height: 1.25;
-}
-
-.adm-candidate-sub {
-  font-size: 0.73rem;
-  color: #94a3b8;
-  margin-top: 3px;
-  line-height: 1.3;
-}
-
-.adm-father-tag {
-  color: #cbd5e1;
-}
-
-.adm-meta-dot {
-  margin: 0 4px;
-  color: #64748b;
-}
-
-.adm-dob-tag {
-  color: #64748b;
-}
-
-/* 3. Contact Channels */
-.adm-contact-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.adm-contact-line {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.78rem;
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
-
-.adm-contact-line.phone {
-  color: #e2e8f0;
-  font-family: var(--font-mono);
-  font-weight: 700;
-}
-
-.adm-contact-line.phone:hover {
-  color: #38bdf8;
-  text-decoration: underline;
-}
-
-.adm-contact-line.email {
-  color: #38bdf8;
-  font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 175px;
-}
-
-.adm-contact-line.email:hover {
-  color: #7dd3fc;
-  text-decoration: underline;
-}
-
-.adm-contact-line.muted {
-  color: #64748b;
-}
-
-/* 4. Course & Location */
-.adm-program-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.adm-course-chip {
-  display: inline-block;
-  padding: 3px 8px;
-  border-radius: 6px;
-  background: rgba(99, 102, 241, 0.12);
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  color: #c7d2fe;
-  font-weight: 700;
-  font-size: 0.76rem;
-  line-height: 1.35;
-  width: fit-content;
-}
-
-.adm-location-line {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.72rem;
-  color: #64748b;
-}
-
-/* 5. Date & Time */
-.adm-time-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.adm-date-badge {
-  font-size: 0.78rem;
-  font-family: var(--font-mono);
-  color: #e2e8f0;
-  font-weight: 700;
-}
-
-.adm-time-tag {
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  color: #64748b;
-}
-
-/* 6. Status & Portal */
-.adm-status-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.adm-status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 9px;
-  border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 800;
-  cursor: pointer;
-  transition: all 0.18s ease;
-  width: fit-content;
-  border: 1px solid transparent;
-}
-
-.adm-status-badge.confirmed {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border-color: rgba(16, 185, 129, 0.4);
-}
-
-.adm-status-badge.verified {
-  background: rgba(56, 189, 248, 0.15);
-  color: #38bdf8;
-  border-color: rgba(56, 189, 248, 0.4);
-}
-
-.adm-status-badge.pending {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
-  border-color: rgba(245, 158, 11, 0.4);
-}
-
-.status-pulse-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-}
-
-.adm-portal-status {
-  font-size: 0.69rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.adm-portal-status.active {
-  color: #10b981;
-}
-
-.adm-portal-status.inactive {
-  color: #f59e0b;
-}
-
-.portal-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: currentColor;
-}
-
-.adm-fee-status-tag {
-  font-size: 0.69rem;
-  font-weight: 700;
-}
-
-.adm-fee-status-tag.paid {
-  color: #10b981;
-}
-
-.adm-fee-status-tag.unpaid {
-  color: #f59e0b;
-}
-
-/* 7. Executive 2-Tier Actions Dock */
-.adm-actions-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: flex-end;
-}
-
-.adm-primary-actions-row {
-  display: flex;
-  gap: 6px;
   justify-content: flex-end;
+  gap: 0.45rem;
+  position: relative;
 }
 
-.adm-btn {
+/* Quick Action Button */
+.quick-action-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 11px;
-  border-radius: 7px;
-  font-size: 0.775rem;
-  font-weight: 800;
-  cursor: pointer;
+  gap: 0.35rem;
+  padding: 0.38rem 0.68rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  border-radius: 8px;
   border: 1px solid transparent;
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
+  line-height: 1.2;
 }
 
-.adm-btn-confirm {
+.quick-confirm-btn {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: #ffffff;
   border-color: #10b981;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
 }
-
-.adm-btn-confirm:hover {
+.quick-confirm-btn:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.5);
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45);
 }
 
-.adm-btn-credentials {
-  background: rgba(56, 189, 248, 0.14);
+.quick-edit-btn {
+  background: rgba(56, 189, 248, 0.12);
   color: #38bdf8;
-  border-color: rgba(56, 189, 248, 0.45);
+  border-color: rgba(56, 189, 248, 0.35);
 }
-
-.adm-btn-credentials:hover {
-  background: #38bdf8;
-  color: #0f172a;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.35);
-}
-
-.adm-btn-edit {
-  background: rgba(255, 255, 255, 0.06);
-  color: #e2e8f0;
-  border-color: rgba(255, 255, 255, 0.16);
-}
-
-.adm-btn-edit:hover {
-  background: rgba(255, 255, 255, 0.14);
+.quick-edit-btn:hover {
+  background: rgba(56, 189, 248, 0.22);
+  border-color: #38bdf8;
   color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 10px rgba(56, 189, 248, 0.3);
   transform: translateY(-1px);
 }
 
-.adm-tools-toolbar {
-  display: flex;
-  gap: 4px;
-  justify-content: flex-end;
-  align-items: center;
+.quick-profile-btn {
+  background: rgba(148, 163, 184, 0.12);
+  color: #e2e8f0;
+  border-color: rgba(148, 163, 184, 0.3);
+}
+.quick-profile-btn:hover {
+  background: rgba(148, 163, 184, 0.22);
+  border-color: #e2e8f0;
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(148, 163, 184, 0.25);
+  transform: translateY(-1px);
 }
 
-.adm-tool-btn {
-  width: 29px;
-  height: 29px;
-  border-radius: 7px;
+/* Dropdown Container & Trigger */
+.action-dropdown-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-trigger-btn {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  font-size: 0.82rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 0.3rem;
+  padding: 0.38rem 0.65rem;
+  font-size: 0.76rem;
+  font-weight: 700;
   color: #cbd5e1;
+  background: rgba(30, 41, 59, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 8px;
   cursor: pointer;
-  position: relative;
-  transition: all 0.18s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
 }
 
-.adm-tool-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+.dropdown-trigger-btn:hover,
+.dropdown-trigger-btn.active {
+  background: rgba(51, 65, 85, 0.95);
+  border-color: #38bdf8;
+  color: #38bdf8;
+  box-shadow: 0 2px 10px rgba(56, 189, 248, 0.25);
 }
 
-.adm-tool-btn .tool-tip {
+.dropdown-caret-svg {
+  transition: transform 0.2s ease;
+}
+.dropdown-trigger-btn.active .dropdown-caret-svg {
+  transform: rotate(180deg);
+}
+
+/* Popover Menu */
+.action-popover-menu {
   position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 1050;
+  min-width: 250px;
+  max-width: 300px;
+  background: rgba(15, 23, 42, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.65), 0 0 1px 1px rgba(255, 255, 255, 0.1);
+  padding: 0.45rem;
+  text-align: left;
+  transform-origin: top right;
+}
+
+.action-popover-menu.is-dropup {
+  top: auto;
   bottom: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%) translateY(4px);
-  background: #0f172a;
-  color: #f8fafc;
+  transform-origin: bottom right;
+}
+
+.popover-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.35rem 0.55rem 0.45rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 0.35rem;
+}
+
+.popover-id-tag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+.popover-status-tag {
   font-size: 0.68rem;
   font-weight: 700;
-  padding: 3px 7px;
-  border-radius: 6px;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+}
+.popover-status-tag.status-confirmed-tag {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+.popover-status-tag.status-pending-tag {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.popover-group {
+  padding: 0.25rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.popover-group:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.popover-group-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  padding: 0.25rem 0.55rem 0.2rem;
+}
+
+.popover-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.42rem 0.55rem;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  color: #e2e8f0;
+}
+
+.popover-menu-item:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.menu-item-icon {
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+
+.menu-item-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.menu-item-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.menu-item-desc {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  margin-top: 1px;
   white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transition: all 0.16s ease;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  z-index: 20;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.adm-tool-btn:hover .tool-tip {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
+/* Item Highlights on Hover */
+.popover-menu-item.highlight-emerald:hover {
+  background: rgba(16, 185, 129, 0.15);
+}
+.popover-menu-item.highlight-emerald:hover .menu-item-title {
+  color: #34d399;
 }
 
-.adm-tool-btn.tool-wa:hover { background: rgba(34, 197, 94, 0.2); border-color: #22c55e; }
-.adm-tool-btn.tool-email:hover { background: rgba(249, 115, 22, 0.2); border-color: #f97316; }
-.adm-tool-btn.tool-pdf:hover { background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; }
-.adm-tool-btn.tool-receipt:hover { background: rgba(52, 211, 153, 0.2); border-color: #34d399; }
-.adm-tool-btn.tool-controls:hover { background: rgba(192, 132, 252, 0.2); border-color: #c084fc; }
-.adm-tool-btn.tool-pass:hover { background: rgba(245, 158, 11, 0.2); border-color: #f59e0b; }
-.adm-tool-btn.tool-delete:hover { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #ef4444; }
-
-/* === Light Theme Overrides === */
-.admin-shell.light-theme .adm-kpi-card {
-  background: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05) !important;
+.popover-menu-item.highlight-cyan:hover {
+  background: rgba(56, 189, 248, 0.15);
+}
+.popover-menu-item.highlight-cyan:hover .menu-item-title {
+  color: #38bdf8;
 }
 
-.admin-shell.light-theme .adm-kpi-num {
-  color: #0f172a !important;
+.popover-menu-item.highlight-yellow:hover {
+  background: rgba(250, 204, 21, 0.15);
+}
+.popover-menu-item.highlight-yellow:hover .menu-item-title {
+  color: #facc15;
 }
 
-.admin-shell.light-theme .adm-kpi-title {
-  color: #64748b !important;
+.popover-menu-item.highlight-purple:hover {
+  background: rgba(192, 132, 252, 0.15);
+}
+.popover-menu-item.highlight-purple:hover .menu-item-title {
+  color: #c084fc;
 }
 
-.admin-shell.light-theme .adm-filter-btn {
-  background: #f1f5f9;
+.popover-menu-item.highlight-green:hover {
+  background: rgba(34, 197, 94, 0.15);
+}
+.popover-menu-item.highlight-green:hover .menu-item-title {
+  color: #22c55e;
+}
+
+.popover-menu-item.highlight-amber:hover {
+  background: rgba(245, 158, 11, 0.15);
+}
+.popover-menu-item.highlight-amber:hover .menu-item-title {
+  color: #fbbf24;
+}
+
+.popover-menu-item.highlight-orange:hover {
+  background: rgba(249, 115, 22, 0.15);
+}
+.popover-menu-item.highlight-orange:hover .menu-item-title {
+  color: #fb923c;
+}
+
+.popover-group-danger {
+  padding-top: 0.3rem;
+}
+
+.popover-menu-item.item-danger {
+  color: #f87171;
+}
+.popover-menu-item.item-danger .menu-item-desc {
+  color: rgba(248, 113, 113, 0.7);
+}
+.popover-menu-item.item-danger:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+/* Light Theme Support */
+.admin-shell.light-theme .dropdown-trigger-btn {
+  background: #f8fafc;
   border-color: #cbd5e1;
-  color: #475569;
+  color: #334155;
+}
+.admin-shell.light-theme .dropdown-trigger-btn:hover,
+.admin-shell.light-theme .dropdown-trigger-btn.active {
+  background: #ffffff;
+  border-color: #0284c7;
+  color: #0284c7;
 }
 
-.admin-shell.light-theme .adm-filter-btn.active {
-  background: #e0f2fe;
-  border-color: #38bdf8;
-  color: #0284c7;
+.admin-shell.light-theme .action-popover-menu {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12), 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.admin-shell.light-theme .popover-badge-row {
+  border-bottom-color: #f1f5f9;
+}
+.admin-shell.light-theme .popover-group {
+  border-bottom-color: #f1f5f9;
+}
+.admin-shell.light-theme .popover-group-label {
+  color: #94a3b8;
+}
+.admin-shell.light-theme .popover-menu-item {
+  color: #1e293b;
+}
+.admin-shell.light-theme .popover-menu-item:hover {
+  background: #f1f5f9;
+}
+.admin-shell.light-theme .menu-item-desc {
+  color: #64748b;
+}
+
+/* Popover Animation */
+.dropdown-pop-enter-active,
+.dropdown-pop-leave-active {
+  transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dropdown-pop-enter-from,
+.dropdown-pop-leave-to {
+  opacity: 0;
+  transform: scale(0.95) translateY(-4px);
+}
+.action-popover-menu.is-dropup.dropdown-pop-enter-from,
+.action-popover-menu.is-dropup.dropdown-pop-leave-to {
+  transform: scale(0.95) translateY(4px);
+}
+
+.admin-shell.light-theme .admissions-tab-panel {
+  color: #172033;
+  font-style: normal;
 }
 
 .admin-shell.light-theme .admissions-table-card {
   background: #ffffff !important;
-  border-color: #cbd5e1 !important;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06) !important;
+  border-color: #d7e0ec !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07) !important;
+}
+
+.admin-shell.light-theme .admissions-table-hint {
+  color: #475569 !important;
+  background: #f1f5f9 !important;
+  border-bottom-color: #dbe3ee !important;
 }
 
 .admin-shell.light-theme .admissions-table th {
-  background: #f8fafc !important;
+  background: #f1f5f9 !important;
   color: #334155 !important;
-  border-bottom-color: #e2e8f0 !important;
+  border-bottom-color: #cbd5e1 !important;
 }
 
 .admin-shell.light-theme .admissions-table td {
   color: #1e293b !important;
-  border-bottom-color: #f1f5f9 !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+.admin-shell.light-theme .admissions-table tbody tr:nth-child(even) {
+  background: #f8fafc;
 }
 
 .admin-shell.light-theme .admissions-table tbody tr:hover {
-  background: #f8fafc !important;
+  background: #eff6ff !important;
 }
 
-.admin-shell.light-theme .adm-candidate-name {
-  color: #0f172a !important;
+.admin-shell.light-theme .admissions-table td [style*="color: var(--text-dim)"] {
+  color: #475569 !important;
 }
 
-.admin-shell.light-theme .adm-btn-edit {
-  background: #f8fafc;
-  color: #334155;
-  border-color: #cbd5e1;
+.admin-shell.light-theme .admissions-table td [style*="color: var(--color-ai-cyan)"] {
+  color: #0369a1 !important;
 }
 
-.admin-shell.light-theme .adm-tool-btn {
-  background: #f8fafc;
-  border-color: #e2e8f0;
-  color: #334155;
+.admin-shell.light-theme .admissions-table .admin-reg-pill {
+  color: #9a3412 !important;
+  background: #ffedd5 !important;
+}
+
+.admin-shell.light-theme .admissions-table .admin-status-chip.status-confirmed {
+  color: #166534 !important;
+  background: #dcfce7 !important;
+  border-color: #86efac !important;
+}
+
+.admin-shell.light-theme .admissions-table .admin-status-chip.status-verified {
+  color: #075985 !important;
+  background: #e0f2fe !important;
+  border-color: #7dd3fc !important;
+}
+
+.admin-shell.light-theme .admissions-table .admin-status-chip.status-pending {
+  color: #92400e !important;
+  background: #fef3c7 !important;
+  border-color: #fcd34d !important;
+}
+
+.admin-shell.light-theme .admissions-table .admin-icon-btn {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+.admin-shell.light-theme .admissions-table .admin-icon-btn:hover {
+  background: #eff6ff !important;
+  border-color: #60a5fa !important;
+}
+
+.admin-shell.light-theme .admissions-table .btn-primary {
+  color: #ffffff !important;
 }
 
 @media (max-width: 960px) {
@@ -13734,18 +13551,9 @@ label {
   height: auto;
 }
 
-.student-directory-table .student-directory-actions {
-  flex-wrap: nowrap !important;
-  justify-content: flex-end;
-  gap: 0.35rem;
-  white-space: nowrap;
-}
-
-.student-directory-actions > button {
-  min-height: 36px !important;
-  padding: 0.35rem 0.55rem !important;
-  flex: 0 0 auto;
-  white-space: nowrap;
+.student-directory-table .action-cell {
+  min-width: 135px;
+  overflow: visible !important;
 }
 
 .student-directory-table .reg-no-code {
