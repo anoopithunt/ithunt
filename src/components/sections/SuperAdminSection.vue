@@ -10328,9 +10328,8 @@ body.light-theme .admin-data-table th {
   display: flex;
   flex-direction: column;
   gap: 1.75rem;
-  max-width: 1560px;
   width: 100%;
-  margin: 0 auto;
+  max-width: 100%;
   box-sizing: border-box;
 }
 
@@ -11130,9 +11129,8 @@ body.light-theme .admin-data-table th {
    ========================================================================== */
 .admin-tab-panel {
   padding: 1.75rem 2rem 3rem;
-  max-width: 1560px;
   width: 100%;
-  margin: 0 auto;
+  max-width: 100%;
   box-sizing: border-box;
 }
 
