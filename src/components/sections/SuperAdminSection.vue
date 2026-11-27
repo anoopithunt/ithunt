@@ -5672,7 +5672,6 @@ const saveCurrentAsPreset = async () => {
 };
 
 const testHomePopup = () => {
-  saveFestivalWishes();
   emit('preview-festival-wish', { ...festivalWishData.value, isActive: true });
   emit('set-tab', 'home');
 };

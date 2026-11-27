@@ -337,8 +337,9 @@
 
     <!-- Festive Celebration Greeting Modal Popup on Home Page -->
     <FestivalWishModal 
+      v-if="festivalWish && festivalWish.isActive && activeTab !== 'superadmin'"
       :key="festivalWish.festivalKey || festivalWish.theme || 'festive-modal'"
-      :isOpen="showFestivalModal && activeTab === 'home'" 
+      :isOpen="showFestivalModal && activeTab === 'home' && festivalWish.isActive" 
       :wish="festivalWish" 
       @close="showFestivalModal = false" 
       @action="handleFestivalModalAction" 
@@ -673,10 +674,16 @@ const syncFestivalWishState = (newWish) => {
 
 const broadcastFestivalWish = (wish) => {
   try {
-    if (typeof BroadcastChannel !== 'undefined') {
-      const channel = new BroadcastChannel('ithunt_festival_sync');
-      channel.postMessage({ type: 'FESTIVAL_WISH_UPDATED', wish });
-      channel.close();
+    if (!festivalChannel && typeof BroadcastChannel !== 'undefined') {
+      festivalChannel = new BroadcastChannel('ithunt_festival_sync');
+      festivalChannel.onmessage = (event) => {
+        if (event.data?.type === 'FESTIVAL_WISH_UPDATED' && event.data.wish) {
+          syncFestivalWishState(event.data.wish);
+        }
+      };
+    }
+    if (festivalChannel) {
+      festivalChannel.postMessage({ type: 'FESTIVAL_WISH_UPDATED', wish });
     }
   } catch (e) {}
 };
@@ -698,10 +705,12 @@ const handleVisibilityChange = () => {
     if (current && current.isActive !== festivalWish.value.isActive) {
       syncFestivalWishState(current);
     }
+    loadFestivalSettings();
   }
 };
 
 let festivalChannel = null;
+let festivalSyncInterval = null;
 
 const loadFestivalSettings = async () => {
   try {
@@ -745,10 +754,6 @@ const handleUpdateFestivalWish = async (updated) => {
 
 const handlePreviewFestivalWish = (previewWish) => {
   festivalWish.value = { ...previewWish, isActive: true };
-  try {
-    localStorage.setItem('ithunt_festival_wish', JSON.stringify(festivalWish.value));
-    localStorage.removeItem('ithunt_festival_dismissed_until');
-  } catch (e) {}
   showFestivalModal.value = false;
   activeTab.value = 'home';
   setTimeout(() => {
@@ -2071,6 +2076,13 @@ onMounted(() => {
   // Fetch true cloud festival state immediately on mount (not deferred)
   loadFestivalSettings();
 
+  // Periodic background check every 15s to guarantee multi-tab & multi-device sync
+  festivalSyncInterval = setInterval(() => {
+    if (document.visibilityState === 'visible') {
+      loadFestivalSettings();
+    }
+  }, 15000);
+
   // Defer background API synchronization to background idle cycles so the Home page loads instantly
   if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
     window.requestIdleCallback(() => {
@@ -2132,6 +2144,9 @@ onUnmounted(() => {
   window.removeEventListener('popstate', handlePopState);
   window.removeEventListener('storage', handleStorageChange);
   document.removeEventListener('visibilitychange', handleVisibilityChange);
+  if (festivalSyncInterval) {
+    clearInterval(festivalSyncInterval);
+  }
   if (festivalChannel) {
     try { festivalChannel.close(); } catch (e) {}
   }

@@ -1901,9 +1901,10 @@ export async function updateFestivalWishInBackend(wishData) {
         localStorage.removeItem('ithunt_festival_dismissed_until');
       }
       if (typeof BroadcastChannel !== 'undefined') {
-        const channel = new BroadcastChannel('ithunt_festival_sync');
-        channel.postMessage({ type: 'FESTIVAL_WISH_UPDATED', wish: wishData });
-        channel.close();
+        if (!globalThis.__ithunt_festival_channel) {
+          globalThis.__ithunt_festival_channel = new BroadcastChannel('ithunt_festival_sync');
+        }
+        globalThis.__ithunt_festival_channel.postMessage({ type: 'FESTIVAL_WISH_UPDATED', wish: wishData });
       }
     } catch (e) {}
     const res = await API.updateFestivalWish(wishData);
