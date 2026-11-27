@@ -18,7 +18,7 @@ function autoBackendPlugin() {
         socket.once('connect', () => { socket.destroy(); resolve(); });
         socket.once('error', () => {
           socket.destroy();
-          backendProcess = spawn('node', ['server/server.js'], { stdio: 'inherit', shell: true });
+          backendProcess = spawn('node', ['--watch', 'server/server.js'], { stdio: 'inherit', shell: true });
           backendProcess.once('exit', () => { backendProcess = undefined; });
           resolve();
         });
