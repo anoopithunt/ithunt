@@ -39,14 +39,18 @@ router.post('/login', loginRateLimit, async (req, res) => {
     }
 
     const normEmail = String(identifier).toLowerCase().trim();
+    const emailVariants = [normEmail];
+    if (normEmail.includes('anup')) emailVariants.push(normEmail.replace(/anup/g, 'anoop'));
+    if (normEmail.includes('anoop')) emailVariants.push(normEmail.replace(/anoop/g, 'anup'));
+
     // Only provisioned user accounts can authenticate; profile records are not credentials.
     const allUsers = await dbAdapter.find('users');
     let user = allUsers.find(u =>
-      (u.userId && u.userId.toLowerCase() === normEmail) ||
-      (u.email && u.email.toLowerCase() === normEmail) ||
-      (u.registrationNo && u.registrationNo.toLowerCase() === normEmail) ||
-      (u.enrollmentNumber && u.enrollmentNumber.toLowerCase() === normEmail) ||
-      (u.id && u.id.toLowerCase() === normEmail) ||
+      (u.userId && emailVariants.includes(u.userId.toLowerCase())) ||
+      (u.email && emailVariants.includes(u.email.toLowerCase())) ||
+      (u.registrationNo && emailVariants.includes(u.registrationNo.toLowerCase())) ||
+      (u.enrollmentNumber && emailVariants.includes(u.enrollmentNumber.toLowerCase())) ||
+      (u.id && emailVariants.includes(u.id.toLowerCase())) ||
       (normEmail === 'admin' && u.email === 'admin@ithunt.com') ||
       (normEmail === 'director' && u.email === 'director@ithunt.com') ||
       ((normEmail === 'anoop' || normEmail === 'anup') && u.email === 'anoop@ithunt.com') ||

@@ -302,35 +302,39 @@ router.post('/login', loginRateLimit, async (req, res) => {
       return res.status(400).json({ success: false, message: 'User ID or email and password are required.' });
     }
     const norm = String(identifier).toLowerCase().trim();
+    const idVariants = [norm];
+    if (norm.includes('anup')) idVariants.push(norm.replace(/anup/g, 'anoop'));
+    if (norm.includes('anoop')) idVariants.push(norm.replace(/anoop/g, 'anup'));
+
     const inputPass = (password || '').trim();
 
     // 1. Check students collection
     const students = await dbAdapter.find('students');
     let student = students.find(s => 
-      (s.userId && s.userId.toLowerCase() === norm) ||
-      (s.email && s.email.toLowerCase() === norm) || 
-      (s.registrationNo && s.registrationNo.toLowerCase() === norm) ||
-      (s.enrollmentNumber && s.enrollmentNumber.toLowerCase() === norm) ||
-      (s.id && s.id.toLowerCase() === norm)
+      (s.userId && idVariants.includes(s.userId.toLowerCase())) ||
+      (s.email && idVariants.includes(s.email.toLowerCase())) || 
+      (s.registrationNo && idVariants.includes(s.registrationNo.toLowerCase())) ||
+      (s.enrollmentNumber && idVariants.includes(s.enrollmentNumber.toLowerCase())) ||
+      (s.id && idVariants.includes(s.id.toLowerCase()))
     );
 
     // 2. Check admissions collection
     const admissions = await dbAdapter.find('admissions');
     let adm = admissions.find(a => 
-      (a.userId && a.userId.toLowerCase() === norm) ||
-      (a.email && a.email.toLowerCase() === norm) || 
-      (a.registrationNo && a.registrationNo.toLowerCase() === norm) ||
-      (a.registrationNumber && a.registrationNumber.toLowerCase() === norm) ||
-      (a.id && a.id.toLowerCase() === norm)
+      (a.userId && idVariants.includes(a.userId.toLowerCase())) ||
+      (a.email && idVariants.includes(a.email.toLowerCase())) || 
+      (a.registrationNo && idVariants.includes(a.registrationNo.toLowerCase())) ||
+      (a.registrationNumber && idVariants.includes(a.registrationNumber.toLowerCase())) ||
+      (a.id && idVariants.includes(a.id.toLowerCase()))
     );
 
     // 3. Check users collection
     const users = await dbAdapter.find('users');
     let user = users.find(u => 
-      (u.userId && u.userId.toLowerCase() === norm) ||
-      (u.email && u.email.toLowerCase() === norm) || 
-      (u.registrationNo && u.registrationNo.toLowerCase() === norm) ||
-      (u.id && u.id.toLowerCase() === norm)
+      (u.userId && idVariants.includes(u.userId.toLowerCase())) ||
+      (u.email && idVariants.includes(u.email.toLowerCase())) || 
+      (u.registrationNo && idVariants.includes(u.registrationNo.toLowerCase())) ||
+      (u.id && idVariants.includes(u.id.toLowerCase()))
     );
 
     if (!student && !adm && !user) {
