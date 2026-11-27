@@ -224,6 +224,7 @@ test('student password reset by SuperAdmin auto-provisions user account when tar
   const handler = layer.route.stack.at(-1).handle;
   const original = {
     find: dbAdapter.find,
+    findOne: dbAdapter.findOne,
     create: dbAdapter.create,
     update: dbAdapter.update
   };
@@ -246,6 +247,7 @@ test('student password reset by SuperAdmin auto-provisions user account when tar
     if (collection === 'users') return []; // User record missing initially
     return [];
   };
+  dbAdapter.findOne = async () => null;
   dbAdapter.create = async (collection, fields) => {
     creates.push({ collection, fields });
     return { ...fields, id: fields.id || 'new-user-id' };
@@ -307,14 +309,15 @@ test('student password reset by SuperAdmin rejects attempting to reset administr
     item.route?.path === '/:id/reset-password' && item.route.methods.post
   );
   const handler = layer.route.stack.at(-1).handle;
-  const original = { find: dbAdapter.find };
+  const original = { find: dbAdapter.find, findOne: dbAdapter.findOne };
 
   dbAdapter.find = async (collection) => {
     if (collection === 'users') {
-      return [{ id: 'admin-1', email: 'admin@ithunt.com', role: 'admin' }];
+      return [{ id: 'admin-1', email: 'admin@ithunt.com', role: 'superadmin' }];
     }
     return [];
   };
+  dbAdapter.findOne = async () => null;
 
   const response = {
     statusCode: 200,
