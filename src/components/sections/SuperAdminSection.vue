@@ -5770,14 +5770,36 @@ const handleSaveResetPassword = async () => {
     return;
   }
   const target = resetStudentTarget.value;
-  const targetId = target.userId || target.id || target.registrationNo;
+  const targetId = target.registrationNo || target.userId || target.id || target.email;
   const newPass = newPasswordInput.value;
 
   emailActionMsg.value = `Updating password for ${target.candidateName || target.name || 'Student'}...`;
 
   try {
-    const result = await resetStudentPasswordInBackend(targetId, newPass);
+    const extraData = {
+      email: target.email,
+      userId: target.userId,
+      registrationNo: target.registrationNo || target.regNo || target.enrollmentNumber || target.id,
+      candidateName: target.candidateName || target.fullName || target.name,
+      name: target.name || target.candidateName || target.fullName,
+      phone: target.mobile || target.phone,
+      course: target.course
+    };
+
+    const result = await resetStudentPasswordInBackend(targetId, newPass, extraData);
     if (result?.success === false) throw new Error(result.error || result.message || 'Password reset failed.');
+
+    // Keep client-side plainPassword and password updated for immediate display in credentials card
+    target.plainPassword = newPass;
+    target.password = newPass;
+    if (confirmedStudentData.value && (
+      confirmedStudentData.value.email === target.email ||
+      confirmedStudentData.value.registrationNo === target.registrationNo ||
+      confirmedStudentData.value.userId === target.userId
+    )) {
+      confirmedStudentData.value.plainPassword = newPass;
+      confirmedStudentData.value.password = newPass;
+    }
 
     emailActionMsg.value = `✓ Password reset for ${target.candidateName || target.name || 'Student'}.`;
     showResetPasswordModal.value = false;

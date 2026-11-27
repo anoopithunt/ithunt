@@ -5,10 +5,11 @@ import { dbAdapter } from '../services/dbAdapter.js';
 
 process.env.JWT_SECRET ||= 'test-only-jwt-secret-with-at-least-32-bytes';
 
-const [admissionsModule, festivalModule, contactModule] = await Promise.all([
+const [admissionsModule, festivalModule, contactModule, studentsModule] = await Promise.all([
   import('./admissions.routes.js'),
   import('./festival.routes.js'),
-  import('./contact.routes.js')
+  import('./contact.routes.js'),
+  import('./students.routes.js')
 ]);
 
 function findRoute(router, path, method) {
@@ -205,6 +206,138 @@ test('admission confirmation activates the existing pending student profile', as
     assert.equal(studentUpdate.fields.status, 'ACTIVE');
     assert.equal(studentUpdate.fields.enrollmentNumber, 'USR-TEST-1');
     assert.equal(updates.find(entry => entry.collection === 'admissions').fields.confirmedBy, 'Verified Admin');
+  } finally {
+    Object.assign(dbAdapter, original);
+  }
+});
+
+test('student password reset route enforces admin authorization', () => {
+  const middleware = findRoute(studentsModule.default, '/:id/reset-password', 'post');
+  assert.ok(middleware.includes('verifyToken'), 'POST /:id/reset-password must verify authentication');
+  assert.ok(middleware.includes('requireAdmin'), 'POST /:id/reset-password must require admin');
+});
+
+test('student password reset by SuperAdmin auto-provisions user account when target matches admission userId', async () => {
+  const layer = studentsModule.default.stack.find(item =>
+    item.route?.path === '/:id/reset-password' && item.route.methods.post
+  );
+  const handler = layer.route.stack.at(-1).handle;
+  const original = {
+    find: dbAdapter.find,
+    create: dbAdapter.create,
+    update: dbAdapter.update
+  };
+  const creates = [];
+  const updates = [];
+
+  const admission = {
+    id: 'adm-001',
+    userId: 'USR-1789980325848',
+    registrationNo: 'ITH-2026-513',
+    candidateName: 'Anoop Mishra',
+    email: 'anoopmishrapitz@gmail.com',
+    course: 'NIELIT O/A Level Diploma',
+    phone: '9795771806'
+  };
+
+  dbAdapter.find = async (collection) => {
+    if (collection === 'admissions') return [admission];
+    if (collection === 'students') return [];
+    if (collection === 'users') return []; // User record missing initially
+    return [];
+  };
+  dbAdapter.create = async (collection, fields) => {
+    creates.push({ collection, fields });
+    return { ...fields, id: fields.id || 'new-user-id' };
+  };
+  dbAdapter.update = async (collection, id, fields) => {
+    updates.push({ collection, id, fields });
+    return { ...fields, id };
+  };
+
+  const response = {
+    statusCode: 200,
+    body: null,
+    status(code) {
+      this.statusCode = code;
+      return this;
+    },
+    json(body) {
+      this.body = body;
+      return this;
+    }
+  };
+
+  try {
+    await handler({
+      params: { id: 'USR-1789980325848' },
+      body: {
+        newPassword: 'SecurePassword2026!',
+        email: 'anoopmishrapitz@gmail.com',
+        registrationNo: 'ITH-2026-513',
+        candidateName: 'Anoop Mishra'
+      },
+      user: { name: 'Director', role: 'superadmin' }
+    }, response);
+
+    assert.equal(response.statusCode, 200);
+    assert.equal(response.body.success, true);
+
+    // Verify user account was auto-provisioned
+    const userCreate = creates.find(c => c.collection === 'users');
+    assert.ok(userCreate, 'User account should be auto-created in users collection');
+    assert.equal(userCreate.fields.email, 'anoopmishrapitz@gmail.com');
+    assert.equal(userCreate.fields.role, 'student');
+    assert.equal(userCreate.fields.status, 'ACTIVE');
+    assert.equal(userCreate.fields.verified, true);
+    assert.equal(userCreate.fields.password, 'SecurePassword2026!');
+
+    // Verify admission was updated
+    const admissionUpdate = updates.find(u => u.collection === 'admissions');
+    assert.ok(admissionUpdate, 'Admission record should be confirmed');
+    assert.equal(admissionUpdate.fields.admissionConfirmed, true);
+    assert.equal(admissionUpdate.fields.plainPassword, 'SecurePassword2026!');
+  } finally {
+    Object.assign(dbAdapter, original);
+  }
+});
+
+test('student password reset by SuperAdmin rejects attempting to reset administrator account', async () => {
+  const layer = studentsModule.default.stack.find(item =>
+    item.route?.path === '/:id/reset-password' && item.route.methods.post
+  );
+  const handler = layer.route.stack.at(-1).handle;
+  const original = { find: dbAdapter.find };
+
+  dbAdapter.find = async (collection) => {
+    if (collection === 'users') {
+      return [{ id: 'admin-1', email: 'admin@ithunt.com', role: 'admin' }];
+    }
+    return [];
+  };
+
+  const response = {
+    statusCode: 200,
+    body: null,
+    status(code) {
+      this.statusCode = code;
+      return this;
+    },
+    json(body) {
+      this.body = body;
+      return this;
+    }
+  };
+
+  try {
+    await handler({
+      params: { id: 'admin-1' },
+      body: { newPassword: 'NewPassword123!' },
+      user: { name: 'SuperAdmin', role: 'superadmin' }
+    }, response);
+
+    assert.equal(response.statusCode, 403);
+    assert.equal(response.body.success, false);
   } finally {
     Object.assign(dbAdapter, original);
   }

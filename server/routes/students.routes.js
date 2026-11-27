@@ -393,24 +393,250 @@ router.post('/login', loginRateLimit, async (req, res) => {
  */
 router.post('/:id/reset-password', verifyToken, requireAdmin, async (req, res) => {
   try {
-    const targetId = req.params.id;
-    const { newPassword } = req.body || {};
+    const targetId = String(req.params.id || '').trim();
+    const {
+      newPassword,
+      email: bodyEmail,
+      registrationNo: bodyRegNo,
+      regNo: bodyRegNo2,
+      enrollmentNumber: bodyEnrollment,
+      userId: bodyUserId,
+      candidateName: bodyCandidateName,
+      name: bodyName,
+      fullName: bodyFullName,
+      phone: bodyPhone,
+      mobile: bodyMobile,
+      course: bodyCourse
+    } = req.body || {};
+
     if (typeof newPassword !== 'string' || newPassword.length < 12 || newPassword.length > 1024) {
       return res.status(400).json({ success: false, message: 'Password must be at least 12 characters.' });
     }
 
-    const allUsers = await dbAdapter.find('users');
-    const user = allUsers.find(u => u.id === targetId || u.userId === targetId || u.registrationNo === targetId || u.email === targetId);
-    if (!user || String(user.role || '').toLowerCase() !== 'student') {
+    const candidateIds = new Set();
+    const candidateEmails = new Set();
+    const candidatePhones = new Set();
+
+    const addId = (val) => {
+      if (val && typeof val === 'string' && val.trim()) {
+        const clean = val.trim();
+        candidateIds.add(clean);
+        candidateIds.add(clean.toLowerCase());
+      }
+    };
+    const addEmail = (val) => {
+      if (val && typeof val === 'string' && val.trim() && val.includes('@')) {
+        candidateEmails.add(val.trim().toLowerCase());
+      }
+    };
+    const addPhone = (val) => {
+      if (val && typeof val === 'string' && val.trim()) {
+        const digits = val.replace(/\D/g, '');
+        if (digits.length >= 7) candidatePhones.add(digits);
+      }
+    };
+
+    addId(targetId);
+    addId(bodyUserId);
+    addId(bodyRegNo);
+    addId(bodyRegNo2);
+    addId(bodyEnrollment);
+
+    if (targetId.includes('@')) addEmail(targetId);
+    addEmail(bodyEmail);
+
+    addPhone(bodyPhone);
+    addPhone(bodyMobile);
+
+    const [allAdmissions, allStudents, allUsers] = await Promise.all([
+      dbAdapter.find('admissions').catch(() => []),
+      dbAdapter.find('students').catch(() => []),
+      dbAdapter.find('users').catch(() => [])
+    ]);
+
+    const matchesRecord = (rec) => {
+      if (!rec || typeof rec !== 'object') return false;
+      const recId = String(rec.id || rec._id || '').trim();
+      const recUserId = String(rec.userId || '').trim();
+      const recReg = String(rec.registrationNo || rec.registrationNumber || rec.enrollmentNumber || '').trim();
+      const recEmail = String(rec.email || '').trim().toLowerCase();
+      const recPhone = String(rec.phone || rec.mobile || '').replace(/\D/g, '');
+
+      if (recEmail && candidateEmails.has(recEmail)) return true;
+      if (recId && (candidateIds.has(recId) || candidateIds.has(recId.toLowerCase()))) return true;
+      if (recUserId && (candidateIds.has(recUserId) || candidateIds.has(recUserId.toLowerCase()))) return true;
+      if (recReg && (candidateIds.has(recReg) || candidateIds.has(recReg.toLowerCase()))) return true;
+      if (recPhone && candidatePhones.has(recPhone)) return true;
+      return false;
+    };
+
+    const matchingAdm = allAdmissions.find(matchesRecord);
+    if (matchingAdm) {
+      addId(matchingAdm.id);
+      addId(matchingAdm._id);
+      addId(matchingAdm.userId);
+      addId(matchingAdm.registrationNo);
+      addId(matchingAdm.registrationNumber);
+      addId(matchingAdm.enrollmentNumber);
+      addEmail(matchingAdm.email);
+      addPhone(matchingAdm.phone);
+      addPhone(matchingAdm.mobile);
+    }
+
+    const matchingStu = allStudents.find(matchesRecord);
+    if (matchingStu) {
+      addId(matchingStu.id);
+      addId(matchingStu._id);
+      addId(matchingStu.userId);
+      addId(matchingStu.registrationNo);
+      addId(matchingStu.registrationNumber);
+      addId(matchingStu.enrollmentNumber);
+      addEmail(matchingStu.email);
+      addPhone(matchingStu.phone);
+      addPhone(matchingStu.mobile);
+    }
+
+    let user = allUsers.find(matchesRecord);
+
+    if (user && ['admin', 'superadmin'].includes(String(user.role || '').toLowerCase())) {
+      return res.status(403).json({
+        success: false,
+        message: 'Administrator passwords cannot be reset via the student password reset endpoint.'
+      });
+    }
+
+    if (!user && !matchingAdm && !matchingStu) {
       return res.status(404).json({ success: false, message: 'Student account not found.' });
     }
-    await dbAdapter.update('users', user.id, { password: newPassword });
+
+    const resolvedEmail = (
+      (user?.email || '').toLowerCase().trim() ||
+      [...candidateEmails][0] ||
+      bodyEmail ||
+      matchingAdm?.email ||
+      matchingStu?.email ||
+      (targetId.includes('@') ? targetId : '') ||
+      `${(bodyRegNo || matchingAdm?.registrationNo || matchingStu?.registrationNo || targetId).toLowerCase()}@ithunt.com`
+    ).toLowerCase().trim();
+
+    const resolvedRegNo = (
+      user?.registrationNo ||
+      bodyRegNo ||
+      bodyRegNo2 ||
+      matchingAdm?.registrationNo ||
+      matchingStu?.registrationNo ||
+      matchingStu?.enrollmentNumber ||
+      (targetId.startsWith('ITH-') ? targetId : '')
+    ).trim();
+
+    const resolvedUserId = (
+      user?.userId ||
+      bodyUserId ||
+      matchingAdm?.userId ||
+      matchingStu?.userId ||
+      resolvedRegNo ||
+      targetId
+    ).trim();
+
+    const resolvedName = (
+      user?.name ||
+      bodyCandidateName ||
+      bodyName ||
+      bodyFullName ||
+      matchingAdm?.candidateName ||
+      matchingAdm?.fullName ||
+      matchingStu?.name ||
+      matchingStu?.fullName ||
+      'Student'
+    ).trim();
+
+    const resolvedCourse = (
+      user?.course ||
+      bodyCourse ||
+      matchingAdm?.course ||
+      matchingStu?.course ||
+      'Software Engineering'
+    ).trim();
+
+    const resolvedPhone = (
+      user?.phone ||
+      bodyPhone ||
+      bodyMobile ||
+      matchingAdm?.phone ||
+      matchingAdm?.mobile ||
+      matchingStu?.phone ||
+      matchingStu?.mobile ||
+      ''
+    ).trim();
+
+    if (!user) {
+      const newUserDoc = {
+        id: resolvedEmail || resolvedUserId,
+        userId: resolvedUserId,
+        name: resolvedName,
+        email: resolvedEmail,
+        role: 'student',
+        registrationNo: resolvedRegNo,
+        course: resolvedCourse,
+        phone: resolvedPhone,
+        password: newPassword,
+        verified: true,
+        status: 'ACTIVE',
+        createdAt: new Date().toISOString(),
+        confirmedAt: new Date().toISOString()
+      };
+      user = await dbAdapter.create('users', newUserDoc);
+    } else {
+      const userUpdates = {
+        password: newPassword,
+        status: 'ACTIVE',
+        verified: true,
+        role: user.role || 'student',
+        updatedAt: new Date().toISOString()
+      };
+      if (resolvedRegNo && !user.registrationNo) userUpdates.registrationNo = resolvedRegNo;
+      if (resolvedUserId && !user.userId) userUpdates.userId = resolvedUserId;
+      if (resolvedCourse && !user.course) userUpdates.course = resolvedCourse;
+      if (resolvedPhone && !user.phone) userUpdates.phone = resolvedPhone;
+
+      await dbAdapter.update('users', user.id || user._id, userUpdates);
+    }
+
+    const nowIso = new Date().toISOString();
+    if (matchingAdm) {
+      try {
+        await dbAdapter.update('admissions', matchingAdm.id || matchingAdm._id || matchingAdm.registrationNo, {
+          admissionConfirmed: true,
+          status: 'Confirmed',
+          plainPassword: newPassword,
+          updatedAt: nowIso
+        });
+      } catch (syncErr) {
+        console.warn('[Students] Could not sync admission password:', syncErr.message);
+      }
+    }
+
+    if (matchingStu) {
+      try {
+        await dbAdapter.update('students', matchingStu.id || matchingStu._id || matchingStu.registrationNo, {
+          admissionConfirmed: true,
+          status: 'ACTIVE',
+          academicStatus: 'ACTIVE',
+          plainPassword: newPassword,
+          updatedAt: nowIso
+        });
+      } catch (syncErr) {
+        console.warn('[Students] Could not sync student status:', syncErr.message);
+      }
+    }
 
     res.json({
       success: true,
       message: 'Student password reset successfully by SuperAdmin',
       data: {
-        userId: user.userId || user.email
+        userId: user?.userId || resolvedUserId || resolvedEmail,
+        email: user?.email || resolvedEmail,
+        registrationNo: resolvedRegNo
       }
     });
   } catch (error) {

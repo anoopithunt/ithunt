@@ -395,7 +395,13 @@ export const API = {
   confirmAdmission: (id, payload = {}) => apiRequest(`/admissions/${id}/confirm`, { method: 'POST', body: JSON.stringify(payload) }),
   updateAdmissionStatus: (id, status, feeStatus) => apiRequest(`/admissions/${id}/status`, { method: 'PATCH', body: JSON.stringify(typeof status === 'object' ? status : { status, ...(feeStatus ? { feeStatus } : {}) }) }),
   deleteAdmission: (id) => apiRequest(`/admissions/${id}`, { method: 'DELETE' }),
-  resetStudentPassword: (id, newPassword) => apiRequest(`/students/${id}/reset-password`, { method: 'POST', body: JSON.stringify({ newPassword }) }),
+  resetStudentPassword: (id, payload) => {
+    const body = typeof payload === 'string' ? { newPassword: payload } : payload;
+    return apiRequest(`/students/${encodeURIComponent(id)}/reset-password`, {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
+  },
 
   // NIELIT Project Submissions
   getNielitProjects: () => apiRequest('/nielit-projects'),
@@ -722,9 +728,13 @@ export async function confirmAdmissionInBackend(adm, creds = {}) {
 /**
  * Reset student password in backend
  */
-export async function resetStudentPasswordInBackend(studentId, newPassword) {
+export async function resetStudentPasswordInBackend(studentId, newPassword, extraData = {}) {
   try {
-    return await API.resetStudentPassword(studentId, newPassword);
+    const payload = {
+      newPassword,
+      ...(typeof extraData === 'object' && extraData !== null ? extraData : {})
+    };
+    return await API.resetStudentPassword(studentId, payload);
   } catch (err) {
     console.warn('API error resetting student password:', err.message);
     return { success: false, error: err.message };
