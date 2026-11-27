@@ -608,7 +608,7 @@ const showToast = (message, type = 'success', duration = 4000) => {
 
 // Festival & Celebration Wishes Broadcast System (SuperAdmin Controlled)
 const DEFAULT_FESTIVAL_WISH = {
-  isActive: true,
+  isActive: false,
   festivalKey: 'diwali',
   occasion: 'DIWALI (Festival of Lights)',
   title: '🪔 Shubh Deepawali & Happy Diwali from IT HUNT!',
@@ -656,10 +656,52 @@ const checkAndShowFestivalModal = (force = false) => {
   }
   if (activeTab.value === 'home' || force) {
     setTimeout(() => {
-      showFestivalModal.value = true;
+      if (festivalWish.value && festivalWish.value.isActive) {
+        showFestivalModal.value = true;
+      }
     }, 350);
   }
 };
+
+const syncFestivalWishState = (newWish) => {
+  if (!newWish || typeof newWish !== 'object') return;
+  festivalWish.value = { ...newWish };
+  if (!festivalWish.value.isActive) {
+    showFestivalModal.value = false;
+  }
+};
+
+const broadcastFestivalWish = (wish) => {
+  try {
+    if (typeof BroadcastChannel !== 'undefined') {
+      const channel = new BroadcastChannel('ithunt_festival_sync');
+      channel.postMessage({ type: 'FESTIVAL_WISH_UPDATED', wish });
+      channel.close();
+    }
+  } catch (e) {}
+};
+
+const handleStorageChange = (e) => {
+  if (e.key === 'ithunt_festival_wish') {
+    try {
+      if (e.newValue) {
+        const parsed = JSON.parse(e.newValue);
+        syncFestivalWishState(parsed);
+      }
+    } catch (err) {}
+  }
+};
+
+const handleVisibilityChange = () => {
+  if (document.visibilityState === 'visible') {
+    const current = getStoredFestivalWish();
+    if (current && current.isActive !== festivalWish.value.isActive) {
+      syncFestivalWishState(current);
+    }
+  }
+};
+
+let festivalChannel = null;
 
 const loadFestivalSettings = async () => {
   try {
@@ -679,14 +721,26 @@ const loadFestivalSettings = async () => {
 
 const handleUpdateFestivalWish = async (updated) => {
   festivalWish.value = { ...updated };
+  if (!festivalWish.value.isActive) {
+    showFestivalModal.value = false;
+  }
   try {
     localStorage.setItem('ithunt_festival_wish', JSON.stringify(festivalWish.value));
-    localStorage.removeItem('ithunt_festival_dismissed_until');
+    if (festivalWish.value.isActive) {
+      localStorage.removeItem('ithunt_festival_dismissed_until');
+    }
   } catch (e) {}
+
+  // Broadcast instantly to all other open tabs/windows
+  broadcastFestivalWish(festivalWish.value);
 
   // Save dynamically to Cloud Database (MongoDB Atlas) so it is live across all visitor locations
   await updateFestivalWishInBackend(festivalWish.value);
-  showToast(`🎉 ${updated.occasion || 'Festival'} celebration is now LIVE across all locations!`, 'success');
+  if (festivalWish.value.isActive) {
+    showToast(`🎉 ${updated.occasion || 'Festival'} celebration is now LIVE across all locations!`, 'success');
+  } else {
+    showToast('🔒 Celebration disabled & hidden across all locations and visitor tabs!', 'info');
+  }
 };
 
 const handlePreviewFestivalWish = (previewWish) => {
@@ -1999,16 +2053,32 @@ onMounted(() => {
   // Bind browser history navigation
   window.addEventListener('popstate', handlePopState);
 
+  // Cross-tab real-time sync for festival & celebrations
+  window.addEventListener('storage', handleStorageChange);
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+
+  try {
+    if (typeof BroadcastChannel !== 'undefined') {
+      festivalChannel = new BroadcastChannel('ithunt_festival_sync');
+      festivalChannel.onmessage = (event) => {
+        if (event.data?.type === 'FESTIVAL_WISH_UPDATED' && event.data.wish) {
+          syncFestivalWishState(event.data.wish);
+        }
+      };
+    }
+  } catch (e) {}
+
+  // Fetch true cloud festival state immediately on mount (not deferred)
+  loadFestivalSettings();
+
   // Defer background API synchronization to background idle cycles so the Home page loads instantly
   if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
     window.requestIdleCallback(() => {
       loadInitialData();
-      loadFestivalSettings();
     }, { timeout: 2000 });
   } else {
     setTimeout(() => {
       loadInitialData();
-      loadFestivalSettings();
     }, 300);
   }
 
@@ -2060,6 +2130,11 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
   window.removeEventListener('popstate', handlePopState);
+  window.removeEventListener('storage', handleStorageChange);
+  document.removeEventListener('visibilitychange', handleVisibilityChange);
+  if (festivalChannel) {
+    try { festivalChannel.close(); } catch (e) {}
+  }
   if (revealObserver) revealObserver.disconnect();
 });
 </script>

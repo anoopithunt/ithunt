@@ -2757,7 +2757,7 @@
           <div class="card-section-head">
             <h4 class="card-section-title">Popup Content & Settings</h4>
             <label class="toggle-control-label live-status-switch">
-              <input type="checkbox" v-model="festivalWishData.isActive">
+              <input type="checkbox" v-model="festivalWishData.isActive" @change="handleToggleFestivalCheckbox">
               <strong :style="{ color: festivalWishData.isActive ? '#10b981' : '#64748b' }">
                 {{ festivalWishData.isActive ? 'Active Across All Locations' : 'Disabled / Hidden' }}
               </strong>
@@ -5617,23 +5617,33 @@ const applyFestivalPreset = (key) => {
   }
 };
 
+const handleToggleFestivalCheckbox = () => {
+  saveFestivalWishes();
+};
+
 const saveFestivalWishes = async () => {
   isSavingFestival.value = true;
   try {
     localStorage.setItem('ithunt_festival_wish', JSON.stringify(festivalWishData.value));
-    localStorage.removeItem('ithunt_festival_dismissed_until');
+    if (festivalWishData.value.isActive) {
+      localStorage.removeItem('ithunt_festival_dismissed_until');
+    }
   } catch (e) {}
   emit('update-festival-wish', { ...festivalWishData.value });
 
   try {
     const res = await updateFestivalWishInBackend(festivalWishData.value);
     if (res && res.success) {
-      emailActionMsg.value = `✓ Festival dynamically saved to Cloud DB & LIVE across ${festivalWishData.value.locationScope || 'all locations'}!`;
+      emailActionMsg.value = festivalWishData.value.isActive
+        ? `✓ Festival dynamically saved to Cloud DB & LIVE across ${festivalWishData.value.locationScope || 'all locations'}!`
+        : '✓ Celebration disabled & hidden across all locations and visitor tabs!';
     } else {
-      emailActionMsg.value = '✓ Festival wish saved & broadcasted!';
+      emailActionMsg.value = festivalWishData.value.isActive
+        ? '✓ Festival wish saved & broadcasted!'
+        : '✓ Celebration disabled across all tabs!';
     }
   } catch (err) {
-    emailActionMsg.value = '✓ Festival wish saved!';
+    emailActionMsg.value = festivalWishData.value.isActive ? '✓ Festival wish saved!' : '✓ Celebration disabled!';
   } finally {
     isSavingFestival.value = false;
   }

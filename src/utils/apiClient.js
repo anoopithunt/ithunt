@@ -282,6 +282,11 @@ export async function apiRequest(endpoint, options = {}, isRetry = false) {
       token = JSON.parse(sessionStorage.getItem('ithunt_superadmin_auth') || '{}').token;
     } catch (e) { token = null; }
   }
+  if (!token && typeof localStorage !== 'undefined') {
+    try {
+      token = JSON.parse(localStorage.getItem('ithunt_superadmin_auth') || '{}').token;
+    } catch (e) { token = null; }
+  }
 
   if (!token && memoryToken) token = memoryToken;
 
@@ -500,6 +505,12 @@ export async function ensureAuthToken(forceFresh = false) {
           try {
             const sessToken = JSON.parse(sessionStorage.getItem('ithunt_superadmin_auth') || '{}').token;
             if (sessToken) return sessToken;
+          } catch (e) { }
+        }
+        if (typeof localStorage !== 'undefined') {
+          try {
+            const localToken = JSON.parse(localStorage.getItem('ithunt_superadmin_auth') || '{}').token;
+            if (localToken) return localToken;
           } catch (e) { }
         }
         if (memoryToken) return memoryToken;
@@ -1886,7 +1897,14 @@ export async function updateFestivalWishInBackend(wishData) {
   try {
     try {
       localStorage.setItem('ithunt_festival_wish', JSON.stringify(wishData));
-      localStorage.removeItem('ithunt_festival_dismissed_until');
+      if (wishData?.isActive) {
+        localStorage.removeItem('ithunt_festival_dismissed_until');
+      }
+      if (typeof BroadcastChannel !== 'undefined') {
+        const channel = new BroadcastChannel('ithunt_festival_sync');
+        channel.postMessage({ type: 'FESTIVAL_WISH_UPDATED', wish: wishData });
+        channel.close();
+      }
     } catch (e) {}
     const res = await API.updateFestivalWish(wishData);
     return { success: true, data: res?.data || res || wishData };

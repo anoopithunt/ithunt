@@ -107,21 +107,32 @@ export const AVAILABLE_LOCATION_SCOPES = [
   'Online / Remote Students Only'
 ];
 
+let currentMemoryWish = null;
+let currentMemoryPresets = null;
+
 /**
  * GET /api/festival-wish
  * Public endpoint: Fetches current active festival settings and presets dynamically from MongoDB Atlas
  */
 router.get('/', async (req, res) => {
   try {
-    const [wishSetting, presetsSetting] = await Promise.all([
-      SystemSetting.findOne({ key: FESTIVAL_WISH_SETTING_KEY }).lean().catch(() => null),
-      SystemSetting.findOne({ key: FESTIVAL_PRESETS_SETTING_KEY }).lean().catch(() => null)
-    ]);
+    let wishSetting = null;
+    let presetsSetting = null;
+    try {
+      [wishSetting, presetsSetting] = await Promise.all([
+        SystemSetting.findOne({ key: FESTIVAL_WISH_SETTING_KEY }).lean().catch(() => null),
+        SystemSetting.findOne({ key: FESTIVAL_PRESETS_SETTING_KEY }).lean().catch(() => null)
+      ]);
+    } catch (_) {}
 
-    const activeWish = wishSetting?.value || DEFAULT_FESTIVAL_PRESETS.diwali;
+    const defaultFallbackWish = {
+      ...DEFAULT_FESTIVAL_PRESETS.diwali,
+      isActive: false
+    };
+    const activeWish = wishSetting?.value || currentMemoryWish || defaultFallbackWish;
     const presets = {
       ...DEFAULT_FESTIVAL_PRESETS,
-      ...(presetsSetting?.value || {})
+      ...(presetsSetting?.value || currentMemoryPresets || {})
     };
 
     return res.json({
@@ -135,10 +146,14 @@ router.get('/', async (req, res) => {
     });
   } catch (error) {
     console.error('[API] Error loading festival wish:', error.message);
+    const defaultFallbackWish = {
+      ...DEFAULT_FESTIVAL_PRESETS.diwali,
+      isActive: false
+    };
     return res.status(200).json({
       success: true,
-      data: DEFAULT_FESTIVAL_PRESETS.diwali,
-      presets: DEFAULT_FESTIVAL_PRESETS,
+      data: currentMemoryWish || defaultFallbackWish,
+      presets: currentMemoryPresets || DEFAULT_FESTIVAL_PRESETS,
       locationScopes: AVAILABLE_LOCATION_SCOPES,
       fallback: true
     });
@@ -173,16 +188,26 @@ const updateFestivalWishHandler = async (req, res) => {
       updatedAt: new Date().toISOString()
     };
 
-    const setting = await SystemSetting.findOneAndUpdate(
-      { key: FESTIVAL_WISH_SETTING_KEY },
-      { $set: { value: normalizedWish } },
-      { new: true, upsert: true, setDefaultsOnInsert: true }
-    ).lean();
+    currentMemoryWish = normalizedWish;
+    let savedWish = normalizedWish;
+
+    try {
+      const setting = await SystemSetting.findOneAndUpdate(
+        { key: FESTIVAL_WISH_SETTING_KEY },
+        { $set: { value: normalizedWish } },
+        { new: true, upsert: true, setDefaultsOnInsert: true }
+      ).lean();
+      if (setting?.value) savedWish = setting.value;
+    } catch (dbErr) {
+      console.warn('[API] SystemSetting DB update fallback to memory:', dbErr?.message);
+    }
 
     return res.json({
       success: true,
-      message: 'Festival wish dynamically saved and live across all locations!',
-      data: setting.value
+      message: normalizedWish.isActive
+        ? 'Festival wish dynamically saved and live across all locations!'
+        : 'Celebration disabled across all locations and visitor tabs!',
+      data: savedWish
     });
   } catch (error) {
     console.error('[API] Error saving festival wish:', error);
